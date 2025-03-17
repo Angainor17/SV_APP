@@ -1,4 +1,4 @@
-package su.sv.app.ui.theme
+package su.sv.commonui.theme
 
 import android.app.Activity
 import android.os.Build

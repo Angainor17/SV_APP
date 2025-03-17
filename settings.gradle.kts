@@ -22,3 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "SV APP"
 include(":app")
 include(":commonarchitecture")
+include(":commonui")
+include(":reader")
+include(":main")
+include(":books")

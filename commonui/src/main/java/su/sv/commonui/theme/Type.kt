@@ -1,4 +1,4 @@
-package su.sv.app.ui.theme
+package su.sv.commonui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,4 +1,4 @@
-package su.sv.app.ui.theme
+package su.sv.commonui.theme
 
 import androidx.compose.ui.graphics.Color
 

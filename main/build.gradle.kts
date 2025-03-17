@@ -1,12 +1,13 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "su.sv.commonarchitecture"
+    namespace = "su.sv.main"
     compileSdk = 35
 
     defaultConfig {
@@ -32,18 +33,27 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+
+    // Модули-фичи
+    implementation(project(":books"))
+    implementation(project(":reader"))
+
+    // Модули-utils
+    implementation(project(":commonarchitecture"))
+    implementation(project(":commonui"))
 
     // DI
     implementation(libs.hilt.android)
-    implementation(libs.androidx.navigation.runtime.ktx)
     ksp(libs.hilt.android.compiler)
 
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.navigation.common.ktx)
+
 }
