@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
+    // UI
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
@@ -65,9 +66,6 @@ dependencies {
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-    implementation(libs.javapoet) // <-- added this https://github.com/google/dagger/issues/3282
-
-
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

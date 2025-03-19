@@ -40,15 +40,28 @@ android {
 
 dependencies {
 
+    // Модули-фичи
+    implementation(project(":reader"))
+
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
+    // UI
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // Compose
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material3)
+    implementation(platform(libs.androidx.compose.bom))
+
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
 }

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "su.sv.reader"
+    namespace = "su.sv.news"
     compileSdk = 35
 
     defaultConfig {
@@ -32,9 +32,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
