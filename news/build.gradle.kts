@@ -21,13 +21,12 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
-    // UI
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-
     // Compose
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+
+    // Network
+    implementation(libs.bundles.retrofit)
 
     // DI
     implementation(libs.hilt.android)

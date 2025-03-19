@@ -1,4 +1,4 @@
-package su.sv.news.root
+package su.sv.news.presentation.root
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

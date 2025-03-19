@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import su.sv.books.catalog.RootBooksCatalog
 import su.sv.info.rootinfo.RootInfo
 import su.sv.main.Screens
-import su.sv.news.root.RootNews
+import su.sv.news.presentation.root.RootNews
 import su.sv.wiki.root.RootWiki
 
 @Composable

@@ -35,15 +35,12 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
 
     // DI
     implementation(libs.hilt.android)
     implementation(libs.androidx.navigation.runtime.ktx)
     ksp(libs.hilt.android.compiler)
 
-    implementation(libs.material)
-    implementation(libs.androidx.navigation.common.ktx)
+    // Network
+    implementation(libs.bundles.retrofit)
 }
