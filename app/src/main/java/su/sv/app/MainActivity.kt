@@ -9,7 +9,6 @@ import su.sv.main.bottomnav.BottomNavigationBar
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
