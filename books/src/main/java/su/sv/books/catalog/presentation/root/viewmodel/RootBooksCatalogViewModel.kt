@@ -1,13 +1,13 @@
-package su.sv.books.catalog.presentation.root
+package su.sv.books.catalog.presentation.root.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import su.sv.books.catalog.domain.GetBooksListUseCase
 import su.sv.books.catalog.presentation.root.mapper.UiBookMapper
-import su.sv.books.catalog.presentation.root.model.UiRootNewsState
+import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import javax.inject.Inject
 
@@ -15,33 +15,37 @@ import javax.inject.Inject
 class RootBooksCatalogViewModel @Inject constructor(
     private val getBooksListUseCase: GetBooksListUseCase,
     private val uiMapper: UiBookMapper,
-) : BaseViewModel() {
+) : BaseViewModel(), RootBooksActions {
 
-    private val _state = MutableStateFlow<UiRootNewsState>(UiRootNewsState.Loading)
-    val state: Flow<UiRootNewsState> get() = _state
+    private val _state = MutableStateFlow<UiRootBooksState>(UiRootBooksState.Loading)
+    val state: StateFlow<UiRootBooksState> get() = _state
 
     init {
         loadBooks()
     }
 
     fun loadBooks() {
-        _state.value = UiRootNewsState.Loading
+        _state.value = UiRootBooksState.Loading
 
         viewModelScope.launch {
             getBooksListUseCase.execute().fold(
                 onSuccess = { list ->
                     _state.value = if (list.isEmpty()) {
-                        UiRootNewsState.EmptyState
+                        UiRootBooksState.EmptyState
                     } else {
-                        UiRootNewsState.Success(
+                        UiRootBooksState.Content(
                             books = uiMapper.fromDomainToUi(list)
                         )
                     }
                 },
                 onFailure = {
-                    _state.value = UiRootNewsState.Failure(it)
+                    _state.value = UiRootBooksState.Failure(it)
                 },
             )
         }
+    }
+
+    override fun onRetryClick() {
+        loadBooks()
     }
 }

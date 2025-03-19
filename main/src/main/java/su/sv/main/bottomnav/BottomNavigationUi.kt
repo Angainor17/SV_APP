@@ -17,7 +17,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import su.sv.books.catalog.RootBooksCatalog
+import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
 import su.sv.info.rootinfo.RootInfo
 import su.sv.main.Screens
 import su.sv.news.presentation.root.RootNews

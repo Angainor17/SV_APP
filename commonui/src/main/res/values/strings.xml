@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="common_error_title">Ошибка</string>
+    <string name="common_retry">Повторить</string>
+
+</resources>
