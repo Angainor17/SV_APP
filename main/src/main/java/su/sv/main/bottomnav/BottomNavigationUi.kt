@@ -1,7 +1,12 @@
 package su.sv.main.bottomnav
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -13,13 +18,19 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
 import su.sv.info.rootinfo.RootInfo
+import su.sv.main.R
 import su.sv.main.Screens
+import su.sv.main.res.BooksVector
 import su.sv.news.presentation.root.RootNews
 import su.sv.wiki.root.RootWiki
 
@@ -43,8 +54,9 @@ fun BottomNavigationBar() {
                             },
                             icon = {
                                 Icon(
-                                    navigationItem.icon,
-                                    contentDescription = navigationItem.label
+                                    imageVector = navigationItem.icon,
+                                    contentDescription = navigationItem.label,
+                                    modifier = Modifier.size(24.dp),
                                 )
                             },
                             onClick = {
@@ -62,25 +74,59 @@ fun BottomNavigationBar() {
             }
         }
     ) { paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = Screens.News.route,
-            modifier = Modifier.padding(
-                paddingValues = paddingValues,
-            )
-        ) {
-            composable(Screens.News.route) {
-                RootNews(navController)
-            }
-            composable(Screens.Books.route) {
-                RootBooksCatalog(navController)
-            }
-            composable(Screens.Wiki.route) {
-                RootWiki(navController)
-            }
-            composable(Screens.Info.route) {
-                RootInfo(navController)
-            }
+        BottomNavHost(navController, paddingValues)
+    }
+}
+
+@Composable
+private fun BottomNavHost(
+    navController: NavHostController,
+    paddingValues: PaddingValues
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Screens.News.route,
+        modifier = Modifier.padding(
+            paddingValues = paddingValues,
+        )
+    ) {
+        composable(Screens.News.route) {
+            RootNews(navController)
+        }
+        composable(Screens.Books.route) {
+            RootBooksCatalog(navController)
+        }
+        composable(Screens.Wiki.route) {
+            RootWiki(navController)
+        }
+        composable(Screens.Info.route) {
+            RootInfo(navController)
         }
     }
+}
+
+@Composable
+fun bottomNavigationItems(): List<BottomNavigationItem> {
+    return listOf(
+        BottomNavigationItem(
+            label = "News",
+            icon = Icons.Filled.Home,
+            route = Screens.News.route
+        ),
+        BottomNavigationItem(
+            label = "Books",
+            icon = Icons.Filled.BooksVector,
+            route = Screens.Books.route
+        ),
+        BottomNavigationItem(
+            label = "Wiki",
+            icon = ImageVector.vectorResource(R.drawable.ic_wikipedia),
+            route = Screens.Wiki.route
+        ),
+        BottomNavigationItem(
+            label = "Info",
+            icon = Icons.Filled.Info,
+            route = Screens.Info.route
+        ),
+    )
 }

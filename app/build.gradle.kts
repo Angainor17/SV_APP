@@ -52,23 +52,14 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-
-    implementation(libs.androidx.material3)
-
+    // Compose
     implementation(libs.bundles.coil)
+    implementation(libs.bundles.compose)
+    implementation(platform(libs.androidx.compose.bom))
 
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
     coreLibraryDesugaring(libs.code.desugaring)
 }
