@@ -1,21 +1,37 @@
 package su.sv.books.catalog.presentation.root.ui
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,8 +48,20 @@ import su.sv.commonui.theme.SVAPPTheme
 @Composable
 fun BookItem(item: UiBook, actions: RootBooksActions) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                actions
+            },
     ) {
+        Logo(item, actions)
+        InfoFooter(item)
+    }
+}
+
+@Composable
+private fun Logo(item: UiBook, actions: RootBooksActions) {
+    Box {
         AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
@@ -46,7 +74,47 @@ fun BookItem(item: UiBook, actions: RootBooksActions) {
             contentScale = ContentScale.Crop,
         )
 
-        InfoFooter(item)
+        // статус скачивания
+        BookDownloadStatus(item, actions)
+    }
+}
+
+@Composable
+private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions) {
+    Button(
+        onClick = {
+            if (!item.isDownloaded) {
+                actions.onAction(RootBookActions.OnDownloadBookClick(item))
+            }
+        },
+        contentPadding = PaddingValues(all = 3.dp),
+        shape = CircleShape,
+        border = BorderStroke(1.dp, Color.Gray),
+        modifier = Modifier
+            .align(Alignment.TopEnd)
+            .padding(top = 12.dp, end = 12.dp)
+            .size(42.dp),
+    ) {
+        if (item.isDownloading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(26.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        } else {
+            Image(
+                imageVector = ImageVector.vectorResource(
+                    if (item.isDownloaded) {
+                        R.drawable.ic_book_downloaded
+                    } else {
+                        R.drawable.ic_download
+                    }
+                ),
+                contentDescription = stringResource(R.string.books_download_status_content_description),
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
 
@@ -116,7 +184,7 @@ fun BookItemPreview() {
         dateFormatted = "25 февр. 2025",
 
         isDownloaded = false,
-        isDownloading = false,
+        isDownloading = true,
         fileUri = null,
     )
     SVAPPTheme {

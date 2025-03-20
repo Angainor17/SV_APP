@@ -73,7 +73,9 @@ class RootBooksCatalogViewModel @Inject constructor(
             RootBookActions.OnRetryClick -> {
                 loadBooks()
             }
-
+            is RootBookActions.OnBookClick -> {
+                // TODO: открытие карточки книги
+            }
             is RootBookActions.OnDownloadBookClick -> {
                 // TODO: permission!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 loadBook(action.book)
@@ -82,6 +84,8 @@ class RootBooksCatalogViewModel @Inject constructor(
     }
 
     private fun loadBook(book: UiBook) {
+        Timber.tag("voronin").d("VM loadBook = ${book.fileNameWithExt}")
+
         viewModelScope.launch {
             updateBookLoadingState(book, isLoading = true)
 
@@ -92,8 +96,9 @@ class RootBooksCatalogViewModel @Inject constructor(
                     fileNameWithExt = book.fileNameWithExt,
                 )
             )
-                .shareIn(viewModelScope, SharingStarted.Eagerly)
+                .shareIn(viewModelScope, SharingStarted.Lazily)
                 .collect { uri: Uri? ->
+                    Timber.tag("voronin").d("uri = $uri")
                     updateBookAfterDownload(uri, book)
                 }
         }
