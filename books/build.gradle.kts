@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":commonui"))
 
     // Compose
+    implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
 

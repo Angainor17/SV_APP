@@ -2,5 +2,8 @@
 <resources>
 
     <string name="books_empty_list_title"></string>
+    <string name="books_item_image_content_description">Обложка книги</string>
+
+    <string name="books_item_page_formatted">%s стр.</string>
 
 </resources>

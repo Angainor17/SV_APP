@@ -1,11 +1,16 @@
 package su.sv.books.catalog.presentation.root.mapper
 
+import su.sv.books.R
 import su.sv.books.catalog.domain.model.Book
 import su.sv.books.catalog.presentation.root.model.UiBook
+import su.sv.commonui.ext.formatDecimal
+import su.sv.commonui.managers.DateFormatter
+import su.sv.commonui.managers.ResourcesRepository
 import javax.inject.Inject
 
 class UiBookMapper @Inject constructor(
-
+    private val resRepo: ResourcesRepository,
+    private val dateFormatter: DateFormatter,
 ) {
 
     fun fromDomainToUi(domains: List<Book>): List<UiBook> {
@@ -16,8 +21,14 @@ class UiBookMapper @Inject constructor(
         return UiBook(
             id = domain.id,
             title = domain.title,
+            description = domain.description,
             image = domain.image,
             link = domain.link,
+            pagesCountFormatted = resRepo.getString(
+                R.string.books_item_page_formatted,
+                domain.pagesCount.formatDecimal()
+            ),
+            dateFormatted = dateFormatter.formatDateFull(domain.publicationDate),
             isDownloaded = domain.fileUri != null,
         )
     }

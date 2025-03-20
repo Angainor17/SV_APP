@@ -31,6 +31,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -60,12 +61,16 @@ dependencies {
 
     implementation(libs.androidx.material3)
 
+    implementation(libs.bundles.coil)
+
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    coreLibraryDesugaring(libs.code.desugaring)
 }
 
 subprojects {
