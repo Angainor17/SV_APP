@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,17 +19,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import su.sv.books.R
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
-import su.sv.books.catalog.presentation.root.viewmodel.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.RootBooksCatalogViewModel
+import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
+import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
+import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
 import su.sv.commonui.ui.LoadingIndicator
+import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.R as CommonR
 
 @Composable
 fun RootBooksCatalog(
-    navController: NavHostController,
+    navController: NavHostController, // TODO
     viewModel: RootBooksCatalogViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
+
+    OneTimeEffect(viewModel.oneTimeEffect) { effect ->
+        when (effect) {
+            is BooksListOneTimeEffect.ShowErrorSnackBar -> {
+//                val text  = LocalContext.current.getString(effect.textResId)
+                // TODO: show snackbar
+            }
+        }
+    }
 
     when (state.value) {
         is UiRootBooksState.Content -> {
@@ -36,15 +50,12 @@ fun RootBooksCatalog(
                 state = state.value as UiRootBooksState.Content,
             )
         }
-
         UiRootBooksState.EmptyState -> {
             NoBooks()
         }
-
         UiRootBooksState.Loading -> {
             Loading()
         }
-
         is UiRootBooksState.Failure -> {
             Error(actions = viewModel)
         }
@@ -86,7 +97,7 @@ fun Error(actions: RootBooksActions) {
                 horizontal = 16.dp,
                 vertical = 6.dp,
             ),
-            onClick = { actions.onRetryClick() },
+            onClick = { actions.onAction(RootBookActions.OnRetryClick) },
         ) {
             Text(
                 text = stringResource(CommonR.string.common_retry),

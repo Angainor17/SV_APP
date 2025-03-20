@@ -1,5 +1,6 @@
 package su.sv.books.catalog.presentation.root.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +25,9 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.root.model.UiBook
-import su.sv.books.catalog.presentation.root.viewmodel.RootBooksActions
+import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
+import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
+import su.sv.commonui.theme.SVAPPTheme
 
 @Composable
 fun BookItem(item: UiBook, actions: RootBooksActions) {
@@ -48,7 +52,11 @@ fun BookItem(item: UiBook, actions: RootBooksActions) {
 
 @Composable
 private fun InfoFooter(item: UiBook) {
-    Column {
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.secondary)
+    ) {
+        Spacer(Modifier.height(4.dp))
         Text(
             text = item.title,
             fontSize = 17.sp,
@@ -71,20 +79,48 @@ private fun InfoFooter(item: UiBook) {
 
 @Composable
 @Preview
+fun InfoFooterPreview() {
+    val item = UiBook(
+        id = "id",
+        title = "Государство и Революция",
+        description = "В. И. Ленин",
+        image = "https://picsum.photos/300/300",
+        downloadUrl = "link",
+        fileNameWithExt = "1.pdf",
+        pagesCountFormatted = "323 стр.",
+        dateFormatted = "25 февр. 2025",
+
+        isDownloaded = false,
+        isDownloading = true,
+        fileUri = null,
+    )
+    SVAPPTheme {
+        InfoFooter(item)
+    }
+}
+
+@Composable
+@Preview
 fun BookItemPreview() {
     val actions = object : RootBooksActions {
-        override fun onRetryClick() = Unit
+        override fun onAction(action: RootBookActions) = Unit
     }
     val item = UiBook(
         id = "id",
-        title = "title",
-        description = "description",
-        image = "image",
-        link = "link",
-        pagesCountFormatted = "pagesCountFormatted",
-        dateFormatted = "dateFormatted",
+        title = "Государство и Революция",
+        description = "В. И. Ленин",
+        image = "https://picsum.photos/300/300",
+        downloadUrl = "link",
+        fileNameWithExt = "1.pdf",
+        pagesCountFormatted = "323 стр.",
+        dateFormatted = "25 февр. 2025",
+
         isDownloaded = false,
+        isDownloading = false,
+        fileUri = null,
     )
-    BookItem(item, actions)
+    SVAPPTheme {
+        BookItem(item, actions)
+    }
 }
 

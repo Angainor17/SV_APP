@@ -12,6 +12,7 @@ data class Book(
     val description: String,
     val image: String,
     val link: String,
+    val fileNameWithExt: String,
     val pagesCount: Int,
     val publicationDate: LocalDate,
 

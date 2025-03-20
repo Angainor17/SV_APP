@@ -27,6 +27,10 @@ dependencies {
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.ui.tooling)
+
+    // Logging
+    implementation(libs.timber)
 
     // DI
     implementation(libs.hilt.android)

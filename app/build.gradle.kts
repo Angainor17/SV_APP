@@ -52,6 +52,9 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
+    // Logging
+    implementation(libs.timber)
+
     // Compose
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)

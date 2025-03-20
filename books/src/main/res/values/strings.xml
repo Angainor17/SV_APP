@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="books_empty_list_title"></string>
+    <string name="books_empty_list_title">Список книг пуст</string>
     <string name="books_item_image_content_description">Обложка книги</string>
 
     <string name="books_item_page_formatted">%s стр.</string>
+    <string name="books_download_description">Файл скачан</string>
+    <string name="books_download_snack_error">Ошибка загрузки файла</string>
 
 </resources>

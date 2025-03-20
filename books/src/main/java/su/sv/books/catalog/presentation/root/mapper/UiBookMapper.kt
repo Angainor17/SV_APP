@@ -23,13 +23,17 @@ class UiBookMapper @Inject constructor(
             title = domain.title,
             description = domain.description,
             image = domain.image,
-            link = domain.link,
+            downloadUrl = domain.link,
+            fileNameWithExt = domain.fileNameWithExt,
             pagesCountFormatted = resRepo.getString(
                 R.string.books_item_page_formatted,
                 domain.pagesCount.formatDecimal()
             ),
             dateFormatted = dateFormatter.formatDateFull(domain.publicationDate),
+
             isDownloaded = domain.fileUri != null,
+            isDownloading = false,
+            fileUri = domain.fileUri,
         )
     }
 }

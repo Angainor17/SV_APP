@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
-import su.sv.books.catalog.presentation.root.viewmodel.RootBooksActions
+import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 
 @Composable
 fun BookList(
@@ -20,7 +20,7 @@ fun BookList(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 8.dp)
     ) {
         state.books.forEach { book ->
             item(key = book.id) {

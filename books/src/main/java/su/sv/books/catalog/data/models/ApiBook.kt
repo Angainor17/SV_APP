@@ -10,4 +10,5 @@ class ApiBook(
     val image: String?,
     val publicationDate: LocalDate?,
     val link: String?,
+    val fileNameWithExt: String?,
 )

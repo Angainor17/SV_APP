@@ -1,5 +1,8 @@
 package su.sv.books.catalog.presentation.root.model
 
+/**
+ * Все состояния экрана со списка книг
+ */
 sealed class UiRootBooksState {
 
     data class Content(
