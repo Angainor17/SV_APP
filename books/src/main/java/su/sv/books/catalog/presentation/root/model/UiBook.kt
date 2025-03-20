@@ -1,5 +1,10 @@
 package su.sv.books.catalog.presentation.root.model
 
+import android.net.Uri
+
+/**
+ * Отображение информации о книге в списке
+ */
 data class UiBook(
 
     /** Идентификатор для хранения */
@@ -15,14 +20,23 @@ data class UiBook(
     val image: String,
 
     /** Ссылка для скачивания */
-    val link: String,
+    val downloadUrl: String,
+
+    /** Имя скачиваемого файла с раширением. Типо "Lenin.pdf" */
+    val fileNameWithExt: String,
 
     /** Количество страниц в формате "1 231 стр." */
     val pagesCountFormatted: String,
 
-    /** Дата публикации книги в формате "6 дек. 2021 г." */
+    /** Дата публикации книги в формате "6 дек. 2021" */
     val dateFormatted: String,
+
+    /** Скачанный файл */
+    val fileUri: Uri?,
 
     /** Есть ли в кеше скачанный файл */
     val isDownloaded: Boolean,
+
+    /** Происходит ли сейчас скачивание файла */
+    val isDownloading: Boolean,
 )
