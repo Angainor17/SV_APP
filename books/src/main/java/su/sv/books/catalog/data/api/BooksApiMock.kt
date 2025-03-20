@@ -19,7 +19,7 @@ class BooksApiMock @Inject constructor() : BooksApi {
                 pagesCount = 746,
                 publicationDate = LocalDate.now().minusYears(1),
                 link = "",
-                fileNameWithExt = "",
+                fileNameWithExt = "asdasdasd.pdf",
             ),
             ApiBook(
                 id = "1",

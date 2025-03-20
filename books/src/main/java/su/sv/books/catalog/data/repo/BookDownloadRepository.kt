@@ -9,12 +9,16 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import android.os.Environment.DIRECTORY_DOWNLOADS
+import androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
+import androidx.core.content.ContextCompat.registerReceiver
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import su.sv.books.R
 import su.sv.commonui.managers.ResourcesRepository
+import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 class BookDownloadRepository @Inject constructor(
@@ -56,17 +60,19 @@ class BookDownloadRepository @Inject constructor(
         receiver = createReceiver(downloadID, onComplete)
 
         // слушаем результат скачивания
-        context.registerReceiver(receiver, downloadIntentFilter)
+        registerReceiver(context, receiver, downloadIntentFilter, RECEIVER_NOT_EXPORTED)
 
         return flow
     }
 
     /**
      * Получаем адрес скачановго файла
+     * Может отсутствовать
      */
-    fun getDownloadsUri(fileNameWithExt: String): Uri {
-        val file = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
-        return Uri.withAppendedPath(Uri.fromFile(file), fileNameWithExt)
+    fun getDownloadsUri(fileNameWithExt: String): Uri? {
+        val folder = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
+        val uri = Uri.withAppendedPath(Uri.fromFile(folder), fileNameWithExt)
+        return uri.takeIf { File(it.path.orEmpty()).exists() }
     }
 
     private fun createReceiver(
@@ -75,6 +81,8 @@ class BookDownloadRepository @Inject constructor(
     ): BroadcastReceiver {
         return object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                Timber.tag("voronin").d("onReceive")
+
                 if (DownloadManager.ACTION_DOWNLOAD_COMPLETE != intent.action) return
 
                 val query = DownloadManager.Query().setFilterById(downloadID)
@@ -88,7 +96,6 @@ class BookDownloadRepository @Inject constructor(
                         DownloadManager.STATUS_SUCCESSFUL -> {
                             onComplete(true)
                         }
-
                         DownloadManager.STATUS_FAILED -> {
                             onComplete(false)
                         }

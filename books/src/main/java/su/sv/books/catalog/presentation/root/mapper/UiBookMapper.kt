@@ -6,6 +6,7 @@ import su.sv.books.catalog.presentation.root.model.UiBook
 import su.sv.commonui.ext.formatDecimal
 import su.sv.commonui.managers.DateFormatter
 import su.sv.commonui.managers.ResourcesRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class UiBookMapper @Inject constructor(
@@ -18,6 +19,8 @@ class UiBookMapper @Inject constructor(
     }
 
     private fun fromDomainToUi(domain: Book): UiBook {
+        Timber.tag("voronin").d("${domain.fileNameWithExt} = ${domain.fileUri}")
+
         return UiBook(
             id = domain.id,
             title = domain.title,
