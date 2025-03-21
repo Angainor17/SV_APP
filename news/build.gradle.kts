@@ -8,7 +8,7 @@ plugins {
 
 
 apply(
-    from = "${project.rootDir}/gradle/android_feature_commons.kts"
+    from = "${project.rootDir}/android_feature_commons.kts"
 )
 
 android {
