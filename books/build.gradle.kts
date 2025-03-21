@@ -7,11 +7,15 @@ plugins {
 }
 
 apply(
-    from = "${project.rootDir}/gradle/android_feature_commons.kts"
+    from = "${project.rootDir}/android_feature_commons.kts"
 )
 
 android {
     namespace = "su.sv.books"
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -40,4 +44,7 @@ dependencies {
     // Network
     implementation(libs.bundles.retrofit)
     implementation(libs.retrofit2.kotlin.coroutines.adapter)
+
+    // code desugaring (for java.time)
+    coreLibraryDesugaring(libs.code.desugaring)
 }

@@ -20,6 +20,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "SV APP"
+
 include(":app")
 include(":commonarchitecture")
 include(":commonui")
