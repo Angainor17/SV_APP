@@ -7,6 +7,7 @@ sealed class UiRootBooksState {
 
     data class Content(
         val books: List<UiBook>,
+        val isRefreshing: Boolean = false,
     ) : UiRootBooksState()
 
     object EmptyState : UiRootBooksState()

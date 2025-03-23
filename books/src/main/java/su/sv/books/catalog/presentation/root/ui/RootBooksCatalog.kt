@@ -9,12 +9,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import su.sv.books.R
@@ -34,14 +36,7 @@ fun RootBooksCatalog(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
-    OneTimeEffect(viewModel.oneTimeEffect) { effect ->
-        when (effect) {
-            is BooksListOneTimeEffect.ShowErrorSnackBar -> {
-//                val text  = LocalContext.current.getString(effect.textResId)
-                // TODO: show snackbar
-            }
-        }
-    }
+    HandleEffects(viewModel)
 
     when (state.value) {
         is UiRootBooksState.Content -> {
@@ -58,6 +53,33 @@ fun RootBooksCatalog(
         }
         is UiRootBooksState.Failure -> {
             Error(actions = viewModel)
+        }
+    }
+}
+
+@Composable
+private fun HandleEffects(viewModel: RootBooksCatalogViewModel) {
+    OneTimeEffect(viewModel.oneTimeEffect) { effect ->
+        when (effect) {
+            is BooksListOneTimeEffect.ShowErrorSnackBar -> {
+//                Toast.makeText(, "", Toast.LENGTH_SHORT).show()
+
+//                val text  = LocalContext.current.getString(effect.textResId)
+                // TODO: show snackbar
+            }
+        }
+    }
+    HandleLifecycleEvents(viewModel)
+}
+
+@Composable
+private fun HandleLifecycleEvents(actions: RootBooksActions) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState = lifecycleOwner.lifecycle.currentStateFlow.collectAsState().value
+
+    LaunchedEffect(lifecycleState) {
+        if (lifecycleState == Lifecycle.State.RESUMED) {
+            actions.onAction(RootBookActions.UpdateStates)
         }
     }
 }

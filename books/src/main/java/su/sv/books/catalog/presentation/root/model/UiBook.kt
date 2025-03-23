@@ -34,9 +34,6 @@ data class UiBook(
     /** Скачанный файл */
     val fileUri: Uri?,
 
-    /** Есть ли в кеше скачанный файл */
-    val isDownloaded: Boolean,
-
-    /** Происходит ли сейчас скачивание файла */
-    val isDownloading: Boolean,
+    /** Наличие скачанного файла */
+    val downloadState: UIBookState,
 )
