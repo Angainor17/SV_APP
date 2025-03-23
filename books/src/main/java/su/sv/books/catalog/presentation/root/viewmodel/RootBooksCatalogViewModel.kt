@@ -55,21 +55,16 @@ class RootBooksCatalogViewModel @Inject constructor(
     private val loadingInProgressMap = hashMapOf<Long, String>()
 
     init {
-        Timber.tag("voronin").d("RootBooksCatalogViewModel init $this")
         loadBooks()
         subscribeToEvents()
     }
 
     private fun subscribeToEvents() {
         viewModelScope.launch {
-            Timber.tag("voronin")
-                .d("BookDownloadedActionHandler init ${bookDownloadedActionHandler.get()}")
             bookDownloadedActionHandler.get().sharedStateFlow.shareIn(
                 viewModelScope,
-                SharingStarted.Eagerly,
-                replay = 1,
+                SharingStarted.WhileSubscribed(),
             ).collect {
-                Timber.tag("voronin").d("bookDownloadedActionHandler sharedStateFlow collect")
                 handleDownloadedBook(it)
             }
         }

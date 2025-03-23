@@ -53,8 +53,8 @@ class BookDownloadRepository @Inject constructor(
         return uri.takeIf {
             val file = File(it.path.orEmpty())
             val fileSize = file.length() / 1024
-            Timber.tag("voronin").d("$fileNameWithExt = size ${fileSize} | exists ${file.exists()}")
+
             file.exists() && fileSize > 0
-        } // TODO: тут надо чекать на наличие или размер. А то в очереди может быть
+        }
     }
 }
