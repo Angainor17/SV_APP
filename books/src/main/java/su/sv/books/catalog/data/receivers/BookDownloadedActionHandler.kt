@@ -2,7 +2,6 @@ package su.sv.books.catalog.data.receivers
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,12 +15,8 @@ class BookDownloadedActionHandler @Inject constructor() {
     private val _sharedStateFlow = MutableSharedFlow<BookState>()
     val sharedStateFlow: SharedFlow<BookState> get() = _sharedStateFlow
 
-    init {
-        Timber.tag("voronin").d("BookDownloadedActionHandler init $this")
-    }
-
-    fun postFileDownloaded(downloadID: Long) {
-        _sharedStateFlow.tryEmit(
+    suspend fun postFileDownloaded(downloadID: Long) {
+        _sharedStateFlow.emit(
             BookState(
                 downloadID = downloadID,
             )
