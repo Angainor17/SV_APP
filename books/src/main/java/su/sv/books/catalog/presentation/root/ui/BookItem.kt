@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
+import su.sv.books.catalog.presentation.root.model.UIBookState
 import su.sv.books.catalog.presentation.root.model.UiBook
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
@@ -83,37 +85,49 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
 private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions) {
     Button(
         onClick = {
-            if (!item.isDownloaded) {
+            if (item.downloadState == UIBookState.AVAILABLE_TO_DOWNLOAD) {
                 actions.onAction(RootBookActions.OnDownloadBookClick(item))
             }
         },
         contentPadding = PaddingValues(all = 3.dp),
         shape = CircleShape,
         border = BorderStroke(1.dp, Color.Gray),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.tertiaryContainer,
+        ),
         modifier = Modifier
             .align(Alignment.TopEnd)
             .padding(top = 12.dp, end = 12.dp)
             .size(42.dp),
     ) {
-        if (item.isDownloading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(26.dp),
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-        } else {
-            Image(
-                imageVector = ImageVector.vectorResource(
-                    if (item.isDownloaded) {
-                        R.drawable.ic_book_downloaded
-                    } else {
-                        R.drawable.ic_download
-                    }
-                ),
-                contentDescription = stringResource(R.string.books_download_status_content_description),
-                modifier = Modifier.fillMaxSize(),
-            )
+        when (item.downloadState) {
+            UIBookState.DOWNLOADED -> {
+                Image(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_book_downloaded),
+                    contentDescription = stringResource(R.string.books_download_status_content_description),
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .fillMaxSize(),
+                )
+            }
+            UIBookState.AVAILABLE_TO_DOWNLOAD -> {
+                Image(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_download),
+                    contentDescription = stringResource(R.string.books_download_status_content_description),
+                    modifier = Modifier
+                        .padding(3.dp)
+                        .fillMaxSize(),
+                )
+            }
+            UIBookState.DOWNLOADING -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(26.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = Color.Magenta,
+                )
+            }
         }
     }
 }
@@ -122,7 +136,8 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
 private fun InfoFooter(item: UiBook) {
     Column(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+            .padding(all = 4.dp)
     ) {
         Spacer(Modifier.height(4.dp))
         Text(
@@ -130,23 +145,36 @@ private fun InfoFooter(item: UiBook) {
             fontSize = 17.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onTertiary,
             fontWeight = FontWeight.Bold,
         )
         Spacer(Modifier.width(4.dp))
-        Text(item.description)
+        Text(
+            text = item.description,
+            color = MaterialTheme.colorScheme.onTertiary,
+        )
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(item.dateFormatted)
-            Text(item.pagesCountFormatted)
+            Text(
+                text = item.dateFormatted,
+                color = MaterialTheme.colorScheme.onTertiary,
+            )
+            Text(
+                text = item.pagesCountFormatted,
+                color = MaterialTheme.colorScheme.onTertiary,
+            )
         }
     }
 }
 
 @Composable
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
 fun InfoFooterPreview() {
     val item = UiBook(
         id = "id",
@@ -158,17 +186,17 @@ fun InfoFooterPreview() {
         pagesCountFormatted = "323 стр.",
         dateFormatted = "25 февр. 2025",
 
-        isDownloaded = false,
-        isDownloading = true,
+        downloadState = UIBookState.DOWNLOADED,
         fileUri = null,
     )
-    SVAPPTheme {
-        InfoFooter(item)
-    }
+    InfoFooter(item)
 }
 
 @Composable
-@Preview
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
 fun BookItemPreview() {
     val actions = object : RootBooksActions {
         override fun onAction(action: RootBookActions) = Unit
@@ -183,8 +211,7 @@ fun BookItemPreview() {
         pagesCountFormatted = "323 стр.",
         dateFormatted = "25 февр. 2025",
 
-        isDownloaded = false,
-        isDownloading = true,
+        downloadState = UIBookState.DOWNLOADING,
         fileUri = null,
     )
     SVAPPTheme {

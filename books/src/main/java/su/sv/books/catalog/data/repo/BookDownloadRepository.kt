@@ -1,20 +1,13 @@
 package su.sv.books.catalog.data.repo
 
 import android.app.DownloadManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.DOWNLOAD_SERVICE
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.os.Environment
 import android.os.Environment.DIRECTORY_DOWNLOADS
-import androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
-import androidx.core.content.ContextCompat.registerReceiver
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import su.sv.books.R
 import su.sv.commonui.managers.ResourcesRepository
 import timber.log.Timber
@@ -26,8 +19,6 @@ class BookDownloadRepository @Inject constructor(
     private val resourcesRepository: ResourcesRepository,
 ) {
 
-    private val downloadIntentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-
     private val downloadManager by lazy {
         context.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
     }
@@ -35,34 +26,21 @@ class BookDownloadRepository @Inject constructor(
     /**
      * Запускаем скачивание файла и ждём результат
      */
-    fun downloadBook(url: String, bookTitle: String, fileNameWithExt: String): Flow<Uri?> {
+    fun downloadBook(url: String, bookTitle: String, fileNameWithExt: String): Long {
         val request = DownloadManager.Request(url.toUri())
             .setTitle(bookTitle)
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION)
-            .setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, fileNameWithExt)
             .setDescription(resourcesRepository.getString(R.string.books_download_description))
+
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, fileNameWithExt)
+
             .setRequiresCharging(false)
             .setAllowedOverMetered(true)
             .setAllowedOverRoaming(true)
 
-        val flow = MutableSharedFlow<Uri?>()
         val downloadID = downloadManager.enqueue(request)
-        var receiver: BroadcastReceiver? = null
-
-        val onComplete = fun(isSuccess: Boolean) {
-            // перестаём слушать после получения результата скачивания
-            context.unregisterReceiver(receiver)
-
-            flow.tryEmit(
-                if (isSuccess) getDownloadsUri(fileNameWithExt) else null
-            )
-        }
-        receiver = createReceiver(downloadID, onComplete)
-
-        // слушаем результат скачивания
-        registerReceiver(context, receiver, downloadIntentFilter, RECEIVER_NOT_EXPORTED)
-
-        return flow
+        Timber.tag("voronin").d("downloadID = $downloadID")
+        return downloadID
     }
 
     /**
@@ -72,36 +50,11 @@ class BookDownloadRepository @Inject constructor(
     fun getDownloadsUri(fileNameWithExt: String): Uri? {
         val folder = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
         val uri = Uri.withAppendedPath(Uri.fromFile(folder), fileNameWithExt)
-        return uri.takeIf { File(it.path.orEmpty()).exists() }
-    }
-
-    private fun createReceiver(
-        downloadID: Long,
-        onComplete: (Boolean) -> Unit,
-    ): BroadcastReceiver {
-        return object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Timber.tag("voronin").d("onReceive")
-
-                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE != intent.action) return
-
-                val query = DownloadManager.Query().setFilterById(downloadID)
-                val cursor = downloadManager.query(query)
-
-                if (cursor.moveToFirst()) {
-                    val columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-                    if (columnIndex < 0) return
-
-                    when (cursor.getInt(columnIndex)) {
-                        DownloadManager.STATUS_SUCCESSFUL -> {
-                            onComplete(true)
-                        }
-                        DownloadManager.STATUS_FAILED -> {
-                            onComplete(false)
-                        }
-                    }
-                }
-            }
-        }
+        return uri.takeIf {
+            val file = File(it.path.orEmpty())
+            val fileSize = file.length() / 1024
+            Timber.tag("voronin").d("$fileNameWithExt = size ${fileSize} | exists ${file.exists()}")
+            file.exists() && fileSize > 0
+        } // TODO: тут надо чекать на наличие или размер. А то в очереди может быть
     }
 }

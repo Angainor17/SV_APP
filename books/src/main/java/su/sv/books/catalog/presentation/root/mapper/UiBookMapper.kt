@@ -2,6 +2,7 @@ package su.sv.books.catalog.presentation.root.mapper
 
 import su.sv.books.R
 import su.sv.books.catalog.domain.model.Book
+import su.sv.books.catalog.presentation.root.model.UIBookState
 import su.sv.books.catalog.presentation.root.model.UiBook
 import su.sv.commonui.ext.formatDecimal
 import su.sv.commonui.managers.DateFormatter
@@ -34,8 +35,10 @@ class UiBookMapper @Inject constructor(
             ),
             dateFormatted = dateFormatter.formatDateFull(domain.publicationDate),
 
-            isDownloaded = domain.fileUri != null,
-            isDownloading = false,
+            downloadState = when {
+                domain.fileUri != null -> UIBookState.DOWNLOADED
+                else -> UIBookState.AVAILABLE_TO_DOWNLOAD
+            },
             fileUri = domain.fileUri,
         )
     }

@@ -51,6 +51,18 @@ class BooksApiMock @Inject constructor() : BooksApi {
                 publicationDate = LocalDate.now().minusDays(22).minusMonths(1),
                 fileNameWithExt = "Hegel_T1.pdf",
             ),
+            ApiBook(
+                id = "4",
+                title = "РЕВОЛЮЦИЯ И КОНТРРЕВОЛЮЦИЯ В СССР",
+                description = "Казеннов А. С., Попов М. В.",
+                image = "https://frafond.ru/wp-content/uploads/2022/04/calibre2-750x375.jpg",
+                pagesCount = 544,
+                link = "https://frafond.ru/wp-content/uploads/2022/04/" +
+                        "REVOLYUTSIYA-I-KONTRREVOLYUTSIYA-V-S-Aleksandr-Sergeevich-Kazennov-_2983.pdf",
+                publicationDate = LocalDate.now().minusDays(22).minusMonths(1),
+                fileNameWithExt = "REVOLYUTSIYA-I-KONTRREVOLYUTSIYA-V-S-Aleksandr-Sergeevich-Kazennov-_2983.pdf",
+            ),
+
         )
     }
 }
