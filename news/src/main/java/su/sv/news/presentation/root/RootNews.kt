@@ -8,10 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 
 @Composable
-fun RootNews(navController: NavHostController, viewModel: RootNewsViewModel = hiltViewModel()) {
+fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primary)

@@ -25,6 +25,7 @@ import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
+import su.sv.commonui.managers.ResourcesRepository
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,6 +38,8 @@ import javax.inject.Inject
 class RootBooksCatalogViewModel @Inject constructor(
     private val getBooksListUseCase: GetBooksListUseCase,
     private val uiMapper: UiBookMapper,
+
+    private val resourcesRepository: Lazy<ResourcesRepository>,
 
     private val downloadBookUseCase: Lazy<DownloadBookUseCase>,
     private val getBookUriUseCase: Lazy<GetBookUriUseCase>,
@@ -135,10 +138,9 @@ class RootBooksCatalogViewModel @Inject constructor(
                 updateDownloadingStates()
             }
             is RootBookActions.OnBookClick -> {
-                // TODO: открытие карточки книги
+                _oneTimeEffect.trySend(BooksListOneTimeEffect.OpenBook(action.book))
             }
             is RootBookActions.OnDownloadBookClick -> {
-                // TODO: permission!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 loadBook(action.book)
             }
         }
@@ -218,7 +220,11 @@ class RootBooksCatalogViewModel @Inject constructor(
     }
 
     private fun showErrorSnack(textResId: Int) {
-        _oneTimeEffect.trySend(BooksListOneTimeEffect.ShowErrorSnackBar(textResId))
+        _oneTimeEffect.trySend(
+            BooksListOneTimeEffect.ShowErrorSnackBar(
+                text = resourcesRepository.get().getString(textResId)
+            )
+        )
     }
 
     private fun updateState(action: (UiRootBooksState.Content) -> UiRootBooksState.Content) {

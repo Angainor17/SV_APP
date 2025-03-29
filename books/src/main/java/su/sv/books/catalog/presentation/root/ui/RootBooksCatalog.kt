@@ -1,15 +1,22 @@
 package su.sv.books.catalog.presentation.root.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,8 +25,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.forward
+import kotlinx.coroutines.launch
 import su.sv.books.R
+import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.RootBooksCatalogViewModel
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
@@ -29,43 +39,61 @@ import su.sv.commonui.ui.LoadingIndicator
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.R as CommonR
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RootBooksCatalog(
-    navController: NavHostController, // TODO
     viewModel: RootBooksCatalogViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    HandleEffects(viewModel)
+    HandleEffects(viewModel, snackbarHostState)
 
-    when (state.value) {
-        is UiRootBooksState.Content -> {
-            BookList(
-                actions = viewModel,
-                state = state.value as UiRootBooksState.Content,
-            )
-        }
-        UiRootBooksState.EmptyState -> {
-            NoBooks()
-        }
-        UiRootBooksState.Loading -> {
-            Loading()
-        }
-        is UiRootBooksState.Failure -> {
-            Error(actions = viewModel)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+    ) { contentPadding ->
+        when (state.value) {
+            is UiRootBooksState.Content -> {
+                BookList(
+                    actions = viewModel,
+                    state = state.value as UiRootBooksState.Content,
+                )
+            }
+            UiRootBooksState.EmptyState -> {
+                NoBooks()
+            }
+            UiRootBooksState.Loading -> {
+                Loading()
+            }
+            is UiRootBooksState.Failure -> {
+                Error(actions = viewModel)
+            }
         }
     }
 }
 
 @Composable
-private fun HandleEffects(viewModel: RootBooksCatalogViewModel) {
+private fun HandleEffects(
+    viewModel: RootBooksCatalogViewModel,
+    snackbarHostState: SnackbarHostState
+) {
+    val scope = rememberCoroutineScope()
+    val stackNavigation = LocalStackNavigation.current
+
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
+            is BooksListOneTimeEffect.OpenBook -> {
+                stackNavigation.forward(BookDetailScreen(effect.book))
+            }
             is BooksListOneTimeEffect.ShowErrorSnackBar -> {
-//                Toast.makeText(, "", Toast.LENGTH_SHORT).show()
-
-//                val text  = LocalContext.current.getString(effect.textResId)
-                // TODO: show snackbar
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = effect.text,
+                        duration = SnackbarDuration.Short,
+                    )
+                }
             }
         }
     }

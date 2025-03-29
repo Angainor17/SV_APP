@@ -1,9 +1,13 @@
 package su.sv.books.catalog.presentation.root.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 /**
  * Статус скачивания файла
  */
-enum class UIBookState {
+@Parcelize
+enum class UIBookState : Parcelable {
 
     /** Происходит ли сейчас скачивание файла */
     DOWNLOADING,

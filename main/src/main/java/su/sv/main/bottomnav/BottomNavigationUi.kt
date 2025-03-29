@@ -35,7 +35,7 @@ import su.sv.news.presentation.root.RootNews
 import su.sv.wiki.root.RootWiki
 
 @Composable
-fun BottomNavigationBar() {
+internal fun BottomNavigationBar() {
     var navigationSelectedItem by remember {
         mutableIntStateOf(0)
     }
@@ -72,7 +72,7 @@ fun BottomNavigationBar() {
                         )
                     }
             }
-        }
+        },
     ) { paddingValues ->
         BottomNavHost(navController, paddingValues)
     }
@@ -91,16 +91,16 @@ private fun BottomNavHost(
         )
     ) {
         composable(Screens.News.route) {
-            RootNews(navController)
+            RootNews()
         }
         composable(Screens.Books.route) {
-            RootBooksCatalog(navController)
+            RootBooksCatalog()
         }
         composable(Screens.Wiki.route) {
-            RootWiki(navController)
+            RootWiki()
         }
         composable(Screens.Info.route) {
-            RootInfo(navController)
+            RootInfo()
         }
     }
 }
