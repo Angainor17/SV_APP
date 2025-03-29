@@ -1,6 +1,6 @@
 package su.sv.books.catalog.presentation.root.viewmodel.effects
 
-import androidx.annotation.StringRes
+import su.sv.books.catalog.presentation.root.model.UiBook
 
 /**
  * Единожды отображаемые события на экране списка книг
@@ -9,6 +9,11 @@ sealed class BooksListOneTimeEffect {
 
     /** Отображение снека об ошибке */
     data class ShowErrorSnackBar(
-        @StringRes val textResId: Int,
+        val text: String,
+    ) : BooksListOneTimeEffect()
+
+    /** Отображение информации о книге */
+    data class OpenBook(
+        val book: UiBook,
     ) : BooksListOneTimeEffect()
 }

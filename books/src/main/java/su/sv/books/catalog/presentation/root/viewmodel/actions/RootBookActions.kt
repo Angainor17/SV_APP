@@ -16,6 +16,6 @@ sealed class RootBookActions {
     /** Нажатие на иконку загрузки у книги */
     data class OnDownloadBookClick(val book: UiBook) : RootBookActions()
 
-    /** Нажатие на сам элемент */
+    /** Нажатие на сам элемент списка */
     data class OnBookClick(val book: UiBook) : RootBookActions()
 }

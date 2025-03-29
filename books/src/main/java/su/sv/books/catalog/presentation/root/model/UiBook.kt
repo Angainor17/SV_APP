@@ -1,10 +1,13 @@
 package su.sv.books.catalog.presentation.root.model
 
 import android.net.Uri
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * Отображение информации о книге в списке
  */
+@Parcelize
 data class UiBook(
 
     /** Идентификатор для хранения */
@@ -36,4 +39,4 @@ data class UiBook(
 
     /** Наличие скачанного файла */
     val downloadState: UIBookState,
-)
+) : Parcelable

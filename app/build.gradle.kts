@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
 
+    // Navigation
+    implementation(libs.modo.compose)
+
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

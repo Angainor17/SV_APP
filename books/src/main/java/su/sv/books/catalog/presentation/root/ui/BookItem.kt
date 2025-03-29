@@ -53,7 +53,7 @@ fun BookItem(item: UiBook, actions: RootBooksActions) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                actions
+                actions.onAction(RootBookActions.OnBookClick(item))
             },
     ) {
         Logo(item, actions)
