@@ -17,9 +17,15 @@ android {
 
 dependencies {
 
+    // Модули-common
+    implementation(project(":models"))
+
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
+
+    // Navigation
+    implementation(libs.modo.compose)
 
     // Compose
     implementation(libs.bundles.compose)

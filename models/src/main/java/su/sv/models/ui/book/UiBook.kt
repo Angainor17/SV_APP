@@ -1,4 +1,4 @@
-package su.sv.books.catalog.presentation.root.model
+package su.sv.models.ui.book
 
 import android.net.Uri
 import android.os.Parcelable

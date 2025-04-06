@@ -41,11 +41,11 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
-import su.sv.books.catalog.presentation.root.model.UIBookState
-import su.sv.books.catalog.presentation.root.model.UiBook
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.models.ui.book.UiBook
+import su.sv.models.ui.book.UIBookState
 
 @Composable
 fun BookItem(item: UiBook, actions: RootBooksActions) {
@@ -111,6 +111,7 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
                         .fillMaxSize(),
                 )
             }
+
             UIBookState.AVAILABLE_TO_DOWNLOAD -> {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_download),
@@ -120,6 +121,7 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
                         .fillMaxSize(),
                 )
             }
+
             UIBookState.DOWNLOADING -> {
                 CircularProgressIndicator(
                     modifier = Modifier.size(26.dp),
