@@ -18,14 +18,14 @@ import su.sv.books.catalog.domain.DownloadBookUseCase
 import su.sv.books.catalog.domain.GetBookUriUseCase
 import su.sv.books.catalog.domain.GetBooksListUseCase
 import su.sv.books.catalog.presentation.root.mapper.UiBookMapper
-import su.sv.books.catalog.presentation.root.model.UIBookState
-import su.sv.books.catalog.presentation.root.model.UiBook
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import su.sv.commonui.managers.ResourcesRepository
+import su.sv.models.ui.book.UiBook
+import su.sv.models.ui.book.UIBookState
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -1,6 +1,6 @@
 package su.sv.books.catalog.presentation.root.viewmodel.actions
 
-import su.sv.books.catalog.presentation.root.model.UiBook
+import su.sv.models.ui.book.UiBook
 
 sealed class RootBookActions {
 

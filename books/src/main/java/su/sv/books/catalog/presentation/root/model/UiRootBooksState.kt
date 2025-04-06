@@ -1,5 +1,7 @@
 package su.sv.books.catalog.presentation.root.model
 
+import su.sv.models.ui.book.UiBook
+
 /**
  * Все состояния экрана со списка книг
  */

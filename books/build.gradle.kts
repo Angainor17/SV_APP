@@ -24,6 +24,9 @@ dependencies {
     // Модули-фичи
     implementation(project(":reader"))
 
+    // Модули-common
+    implementation(project(":models"))
+
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))

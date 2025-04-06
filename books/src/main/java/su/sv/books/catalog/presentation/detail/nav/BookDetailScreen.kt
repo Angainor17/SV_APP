@@ -7,7 +7,7 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 import su.sv.books.catalog.presentation.detail.ui.BookDetailUi
-import su.sv.books.catalog.presentation.root.model.UiBook
+import su.sv.models.ui.book.UiBook
 
 @Parcelize
 class BookDetailScreen(
@@ -19,6 +19,7 @@ class BookDetailScreen(
     override fun Content(modifier: Modifier) {
         BookDetailUi(
             uiBook = uiBook,
+            modifier = modifier,
         )
     }
 }

@@ -2,11 +2,11 @@ package su.sv.books.catalog.presentation.root.mapper
 
 import su.sv.books.R
 import su.sv.books.catalog.domain.model.Book
-import su.sv.books.catalog.presentation.root.model.UIBookState
-import su.sv.books.catalog.presentation.root.model.UiBook
 import su.sv.commonui.ext.formatDecimal
 import su.sv.commonui.managers.DateFormatter
 import su.sv.commonui.managers.ResourcesRepository
+import su.sv.models.ui.book.UiBook
+import su.sv.models.ui.book.UIBookState
 import javax.inject.Inject
 
 class UiBookMapper @Inject constructor(
