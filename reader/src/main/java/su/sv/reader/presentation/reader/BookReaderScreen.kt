@@ -1,4 +1,4 @@
-package su.sv.reader.presentation
+package su.sv.reader.presentation.reader
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
