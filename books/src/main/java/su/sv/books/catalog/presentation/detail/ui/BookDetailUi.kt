@@ -11,7 +11,7 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import su.sv.books.catalog.presentation.detail.viewmodel.BookDetailViewModel
 import su.sv.models.ui.book.UiBook
-import su.sv.reader.presentation.BookReaderScreen
+import su.sv.reader.presentation.reader.BookReaderScreen
 
 @Composable
 fun BookDetailUi(

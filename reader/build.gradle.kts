@@ -24,6 +24,9 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
+    // PDF reader
+    implementation(libs.bouquet)
+
     // Navigation
     implementation(libs.modo.compose)
 
