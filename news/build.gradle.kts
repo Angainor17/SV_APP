@@ -31,6 +31,9 @@ dependencies {
     // Navigation
     implementation(libs.modo.compose)
 
+    // Logging
+    implementation(libs.timber)
+
     // Network
     implementation(libs.bundles.retrofit)
 

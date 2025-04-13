@@ -4,4 +4,7 @@
     <string name="common_error_title">Ошибка</string>
     <string name="common_retry">Повторить</string>
 
+    <string name="common_expand_text_show_more">Показать ещё</string>
+    <string name="common_expand_text_show_less">Скрыть</string>
+
 </resources>

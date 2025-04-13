@@ -25,10 +25,10 @@ class DateFormatter @Inject constructor() {
      * Форматирует дату
      * @see DATE_ONLY_TEMPLATE
      *
-     * Пример: 20 окт.
+     * Пример: 20 окт
      */
     fun formatShortDateOnly(date: LocalDate): String {
-        return shortDateFormat.format(date)
+        return shortDateFormat.format(date).replace(".", "")
     }
 
     /**
