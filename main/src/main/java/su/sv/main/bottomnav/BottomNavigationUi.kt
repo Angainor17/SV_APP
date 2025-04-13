@@ -31,7 +31,7 @@ import su.sv.info.rootinfo.RootInfo
 import su.sv.main.R
 import su.sv.main.Screens
 import su.sv.main.res.BooksVector
-import su.sv.news.presentation.root.RootNews
+import su.sv.news.presentation.root.ui.RootNews
 import su.sv.wiki.root.RootWiki
 
 @Composable

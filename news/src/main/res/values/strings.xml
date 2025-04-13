@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="news_empty_list_title">Нет новостей</string>
+
+    <string name="news_item_image_content_description">Картинка новости</string>
+
+</resources>
