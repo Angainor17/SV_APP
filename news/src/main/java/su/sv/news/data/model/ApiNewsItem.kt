@@ -11,7 +11,7 @@ class ApiNewsItem(
     /** Идентификатор для хранения */
     @SerializedName("id") val id: Int?,
 
-    @SerializedName("date") val dateMillis: Long?,
+    @SerializedName("date") val dateSeconds: Long?,
 
     @SerializedName("text") val text: String?,
 
