@@ -9,9 +9,9 @@ class UiNewsMapper @Inject constructor() {
     fun fromDomainToUi(domain: NewsItem): UiNewsItem {
         return UiNewsItem(
             id = domain.id.orEmpty(),
-            title = domain.title.orEmpty(),
+            title = domain.date.orEmpty(),
             description = domain.description.orEmpty(),
-            image = domain.image.orEmpty(),
+            image = domain.images.orEmpty(),
         )
     }
 }
