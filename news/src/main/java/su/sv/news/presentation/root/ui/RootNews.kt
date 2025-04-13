@@ -70,7 +70,7 @@ fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
                 }
 
                 if (hasItems) {
-                    BookList(
+                    NewsList(
                         lazyPagingItems = lazyPagingItems,
                         actions = viewModel,
                         state = stateValue,

@@ -31,7 +31,7 @@ abstract class BasePagingSource<T : Any> : PagingSource<Int, T>() {
     abstract suspend fun loadPage(offset: Int, limit: Int): Result<List<T>>
 
     override fun getRefreshKey(state: PagingState<Int, T>): Int? {
-        return state.anchorPosition
+        return null
     }
 
     companion object {

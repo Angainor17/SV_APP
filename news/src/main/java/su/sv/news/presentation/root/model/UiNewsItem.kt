@@ -18,6 +18,6 @@ data class UiNewsItem(
     /** Описание/содержание. Например: "8 статей" */
     val description: String,
 
-    /** Центральная картинка */
-    val image: String,
+    /** Список картинок. Может быть пустым */
+    val images: List<String>,
 ) : Parcelable

@@ -4,6 +4,7 @@ package su.sv.news.presentation.root.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +24,7 @@ import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
 
 @Composable
-fun BookList(
+fun NewsList(
     lazyPagingItems: LazyPagingItems<UiNewsItem>,
     state: UiRootNewsState,
     actions: RootNewsActionsHandler,
@@ -39,12 +40,15 @@ fun BookList(
         state = pullToRefreshState,
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-            modifier = Modifier.padding(horizontal = 8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(
+                bottom = 12.dp,
+            )
         ) {
             items(
-                lazyPagingItems.itemCount,
-                key = lazyPagingItems.itemKey { it.id }
+                count = lazyPagingItems.itemCount,
+                key = lazyPagingItems.itemKey { it.id },
             ) { index ->
                 val item = lazyPagingItems[index]
                 if (item != null) {

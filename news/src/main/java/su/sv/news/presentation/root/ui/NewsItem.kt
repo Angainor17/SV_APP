@@ -1,13 +1,16 @@
 package su.sv.news.presentation.root.ui
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -19,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.ui.ExpandingText
+import su.sv.commonui.ui.ImageCarousel
+import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
 import su.sv.news.presentation.root.model.UiNewsItem
 
@@ -29,9 +35,9 @@ fun NewsItem(item: UiNewsItem) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Logo(item)
-            Text(
+            ExpandingText(
                 text = item.description,
-                maxLines = 5,
+                minimizedMaxLines = 4,
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 modifier = Modifier.padding(
                     start = 8.dp,
@@ -60,20 +66,35 @@ fun NewsItem(item: UiNewsItem) {
 
 @Composable
 private fun Logo(item: UiNewsItem) {
-    if (item.image.isEmpty()) return
-
-    Box {
-        AsyncImage(
-            modifier = Modifier
-                .fillMaxWidth(),
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(item.image)
-                .build(),
-//            placeholder = painterResource(R.drawable.ic_book_placeholder),
-            contentDescription = stringResource(R.string.news_item_image_content_description),
-            contentScale = ContentScale.Crop,
-        )
+    when {
+        item.images.isEmpty() -> return
+        item.images.size == 1 -> SingleImage(item)
+        else -> MultiImage(item)
     }
+}
+
+@Composable
+private fun SingleImage(item: UiNewsItem) {
+    val showShimmer = remember { mutableStateOf(true) }
+
+    AsyncImage(
+        modifier = Modifier
+            .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
+            .fillMaxWidth()
+            .heightIn(min = 220.dp),
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(item.images.firstOrNull().orEmpty())
+            .build(),
+        contentDescription = stringResource(R.string.news_item_image_content_description),
+        contentScale = ContentScale.Crop,
+    )
+}
+
+@Composable
+private fun MultiImage(item: UiNewsItem) {
+    ImageCarousel(
+        images = item.images,
+    )
 }
 
 @Composable
@@ -86,7 +107,9 @@ fun BookItemPreview() {
         id = "id",
         dateFormatted = "2 февраля",
         description = "В. И. Ленин",
-        image = "https://picsum.photos/300/300",
+        images = listOf(
+            "https://picsum.photos/300/300"
+        ),
     )
     SVAPPTheme {
         NewsItem(item)

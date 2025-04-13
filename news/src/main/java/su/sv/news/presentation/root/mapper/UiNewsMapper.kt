@@ -18,7 +18,7 @@ class UiNewsMapper @Inject constructor(
                 dateFormatter.formatShortDateOnly(it)
             }.orEmpty(),
             description = domain.description.orEmpty(),
-            image = domain.images.firstOrNull().orEmpty(), //FIXME" multiImages
+            images = domain.images.filter { it.isNotEmpty() },
         )
     }
 }
