@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.paging.compose)
+    debugImplementation(libs.androidx.ui.tooling)
 
     // Navigation
     implementation(libs.modo.compose)
