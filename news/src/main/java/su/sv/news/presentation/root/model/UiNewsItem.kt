@@ -12,8 +12,8 @@ data class UiNewsItem(
     /** Идентификатор для хранения */
     val id: String,
 
-    /** Заголовок. Например: "ОВЛ1" */
-    val title: String,
+    /** Дата поста*/
+    val dateFormatted: String,
 
     /** Описание/содержание. Например: "8 статей" */
     val description: String,

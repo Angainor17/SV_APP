@@ -13,13 +13,14 @@ class NewsRepo @Inject constructor(
 ) {
     suspend fun getNews(offset: Int, count: Int): Result<List<ApiNewsItem>> {
         return runCatchingHttpRequest {
-            vkApi.getPosts(
+            val response = vkApi.getPosts(
                 accessToken = resRepo.getString(R.string.vk_service_key_mini_app_for_api_request),
                 domain = resRepo.getString(R.string.vk_public_name),
 
                 offset = offset,
                 count = count,
-            ).items.orEmpty()
+            ).response
+            response.items.orEmpty()
         }
     }
 }

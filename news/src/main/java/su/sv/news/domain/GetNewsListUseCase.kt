@@ -1,10 +1,10 @@
 package su.sv.news.domain
 
+import android.annotation.SuppressLint
 import su.sv.commonui.ext.toLocalDateTime
 import su.sv.news.data.NewsRepo
 import su.sv.news.data.model.ApiNewsItem
 import su.sv.news.domain.model.NewsItem
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class GetNewsListUseCase @Inject constructor(
@@ -20,10 +20,11 @@ class GetNewsListUseCase @Inject constructor(
         }
     }
 
+    @SuppressLint("NewApi")
     private fun ApiNewsItem.toDomain(): NewsItem {
         return NewsItem(
             id = (id ?: 0).toString(),
-            date = dateMillis?.toLocalDateTime() ?: LocalDateTime.now(),
+            date = ((dateSeconds?:0) * 1_000).toLocalDateTime(),
             description = text.orEmpty(),
             images = attachments.orEmpty()
                 .filter { it.type == "photo" }

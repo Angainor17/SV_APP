@@ -29,8 +29,8 @@ class RootNewsViewModel @Inject constructor(
     private val uiMapper: UiNewsMapper,
 ) : BaseViewModel(), RootNewsActionsHandler {
 
-    /** Контент экрана */
-    private val _state = MutableStateFlow<UiRootNewsState>(UiRootNewsState.Loading)
+    /** Контент экрана (вне списка) */
+    private val _state = MutableStateFlow<UiRootNewsState>(UiRootNewsState())
     val state: StateFlow<UiRootNewsState> get() = _state
 
     /** Одноразовые события */
@@ -43,7 +43,7 @@ class RootNewsViewModel @Inject constructor(
         initialLoadSize = GetNewsListUseCase.NEWS_PAGE_SIZE,   // Initial load size
     )
 
-    val pagingDataFlow: Flow<PagingData<UiNewsItem>> = Pager(pagingConfig, remoteMediator = ) {
+    val pagingDataFlow: Flow<PagingData<UiNewsItem>> = Pager(pagingConfig) {
         NewsPagingSource(
             useCase = getNewsListUseCase,
             uiMapper = uiMapper,
@@ -52,15 +52,15 @@ class RootNewsViewModel @Inject constructor(
 
     override fun onAction(action: RootNewsActions) {
         when (action) {
+            RootNewsActions.OnSwipeRefreshFinished -> {
+                updateState { contentState ->
+                    contentState.copy(isRefreshing = false)
+                }
+            }
             RootNewsActions.OnSwipeRefresh -> {
                 updateState { contentState ->
                     contentState.copy(isRefreshing = true)
                 }
-                refreshList()
-            }
-
-            RootNewsActions.OnRetryClick -> {
-                loadBooks()
             }
 
             is RootNewsActions.OnNewsClick -> {
@@ -71,39 +71,9 @@ class RootNewsViewModel @Inject constructor(
         }
     }
 
-    private fun loadBooks() {
-        _state.value = UiRootNewsState.Loading
-        refreshList()
-    }
-
-    private fun refreshList() {
-//        pagingDataFlow.
-//        viewModelScope.launch {
-//            getNewsListUseCase.execute().fold(
-//                onSuccess = { list ->
-//                    _state.value = if (list.isEmpty()) {
-//                        UiRootNewsState.EmptyState
-//                    } else {
-//                        UiRootNewsState.Content(
-//                            newsPagingData = pagingDataFlow,
-////                            news = uiMapper.fromDomainToUi(list),
-//                        )
-//                    }
-//                },
-//                onFailure = {
-//                    _state.value = UiRootNewsState.Failure(it)
-//                },
-//            )
-//        }
-    }
-
-    private fun updateState(action: (UiRootNewsState.Content) -> UiRootNewsState.Content) {
+    private fun updateState(action: (UiRootNewsState) -> UiRootNewsState) {
         _state.update { state ->
-            if (state is UiRootNewsState.Content) {
-                action.invoke(state)
-            } else {
-                state
-            }
+            action.invoke(state)
         }
     }
 }

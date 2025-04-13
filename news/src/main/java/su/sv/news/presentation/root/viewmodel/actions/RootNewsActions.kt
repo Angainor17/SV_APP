@@ -4,8 +4,8 @@ import su.sv.news.presentation.root.model.UiNewsItem
 
 sealed class RootNewsActions {
 
-    /** Нажатие на кнопку "Повторить", которая отобразилась из-за ошибки */
-    object OnRetryClick : RootNewsActions()
+    /** Завершилось обновление при помощи SwipeRefresh */
+    object OnSwipeRefreshFinished : RootNewsActions()
 
     /** Обновление списка книг при помощи SwipeRefresh */
     object OnSwipeRefresh : RootNewsActions()

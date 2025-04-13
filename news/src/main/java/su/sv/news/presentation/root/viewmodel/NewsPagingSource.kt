@@ -14,7 +14,7 @@ class NewsPagingSource(
         offset: Int,
         limit: Int
     ): Result<List<UiNewsItem>> {
-        return useCase.execute().map { list ->
+        return useCase.execute(offset = offset).map { list ->
             list.map { newsItem ->
                 uiMapper.fromDomainToUi(newsItem)
             }

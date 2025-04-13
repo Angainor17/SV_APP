@@ -21,23 +21,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.terrakok.modo.stack.LocalStackNavigation
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import su.sv.commonui.ui.LoadingIndicator
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.news.R
 import su.sv.news.presentation.root.RootNewsViewModel
-import su.sv.news.presentation.root.model.UiRootNewsState
+import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
-import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
 import su.sv.commonui.R as CommonR
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems()
+    val loadState = lazyPagingItems.loadState.refresh
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -46,24 +49,35 @@ fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
             SnackbarHost(hostState = snackbarHostState)
         },
     ) { contentPadding ->
-        when (state.value) {
-            is UiRootNewsState.Content -> {
-                BookList(
-                    actions = viewModel,
-                    state = state.value as UiRootNewsState.Content,
-                )
-            }
-
-            UiRootNewsState.EmptyState -> {
-                NoNews()
-            }
-
-            UiRootNewsState.Loading -> {
+        val hasItems = lazyPagingItems.itemSnapshotList.isNotEmpty()
+        when {
+            loadState == LoadState.Loading && !hasItems -> {
                 Loading()
             }
 
-            is UiRootNewsState.Failure -> {
-                Error(actions = viewModel)
+            loadState is LoadState.Error && !hasItems -> {
+                Error(
+                    lazyPagingItems = lazyPagingItems,
+                )
+            }
+
+            else -> {
+                val state = viewModel.state.collectAsStateWithLifecycle()
+                val stateValue = state.value
+
+                if (stateValue.isRefreshing) {
+                    viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
+                }
+
+                if (hasItems) {
+                    BookList(
+                        lazyPagingItems = lazyPagingItems,
+                        actions = viewModel,
+                        state = stateValue,
+                    )
+                } else {
+                    NoNews()
+                }
             }
         }
     }
@@ -80,7 +94,9 @@ fun Loading() {
 }
 
 @Composable
-fun Error(actions: RootNewsActionsHandler) {
+fun Error(
+    lazyPagingItems: LazyPagingItems<UiNewsItem>,
+) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -92,7 +108,7 @@ fun Error(actions: RootNewsActionsHandler) {
                 horizontal = 16.dp,
                 vertical = 6.dp,
             ),
-            onClick = { actions.onAction(RootNewsActions.OnRetryClick) },
+            onClick = { lazyPagingItems.refresh() },
         ) {
             Text(
                 text = stringResource(CommonR.string.common_retry),
@@ -107,7 +123,6 @@ private fun HandleEffects(
     snackbarHostState: SnackbarHostState
 ) {
     val scope = rememberCoroutineScope()
-    val stackNavigation = LocalStackNavigation.current
 
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {

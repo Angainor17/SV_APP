@@ -4,6 +4,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import su.sv.news.data.response.VkNewsResponse
+import su.sv.news.data.response.VkResponse
 
 interface VkApi {
 
@@ -17,7 +18,7 @@ interface VkApi {
         @Field("offset") offset: Int,
         @Field("count") count: Int,
         @Field("v") version: String = VK_API_VERSION,
-    ): VkNewsResponse
+    ): VkResponse<VkNewsResponse>
 
     companion object {
         const val VK_API_VERSION = "5.199"

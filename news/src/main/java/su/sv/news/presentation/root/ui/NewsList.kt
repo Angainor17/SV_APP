@@ -15,17 +15,17 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
-import su.sv.news.presentation.root.RootNewsViewModel
+import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiRootNewsState
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
 
 @Composable
 fun BookList(
-    viewModel: RootNewsViewModel,
-    state: UiRootNewsState.Content,
+    lazyPagingItems: LazyPagingItems<UiNewsItem>,
+    state: UiRootNewsState,
     actions: RootNewsActionsHandler,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
@@ -33,16 +33,14 @@ fun BookList(
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
         onRefresh = {
+            lazyPagingItems.refresh()
             actions.onAction(RootNewsActions.OnSwipeRefresh)
         },
         state = pullToRefreshState,
     ) {
-        val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems()
-
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(horizontal = 8.dp)
         ) {
             items(
                 lazyPagingItems.itemCount,
@@ -50,7 +48,7 @@ fun BookList(
             ) { index ->
                 val item = lazyPagingItems[index]
                 if (item != null) {
-                    NewsItem(item, actions)
+                    NewsItem(item)
                 } else {
                     MessagePlaceholder()
                 }

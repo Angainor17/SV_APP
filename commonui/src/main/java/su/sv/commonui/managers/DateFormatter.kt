@@ -11,10 +11,25 @@ private const val DATE_ONLY_TEMPLATE = "yyyy-MM-dd"
 /** Пример: "20 окт. 2024" */
 private const val FULL_DATE_TEMPLATE = "d MMM YYYY"
 
+/** Пример: "20 окт." */
+private const val SHORT_DATE_TEMPLATE = "d MMM"
+
 class DateFormatter @Inject constructor() {
 
     private val dateOnlyFormat = createFormat(DATE_ONLY_TEMPLATE)
     private val fullDateFormat = createFormat(FULL_DATE_TEMPLATE)
+    private val shortDateFormat = createFormat(SHORT_DATE_TEMPLATE)
+
+
+    /**
+     * Форматирует дату
+     * @see DATE_ONLY_TEMPLATE
+     *
+     * Пример: 20 окт.
+     */
+    fun formatShortDateOnly(date: LocalDate): String {
+        return shortDateFormat.format(date)
+    }
 
     /**
      * Форматирует дату
