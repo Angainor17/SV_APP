@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("kotlin-parcelize")
 }
 
 
@@ -22,8 +23,13 @@ dependencies {
     implementation(project(":commonui"))
 
     // Compose
+    implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.paging.compose)
+
+    // Navigation
+    implementation(libs.modo.compose)
 
     // Network
     implementation(libs.bundles.retrofit)
