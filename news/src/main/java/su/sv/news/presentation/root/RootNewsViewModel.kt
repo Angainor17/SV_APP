@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import su.sv.news.domain.GetNewsListUseCase
 import su.sv.news.presentation.root.mapper.UiNewsMapper
@@ -38,13 +37,13 @@ class RootNewsViewModel @Inject constructor(
     private val _oneTimeEffect = Channel<NewsListOneTimeEffect>(capacity = Channel.BUFFERED)
     val oneTimeEffect: Flow<NewsListOneTimeEffect> get() = _oneTimeEffect.receiveAsFlow()
 
-    val pagingConfig = PagingConfig(
+    private val pagingConfig = PagingConfig(
         pageSize = GetNewsListUseCase.NEWS_PAGE_SIZE,
         prefetchDistance = GetNewsListUseCase.NEWS_PREFETCH_DISTANCE,  // Pre-fetch the next page when 5 items away from the end
-        initialLoadSize = GetNewsListUseCase.NEWS_PAGE_SIZE   // Initial load size
+        initialLoadSize = GetNewsListUseCase.NEWS_PAGE_SIZE,   // Initial load size
     )
 
-    val pagingDataFlow: Flow<PagingData<UiNewsItem>> = Pager(pagingConfig) {
+    val pagingDataFlow: Flow<PagingData<UiNewsItem>> = Pager(pagingConfig, remoteMediator = ) {
         NewsPagingSource(
             useCase = getNewsListUseCase,
             uiMapper = uiMapper,
@@ -78,23 +77,24 @@ class RootNewsViewModel @Inject constructor(
     }
 
     private fun refreshList() {
-        viewModelScope.launch {
-            getNewsListUseCase.execute().fold(
-                onSuccess = { list ->
-                    _state.value = if (list.isEmpty()) {
-                        UiRootNewsState.EmptyState
-                    } else {
-                        UiRootNewsState.Content(
-                            newsPagingData = pagingDataFlow,
-//                            news = uiMapper.fromDomainToUi(list),
-                        )
-                    }
-                },
-                onFailure = {
-                    _state.value = UiRootNewsState.Failure(it)
-                },
-            )
-        }
+//        pagingDataFlow.
+//        viewModelScope.launch {
+//            getNewsListUseCase.execute().fold(
+//                onSuccess = { list ->
+//                    _state.value = if (list.isEmpty()) {
+//                        UiRootNewsState.EmptyState
+//                    } else {
+//                        UiRootNewsState.Content(
+//                            newsPagingData = pagingDataFlow,
+////                            news = uiMapper.fromDomainToUi(list),
+//                        )
+//                    }
+//                },
+//                onFailure = {
+//                    _state.value = UiRootNewsState.Failure(it)
+//                },
+//            )
+//        }
     }
 
     private fun updateState(action: (UiRootNewsState.Content) -> UiRootNewsState.Content) {
