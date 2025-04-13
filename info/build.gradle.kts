@@ -23,6 +23,7 @@ dependencies {
     // Compose
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.ui.tooling)
 
     // DI
     implementation(libs.hilt.android)

@@ -24,9 +24,8 @@ import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import su.sv.commonui.managers.ResourcesRepository
-import su.sv.models.ui.book.UiBook
 import su.sv.models.ui.book.UIBookState
-import timber.log.Timber
+import su.sv.models.ui.book.UiBook
 import javax.inject.Inject
 
 /**
@@ -134,7 +133,6 @@ class RootBooksCatalogViewModel @Inject constructor(
                 loadBooks()
             }
             RootBookActions.UpdateStates -> {
-                Timber.tag("voronin").d("RootBookActions.UpdateStates")
                 updateDownloadingStates()
             }
             is RootBookActions.OnBookClick -> {

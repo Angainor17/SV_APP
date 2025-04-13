@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -18,21 +16,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
-import su.sv.commonui.ui.LoadingIndicator
+import su.sv.commonui.ui.FullScreenError
+import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.news.R
 import su.sv.news.presentation.root.RootNewsViewModel
-import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
-import su.sv.commonui.R as CommonR
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -52,13 +47,13 @@ fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
         val hasItems = lazyPagingItems.itemSnapshotList.isNotEmpty()
         when {
             loadState == LoadState.Loading && !hasItems -> {
-                Loading()
+                FullScreenLoading()
             }
 
             loadState is LoadState.Error && !hasItems -> {
-                Error(
-                    lazyPagingItems = lazyPagingItems,
-                )
+                FullScreenError {
+                    lazyPagingItems.refresh()
+                }
             }
 
             else -> {
@@ -79,40 +74,6 @@ fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
                     NoNews()
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun Loading() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        LoadingIndicator()
-    }
-}
-
-@Composable
-fun Error(
-    lazyPagingItems: LazyPagingItems<UiNewsItem>,
-) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(
-            text = stringResource(CommonR.string.common_error_title),
-        )
-        Button(
-            modifier = Modifier.padding(
-                horizontal = 16.dp,
-                vertical = 6.dp,
-            ),
-            onClick = { lazyPagingItems.refresh() },
-        ) {
-            Text(
-                text = stringResource(CommonR.string.common_retry),
-            )
         }
     }
 }
