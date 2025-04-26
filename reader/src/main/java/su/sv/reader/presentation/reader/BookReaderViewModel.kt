@@ -19,6 +19,6 @@ class BookReaderViewModel @Inject constructor(
     val state: StateFlow<BookReaderState> get() = _state
 
     fun loadBook(book: UiBook) {
-        _state.value = uiMapper.createState(book)
+//        _state.value = uiMapper.createState(book)
     }
 }

@@ -13,6 +13,10 @@ apply(
 
 android {
     namespace = "su.sv.reader"
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -25,16 +29,15 @@ dependencies {
     implementation(project(":commonui"))
 
     // PDF reader
-    implementation(libs.bouquet)
+    implementation(libs.androidpdfviewer)
 
     // Navigation
     implementation(libs.modo.compose)
 
     // Compose
     implementation(libs.bundles.compose)
+    implementation(libs.androidx.ui.viewbinding)
     implementation(platform(libs.androidx.compose.bom))
-
-    implementation(libs.bouquet)
 
     // DI
     implementation(libs.hilt.android)
