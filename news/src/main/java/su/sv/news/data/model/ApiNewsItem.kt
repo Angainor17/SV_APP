@@ -16,4 +16,6 @@ class ApiNewsItem(
     @SerializedName("text") val text: String?,
 
     @SerializedName("attachments") val attachments: List<VkResponseNewsAttachment>?,
+
+    @SerializedName("copy_history") val copyHistory: List<ApiNewsItem>?,
 )

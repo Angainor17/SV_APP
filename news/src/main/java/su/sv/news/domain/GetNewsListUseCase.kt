@@ -22,9 +22,13 @@ class GetNewsListUseCase @Inject constructor(
 
     @SuppressLint("NewApi")
     private fun ApiNewsItem.toDomain(): NewsItem {
+        if (copyHistory.orEmpty().isNotEmpty()) {
+            return copyHistory.orEmpty().first().toDomain()
+        }
+
         return NewsItem(
             id = (id ?: 0).toString(),
-            date = ((dateSeconds?:0) * 1_000).toLocalDateTime(),
+            date = ((dateSeconds ?: 0) * 1_000).toLocalDateTime(),
             description = text.orEmpty(),
             images = attachments.orEmpty()
                 .filter { it.type == "photo" }
