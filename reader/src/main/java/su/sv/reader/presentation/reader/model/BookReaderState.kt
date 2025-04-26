@@ -1,12 +1,12 @@
 package su.sv.reader.presentation.reader.model
 
-import com.rizzi.bouquet.VerticalPdfReaderState
+//import com.rizzi.bouquet.VerticalPdfReaderState
 
 sealed class BookReaderState {
 
-    data class Content(
-        val pdfReaderState: VerticalPdfReaderState,
-    ) : BookReaderState()
+//    data class Content(
+//        val pdfReaderState: VerticalPdfReaderState,
+//    ) : BookReader/State()
 
     data object Loading : BookReaderState()
 }
