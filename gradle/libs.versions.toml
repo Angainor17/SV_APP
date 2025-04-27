@@ -1,6 +1,6 @@
 [versions]
-agp = "8.9.0"
-bouquet = "1.1.2"
+agp = "8.9.2"
+
 modoCompose = "0.10.1"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
@@ -21,11 +21,15 @@ navigationCompose = "2.8.9"
 coilCompose = "3.1.0"
 code-desugaring = "2.1.5"
 uiTooling = "1.7.8"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+
 appcompat = "1.7.0"
 material = "1.12.0"
+
+djvulibre = "0.1.4"
+k2pdfopt = "0.1.6"
+fbreader = "0.1.18"
+pdfium = "2.0.16"
+wget = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,7 +45,6 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
 # DI
-bouquet = { module = "io.github.grizzi91:bouquet", version.ref = "bouquet" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
@@ -61,16 +64,20 @@ retrofit2-kotlin-coroutines-adapter = { module = "com.jakewharton.retrofit:retro
 
 code-desugaring = { module = "com.android.tools:desugar_jdk_libs", version.ref = "code-desugaring" }
 
+
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # Navigation
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+# Reader
+axet-wget = { module = "com.github.axet:wget", version.ref = "wget" }
+axet-djvulibre = { module = "com.github.axet:djvulibre", version.ref = "djvulibre" }
+axet-pdfium = { module = "com.github.axet:pdfium", version.ref = "pdfium" }
+axet-k2pdfopt = { module = "com.github.axet:k2pdfopt", version.ref = "k2pdfopt" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]

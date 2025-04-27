@@ -1,0 +1,45 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+apply(
+    from = "${project.rootDir}/android_feature_commons.kts"
+)
+android {
+    namespace = "com.github.axet.bookreader"
+    packaging {
+        jniLibs {
+            excludes.add("META-INF/DEPENDENCIES")
+        }
+        resources {
+            excludes.add("META-INF/DEPENDENCIES")
+        }
+    }
+}
+
+dependencies {
+    implementation("com.github.axet.fbreader:library:0.1.18"){
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
+    implementation("com.github.axet:android-library:1.35.21"){
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
+
+    implementation(libs.axet.djvulibre){
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
+    implementation(libs.axet.pdfium){
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
+    implementation(libs.axet.k2pdfopt){
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
+    implementation(libs.axet.wget){
+        exclude("org.apache.httpcomponents", "httpmime")
+    } //{ exclude group: 'org.json', module: 'json' }
+
+    implementation(libs.appcompat)
+    implementation(libs.material)
+}

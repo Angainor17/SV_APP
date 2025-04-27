@@ -22,7 +22,7 @@ android {
 dependencies {
 
     // Модули-фичи
-    implementation(project(":reader"))
+    implementation(project(":bookreader"))
 
     // Модули-common
     implementation(project(":models"))

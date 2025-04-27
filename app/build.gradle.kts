@@ -20,7 +20,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -47,6 +46,7 @@ dependencies {
 
     // Модули-фичи
     implementation(project(":main"))
+    implementation(project(":bookreader"))
 
     // Модули-utils
     implementation(project(":commonarchitecture"))
