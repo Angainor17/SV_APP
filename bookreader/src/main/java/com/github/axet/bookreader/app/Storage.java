@@ -195,7 +195,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
 
     public Uri recentUri(Book book) {
         String s = book.url.getScheme();
-        if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+        if (s.equals(ContentResolver.SCHEME_CONTENT)) {
             String id = book.md5 + "." + JSON_EXT;
             Uri doc = Storage.getDocumentParent(context, book.url);
             return child(context, doc, id);
@@ -210,7 +210,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         List<Uri> list = new ArrayList<>();
         Uri storage = getStoragePath();
         String s = storage.getScheme();
-        if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+        if (s.equals(ContentResolver.SCHEME_CONTENT)) {
             ContentResolver contentResolver = context.getContentResolver();
             Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(storage, DocumentsContract.getTreeDocumentId(storage));
             Cursor childCursor = contentResolver.query(childrenUri, null, null, null, null);
@@ -231,12 +231,9 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             }
         } else if (s.equals(ContentResolver.SCHEME_FILE)) {
             File dir = getFile(storage);
-            File[] ff = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    String e = getExt(name).toLowerCase();
-                    return name.startsWith(book.md5) && e.equals(JSON_EXT);
-                }
+            File[] ff = dir.listFiles((dir1, name) -> {
+                String e = getExt(name).toLowerCase();
+                return name.startsWith(book.md5) && e.equals(JSON_EXT);
             });
             if (ff != null) {
                 for (File f : ff)
@@ -252,7 +249,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         book.info.last = System.currentTimeMillis();
         Uri u = recentUri(book);
         String s = u.getScheme();
-        if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+        if (s.equals(ContentResolver.SCHEME_CONTENT)) {
             Uri root = Storage.getDocumentTreeUri(u);
             String id = DocumentsContract.getTreeDocumentId(u);
             String path;
@@ -484,7 +481,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 }
             }
 
-            if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+            if (s.equals(ContentResolver.SCHEME_CONTENT)) {
                 ContentResolver contentResolver = context.getContentResolver();
                 Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(storage, DocumentsContract.getTreeDocumentId(storage));
                 Cursor childCursor = contentResolver.query(childrenUri, null, null, null, null);
