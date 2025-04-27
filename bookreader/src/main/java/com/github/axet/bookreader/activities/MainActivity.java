@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -31,11 +30,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.github.axet.androidlibrary.app.FileTypeDetector;
 import com.github.axet.androidlibrary.preferences.AboutPreferenceCompat;
 import com.github.axet.androidlibrary.preferences.RotatePreferenceCompat;
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter;
-import com.github.axet.androidlibrary.widgets.ErrorDialog;
 import com.github.axet.androidlibrary.widgets.OpenChoicer;
 import com.github.axet.androidlibrary.widgets.OpenFileDialog;
 import com.github.axet.androidlibrary.widgets.SearchView;
@@ -318,46 +315,37 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
     }
 
     public void loadBook(final Uri u, final Runnable success) {
-        final ProgressDialog builder = new ProgressDialog(this);
-        final AlertDialog d = builder.create();
-        d.show();
-        Thread thread = new Thread("load book") {
-            @Override
-            public void run() {
-                final Thread t = Thread.currentThread();
-                d.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        t.interrupt();
-                    }
-                });
-                try {
-                    final Storage.Book book = storage.load(u, builder.progress);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isFinishing() || !isRunning)
-                                return;
-                            loadBook(book);
-                            if (success != null)
-                                success.run();
-                        }
-                    });
-                } catch (FileTypeDetector.DownloadInterrupted e) {
-                    Log.d(TAG, "interrupted", e);
-                } catch (Throwable e) {
-                    ErrorDialog.Post(MainActivity.this, e);
-                } finally {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            d.cancel();
-                        }
-                    });
-                }
-            }
-        };
-        thread.start();
+//        final ProgressDialog builder = new ProgressDialog(this);
+//        final AlertDialog d = builder.create();
+//        d.show();
+//        Thread thread = new Thread("load book") {
+//            @Override
+//            public void run() {
+//                final Thread t = Thread.currentThread();
+//                d.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> t.interrupt());
+//                try {
+//                    final Storage.Book book = storage.load(u, builder.progress);
+//                    runOnUiThread(() -> {
+//                        if (isFinishing() || !isRunning)
+//                            return;
+//                        loadBook(book);
+//                        if (success != null)
+//                            success.run();
+//                    });
+//                } catch (FileTypeDetector.DownloadInterrupted e) {
+//                    Log.d(TAG, "interrupted", e);
+//                } catch (Throwable e) {
+//                    ErrorDialog.Post(MainActivity.this, e);
+//                } finally {
+//                    runOnUiThread(() -> d.cancel());
+//                }
+//            }
+//        };
+//        storage.load(u, builder.progress);
+        Storage.Book book = new Storage.Book(getApplicationContext(), u);
+        loadBook(book);
+
+//        thread.start();
     }
 
     @SuppressLint("RestrictedApi")
@@ -375,25 +363,22 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
 
             final Storage.FBook fbook = storage.read(book);
 
-            final Runnable done = new Runnable() {
-                @Override
-                public void run() {
-                    fbook.close();
+            final Runnable done = () -> {
+                fbook.close();
 
-                    for (Uri u : uu) {
-                        try {
-                            Storage.RecentInfo info = new Storage.RecentInfo(MainActivity.this, u);
-                            book.info.merge(info);
-                        } catch (Exception e) {
-                            Log.d(TAG, "unable to merge info", e);
-                        }
-                        Storage.delete(MainActivity.this, u);
+                for (Uri u : uu) {
+                    try {
+                        Storage.RecentInfo info = new Storage.RecentInfo(MainActivity.this, u);
+                        book.info.merge(info);
+                    } catch (Exception e) {
+                        Log.d(TAG, "unable to merge info", e);
                     }
-                    book.info.position = selected.get(0);
-                    storage.save(book);
-
-                    openBook(book.url);
+                    Storage.delete(MainActivity.this, u);
                 }
+                book.info.position = selected.get(0);
+                storage.save(book);
+
+                openBook(book.url);
             };
 
             builder.setTitle(R.string.sync_conflict);
@@ -459,24 +444,11 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
 
             builder.setView(v);
 
-            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    fbook.close();
-                }
-            });
+            builder.setOnDismissListener(dialog -> fbook.close());
 
-            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
+            builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
             });
-            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    done.run();
-                }
-            });
+            builder.setPositiveButton(android.R.string.ok, (dialog, which) -> done.run());
 
             builder.show();
             return;
@@ -686,22 +658,14 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
             setTitle(R.string.loading_book);
             setView(ll);
             setCancelable(false);
-            setPositiveButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
+            setPositiveButton(android.R.string.cancel, (dialog, which) -> {
             });
         }
 
         public Storage.Progress progress = new Storage.Progress() {
             @Override
             public void progress(final long bytes, final long total) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ProgressDialog.this.progress(bytes, total);
-                    }
-                });
+                handler.post(() -> ProgressDialog.this.progress(bytes, total));
             }
         };
 
