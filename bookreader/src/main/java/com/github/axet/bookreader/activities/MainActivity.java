@@ -61,7 +61,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends FullscreenActivity implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends FullscreenActivity implements NavigationView.OnNavigationItemSelectedListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String TAG = MainActivity.class.getSimpleName();
 
     public static final int RESULT_FILE = 1;
@@ -119,6 +120,8 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
 
         SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(this);
         shared.registerOnSharedPreferenceChangeListener(this);
+
+        openIntent(getIntent());
     }
 
     @SuppressLint("RestrictedApi")
@@ -310,8 +313,7 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
             if (t != null && t.startsWith(WebViewCustom.SCHEME_HTTP))
                 u = Uri.parse(t);
         }
-        if (u == null)
-            return;
+        if (u == null) return;
         loadBook(u, null);
     }
 
@@ -660,6 +662,7 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
         public ProgressBar v;
         public TextView text;
         public AlertDialog dialog;
+
         public ProgressDialog(Context context) {
             super(context);
             int dp10 = ThemeUtils.dp2px(context, 10);
@@ -688,7 +691,9 @@ public class MainActivity extends FullscreenActivity implements NavigationView.O
                 public void onClick(DialogInterface dialog, int which) {
                 }
             });
-        }        public Storage.Progress progress = new Storage.Progress() {
+        }
+
+        public Storage.Progress progress = new Storage.Progress() {
             @Override
             public void progress(final long bytes, final long total) {
                 handler.post(new Runnable() {

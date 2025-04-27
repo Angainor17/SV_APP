@@ -1,17 +1,17 @@
 package su.sv.app
 
-import android.app.Application
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
+import com.github.axet.bookreader.app.BookApplication
 import dagger.hilt.android.HiltAndroidApp
 import okio.Path.Companion.toOkioPath
 import timber.log.Timber
 
 @HiltAndroidApp
-class SvApp : Application(), SingletonImageLoader.Factory {
+class SvApp : BookApplication(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()

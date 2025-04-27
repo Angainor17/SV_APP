@@ -46,7 +46,12 @@ dependencies {
 
     // Модули-фичи
     implementation(project(":main"))
+
+    // читалка
     implementation(project(":bookreader"))
+    implementation("com.github.axet:android-library:1.35.21"){
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
 
     // Модули-utils
     implementation(project(":commonarchitecture"))
