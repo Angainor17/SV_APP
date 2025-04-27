@@ -8,10 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.forward
 import su.sv.books.catalog.presentation.detail.viewmodel.BookDetailViewModel
 import su.sv.models.ui.book.UiBook
-import su.sv.reader.presentation.reader.BookReaderScreen
+
 
 @Composable
 fun BookDetailUi(
@@ -21,7 +20,7 @@ fun BookDetailUi(
 ) {
     val stackNavigation = LocalStackNavigation.current
 
-    Column (modifier = modifier.statusBarsPadding()){
+    Column(modifier = modifier.statusBarsPadding()) {
         Text(
             text = "Detail Book",
             modifier = Modifier,
@@ -29,7 +28,7 @@ fun BookDetailUi(
 
         Button(
             onClick = {
-                stackNavigation.forward(BookReaderScreen(uiBook))
+//                stackNavigation.forward(BookReaderScreen(uiBook))
             },
         ) {
             Text(text = "Open reader")
