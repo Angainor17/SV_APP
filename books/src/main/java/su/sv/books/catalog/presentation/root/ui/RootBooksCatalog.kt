@@ -87,7 +87,12 @@ private fun HandleEffects(
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
             is BooksListOneTimeEffect.OpenBook -> {
-                stackNavigation.forward(BookDetailScreen(effect.book))
+                stackNavigation.forward(
+                    BookDetailScreen(
+                        uiBook = effect.book,
+                        onBookUpdated = {},
+                    )
+                )
             }
 
             is BooksListOneTimeEffect.ShowErrorSnackBar -> {
