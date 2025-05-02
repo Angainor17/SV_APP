@@ -20,23 +20,23 @@ android {
 }
 
 dependencies {
-    implementation("com.github.axet.fbreader:library:0.1.18"){
+    implementation("com.github.axet.fbreader:library:0.1.18") {
         exclude("org.apache.httpcomponents", "httpmime")
     }
-    implementation("com.github.axet:android-library:1.35.21"){
+    implementation("com.github.axet:android-library:1.35.21") {
         exclude("org.apache.httpcomponents", "httpmime")
     }
 
-    implementation(libs.axet.djvulibre){
+    implementation(libs.axet.djvulibre) {
         exclude("org.apache.httpcomponents", "httpmime")
     }
-    implementation(libs.axet.pdfium){
+    implementation(libs.axet.pdfium) {
         exclude("org.apache.httpcomponents", "httpmime")
     }
-    implementation(libs.axet.k2pdfopt){
+    implementation(libs.axet.k2pdfopt) {
         exclude("org.apache.httpcomponents", "httpmime")
     }
-    implementation(libs.axet.wget){
+    implementation(libs.axet.wget) {
         exclude("org.apache.httpcomponents", "httpmime")
     } //{ exclude group: 'org.json', module: 'json' }
 

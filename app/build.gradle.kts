@@ -49,7 +49,7 @@ dependencies {
 
     // читалка
     implementation(project(":bookreader"))
-    implementation("com.github.axet:android-library:1.35.21"){
+    implementation("com.github.axet:android-library:1.35.21") {
         exclude("org.apache.httpcomponents", "httpmime")
     }
 

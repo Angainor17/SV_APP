@@ -18,8 +18,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class BookDownloadBroadcastReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var downloadedActionHandler: BookDownloadedActionHandler
-    @Inject lateinit var dispatcherProvider: DispatcherProvider
+    @Inject
+    lateinit var downloadedActionHandler: BookDownloadedActionHandler
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val downloadID: Long = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) ?: return

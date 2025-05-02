@@ -72,7 +72,8 @@ public class TTSPopup {
             panel.setLayoutParams(lp);
         }
     };
-    Runnable speakRetry = null;    Runnable speakNext = new Runnable() {
+    Runnable speakRetry = null;
+    Runnable speakNext = new Runnable() {
         @Override
         public void run() {
             Log.d(TAG, "speakNext");
@@ -80,6 +81,7 @@ public class TTSPopup {
             speakNext();
         }
     };
+
     public TTSPopup(FBReaderView v) {
         this.context = v.getContext();
         fb = v;

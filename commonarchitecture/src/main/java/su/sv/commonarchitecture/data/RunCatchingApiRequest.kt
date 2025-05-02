@@ -40,6 +40,7 @@ val Throwable.isNetworkError: Boolean
             is ConnectException,
             is UnknownHostException,
             is SocketTimeoutException -> true
+
             else -> false
         }
     }

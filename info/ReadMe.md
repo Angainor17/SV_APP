@@ -1,6 +1,5 @@
 **Источники**
 
-
 Купить бумажную книгу https://svg-shop.ru/
 Скачать электронную книгу https://bibl.fra-mos.ru/category/svobodnoe-vremya/
 

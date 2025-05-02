@@ -10,5 +10,5 @@ import javax.inject.Singleton
 class CommonDownloadBookStates @Inject constructor() {
 
     /** Список downloadId, которые в прогрессе скачивания. Значение - Book.id */
-     val loadingInProgressMap = hashMapOf<Long, String>()
+    val loadingInProgressMap = hashMapOf<Long, String>()
 }

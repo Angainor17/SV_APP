@@ -4,9 +4,9 @@ build:
   maxIssues: 0
   excludeCorrectable: false
   weights:
-    # complexity: 2
-    # LongParameterList: 1
-    # style: 1
+  # complexity: 2
+  # LongParameterList: 1
+  # style: 1
 #    comments: 0
 
 config:
@@ -114,7 +114,7 @@ complexity:
       - 'with'
   LabeledExpression:
     active: false
-    ignoredLabels: []
+    ignoredLabels: [ ]
   LargeClass:
     active: true
     threshold: 600
@@ -657,7 +657,7 @@ style:
     active: true
     ignoreOverridableFunction: true
     ignoreActualFunction: true
-    excludedFunctions: ['']
+    excludedFunctions: [ '' ]
     ignoreAnnotated: [ 'dagger.Provides' ]
   LoopWithTooManyJumpStatements:
     active: true
@@ -723,7 +723,7 @@ style:
   ReturnCount:
     active: false
     max: 2
-    excludedFunctions: ['equals']
+    excludedFunctions: [ 'equals' ]
     excludeLabeled: false
     excludeReturnFromLambda: true
     excludeGuardClauses: false
