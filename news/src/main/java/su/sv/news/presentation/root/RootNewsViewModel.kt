@@ -57,6 +57,7 @@ class RootNewsViewModel @Inject constructor(
                     contentState.copy(isRefreshing = false)
                 }
             }
+
             RootNewsActions.OnSwipeRefresh -> {
                 updateState { contentState ->
                     contentState.copy(isRefreshing = true)

@@ -140,6 +140,7 @@ public class FBReaderView extends RelativeLayout {
     DrawerLayout drawer;
     Plugin.View.Search search;
     int searchPagePending;
+
     public FBReaderView(Context context) { // create child view
         super(context);
         create();

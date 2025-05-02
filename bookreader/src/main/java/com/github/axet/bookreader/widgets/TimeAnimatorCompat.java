@@ -10,12 +10,15 @@ public class TimeAnimatorCompat {
     Handler handler = new Handler();
     TimeListener listener;
     ValueAnimator v;
+
     public TimeAnimatorCompat() {
         if (Build.VERSION.SDK_INT >= 16)
             v = new TimeAnimator();
         else if (Build.VERSION.SDK_INT >= 11)
             v = ValueAnimator.ofFloat(0f, 1f);
-    }    Runnable run = new Runnable() {
+    }
+
+    Runnable run = new Runnable() {
         @Override
         public void run() {
             if (listener != null)

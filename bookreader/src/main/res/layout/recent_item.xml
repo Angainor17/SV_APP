@@ -7,5 +7,4 @@
     android:background="?attr/colorButtonNormal"
     android:gravity="center"
     android:padding="10dp"
-    android:text="69">
-</TextView>
+    android:text="69"></TextView>

@@ -28,7 +28,6 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = White,
 
 
-
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
 
