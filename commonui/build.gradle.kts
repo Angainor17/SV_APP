@@ -46,6 +46,9 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
 
+    // Linkify
+    implementation(libs.linkify.text)
+
     // DI
     implementation(libs.hilt.android)
     implementation(libs.androidx.navigation.runtime.ktx)
