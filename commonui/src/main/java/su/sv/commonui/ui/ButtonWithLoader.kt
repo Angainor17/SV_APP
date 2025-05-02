@@ -53,7 +53,9 @@ fun LoadingButton(
         label = "button's content padding",
     )
     Button(
-        onClick = onClick,
+        onClick = {
+            if (!loading) onClick.invoke()
+        },
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
