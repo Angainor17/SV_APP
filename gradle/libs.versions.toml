@@ -1,6 +1,7 @@
 [versions]
 agp = "8.9.2"
 
+linkifyText = "1.0"
 modoCompose = "0.10.1"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
@@ -50,6 +51,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 # Navigation
+linkify-text = { module = "io.github.khudoyshukur:linkify-text", version.ref = "linkifyText" }
 modo-compose = { module = "com.github.terrakok:modo-compose", version.ref = "modoCompose" }
 
 # Image

@@ -90,7 +90,6 @@ private fun HandleEffects(
                 stackNavigation.forward(
                     BookDetailScreen(
                         uiBook = effect.book,
-                        onBookUpdated = {},
                     )
                 )
             }
