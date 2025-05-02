@@ -9,5 +9,7 @@
     <string name="books_download_snack_error">Ошибка загрузки файла</string>
 
     <string name="books_download_status_content_description">Статус скачивания книги</string>
+    <string name="books_read">Читать</string>
+    <string name="books_download">Скачать</string>
 
 </resources>

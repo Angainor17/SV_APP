@@ -21,6 +21,7 @@ class GetBooksListUseCase @Inject constructor(
                     id = id,
                     title = it.title.orEmpty(),
                     description = it.description.orEmpty(),
+                    author = it.author.orEmpty(),
                     image = it.image.orEmpty(),
                     link = it.link.orEmpty(),
                     fileNameWithExt = fileNameWithExt,

@@ -17,33 +17,36 @@ import su.sv.books.catalog.data.receivers.BookDownloadedActionHandler
 import su.sv.books.catalog.domain.DownloadBookUseCase
 import su.sv.books.catalog.domain.GetBookUriUseCase
 import su.sv.books.catalog.domain.GetBooksListUseCase
+import su.sv.books.catalog.presentation.CommonDownloadBookStates
+import su.sv.books.catalog.presentation.base.BaseBookViewModel
 import su.sv.books.catalog.presentation.root.mapper.UiBookMapper
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
-import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import su.sv.commonui.managers.ResourcesRepository
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 import javax.inject.Inject
 
 /**
- * TODO при разворачивании экрана надо чекать статусы
  * TODO: permission!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * TODO: swipeRefresh
  */
 @HiltViewModel
 class RootBooksCatalogViewModel @Inject constructor(
     private val getBooksListUseCase: GetBooksListUseCase,
     private val uiMapper: UiBookMapper,
+    private val downloadBookStates: CommonDownloadBookStates,
 
     private val resourcesRepository: Lazy<ResourcesRepository>,
-
     private val downloadBookUseCase: Lazy<DownloadBookUseCase>,
-    private val getBookUriUseCase: Lazy<GetBookUriUseCase>,
     private val bookDownloadedActionHandler: Lazy<BookDownloadedActionHandler>,
-) : BaseViewModel(), RootBooksActions {
+
+    getBookUriUseCase: Lazy<GetBookUriUseCase>,
+) : BaseBookViewModel(
+    downloadBookStates = downloadBookStates,
+    getBookUriUseCase = getBookUriUseCase,
+), RootBooksActions {
 
     /** Контент экрана */
     private val _state = MutableStateFlow<UiRootBooksState>(UiRootBooksState.Loading)
@@ -53,8 +56,6 @@ class RootBooksCatalogViewModel @Inject constructor(
     private val _oneTimeEffect = Channel<BooksListOneTimeEffect>(capacity = Channel.BUFFERED)
     val oneTimeEffect: Flow<BooksListOneTimeEffect> get() = _oneTimeEffect.receiveAsFlow()
 
-    /** Список downloadId, которые в прогрессе скачивания. Значение - Book.id */
-    private val loadingInProgressMap = hashMapOf<Long, String>()
 
     init {
         loadBooks()
@@ -72,30 +73,6 @@ class RootBooksCatalogViewModel @Inject constructor(
         }
     }
 
-    private fun handleDownloadedBook(state: BookDownloadedActionHandler.BookState) {
-        val (downloadId) = state
-        val bookId = loadingInProgressMap[downloadId]
-
-        var currentBook: UiBook? = null // FIXME
-        // обновляется на статус скачанного (или нет)
-        updateBookState { oldBook ->
-            if (oldBook.id == bookId) {
-                currentBook = getBookWithActualDownloadState(oldBook)
-                currentBook
-            } else {
-                oldBook
-            }
-        }
-
-        //TODO : refactor
-        val uri = getBookUriUseCase.get().execute(currentBook?.fileNameWithExt.orEmpty())
-        val isSuccess = currentBook != null && uri != null
-        if (!isSuccess) {
-            showErrorSnack(R.string.books_download_snack_error)
-        }
-
-        loadingInProgressMap.remove(downloadId)
-    }
 
     private fun loadBooks() {
         _state.value = UiRootBooksState.Loading
@@ -129,15 +106,19 @@ class RootBooksCatalogViewModel @Inject constructor(
                 }
                 refreshList()
             }
+
             RootBookActions.OnRetryClick -> {
                 loadBooks()
             }
+
             RootBookActions.UpdateStates -> {
                 updateDownloadingStates()
             }
+
             is RootBookActions.OnBookClick -> {
                 _oneTimeEffect.trySend(BooksListOneTimeEffect.OpenBook(action.book))
             }
+
             is RootBookActions.OnDownloadBookClick -> {
                 loadBook(action.book)
             }
@@ -154,22 +135,6 @@ class RootBooksCatalogViewModel @Inject constructor(
         }
     }
 
-    private fun getBookWithActualDownloadState(book: UiBook): UiBook {
-        val uri = getBookUriUseCase.get().execute(book.fileNameWithExt)
-
-        return book.copy(
-            downloadState = when {
-                uri != null -> {
-                    UIBookState.DOWNLOADED
-                }
-                // скачивание ещё идёт
-                loadingInProgressMap.values.contains(book.id) -> UIBookState.DOWNLOADING
-                else -> UIBookState.AVAILABLE_TO_DOWNLOAD
-            },
-            fileUri = uri,
-        )
-    }
-
     private fun loadBook(book: UiBook) {
         viewModelScope.launch {
             showBookLoadingState(book)
@@ -182,7 +147,7 @@ class RootBooksCatalogViewModel @Inject constructor(
                         fileNameWithExt = book.fileNameWithExt,
                     )
                 )
-                loadingInProgressMap[downloadId] = book.id
+                downloadBookStates.loadingInProgressMap[downloadId] = book.id
             } catch (_: Exception) {
                 showErrorSnack(R.string.books_download_snack_error)
             } finally {
@@ -209,7 +174,7 @@ class RootBooksCatalogViewModel @Inject constructor(
         }
     }
 
-    private fun updateBookState(action: (UiBook) -> UiBook) {
+    override fun updateBookState(action: (UiBook) -> UiBook) {
         updateState { state ->
             state.copy(
                 books = state.books.map { action(it) },
@@ -217,7 +182,7 @@ class RootBooksCatalogViewModel @Inject constructor(
         }
     }
 
-    private fun showErrorSnack(textResId: Int) {
+    override fun showErrorSnack(textResId: Int) {
         _oneTimeEffect.trySend(
             BooksListOneTimeEffect.ShowErrorSnackBar(
                 text = resourcesRepository.get().getString(textResId)

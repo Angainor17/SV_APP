@@ -5,8 +5,8 @@ import su.sv.books.catalog.domain.model.Book
 import su.sv.commonui.ext.formatDecimal
 import su.sv.commonui.managers.DateFormatter
 import su.sv.commonui.managers.ResourcesRepository
-import su.sv.models.ui.book.UiBook
 import su.sv.models.ui.book.UIBookState
+import su.sv.models.ui.book.UiBook
 import javax.inject.Inject
 
 class UiBookMapper @Inject constructor(
@@ -22,6 +22,7 @@ class UiBookMapper @Inject constructor(
         return UiBook(
             id = domain.id,
             title = domain.title,
+            author = domain.author,
             description = domain.description,
             image = domain.image,
             downloadUrl = domain.link,
