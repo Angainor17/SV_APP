@@ -46,7 +46,7 @@ fun ExpandingText(
         LinkifyText(
             content = LinkifyContent(text),
             style = TextStyle.Default.copy(
-                fontSize = fontSize
+                fontSize = fontSize,
             ),
             maxLines = if (isExpanded) Int.MAX_VALUE else minimizedMaxLines,
             onTextLayout = { textLayoutResultState.value = it },

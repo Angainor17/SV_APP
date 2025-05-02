@@ -30,6 +30,7 @@ import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.RootBooksCatalogViewModel
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
+import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions.OnBookStateHandle
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
 import su.sv.commonui.ui.FullScreenError
@@ -83,6 +84,15 @@ private fun HandleEffects(
 ) {
     val scope = rememberCoroutineScope()
     val stackNavigation = LocalStackNavigation.current
+
+    val downloadState = viewModel.bookDownloadedActionHandler.get()
+        .sharedStateFlow
+        .collectAsStateWithLifecycle(null)
+        .value
+
+    LaunchedEffect(downloadState) {
+        downloadState?.let { viewModel.onAction(OnBookStateHandle(it)) }
+    }
 
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {

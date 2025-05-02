@@ -1,5 +1,6 @@
 package su.sv.books.catalog.presentation.root.viewmodel.actions
 
+import su.sv.books.catalog.data.receivers.BookDownloadedActionHandler.BookState
 import su.sv.models.ui.book.UiBook
 
 sealed class RootBookActions {
@@ -18,4 +19,7 @@ sealed class RootBookActions {
 
     /** Нажатие на сам элемент списка */
     data class OnBookClick(val book: UiBook) : RootBookActions()
+
+    /** Получение уведомления о скачивании */
+    data class OnBookStateHandle(val bookState: BookState) : RootBookActions()
 }

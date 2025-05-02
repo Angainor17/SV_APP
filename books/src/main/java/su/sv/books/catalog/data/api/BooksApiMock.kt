@@ -143,7 +143,7 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         "рассудочным, неполным изображением Логики как жизни идеи. Только " +
                         "спекулятивное, в котором формально-логическое (рассудочное) преодолевается " +
                         "диалектически, является истинной Логикой.",
-                author = "Г.В.Ф. Гегель",
+                author = "Г. В. Ф. Гегель",
                 image = "https://bibl.fra-mos.ru/wp-content/uploads/2016/12/Hegel_SL_Cover.jpg",
                 pagesCount = 544,
                 link = "https://bibl.fra-mos.ru/wp-content/uploads/2020/04/Hegel_T1.pdf",

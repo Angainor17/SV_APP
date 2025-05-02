@@ -6,10 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import su.sv.books.R
@@ -35,7 +33,8 @@ class BookDetailViewModel @Inject constructor(
 
     private val resourcesRepository: Lazy<ResourcesRepository>,
     private val downloadBookUseCase: Lazy<DownloadBookUseCase>,
-    private val bookDownloadedActionHandler: Lazy<BookDownloadedActionHandler>,
+
+    val bookDownloadedActionHandler: Lazy<BookDownloadedActionHandler>,
 
     getBookUriUseCase: Lazy<GetBookUriUseCase>,
 ) : BaseBookViewModel(
@@ -51,10 +50,6 @@ class BookDetailViewModel @Inject constructor(
     private val _oneTimeEffect = Channel<BookDetailOneTimeEffect>(capacity = Channel.BUFFERED)
     val oneTimeEffect: Flow<BookDetailOneTimeEffect> get() = _oneTimeEffect.receiveAsFlow()
 
-    init {
-        subscribeToEvents()
-    }
-
     override fun onAction(action: DetailBookActions) {
         when (action) {
             is DetailBookActions.LoadState -> {
@@ -63,6 +58,10 @@ class BookDetailViewModel @Inject constructor(
 
             is DetailBookActions.OnActionClick -> {
                 handleActionClick(action)
+            }
+
+            is DetailBookActions.OnBookStateHandle -> {
+                handleDownloadedBook(action.bookState)
             }
         }
     }
@@ -116,17 +115,6 @@ class BookDetailViewModel @Inject constructor(
                     downloadState = UIBookState.DOWNLOADING,
                 )
             )
-        }
-    }
-
-    private fun subscribeToEvents() {
-        viewModelScope.launch {
-            bookDownloadedActionHandler.get().sharedStateFlow.shareIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(),
-            ).collect {
-                handleDownloadedBook(it)
-            }
         }
     }
 

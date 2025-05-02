@@ -6,10 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import su.sv.books.R
@@ -40,7 +38,8 @@ class RootBooksCatalogViewModel @Inject constructor(
 
     private val resourcesRepository: Lazy<ResourcesRepository>,
     private val downloadBookUseCase: Lazy<DownloadBookUseCase>,
-    private val bookDownloadedActionHandler: Lazy<BookDownloadedActionHandler>,
+
+    val bookDownloadedActionHandler: Lazy<BookDownloadedActionHandler>,
 
     getBookUriUseCase: Lazy<GetBookUriUseCase>,
 ) : BaseBookViewModel(
@@ -59,20 +58,7 @@ class RootBooksCatalogViewModel @Inject constructor(
 
     init {
         loadBooks()
-        subscribeToEvents()
     }
-
-    private fun subscribeToEvents() {
-        viewModelScope.launch {
-            bookDownloadedActionHandler.get().sharedStateFlow.shareIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(),
-            ).collect {
-                handleDownloadedBook(it)
-            }
-        }
-    }
-
 
     private fun loadBooks() {
         _state.value = UiRootBooksState.Loading
@@ -113,6 +99,10 @@ class RootBooksCatalogViewModel @Inject constructor(
 
             RootBookActions.UpdateStates -> {
                 updateDownloadingStates()
+            }
+
+            is RootBookActions.OnBookStateHandle -> {
+                handleDownloadedBook(action.bookState)
             }
 
             is RootBookActions.OnBookClick -> {

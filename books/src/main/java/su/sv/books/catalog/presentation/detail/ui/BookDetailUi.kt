@@ -103,6 +103,14 @@ private fun HandleEffects(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val downloadState = viewModel.bookDownloadedActionHandler.get()
+        .sharedStateFlow
+        .collectAsStateWithLifecycle(null)
+        .value
+
+    LaunchedEffect(downloadState) {
+        downloadState?.let { viewModel.onAction(DetailBookActions.OnBookStateHandle(it)) }
+    }
 
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
