@@ -1,42 +1,102 @@
 package su.sv.books.catalog.presentation.detail.ui
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.activities.MainActivity
+import kotlinx.coroutines.launch
+import su.sv.books.catalog.presentation.detail.actions.DetailBookActions
+import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
+import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
 import su.sv.books.catalog.presentation.detail.viewmodel.BookDetailViewModel
+import su.sv.commonui.ui.OneTimeEffect
 import su.sv.models.ui.book.UiBook
 
-
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BookDetailUi(
     viewModel: BookDetailViewModel = hiltViewModel(),
     uiBook: UiBook,
     modifier: Modifier
 ) {
-    val context = LocalContext.current
+    val state = viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(modifier = modifier.statusBarsPadding()) {
-        Text(
-            text = "Detail Book",
-            modifier = Modifier,
-        )
+    LaunchedEffect(Unit) {
+        viewModel.onAction(DetailBookActions.LoadState(uiBook))
+    }
 
-        Button(
-            onClick = {
-                val intent = Intent(context, MainActivity::class.java)
-                intent.action = Intent.ACTION_VIEW
-                intent.data = uiBook.fileUri
-                context.startActivity(intent)
-            },
+    HandleEffects(
+        viewModel = viewModel,
+        snackbarHostState = snackbarHostState,
+    )
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    ) { contentPadding ->
+        Box(
+            modifier = modifier.statusBarsPadding()
         ) {
-            Text(text = "Open reader")
+            when (val value = state.value) {
+                is UiBookDetailState.Content -> {
+                    BookDetailInfoUi(
+                        state = value,
+                        actionsHandler = viewModel,
+                    )
+                }
+
+                UiBookDetailState.NoContent -> Unit
+            }
         }
     }
+}
+
+@Composable
+private fun HandleEffects(
+    viewModel: BookDetailViewModel,
+    snackbarHostState: SnackbarHostState,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+
+    OneTimeEffect(viewModel.oneTimeEffect) { effect ->
+        when (effect) {
+            is BookDetailOneTimeEffect.OpenBook -> {
+                openBook(context, effect.book)
+            }
+
+            is BookDetailOneTimeEffect.ShowErrorSnackBar -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = effect.text,
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun openBook(context: Context, uiBook: UiBook) {
+    val intent = Intent(context, MainActivity::class.java).apply {
+        action = Intent.ACTION_VIEW
+        data = uiBook.fileUri
+    }
+
+    context.startActivity(intent)
 }

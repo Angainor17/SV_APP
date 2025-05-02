@@ -16,6 +16,9 @@ data class UiBook(
     /** Заголовок. Например: "ОВЛ1" */
     val title: String,
 
+    /** Автор. Например: "В.И. Ленин" */
+    val author: String,
+
     /** Описание/содержание. Например: "8 статей" */
     val description: String,
 

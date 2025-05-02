@@ -44,8 +44,8 @@ import su.sv.books.R
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.commonui.theme.SVAPPTheme
-import su.sv.models.ui.book.UiBook
 import su.sv.models.ui.book.UIBookState
+import su.sv.models.ui.book.UiBook
 
 @Composable
 fun BookItem(item: UiBook, actions: RootBooksActions) {
@@ -152,8 +152,10 @@ private fun InfoFooter(item: UiBook) {
         )
         Spacer(Modifier.width(4.dp))
         Text(
-            text = item.description,
+            text = item.author,
             color = MaterialTheme.colorScheme.onTertiary,
+            minLines = 2,
+            maxLines = 2,
         )
 
         Row(
@@ -181,6 +183,7 @@ fun InfoFooterPreview() {
     val item = UiBook(
         id = "id",
         title = "Государство и Революция",
+        author = "В. И. Ленин",
         description = "В. И. Ленин",
         image = "https://picsum.photos/300/300",
         downloadUrl = "link",
@@ -206,6 +209,7 @@ fun BookItemPreview() {
     val item = UiBook(
         id = "id",
         title = "Государство и Революция",
+        author = "В. И. Ленин",
         description = "В. И. Ленин",
         image = "https://picsum.photos/300/300",
         downloadUrl = "link",
