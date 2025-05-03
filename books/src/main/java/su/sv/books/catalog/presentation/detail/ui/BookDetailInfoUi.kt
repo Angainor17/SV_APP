@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,68 +36,69 @@ fun BookDetailInfoUi(
     actionsHandler: DetailBooksActionsHandler,
 ) {
     val uiBook = state.book
-
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-    ) {
-        Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(uiBook.image)
-                    .build(),
-                placeholder = painterResource(R.drawable.ic_book_placeholder),
-                contentDescription = stringResource(R.string.books_item_image_content_description),
-                contentScale = ContentScale.FillWidth,
-            )
-        }
-        Text(
-            modifier = Modifier.padding(
-                top = 8.dp,
-                start = 12.dp,
-                end = 12.dp,
-            ),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-            text = uiBook.title,
-        )
-
-        Text(
-            modifier = Modifier.padding(
-                start = 12.dp,
-                end = 12.dp,
-            ),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-            text = uiBook.author,
-        )
-
-        Box(
+    SelectionContainer {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp),
+                .verticalScroll(rememberScrollState())
         ) {
-            LoadingButton(
-                text = state.actionText,
-                loading = state.isActionLoading,
-                onClick = {
-                    actionsHandler.onAction(DetailBookActions.OnActionClick(uiBook))
-                }
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(uiBook.image)
+                        .build(),
+                    placeholder = painterResource(R.drawable.ic_book_placeholder),
+                    contentDescription = stringResource(R.string.books_item_image_content_description),
+                    contentScale = ContentScale.FillWidth,
+                )
+            }
+            Text(
+                modifier = Modifier.padding(
+                    top = 8.dp,
+                    start = 12.dp,
+                    end = 12.dp,
+                ),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                text = uiBook.title,
+            )
+
+            Text(
+                modifier = Modifier.padding(
+                    start = 12.dp,
+                    end = 12.dp,
+                ),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
+                text = uiBook.author,
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, end = 12.dp),
+            ) {
+                LoadingButton(
+                    text = state.actionText,
+                    loading = state.isActionLoading,
+                    onClick = {
+                        actionsHandler.onAction(DetailBookActions.OnActionClick(uiBook))
+                    }
+                )
+            }
+
+            Text(
+                modifier = Modifier.padding(
+                    top = 4.dp,
+                    start = 12.dp,
+                    bottom = 32.dp,
+                    end = 12.dp,
+                ),
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                text = uiBook.description,
             )
         }
-
-        Text(
-            modifier = Modifier.padding(
-                top = 4.dp,
-                start = 12.dp,
-                bottom = 32.dp,
-                end = 12.dp,
-            ),
-            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-            text = uiBook.description,
-        )
     }
 }
 

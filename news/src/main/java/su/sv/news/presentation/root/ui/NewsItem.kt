@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,16 +36,18 @@ fun NewsItem(item: UiNewsItem) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Logo(item)
-            ExpandingText(
-                text = item.description,
-                minimizedMaxLines = 4,
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                modifier = Modifier.padding(
-                    start = 8.dp,
-                    end = 8.dp,
-                    top = 8.dp,
-                ),
-            )
+            SelectionContainer {
+                ExpandingText(
+                    text = item.description,
+                    minimizedMaxLines = 4,
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    modifier = Modifier.padding(
+                        start = 8.dp,
+                        end = 8.dp,
+                        top = 8.dp,
+                    ),
+                )
+            }
 
             Text(
                 text = item.dateFormatted,
