@@ -1,785 +1,763 @@
-package com.github.axet.bookreader.fragments;
+package com.github.axet.bookreader.fragments
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.OnShowListener
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.Typeface
+import android.net.Uri
+import android.os.BatteryManager
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.preference.PreferenceManager
+import android.util.Log
+import android.view.Gravity
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
+import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
+import com.github.axet.androidlibrary.BuildConfig
+import com.github.axet.androidlibrary.preferences.ScreenlockPreference
+import com.github.axet.androidlibrary.widgets.ErrorDialog
+import com.github.axet.androidlibrary.widgets.InvalidateOptionsMenuCompat
+import com.github.axet.androidlibrary.widgets.PopupWindowCompat
+import com.github.axet.androidlibrary.widgets.ThemeUtils
+import com.github.axet.androidlibrary.widgets.TreeListView
+import com.github.axet.androidlibrary.widgets.TreeRecyclerView
+import com.github.axet.bookreader.R
+import com.github.axet.bookreader.activities.FullscreenActivity.FullscreenListener
+import com.github.axet.bookreader.activities.MainActivity
+import com.github.axet.bookreader.activities.MainActivity.OnBackPressed
+import com.github.axet.bookreader.activities.MainActivity.SearchListener
+import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.ComicsPlugin.ComicsView
+import com.github.axet.bookreader.app.Storage
+import com.github.axet.bookreader.app.Storage.FBook
+import com.github.axet.bookreader.app.Storage.RecentInfo
+import com.github.axet.bookreader.widgets.BookmarksDialog
+import com.github.axet.bookreader.widgets.FBReaderView
+import com.github.axet.bookreader.widgets.FBReaderView.Widgets
+import com.github.axet.bookreader.widgets.FBReaderView.ZLTextIndexPosition
+import com.github.axet.bookreader.widgets.FontsPopup
+import com.github.axet.bookreader.widgets.ScrollWidget
+import com.github.axet.bookreader.widgets.ToolbarButtonView
+import org.geometerplus.fbreader.bookmodel.TOCTree
+import org.geometerplus.fbreader.fbreader.ActionCode
+import org.geometerplus.zlibrary.core.view.ZLViewEnums.PageIndex
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.BatteryManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListener,
+    FullscreenListener, OnBackPressed {
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.view.MenuItemCompat;
-import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
-
-import com.github.axet.androidlibrary.BuildConfig;
-import com.github.axet.androidlibrary.preferences.ScreenlockPreference;
-import com.github.axet.androidlibrary.widgets.ErrorDialog;
-import com.github.axet.androidlibrary.widgets.InvalidateOptionsMenuCompat;
-import com.github.axet.androidlibrary.widgets.PopupWindowCompat;
-import com.github.axet.androidlibrary.widgets.ThemeUtils;
-import com.github.axet.androidlibrary.widgets.TreeListView;
-import com.github.axet.androidlibrary.widgets.TreeRecyclerView;
-import com.github.axet.bookreader.R;
-import com.github.axet.bookreader.activities.FullscreenActivity;
-import com.github.axet.bookreader.activities.MainActivity;
-import com.github.axet.bookreader.app.BookApplication;
-import com.github.axet.bookreader.app.ComicsPlugin;
-import com.github.axet.bookreader.app.Plugin;
-import com.github.axet.bookreader.app.Storage;
-import com.github.axet.bookreader.widgets.BookmarksDialog;
-import com.github.axet.bookreader.widgets.FBReaderView;
-import com.github.axet.bookreader.widgets.FontsPopup;
-import com.github.axet.bookreader.widgets.ScrollWidget;
-import com.github.axet.bookreader.widgets.ToolbarButtonView;
-
-import org.geometerplus.fbreader.bookmodel.TOCTree;
-import org.geometerplus.fbreader.fbreader.ActionCode;
-import org.geometerplus.zlibrary.core.view.ZLViewEnums;
-
-import java.util.List;
-
-public class ReaderFragment extends Fragment implements MainActivity.SearchListener, SharedPreferences.OnSharedPreferenceChangeListener, FullscreenActivity.FullscreenListener, MainActivity.OnBackPressed {
-    public static final String TAG = ReaderFragment.class.getSimpleName();
-
-    public static final int FONT_START = 15;
-    public static final int FONT_END = 100;
-    public static final int REFLOW_START = 3;
-    public static final int REFLOW_END = 15;
-
-    public static final int RESULT_FONTS = 1;
-
-    Handler handler = new Handler();
-    Storage storage;
-    Storage.Book book;
-    Storage.FBook fbook;
-    FBReaderView fb;
-    AlertDialog tocdialog;
-    boolean showRTL;
-    FontsPopup fontsPopup;
-    MenuItem searchMenu;
-    BroadcastReceiver battery;
-    Runnable invalidateOptionsMenu;
-    Runnable time = new Runnable() {
-        @Override
-        public void run() {
-            long s60 = 60 * 1000;
-            long secs = System.currentTimeMillis() % s60;
-            handler.removeCallbacks(this);
-            long d = s60 - secs;
-            if (d < 1000)
-                d = s60 + d;
-            handler.postDelayed(this, d);
-            fb.invalidateFooter();
-            savePosition();
+    private val handler: Handler = Handler()
+    private val storage: Storage by lazy { Storage(context) }
+    private var book: Storage.Book? = null
+    private var fbook: FBook? = null
+    private var fb: FBReaderView? = null
+    private var tocdialog: AlertDialog? = null
+    private var showRTL: Boolean = false
+    private var fontsPopup: FontsPopup? = null
+    private var searchMenu: MenuItem? = null
+    private var battery: BroadcastReceiver? = null
+    private var invalidateOptionsMenu: Runnable? = null
+    private val time: Runnable = object : Runnable {
+        override fun run() {
+            val s60 = (60 * 1000).toLong()
+            val secs = System.currentTimeMillis() % s60
+            handler.removeCallbacks(this)
+            var d = s60 - secs
+            if (d < 1000) d = s60 + d
+            handler.postDelayed(this, d)
+            fb!!.invalidateFooter()
+            savePosition()
         }
-    };
-
-    public ReaderFragment() {
     }
 
-    public static View getOverflowMenuButton(Activity a) {
-        return getOverflowMenuButton((ViewGroup) a.findViewById(R.id.toolbar));
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
+        val shared = PreferenceManager.getDefaultSharedPreferences(context)
+        shared.registerOnSharedPreferenceChangeListener(this)
     }
 
-    public static View getOverflowMenuButton(ViewGroup p) {
-        for (int i = 0; i < p.getChildCount(); i++) {
-            View v = p.getChildAt(i);
-            if (v.getClass().getCanonicalName().contains("OverflowMenuButton"))
-                return v;
-            if (v instanceof ViewGroup) {
-                v = getOverflowMenuButton((ViewGroup) v);
-                if (v != null)
-                    return v;
-            }
-        }
-        return null;
+    override fun onStart() {
+        super.onStart()
     }
 
-    public static ReaderFragment newInstance(Uri uri) {
-        ReaderFragment fragment = new ReaderFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("uri", uri);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val v = inflater.inflate(R.layout.fragment_reader, container, false)
 
-    public static ReaderFragment newInstance(Uri uri, FBReaderView.ZLTextIndexPosition pos) {
-        ReaderFragment fragment = new ReaderFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("uri", uri);
-        args.putParcelable("pos", pos);
-        fragment.setArguments(args);
-        return fragment;
-    }
+        val main = activity as MainActivity?
+        fb = v.findViewById<View?>(R.id.main_view) as FBReaderView?
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        storage = new Storage(getContext());
-        setHasOptionsMenu(true);
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-        shared.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        final View v = inflater.inflate(R.layout.fragment_reader, container, false);
-
-        final MainActivity main = (MainActivity) getActivity();
-        fb = (FBReaderView) v.findViewById(R.id.main_view);
-
-        fb.listener = new FBReaderView.Listener() {
-            @Override
-            public void onScrollingFinished(ZLViewEnums.PageIndex index) {
+        fb!!.listener = object : FBReaderView.Listener {
+            override fun onScrollingFinished(index: PageIndex?) {
                 if (fontsPopup != null) {
-                    fontsPopup.dismiss();
-                    fontsPopup = null;
+                    fontsPopup!!.dismiss()
+                    fontsPopup = null
                 }
-                updateToolbar();
+                updateToolbar()
             }
 
-            @Override
-            public void onSearchClose() {
-                MenuItemCompat.collapseActionView(searchMenu);
+            override fun onSearchClose() {
+                MenuItemCompat.collapseActionView(searchMenu)
             }
 
-            @Override
-            public void onBookmarksUpdate() {
-                updateToolbar();
+            override fun onBookmarksUpdate() {
+                updateToolbar()
             }
 
-            @Override
-            public void onDismissDialog() {
-                if (main.fullscreen)
-                    main.hideSystemUI();
+            override fun onDismissDialog() {
+                if (main!!.fullscreen) main.hideSystemUI()
             }
 
-            @Override
-            public void ttsStatus(boolean speaking) {
-                MainActivity main = (MainActivity) getActivity();
-                main.volumeEnabled = !speaking;
+            override fun ttsStatus(speaking: Boolean) {
+                val main = activity as MainActivity?
+                main!!.volumeEnabled = !speaking
             }
-        };
+        }
 
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String mode = shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "");
-        fb.setWidget(mode.equals(FBReaderView.Widgets.CONTINUOUS.toString()) ? FBReaderView.Widgets.CONTINUOUS : FBReaderView.Widgets.PAGING);
+        val shared = PreferenceManager.getDefaultSharedPreferences(context)
+        val mode: String = shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "")!!
+        fb!!.setWidget(if (mode == Widgets.CONTINUOUS.toString()) Widgets.CONTINUOUS else Widgets.PAGING)
 
-        fb.setWindow(getActivity().getWindow());
-        fb.setActivity(getActivity());
+        fb!!.setWindow(requireActivity().window)
+        fb!!.setActivity(activity)
 
-        Uri uri = getArguments().getParcelable("uri");
-        FBReaderView.ZLTextIndexPosition pos = getArguments().getParcelable("pos");
+        val uri = requireArguments().getParcelable<Uri?>("uri")
+        val pos = requireArguments().getParcelable<ZLTextIndexPosition?>("pos")
 
         try {
-            book = storage.load(uri);
-            fbook = storage.read(book);
-            fb.loadBook(fbook);
-            if (pos != null)
-                fb.gotoPosition(pos);
-        } catch (RuntimeException e) {
-            ErrorDialog.Error(main, e);
+            book = storage.load(uri)
+            fbook = storage.read(book)
+            fb!!.loadBook(fbook)
+            if (pos != null) fb!!.gotoPosition(pos)
+        } catch (e: RuntimeException) {
+            ErrorDialog.Error(main, e)
             // or openLibrary crash with java.lang.IllegalStateException on FragmentActivity.onResume
-            handler.post(() -> {
-                if (!main.isFinishing())
-                    main.openLibrary();
-            });
-            return v; // ignore post called
+            handler.post(Runnable {
+                if (!main!!.isFinishing) main.openLibrary()
+            })
+            return v // ignore post called
         }
 
-        handler.post(() -> {
-            if (getActivity().isFinishing())
-                return;
-            updateToolbar(); // update toolbar after page been drawn to detect RTL
-            fb.showControls(); //  update toolbar after page been drawn, getWidth() == 0
-        });
-
-        return v;
-    }
-
-    void updateToolbar() {
-        if (invalidateOptionsMenu != null)
-            invalidateOptionsMenu.run();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        ScreenlockPreference.onResume(getActivity(), BookApplication.PREFERENCE_SCREENLOCK);
-
-        battery = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                fb.battery = level * 100 / scale;
-                fb.invalidateFooter();
+        handler.post(
+            Runnable {
+                if (requireActivity().isFinishing) return@Runnable
+                updateToolbar() // update toolbar after page been drawn to detect RTL
+                fb?.showControls() //  update toolbar after page been drawn, getWidth() == 0
             }
-        };
+        )
+
+        return v
+    }
+
+    fun updateToolbar() {
+        if (invalidateOptionsMenu != null) invalidateOptionsMenu!!.run()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ScreenlockPreference.onResume(activity, BookApplication.PREFERENCE_SCREENLOCK)
+
+        battery = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent) {
+                val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                fb!!.battery = level * 100 / scale
+                fb!!.invalidateFooter()
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            battery.onReceive(
-                    getContext(),
-                    getContext().registerReceiver(
-                            battery,
-                            new IntentFilter(Intent.ACTION_BATTERY_CHANGED),
-                            RECEIVER_NOT_EXPORTED
-                    )
-            );
+            battery!!.onReceive(
+                requireContext(),
+                requireContext().registerReceiver(
+                    battery,
+                    IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+                    Context.RECEIVER_NOT_EXPORTED
+                )
+            )
         } else {
-            battery.onReceive(
-                    getContext(),
-                    getContext().registerReceiver(
-                            battery,
-                            new IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-                    )
-            );
+            battery!!.onReceive(
+                requireContext(),
+                requireContext().registerReceiver(
+                    battery,
+                    IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+                )
+            )
         }
 
-        time.run();
+        time.run()
 
-        updateTheme(); // MainActivity.restartActivity() not called when double change while ReaderFragment active
+        updateTheme() // MainActivity.restartActivity() not called when double change while ReaderFragment active
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        savePosition();
-        ScreenlockPreference.onPause(getActivity(), BookApplication.PREFERENCE_SCREENLOCK);
+    override fun onPause() {
+        super.onPause()
+        savePosition()
+        ScreenlockPreference.onPause(activity, BookApplication.PREFERENCE_SCREENLOCK)
 
         if (battery != null) {
-            getContext().unregisterReceiver(battery);
-            battery = null;
+            requireContext().unregisterReceiver(battery)
+            battery = null
         }
 
-        handler.removeCallbacks(time);
+        handler.removeCallbacks(time)
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        savePosition();
+    override fun onDetach() {
+        super.onDetach()
+        savePosition()
     }
 
-    public float getFontsizeReflow() {
-        Float fontsize = fb.getFontsizeReflow();
-        if (fontsize != null)
-            return fontsize;
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return shared.getFloat(BookApplication.PREFERENCE_FONTSIZE_REFLOW, BookApplication.PREFERENCE_FONTSIZE_REFLOW_DEFAULT);
-    }
+    val fontsizeReflow: Float
+        get() {
+            val fontsize = fb!!.getFontsizeReflow()
+            if (fontsize != null) return fontsize
+            val shared =
+                PreferenceManager.getDefaultSharedPreferences(context)
+            return shared.getFloat(
+                BookApplication.PREFERENCE_FONTSIZE_REFLOW,
+                BookApplication.PREFERENCE_FONTSIZE_REFLOW_DEFAULT
+            )
+        }
 
-    void savePosition() {
-        if (book == null)
-            return;
-        if (fb.book == null) // when book isn't loaded and view closed
-            return;
-        Storage.RecentInfo save = new Storage.RecentInfo(fb.book.info);
-        save.position = fb.getPosition();
-        Uri u = storage.recentUri(book);
-        if (Storage.exists(getContext(), u)) { // file can be changed during sync, check for conflicts
+    fun savePosition() {
+        if (book == null) return
+        if (fb!!.book == null)  // when book isn't loaded and view closed
+            return
+        val save = RecentInfo(fb!!.book.info)
+        save.position = fb!!.position
+        val u = storage!!.recentUri(book)
+        if (Storage.exists(
+                context,
+                u
+            )
+        ) { // file can be changed during sync, check for conflicts
             try {
-                Storage.RecentInfo info = new Storage.RecentInfo(getContext(), u);
+                val info = RecentInfo(context, u)
                 if (info.position != null && save.position.samePositionAs(info.position)) {
-                    if (save.fontsize == null || info.fontsize != null && save.fontsize.equals(info.fontsize)) {
-                        if (save.equals(info.fontsizes))
-                            if (save.bookmarks == null || info.bookmarks != null && save.bookmarks.equals(info.bookmarks))
-                                return; // nothing to save
+                    if (save.fontsize == null || info.fontsize != null && save.fontsize == info.fontsize) {
+                        if (save.equals(info.fontsizes)) if (save.bookmarks == null || info.bookmarks != null && save.bookmarks.equals(
+                                info.bookmarks
+                            )
+                        ) return  // nothing to save
                     }
                 }
-                if (book.info.last != info.last) // file changed between saves?
-                    storage.move(u, storage.getStoragePath()); // yes. create conflict (1)
-                save.merge(info.fontsizes, info.last);
-            } catch (RuntimeException e) {
-                Log.d(TAG, "Unable to load JSON", e);
+                if (book!!.info.last != info.last)  // file changed between saves?
+                    storage!!.move(u, storage!!.getStoragePath()) // yes. create conflict (1)
+
+                save.merge(info.fontsizes, info.last)
+            } catch (e: RuntimeException) {
+                Log.d(TAG, "Unable to load JSON", e)
             }
         }
-        book.info = save;
-        storage.save(book);
-        Log.d(TAG, "savePosition " + save.position);
+        book!!.info = save
+        storage!!.save(book)
+        Log.d(TAG, "savePosition " + save.position)
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        handler.removeCallbacksAndMessages(null);
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-        shared.unregisterOnSharedPreferenceChangeListener(this);
-        handler.removeCallbacks(time);
-        ScreenlockPreference.onUserInteractionRemove();
-        if (fb != null) // onDestory without onCreate
-            fb.closeBook();
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+        val shared = PreferenceManager.getDefaultSharedPreferences(context)
+        shared.unregisterOnSharedPreferenceChangeListener(this)
+        handler.removeCallbacks(time)
+        ScreenlockPreference.onUserInteractionRemove()
+        if (fb != null)  // onDestory without onCreate
+            fb!!.closeBook()
         if (fontsPopup != null) {
-            fontsPopup.dismiss();
-            fontsPopup = null;
+            fontsPopup!!.dismiss()
+            fontsPopup = null
         }
         if (fbook != null) {
-            fbook.close();
-            fbook = null;
+            fbook!!.close()
+            fbook = null
         }
-        book = null;
+        book = null
     }
 
-    @Override
-    public void onUserInteraction() {
-        ScreenlockPreference.onUserInteraction(getActivity(), BookApplication.PREFERENCE_SCREENLOCK);
+    override fun onUserInteraction() {
+        ScreenlockPreference.onUserInteraction(activity, BookApplication.PREFERENCE_SCREENLOCK)
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (fontsPopup != null) {
-            fontsPopup.dismiss();
-            fontsPopup = null;
+            fontsPopup!!.dismiss()
+            fontsPopup = null
         }
-        int id = item.getItemId();
+        val id = item.itemId
         if (id == R.id.action_toc) {
-            showTOC();
-            return true;
+            showTOC()
+            return true
         }
         if (id == R.id.action_bm) {
-            BookmarksDialog dialog = new BookmarksDialog(getContext()) {
-                @Override
-                public void onSelected(Storage.Bookmark b) {
-                    fb.gotoPosition(new FBReaderView.ZLTextIndexPosition(b.start, b.end));
+            val dialog: BookmarksDialog = object : BookmarksDialog(context) {
+                override fun onSelected(b: Storage.Bookmark) {
+                    fb!!.gotoPosition(ZLTextIndexPosition(b.start, b.end))
                 }
 
-                @Override
-                public void onSave(Storage.Bookmark bm) {
-                    fb.bookmarksUpdate();
-                    savePosition();
+                override fun onSave(bm: Storage.Bookmark?) {
+                    fb!!.bookmarksUpdate()
+                    savePosition()
                 }
 
-                @Override
-                public void onDelete(Storage.Bookmark bm) {
-                    int i = book.info.bookmarks.indexOf(bm);
-                    book.info.bookmarks.remove(i);
-                    i = fb.book.info.bookmarks.indexOf(bm);
-                    fb.book.info.bookmarks.remove(i);
-                    fb.bookmarksUpdate();
-                    savePosition();
+                override fun onDelete(bm: Storage.Bookmark?) {
+                    var i = book!!.info.bookmarks.indexOf(bm)
+                    book!!.info.bookmarks.removeAt(i)
+                    i = fb!!.book.info.bookmarks.indexOf(bm)
+                    fb!!.book.info.bookmarks.removeAt(i)
+                    fb!!.bookmarksUpdate()
+                    savePosition()
                 }
-            };
-            dialog.load(fb.book.info.bookmarks);
-            dialog.show();
-            return true;
+            }
+            dialog.load(fb!!.book.info.bookmarks)
+            dialog.show()
+            return true
         }
         if (id == R.id.action_reflow) {
-            fb.setReflow(!fb.isReflow());
-            updateToolbar();
+            fb!!.setReflow(!fb!!.isReflow)
+            updateToolbar()
         }
         if (id == R.id.action_debug) {
-            fb.pluginview.reflowDebug = !fb.pluginview.reflowDebug;
-            if (fb.pluginview.reflowDebug) {
-                fb.pluginview.reflow = true;
-                fb.setWidget(FBReaderView.Widgets.PAGING);
+            fb!!.pluginview.reflowDebug = !fb!!.pluginview.reflowDebug
+            if (fb!!.pluginview.reflowDebug) {
+                fb!!.pluginview.reflow = true
+                fb!!.setWidget(Widgets.PAGING)
             }
-            fb.reset();
-            updateToolbar();
+            fb!!.reset()
+            updateToolbar()
         }
         if (id == R.id.action_fontsize) {
-            if (fb.pluginview == null) {
-                fontsPopup = new FontsPopup(getContext(), BookApplication.from(getContext()).ttf) {
-                    @Override
-                    public void setFont(String f) {
-                        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-                        SharedPreferences.Editor edit = shared.edit();
-                        edit.putString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, f);
-                        edit.apply();
-                        fb.setFontFB(f);
-                        updateToolbar();
-                    }
+            if (fb!!.pluginview == null) {
+                fontsPopup =
+                    object : FontsPopup(context, BookApplication.from(requireContext())?.ttf) {
+                        override fun setFont(f: String?) {
+                            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+                            shared.edit {
+                                putString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, f)
+                            }
+                            fb?.setFontFB(f)
+                            updateToolbar()
+                        }
 
-                    @Override
-                    public void setFontsize(int f) {
-                        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-                        SharedPreferences.Editor edit = shared.edit();
-                        edit.putInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, f);
-                        edit.apply();
-                        fb.setFontsizeFB(f);
-                        updateToolbar();
-                    }
+                        override fun setFontsize(f: Int) {
+                            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+                            shared.edit {
+                                putInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, f)
+                            }
+                            fb?.setFontsizeFB(f)
+                            updateToolbar()
+                        }
 
-                    @Override
-                    public void setIgnoreEmbeddedFonts(boolean f) {
-                        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-                        SharedPreferences.Editor edit = shared.edit();
-                        edit.putBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, f);
-                        edit.apply();
-                        fb.setIgnoreCssFonts(f);
-                        updateToolbar();
-                    }
+                        override fun setIgnoreEmbeddedFonts(f: Boolean) {
+                            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+                            shared.edit {
+                                putBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, f)
+                            }
+                            fb?.setIgnoreCssFonts(f)
+                            updateToolbar()
+                        }
 
-                    @Override
-                    public void updateFontsize(int f) {
-                        fontsizepopup_text.setText(Integer.toString(f));
+                        override fun updateFontsize(f: Int) {
+                            fontsizepopup_text.text = f.toString()
+                        }
                     }
-                };
-                fontsPopup.fragment = this;
-                fontsPopup.code = RESULT_FONTS;
-                fontsPopup.loadFonts();
-                fontsPopup.fonts.select(fb.app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption.getValue());
-                fontsPopup.ignore_embedded_fonts.setChecked(fb.getIgnoreCssFonts());
-                fontsPopup.fontsList.scrollToPosition(fontsPopup.fonts.selected);
-                fontsPopup.updateFontsize(FONT_START, FONT_END, fb.getFontsizeFB());
+                fontsPopup!!.fragment = this
+                fontsPopup!!.code = RESULT_FONTS
+                fontsPopup!!.loadFonts()
+                fontsPopup!!.fonts.select(
+                    fb!!.app.ViewOptions.getTextStyleCollection()
+                        .baseStyle.FontFamilyOption.value
+                )
+                fontsPopup!!.ignore_embedded_fonts.setChecked(fb!!.ignoreCssFonts)
+                fontsPopup!!.fontsList.scrollToPosition(fontsPopup!!.fonts.selected)
+                fontsPopup!!.updateFontsize(FONT_START, FONT_END, fb!!.getFontsizeFB())
             } else {
-                fontsPopup = new FontsPopup(getContext(), BookApplication.from(getContext()).ttf) {
-                    @Override
-                    public void setFontsize(int f) {
-                        float p = f / 10f;
-                        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-                        SharedPreferences.Editor editor = shared.edit();
-                        editor.putFloat(BookApplication.PREFERENCE_FONTSIZE_REFLOW, p);
-                        editor.apply();
-                        fb.setFontsizeReflow(p);
-                        updateToolbar();
-                    }
+                fontsPopup =
+                    object : FontsPopup(context, BookApplication.from(requireContext())?.ttf) {
+                        override fun setFontsize(f: Int) {
+                            val p = f / 10f
+                            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+                            shared.edit {
+                                putFloat(BookApplication.PREFERENCE_FONTSIZE_REFLOW, p)
+                            }
+                            fb!!.setFontsizeReflow(p)
+                            updateToolbar()
+                        }
 
-                    @Override
-                    public void updateFontsize(int f) {
-                        fontsizepopup_text.setText(String.format("%.1f", f / 10f));
+                        override fun updateFontsize(f: Int) {
+                            fontsizepopup_text.text = String.format("%.1f", f / 10f)
+                        }
                     }
-                };
-                fontsPopup.fontsFrame.setVisibility(View.GONE);
-                fontsPopup.updateFontsize(REFLOW_START, REFLOW_END, (int) (getFontsizeReflow() * 10));
+                fontsPopup!!.fontsFrame.visibility = View.GONE
+                fontsPopup!!.updateFontsize(
+                    REFLOW_START,
+                    REFLOW_END,
+                    (this.fontsizeReflow * 10).toInt()
+                )
             }
-            View v = MenuItemCompat.getActionView(item);
-            if (v == null || !ViewCompat.isAttachedToWindow(v))
-                v = getOverflowMenuButton(getActivity());
-            PopupWindowCompat.showAsTooltip(fontsPopup, v, Gravity.BOTTOM,
-                    ThemeUtils.getThemeColor(getContext(), com.github.axet.androidlibrary.R.attr.colorButtonNormal), // v has overflow ThemedContext
-                    ThemeUtils.dp2px(getContext(), 300));
+            var v = MenuItemCompat.getActionView(item)
+            if (v == null || !ViewCompat.isAttachedToWindow(v)) v = getOverflowMenuButton(
+                requireActivity()
+            )
+            PopupWindowCompat.showAsTooltip(
+                fontsPopup, v, Gravity.BOTTOM,
+                ThemeUtils.getThemeColor(
+                    context,
+                    com.github.axet.androidlibrary.R.attr.colorButtonNormal
+                ),  // v has overflow ThemedContext
+                ThemeUtils.dp2px(context, 300f)
+            )
         }
         if (id == R.id.action_rtl) {
-            fb.app.BookTextView.rtlMode = !fb.app.BookTextView.rtlMode;
-            fb.reset();
-            updateToolbar();
+            fb!!.app.BookTextView.rtlMode = !fb!!.app.BookTextView.rtlMode
+            fb!!.reset()
+            updateToolbar()
         }
         if (id == R.id.action_mode) {
-            FBReaderView.Widgets m = fb.widget instanceof ScrollWidget ? FBReaderView.Widgets.PAGING : FBReaderView.Widgets.CONTINUOUS;
-            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-            SharedPreferences.Editor edit = shared.edit();
-            edit.putString(BookApplication.PREFERENCE_VIEW_MODE, m.toString());
-            edit.apply();
-            fb.setWidget(m);
-            fb.reset();
-            updateToolbar();
+            val m = if (fb!!.widget is ScrollWidget) Widgets.PAGING else Widgets.CONTINUOUS
+            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+            shared.edit {
+                putString(BookApplication.PREFERENCE_VIEW_MODE, m.toString())
+            }
+            fb!!.setWidget(m)
+            fb!!.reset()
+            updateToolbar()
         }
         if (id == R.id.action_tts) {
-            if (fb.tts != null) {
-                fb.tts.dismiss();
-                fb.tts = null;
+            if (fb!!.tts != null) {
+                fb!!.tts.dismiss()
+                fb!!.tts = null
             } else {
-                fb.ttsOpen();
+                fb!!.ttsOpen()
             }
         }
 
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
-    public void updateTheme() {
-        fb.updateTheme();
+    fun updateTheme() {
+        fb!!.updateTheme()
     }
 
-    @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
 
-        invalidateOptionsMenu = InvalidateOptionsMenuCompat.onCreateOptionsMenu(this, menu, inflater);
+        invalidateOptionsMenu =
+            InvalidateOptionsMenuCompat.onCreateOptionsMenu(this, menu, inflater)
 
-        MenuItem homeMenu = menu.findItem(R.id.action_home);
-        MenuItem tocMenu = menu.findItem(R.id.action_toc);
-        searchMenu = menu.findItem(R.id.action_search);
-        MenuItem reflow = menu.findItem(R.id.action_reflow);
-        MenuItem debug = menu.findItem(R.id.action_debug);
-        MenuItem bookmarksMenu = menu.findItem(R.id.action_bm);
-        final MenuItem fontsize = menu.findItem(R.id.action_fontsize);
-        final MenuItem rtl = menu.findItem(R.id.action_rtl);
-        MenuItem grid = menu.findItem(R.id.action_grid);
-        MenuItem mode = menu.findItem(R.id.action_mode);
-        MenuItem theme = menu.findItem(R.id.action_theme);
-        MenuItem sort = menu.findItem(R.id.action_sort);
-        MenuItem tts = menu.findItem(R.id.action_tts);
+        val homeMenu = menu.findItem(R.id.action_home)
+        val tocMenu = menu.findItem(R.id.action_toc)
+        searchMenu = menu.findItem(R.id.action_search)
+        val reflow = menu.findItem(R.id.action_reflow)
+        val debug = menu.findItem(R.id.action_debug)
+        val bookmarksMenu = menu.findItem(R.id.action_bm)
+        val fontsize = menu.findItem(R.id.action_fontsize)
+        val rtl = menu.findItem(R.id.action_rtl)
+        val grid = menu.findItem(R.id.action_grid)
+        val mode = menu.findItem(R.id.action_mode)
+        val theme = menu.findItem(R.id.action_theme)
+        val sort = menu.findItem(R.id.action_sort)
+        val tts = menu.findItem(R.id.action_tts)
 
-        boolean search;
+        val search: Boolean
 
-        if (fb.pluginview == null) {
-            search = true;
+        if (fb!!.pluginview == null) {
+            search = true
         } else {
-            Plugin.View.Search s = fb.pluginview.search("");
+            val s = fb!!.pluginview.search("")
             if (s == null) {
-                search = false;
+                search = false
             } else {
-                s.close();
-                search = true;
+                s.close()
+                search = true
             }
-            if (fb.pluginview.reflow || fb.pluginview instanceof ComicsPlugin.ComicsView)
-                tts.setVisible(false); // TODO reflow - possible and can be very practical
+            if (fb!!.pluginview.reflow || fb!!.pluginview is ComicsView) tts.isVisible =
+                false // TODO reflow - possible and can be very practical
         }
 
-        grid.setVisible(false);
-        homeMenu.setVisible(false);
-        sort.setVisible(false);
-        tocMenu.setVisible(fb.app.Model != null && fb.app.Model.TOCTree != null && fb.app.Model.TOCTree.hasChildren());
-        searchMenu.setVisible(search);
-        reflow.setVisible(fb.pluginview != null && !(fb.pluginview instanceof ComicsPlugin.ComicsView));
+        grid.isVisible = false
+        homeMenu.isVisible = false
+        sort.isVisible = false
+        tocMenu.isVisible =
+            fb!!.app.Model != null && fb!!.app.Model.TOCTree != null && fb!!.app.Model.TOCTree.hasChildren()
+        searchMenu!!.isVisible = search
+        reflow.isVisible = fb!!.pluginview != null && fb!!.pluginview !is ComicsView
 
-        if (BuildConfig.DEBUG && fb.pluginview != null && !(fb.pluginview instanceof ComicsPlugin.ComicsView))
-            debug.setVisible(true);
-        else
-            debug.setVisible(false);
+        debug.isVisible =
+            BuildConfig.DEBUG && fb!!.pluginview != null && (fb!!.pluginview !is ComicsView)
 
-        fontsize.setVisible(fb.pluginview == null || fb.pluginview.reflow);
-        if (fb.pluginview == null)
-            ((ToolbarButtonView) MenuItemCompat.getActionView(fontsize)).text.setText("" + (fb.book == null ? "" : fb.getFontsizeFB())); // call before onCreateView
-        else
-            ((ToolbarButtonView) MenuItemCompat.getActionView(fontsize)).text.setText(String.format("%.1f", getFontsizeReflow()));
-        MenuItemCompat.getActionView(fontsize).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOptionsItemSelected(fontsize);
-            }
-        });
-
-        mode.setIcon(fb.widget instanceof ScrollWidget ? R.drawable.ic_view_day_black_24dp : R.drawable.ic_view_carousel_black_24dp); // icon current
-        mode.setTitle(fb.widget instanceof ScrollWidget ? R.string.view_mode_paging : R.string.view_mode_continuous); // text next
-
-        showRTL |= !fb.app.BookTextView.rtlMode && fb.app.BookTextView.rtlDetected;
-        if (showRTL)
-            rtl.setVisible(true);
-        else
-            rtl.setVisible(false);
-        MenuItemCompat.getActionView(rtl).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOptionsItemSelected(rtl);
-            }
-        });
-        rtl.setTitle(fb.app.BookTextView.rtlMode ? "RTL" : "LTR");
-        ((ToolbarButtonView) MenuItemCompat.getActionView(rtl)).text.setText(fb.app.BookTextView.rtlMode ? "RTL" : "LTR");
-        if (fb.book != null) // call before onCreateView
-            bookmarksMenu.setVisible(fb.book.info.bookmarks != null && fb.book.info.bookmarks.size() > 0);
-
-        if (fb.pluginview instanceof ComicsPlugin.ComicsView)
-            theme.setVisible(false);
-    }
-
-    void showTOC() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final TOCTree current = fb.app.getCurrentTOCElement();
-        final TOCAdapter a = new TOCAdapter(fb.app.Model.TOCTree.subtrees(), current);
-        final TreeRecyclerView tree = new TreeRecyclerView(getContext());
-        tree.setAdapter(a);
-        builder.setView(tree);
-        builder.setPositiveButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        tocdialog = builder.create();
-        tocdialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                final int i = a.getCurrent() - 1;
-                if (i > 0)
-                    tree.setSelection(i);
-            }
-        });
-        tocdialog.show();
-    }
-
-    @Override
-    public void search(String s) {
-        fb.app.runAction(ActionCode.SEARCH, s);
-    }
-
-    @Override
-    public void searchClose() {
-        fb.searchClose();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(BookApplication.PREFERENCE_VIEW_MODE)) {
-            fb.configWidget(sharedPreferences);
-            fb.showControls();
+        fontsize.isVisible = fb!!.pluginview == null || fb!!.pluginview.reflow
+        if (fb!!.pluginview == null) {
+            (MenuItemCompat.getActionView(fontsize) as ToolbarButtonView).text.text =
+                "" + (if (fb!!.book == null) "" else fb!!.getFontsizeFB())
+        } // call before onCreateView
+        else {
+            (MenuItemCompat.getActionView(fontsize) as ToolbarButtonView).text.text = String.format(
+                "%.1f",
+                this.fontsizeReflow
+            )
         }
-        if (key.equals(BookApplication.PREFERENCE_THEME)) {
-            fb.configColorProfile(sharedPreferences);
+        MenuItemCompat.getActionView(fontsize).setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                onOptionsItemSelected(fontsize)
+            }
+        })
+
+        mode.setIcon(if (fb!!.widget is ScrollWidget) R.drawable.ic_view_day_black_24dp else R.drawable.ic_view_carousel_black_24dp) // icon current
+        mode.setTitle(if (fb!!.widget is ScrollWidget) R.string.view_mode_paging else R.string.view_mode_continuous) // text next
+
+        showRTL = showRTL or (!fb!!.app.BookTextView.rtlMode && fb!!.app.BookTextView.rtlDetected)
+        rtl.isVisible = showRTL
+        MenuItemCompat.getActionView(rtl).setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                onOptionsItemSelected(rtl)
+            }
+        })
+        rtl.title = if (fb!!.app.BookTextView.rtlMode) "RTL" else "LTR"
+        (MenuItemCompat.getActionView(rtl) as ToolbarButtonView).text.text =
+            if (fb!!.app.BookTextView.rtlMode) "RTL" else "LTR"
+        if (fb!!.book != null)  // call before onCreateView
+            bookmarksMenu.isVisible =
+                fb!!.book.info.bookmarks != null && fb!!.book.info.bookmarks.isNotEmpty()
+
+        if (fb!!.pluginview is ComicsView) theme.isVisible = false
+    }
+
+    fun showTOC() {
+        val builder = AlertDialog.Builder(requireContext())
+        val current = fb!!.app.currentTOCElement
+        val a = TOCAdapter(fb!!.app.Model.TOCTree.subtrees(), current)
+        val tree = TreeRecyclerView(requireContext())
+        tree.setAdapter(a)
+        builder.setView(tree)
+        builder.setPositiveButton(
+            android.R.string.cancel,
+            object : DialogInterface.OnClickListener {
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                }
+            })
+        tocdialog = builder.create()
+        tocdialog!!.setOnShowListener(object : OnShowListener {
+            override fun onShow(dialog: DialogInterface?) {
+                val i = a.getCurrent() - 1
+                if (i > 0) tree.setSelection(i)
+            }
+        })
+        tocdialog!!.show()
+    }
+
+    override fun search(s: String?) {
+        fb!!.app.runAction(ActionCode.SEARCH, s)
+    }
+
+    override fun searchClose() {
+        fb!!.searchClose()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        if (key == BookApplication.PREFERENCE_VIEW_MODE) {
+            fb!!.configWidget(sharedPreferences)
+            fb!!.showControls()
+        }
+        if (key == BookApplication.PREFERENCE_THEME) {
+            fb!!.configColorProfile(sharedPreferences)
         }
     }
 
-    @Override
-    public String getHint() {
-        return getString(R.string.search_book);
+    override val hint: String?
+        get() = getString(R.string.search_book)
+
+    override fun onFullscreenChanged(f: Boolean) {
+        fb!!.onConfigurationChanged(null)
     }
 
-    @Override
-    public void onFullscreenChanged(boolean f) {
-        fb.onConfigurationChanged(null);
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
-            fb.app.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD);
-            return true;
+            fb!!.app.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
+            return true
         }
         if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
-            fb.app.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK);
-            return true;
+            fb!!.app.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
+            return true
         }
-        return false;
+        return false
     }
 
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN))
-            return true;
-        if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP))
-            return true;
-        return false;
+    fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) return true
+        if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP)) return true
+        return false
     }
 
-    @Override
-    public boolean onBackPressed() {
-        if (fb.isPinch()) {
-            fb.pinchClose();
-            return true;
+    override fun onBackPressed(): Boolean {
+        if (fb!!.isPinch()) {
+            fb!!.pinchClose()
+            return true
         }
-        return false;
+        return false
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (fontsPopup != null && fontsPopup.choicer != null)
-            fontsPopup.choicer.onActivityResult(resultCode, data);
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (fontsPopup != null && fontsPopup!!.choicer != null) fontsPopup!!.choicer.onActivityResult(
+            resultCode,
+            data
+        )
     }
 
-    public static class TOCHolder extends TreeRecyclerView.TreeHolder {
-        ImageView i;
-        TextView textView;
-
-        public TOCHolder(View itemView) {
-            super(itemView);
-            i = (ImageView) itemView.findViewById(R.id.image);
-            textView = (TextView) itemView.findViewById(R.id.text);
-        }
+    class TOCHolder(itemView: View) : TreeRecyclerView.TreeHolder(itemView) {
+        val i: ImageView = itemView.findViewById<View?>(R.id.image) as ImageView
+        val textView: TextView = itemView.findViewById<View?>(R.id.text) as TextView
     }
 
-    public class TOCAdapter extends TreeRecyclerView.TreeAdapter<TOCHolder> {
-        TOCTree current;
+    inner class TOCAdapter(
+        ll: MutableList<TOCTree>,
+        val current: TOCTree?,
+    ) :
+        TreeRecyclerView.TreeAdapter<TOCHolder?>() {
 
-        public TOCAdapter(List<TOCTree> ll, TOCTree current) {
-            this.current = current;
-            loadTOC(root, ll);
-            load();
+        init {
+            loadTOC(root, ll)
+            load()
         }
 
-        void loadTOC(TreeListView.TreeNode r, List<TOCTree> tree) {
-            for (TOCTree t : tree) {
-                TreeListView.TreeNode n = new TreeListView.TreeNode(r, t);
-                r.nodes.add(n);
+        fun loadTOC(r: TreeListView.TreeNode, tree: MutableList<TOCTree>) {
+            for (t in tree) {
+                val n = TreeListView.TreeNode(r, t)
+                r.nodes.add(n)
                 if (equals(t, current)) {
-                    n.selected = true; // current selected
-                    r.expanded = true; // parent expanded
+                    n.selected = true // current selected
+                    r.expanded = true // parent expanded
                 }
                 if (t.hasChildren()) {
-                    loadTOC(n, t.subtrees());
+                    loadTOC(n, t.subtrees())
                     if (n.expanded) {
-                        n.selected = true;
-                        r.expanded = true;
+                        n.selected = true
+                        r.expanded = true
                     }
                 }
             }
         }
 
-        public int getCurrent() {
-            for (int i = 0; i < getItemCount(); i++) {
-                TOCTree t = (TOCTree) getItem(i).tag;
-                if (equals(t, current))
-                    return i;
+        fun getCurrent(): Int {
+            for (i in 0..<itemCount) {
+                val t = getItem(i).tag as TOCTree?
+                if (equals(t, current)) return i
             }
-            return -1;
+            return -1
         }
 
-        @Override
-        public TOCHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            View convertView = inflater.inflate(R.layout.toc_item, null);
-            return new TOCHolder(convertView);
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TOCHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            val convertView = inflater.inflate(R.layout.toc_item, null)
+            return TOCHolder(convertView)
         }
 
-        @Override
-        public void onBindViewHolder(final TOCHolder h, int position) {
-            TreeListView.TreeNode t = getItem(h.getAdapterPosition(this));
-            TOCTree tt = (TOCTree) t.tag;
-            ImageView ex = (ImageView) h.itemView.findViewById(R.id.expand);
-            if (t.nodes.isEmpty())
-                ex.setVisibility(View.INVISIBLE);
-            else
-                ex.setVisibility(View.VISIBLE);
-            ex.setImageResource(t.expanded ? R.drawable.ic_expand_less_black_24dp : R.drawable.ic_expand_more_black_24dp);
-            h.itemView.setPadding(20 * t.level, 0, 0, 0);
+        override fun onBindViewHolder(h: TOCHolder, position: Int) {
+            val t = getItem(h.getAdapterPosition(this))
+            val tt = t.tag as TOCTree
+            val ex = h.itemView.findViewById<View?>(R.id.expand) as ImageView
+            if (t.nodes.isEmpty()) ex.setVisibility(View.INVISIBLE)
+            else ex.setVisibility(View.VISIBLE)
+            ex.setImageResource(
+                if (t.expanded) R.drawable.ic_expand_less_black_24dp else R.drawable.ic_expand_more_black_24dp
+            )
+            h.itemView.setPadding(20 * t.level, 0, 0, 0)
             if (t.selected) {
-                h.textView.setTypeface(null, Typeface.BOLD);
-                h.i.setColorFilter(null);
+                h.textView.setTypeface(null, Typeface.BOLD)
+                h.i.colorFilter = null
             } else {
-                h.i.setColorFilter(Color.GRAY);
-                h.textView.setTypeface(null, Typeface.NORMAL);
+                h.i.setColorFilter(Color.GRAY)
+                h.textView.setTypeface(null, Typeface.NORMAL)
             }
-            h.textView.setText(tt.getText());
-            h.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TOCTree n = (TOCTree) getItem(h.getAdapterPosition(TOCAdapter.this)).tag;
-                    if (n.hasChildren())
-                        return;
-                    fb.gotoPosition(n.getReference());
-                    tocdialog.dismiss();
+            h.textView.text = tt.text
+            h.itemView.setOnClickListener(object : View.OnClickListener {
+                override fun onClick(v: View?) {
+                    val n = getItem(h.getAdapterPosition(this@TOCAdapter)).tag as TOCTree
+                    if (n.hasChildren()) return
+                    fb!!.gotoPosition(n.reference)
+                    tocdialog!!.dismiss()
                 }
-            });
+            })
         }
 
-        boolean equals(TOCTree t, TOCTree t2) {
-            if (t == null || t2 == null)
-                return false;
-            TOCTree.Reference r1 = t.getReference();
-            TOCTree.Reference r2 = t2.getReference();
-            if (r1 == null || r2 == null)
-                return false;
-            return r1.ParagraphIndex == r2.ParagraphIndex;
+        fun equals(t: TOCTree?, t2: TOCTree?): Boolean {
+            if (t == null || t2 == null) return false
+            val r1 = t.reference
+            val r2 = t2.reference
+            if (r1 == null || r2 == null) return false
+            return r1.ParagraphIndex == r2.ParagraphIndex
+        }
+    }
+
+    companion object {
+        val TAG: String = ReaderFragment::class.java.getSimpleName()
+
+        const val FONT_START: Int = 15
+        const val FONT_END: Int = 100
+        const val REFLOW_START: Int = 3
+        const val REFLOW_END: Int = 15
+
+        const val RESULT_FONTS: Int = 1
+
+        fun getOverflowMenuButton(a: Activity): View? {
+            return getOverflowMenuButton((a.findViewById<View?>(R.id.toolbar) as ViewGroup?)!!)
+        }
+
+        fun getOverflowMenuButton(p: ViewGroup): View? {
+            for (i in 0..<p.childCount) {
+                var v = p.getChildAt(i)
+                if (v!!.javaClass.getCanonicalName().contains("OverflowMenuButton")) return v
+                if (v is ViewGroup) {
+                    v = getOverflowMenuButton(v)
+                    if (v != null) return v
+                }
+            }
+            return null
+        }
+
+        fun newInstance(uri: Uri?): ReaderFragment {
+            val fragment = ReaderFragment()
+            val args = Bundle()
+            args.putParcelable("uri", uri)
+            fragment.setArguments(args)
+            return fragment
+        }
+
+        fun newInstance(uri: Uri?, pos: ZLTextIndexPosition?): ReaderFragment {
+            val fragment = ReaderFragment()
+            val args = Bundle()
+            args.putParcelable("uri", uri)
+            args.putParcelable("pos", pos)
+            fragment.setArguments(args)
+            return fragment
         }
     }
 }

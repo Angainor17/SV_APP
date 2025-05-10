@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -65,7 +64,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
 
         lm = new LinearLayoutManager(fb.getContext()) {
             int idley;
-            Runnable idle = new Runnable() {
+            final Runnable idle = new Runnable() {
                 @Override
                 public void run() {
                     if (idley >= 0) {
@@ -103,7 +102,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             @Override
             public void smoothScrollToPosition(RecyclerView recyclerView, State state, int position) {
                 PowerManager pm = (PowerManager) fb.getContext().getSystemService(Context.POWER_SERVICE);
-                if (Build.VERSION.SDK_INT >= 21 && pm.isPowerSaveMode()) {
+                if (pm.isPowerSaveMode()) {
                     scrollToPositionWithOffset(position, 0);
                     idley = position - findFirstPage();
                     onScrollStateChanged(SCROLL_STATE_IDLE);
@@ -470,7 +469,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                         offset = (int) (fb.scrollDelayed.getElementIndex() / pinfo.ratio * ratio);
                     }
                     for (Rect s : ss) {
-                        if (s.top <= offset && s.bottom >= offset || s.top > offset) {
+                        if (s.top > offset || s.bottom >= offset) {
                             scrollToPosition(i);
                             int screen = (int) ((s.top - offset) / ratio);
                             int off = info.src.get(s).top - screen;
@@ -1210,7 +1209,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                 progress = new FrameLayout(getContext());
 
                 progressBar = new ProgressBar(getContext()) {
-                    Handler handler = new Handler();
+                    final Handler handler = new Handler();
 
                     @Override
                     public void draw(Canvas canvas) {
@@ -1334,7 +1333,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                             if (thread != null) {
                                 if (time == null) {
                                     PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
-                                    if (Build.VERSION.SDK_INT >= 21 && pm.isPowerSaveMode()) {
+                                    if (pm.isPowerSaveMode()) {
                                         fb.postDelayed(() -> invalidate(), 1000);
                                     } else {
                                         time = new TimeAnimatorCompat();
@@ -1439,9 +1438,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             boolean isCached(PageCursor c) {
                 if (cache == null || cache != c) // should be same 'cache' memory ref
                     return false;
-                if (bm == null)
-                    return false;
-                return true;
+                return bm != null;
             }
 
             void drawCache(Canvas draw) {
@@ -1491,8 +1488,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                         return true;
                 }
                 if (end != null && p.end != null) {
-                    if (equals(end, p.end))
-                        return true;
+                    return equals(end, p.end);
                 }
                 return false;
             }
@@ -1697,9 +1693,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
 
         public boolean onFilter(MotionEvent e) {
-            if (fb.app.BookTextView.mySelection.isEmpty())
-                return false;
-            return true;
+            return !fb.app.BookTextView.mySelection.isEmpty();
         }
 
         public boolean onTouchEvent(MotionEvent e) {
@@ -1711,9 +1705,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                 return true;
             if (gestures.onTouchEvent(e))
                 return true;
-            if (onFilter(e))
-                return true;
-            return false;
+            return onFilter(e);
         }
     }
 }

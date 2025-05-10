@@ -189,7 +189,7 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
             this.page = p;
             this.ppage = page;
             this.text = page.open();
-            this.count = (int) text.getCount();
+            this.count = text.getCount();
             this.w = w;
             this.h = h;
             this.index = -1;
@@ -310,7 +310,6 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
                     return;
                 start.index = index;
                 this.start = start;
-                return;
             }
         }
 
@@ -324,7 +323,6 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
                     return;
                 end.index = index;
                 this.end = end;
-                return;
             }
         }
 
@@ -397,9 +395,7 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
             if (b.page.count > 0) {
                 point = new Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y));
                 int index = b.page.text.getIndex(point.x, point.y);
-                if (index == -1)
-                    return false;
-                return true;
+                return index != -1;
             }
             return false;
         }
@@ -592,9 +588,7 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
                 return false;
             Pdfium.Text t = p.open();
             try {
-                if (t != null && t.getCount() > 0)
-                    return true;
-                return false;
+                return t != null && t.getCount() > 0;
             } finally {
                 if (t != null)
                     t.close();
@@ -608,7 +602,7 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
             String pattern = str.toLowerCase(Locale.US);
             ArrayList<SearchResult> rr = new ArrayList<>();
             if (text.getCount() > 0) {
-                String str = text.getText(0, (int) text.getCount());
+                String str = text.getText(0, text.getCount());
                 str = str.toLowerCase(Locale.US);
                 int index = str.indexOf(pattern);
                 while (index != -1) {

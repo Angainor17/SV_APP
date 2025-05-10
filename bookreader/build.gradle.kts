@@ -20,6 +20,13 @@ android {
 }
 
 dependencies {
+
+    // Compose
+    implementation(libs.bundles.coil)
+    implementation(libs.bundles.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.ui.tooling)
+
     implementation("com.github.axet.fbreader:library:0.1.18") {
         exclude("org.apache.httpcomponents", "httpmime")
     }

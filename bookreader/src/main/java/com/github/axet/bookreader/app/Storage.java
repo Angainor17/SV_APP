@@ -397,7 +397,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
 
         String s = storage.getScheme();
 
-        if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT) && DocumentsContract.isDocumentUri(context, u)) {
+        if (s.equals(ContentResolver.SCHEME_CONTENT) && DocumentsContract.isDocumentUri(context, u)) {
             if (DocumentsContract.getDocumentId(u).startsWith(DocumentsContract.getTreeDocumentId(storage))) // else we can't get from content://storage to real path
                 return new Book(context, DocumentsContract.buildDocumentUriUsingTree(storage, DocumentsContract.getDocumentId(u)));
         }
@@ -529,7 +529,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 });
                 if (ff != null) {
                     for (File k : ff) {
-                        if (!getExt(k).toLowerCase().equals(JSON_EXT))
+                        if (!getExt(k).equalsIgnoreCase(JSON_EXT))
                             k.delete();
                     }
                 }
@@ -616,9 +616,9 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             if (bm == null && (a || t)) {
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 View v = inflater.inflate(R.layout.cover_generate, null);
-                TextView aa = (TextView) v.findViewById(R.id.author);
+                TextView aa = v.findViewById(R.id.author);
                 aa.setText(fbook.book.authorsString(", "));
-                TextView tt = (TextView) v.findViewById(R.id.title);
+                TextView tt = v.findViewById(R.id.title);
                 tt.setText(fbook.book.getTitle());
                 bm = renderView(v);
             }
@@ -690,7 +690,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         Uri uri = getStoragePath();
         ArrayList<Book> list = new ArrayList<>();
         String s = uri.getScheme();
-        if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+        if (s.equals(ContentResolver.SCHEME_CONTENT)) {
             ContentResolver contentResolver = context.getContentResolver();
             Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri));
             Cursor childCursor = contentResolver.query(childrenUri, null, null, null, null);
@@ -758,7 +758,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         // delete all md5.* files (old, cover images, and sync conflicts files)
         Uri storage = getStoragePath();
         String s = storage.getScheme();
-        if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+        if (s.equals(ContentResolver.SCHEME_CONTENT)) {
             ContentResolver contentResolver = context.getContentResolver();
             Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(storage, DocumentsContract.getTreeDocumentId(storage));
             Cursor childCursor = contentResolver.query(childrenUri, null, null, null, null);
@@ -917,8 +917,10 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             else {
                 FileTypeDetector.Detector[] dd = supported();
                 for (FileTypeDetector.Detector d : dd) {
-                    if (e.equals(d.ext))
+                    if (e.equals(d.ext)) {
                         m = true;
+                        break;
+                    }
                 }
             }
             if (m)
@@ -932,7 +934,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             InputStream is;
             OutputStream os;
             String s = u.getScheme();
-            if (Build.VERSION.SDK_INT >= 21 && s.equals(ContentResolver.SCHEME_CONTENT)) {
+            if (s.equals(ContentResolver.SCHEME_CONTENT)) {
                 ContentResolver resolver = getContext().getContentResolver();
                 is = resolver.openInputStream(u);
                 n = createFile(context, dir, Storage.getDocumentChildPath(n));

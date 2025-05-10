@@ -1,741 +1,681 @@
-package com.github.axet.bookreader.fragments;
+package com.github.axet.bookreader.fragments
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Process;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Bundle
+import android.os.Process
+import android.preference.PreferenceManager
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.View.OnLongClickListener
+import android.view.ViewGroup
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.AdapterView.OnItemLongClickListener
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupMenu
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
+import androidx.core.view.get
+import androidx.core.view.size
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.github.axet.androidlibrary.net.HttpClient
+import com.github.axet.androidlibrary.services.StorageProvider
+import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
+import com.github.axet.androidlibrary.widgets.CacheImagesAdapter.DownloadImageTask
+import com.github.axet.androidlibrary.widgets.CacheImagesRecyclerAdapter
+import com.github.axet.androidlibrary.widgets.InvalidateOptionsMenuCompat
+import com.github.axet.androidlibrary.widgets.OpenFileDialog.EditTextDialog
+import com.github.axet.androidlibrary.widgets.SearchView
+import com.github.axet.androidlibrary.widgets.TextMax
+import com.github.axet.bookreader.R
+import com.github.axet.bookreader.activities.MainActivity
+import com.github.axet.bookreader.activities.MainActivity.SearchListener
+import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.Storage
+import com.github.axet.bookreader.app.Storage.FBook
+import com.github.axet.bookreader.fragments.LibraryFragment.BooksAdapter.BookHolder
+import com.github.axet.bookreader.widgets.BookmarksDialog
+import com.github.axet.bookreader.widgets.FBReaderView.ZLTextIndexPosition
+import org.apache.commons.io.IOUtils
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.Collections.reverseOrder
+import org.geometerplus.zlibrary.ui.android.R as ZlibraryR
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+class LibraryFragment : Fragment(), SearchListener {
 
-import com.github.axet.androidlibrary.net.HttpClient;
-import com.github.axet.androidlibrary.services.StorageProvider;
-import com.github.axet.androidlibrary.widgets.CacheImagesAdapter;
-import com.github.axet.androidlibrary.widgets.CacheImagesRecyclerAdapter;
-import com.github.axet.androidlibrary.widgets.InvalidateOptionsMenuCompat;
-import com.github.axet.androidlibrary.widgets.OpenFileDialog;
-import com.github.axet.androidlibrary.widgets.SearchView;
-import com.github.axet.androidlibrary.widgets.TextMax;
-import com.github.axet.bookreader.R;
-import com.github.axet.bookreader.activities.MainActivity;
-import com.github.axet.bookreader.app.BookApplication;
-import com.github.axet.bookreader.app.Storage;
-import com.github.axet.bookreader.widgets.BookmarksDialog;
-import com.github.axet.bookreader.widgets.FBReaderView;
+    private lateinit var books: LibraryAdapter
+    private lateinit var storage: Storage
+    private lateinit var holder: FragmentHolder
 
-import org.apache.commons.io.IOUtils;
+    private var lastSearch: String? = ""
+    private var invalidateOptionsMenu: Runnable? = null
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
-public class LibraryFragment extends Fragment implements MainActivity.SearchListener {
-    public static final String TAG = LibraryFragment.class.getSimpleName();
-
-    LibraryAdapter books;
-    Storage storage;
-    String lastSearch = "";
-    FragmentHolder holder;
-    Runnable invalidateOptionsMenu;
-
-    public LibraryFragment() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        storage = Storage(requireContext())
+        holder = FragmentHolder(requireContext())
+        books = LibraryAdapter(holder)
+        setHasOptionsMenu(true)
     }
 
-    public static LibraryFragment newInstance() {
-        LibraryFragment fragment = new LibraryFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+    override fun onResume() {
+        super.onResume()
+        books.load()
+        books.refresh()
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        storage = new Storage(getContext());
-        holder = new FragmentHolder(getContext());
-        books = new LibraryAdapter(holder);
-        setHasOptionsMenu(true);
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val v = inflater.inflate(R.layout.fragment_library, container, false)
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        books.load();
-        books.refresh();
-    }
+        holder.create(v)
+        holder.footer?.visibility = View.GONE
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_library, container, false);
-
-        holder.create(v);
-        holder.footer.setVisibility(View.GONE);
-
-        final MainActivity main = (MainActivity) getActivity();
-        main.toolbar.setTitle(R.string.app_name);
-        holder.grid.setAdapter(books);
-        holder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Storage.Book b = books.getItem(position);
-                main.loadBook(b);
-            }
-        });
-        holder.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final Storage.Book b = books.getItem(position);
-                PopupMenu popup = new PopupMenu(getContext(), view);
-                popup.inflate(R.menu.bookitem_menu);
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.action_rename) {
-                            final OpenFileDialog.EditTextDialog e = new OpenFileDialog.EditTextDialog(getContext());
-                            e.setTitle(R.string.book_rename);
-                            e.setText(b.info.title);
-                            e.setPositiveButton(new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String name = e.getText();
-                                    b.info.title = name;
-                                    storage.save(b);
-                                    books.notifyDataSetChanged();
-                                }
-                            });
-                            AlertDialog d = e.create();
-                            d.show();
-                        }
-                        if (item.getItemId() == R.id.action_open) {
-                            String ext = Storage.getExt(getContext(), b.url);
-                            String n = Storage.getTitle(b.info) + "." + ext;
-                            Intent open = StorageProvider.getProvider().openIntent(b.url, n);
-                            startActivity(open);
-                        }
-                        if (item.getItemId() == R.id.action_share) {
-                            String ext = Storage.getExt(getContext(), b.url);
-                            String t = Storage.getTitle(b.info) + "." + ext;
-                            String name = Storage.getName(getContext(), b.url);
-                            String type = Storage.getTypeByName(name);
-                            Intent share = StorageProvider.getProvider().shareIntent(b.url, t, type, t);
-                            startActivity(share);
-                        }
-                        if (item.getItemId() == R.id.action_delete) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            builder.setTitle(R.string.book_delete);
-                            builder.setMessage(com.github.axet.androidlibrary.R.string.are_you_sure);
-                            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-                            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    storage.delete(b);
-                                    books.delete(b);
-                                }
-                            });
-                            builder.show();
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
-                return true;
-            }
-        });
-        return v;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        MainActivity main = ((MainActivity) getActivity());
-        main.setFullscreen(false);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        books.clearTasks();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        invalidateOptionsMenu = InvalidateOptionsMenuCompat.onCreateOptionsMenu(this, menu, inflater);
-
-        MenuItem homeMenu = menu.findItem(R.id.action_home);
-        MenuItem tocMenu = menu.findItem(R.id.action_toc);
-        MenuItem bookmarksMenu = menu.findItem(R.id.action_bm);
-        MenuItem searchMenu = menu.findItem(R.id.action_search);
-        MenuItem reflow = menu.findItem(R.id.action_reflow);
-        MenuItem fontsize = menu.findItem(R.id.action_fontsize);
-        MenuItem debug = menu.findItem(R.id.action_debug);
-        MenuItem rtl = menu.findItem(R.id.action_rtl);
-        MenuItem mode = menu.findItem(R.id.action_mode);
-        MenuItem sort = menu.findItem(R.id.action_sort);
-        MenuItem tts = menu.findItem(R.id.action_tts);
-
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-        int selected = getContext().getResources().getIdentifier(shared.getString(BookApplication.PREFERENCE_SORT, getContext().getResources().getResourceEntryName(R.id.sort_add_ask)), "id", getContext().getPackageName());
-        SubMenu sorts = sort.getSubMenu();
-        for (int i = 0; i < sorts.size(); i++) {
-            MenuItem m = sorts.getItem(i);
-            if (m.getItemId() == selected)
-                m.setChecked(true);
-            m.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    return false;
+        val main = activity as MainActivity?
+        main?.toolbar?.setTitle(R.string.app_name)
+        holder.grid?.setAdapter(books)
+        holder.setOnItemClickListener(OnItemClickListener { parent, view, position, id ->
+            val b = books.getItem(position)
+            main?.loadBookFromUri(b)
+        })
+        holder.setOnItemLongClickListener(OnItemLongClickListener { parent, view, position, id ->
+            val b = books.getItem(position)
+            val popup = PopupMenu(context, view)
+            popup.inflate(R.menu.bookitem_menu)
+            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+                if (item?.itemId == R.id.action_rename) {
+                    val e = EditTextDialog(context)
+                    e.setTitle(R.string.book_rename)
+                    e.setText(b.info.title)
+                    e.setPositiveButton(DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                        val name = e.text
+                        b.info.title = name
+                        storage.save(b)
+                        books.notifyDataSetChanged()
+                    })
+                    val d = e.create()
+                    d.show()
                 }
-            });
+                if (item?.itemId == R.id.action_open) {
+                    val ext = Storage.getExt(context, b.url)
+                    val n = Storage.getTitle(b.info) + "." + ext
+                    val open = StorageProvider.getProvider().openIntent(b.url, n)
+                    startActivity(open)
+                }
+                if (item?.itemId == R.id.action_share) {
+                    val ext = Storage.getExt(context, b.url)
+                    val t = Storage.getTitle(b.info) + "." + ext
+                    val name = Storage.getName(context, b.url)
+                    val type = Storage.getTypeByName(name)
+                    val share = StorageProvider.getProvider().shareIntent(b.url, t, type, t)
+                    startActivity(share)
+                }
+                if (item?.itemId == R.id.action_delete) {
+                    val builder = AlertDialog.Builder(requireContext())
+                    builder.setTitle(R.string.book_delete)
+                    builder.setMessage(com.github.axet.androidlibrary.R.string.are_you_sure)
+                    builder.setNegativeButton(
+                        android.R.string.cancel,
+                        DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int -> })
+                    builder.setPositiveButton(
+                        android.R.string.ok,
+                        DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                            storage.delete(b)
+                            books.delete(b)
+                        })
+                    builder.show()
+                }
+                true
+            })
+            popup.show()
+            true
+        })
+        return v
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val main = (requireActivity() as MainActivity?)
+        main?.setFullscreen(false)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+    }
+
+    override fun onDestroy() {
+        books.clearTasks()
+        super.onDestroy()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        invalidateOptionsMenu =
+            InvalidateOptionsMenuCompat.onCreateOptionsMenu(this, menu, inflater)
+
+        val homeMenu = menu.findItem(R.id.action_home)
+        val tocMenu = menu.findItem(R.id.action_toc)
+        val bookmarksMenu = menu.findItem(R.id.action_bm)
+        val searchMenu = menu.findItem(R.id.action_search)
+        val reflow = menu.findItem(R.id.action_reflow)
+        val fontsize = menu.findItem(R.id.action_fontsize)
+        val debug = menu.findItem(R.id.action_debug)
+        val rtl = menu.findItem(R.id.action_rtl)
+        val mode = menu.findItem(R.id.action_mode)
+        val sort = menu.findItem(R.id.action_sort)
+        val tts = menu.findItem(R.id.action_tts)
+
+        val shared = PreferenceManager.getDefaultSharedPreferences(context)
+        val selected = requireContext().resources.getIdentifier(
+            shared.getString(
+                BookApplication.PREFERENCE_SORT,
+                requireContext().resources.getResourceEntryName(R.id.sort_add_ask)
+            ), "id", requireContext().packageName
+        )
+        val sorts = sort.subMenu
+        for (i in 0..<sorts!!.size) {
+            val m = sorts[i]
+            if (m.itemId == selected) m.isChecked = true
+            m.setOnMenuItemClickListener(MenuItem.OnMenuItemClickListener { item: MenuItem? ->
+                false
+            })
         }
 
-        reflow.setVisible(false);
-        searchMenu.setVisible(true);
-        homeMenu.setVisible(false);
-        tocMenu.setVisible(false);
-        bookmarksMenu.setVisible(books.hasBookmarks());
-        fontsize.setVisible(false);
-        debug.setVisible(false);
-        rtl.setVisible(false);
-        mode.setVisible(false);
-        tts.setVisible(false);
+        reflow.isVisible = false
+        searchMenu.isVisible = true
+        homeMenu.isVisible = false
+        tocMenu.isVisible = false
+        bookmarksMenu.isVisible = books.hasBookmarks()
+        fontsize.isVisible = false
+        debug.isVisible = false
+        rtl.isVisible = false
+        mode.isVisible = false
+        tts.isVisible = false
 
-        holder.onCreateOptionsMenu(menu);
+        holder.onCreateOptionsMenu(menu)
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (holder.onOptionsItemSelected(item)) {
-            invalidateOptionsMenu.run();
-            return true;
+            invalidateOptionsMenu!!.run()
+            return true
         }
-        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-        int id = item.getItemId();
-        if (id == R.id.sort_add_ask || id == R.id.sort_add_desc || id == R.id.sort_name_ask || id == R.id.sort_name_desc || id == R.id.sort_open_ask || id == R.id.sort_open_desc) {
-            shared.edit().putString(BookApplication.PREFERENCE_SORT, getContext().getResources().getResourceEntryName(item.getItemId())).commit();
-            books.sort();
-            invalidateOptionsMenu.run();
-            return true;
+        val shared = PreferenceManager.getDefaultSharedPreferences(context)
+        val id = item.itemId
+        if (id == R.id.sort_add_ask || id == R.id.sort_add_desc || id == R.id.sort_name_ask
+            || id == R.id.sort_name_desc || id == R.id.sort_open_ask || id == R.id.sort_open_desc
+        ) {
+            shared.edit(commit = true) {
+                putString(
+                    BookApplication.PREFERENCE_SORT,
+                    requireContext().resources.getResourceEntryName(item.itemId)
+                )
+            }
+            books.sort()
+            invalidateOptionsMenu?.run()
+            return true
         } else if (id == R.id.action_bm) {
-            BookmarksDialog dialog = new BookmarksDialog(getContext()) {
-                @Override
-                public void onSelected(Storage.Book b, Storage.Bookmark bm) {
-                    MainActivity main = ((MainActivity) getActivity());
-                    main.openBook(b.url, new FBReaderView.ZLTextIndexPosition(bm.start, bm.end));
+            val dialog: BookmarksDialog = object : BookmarksDialog(context) {
+                override fun onSelected(b: Storage.Book, bm: Storage.Bookmark) {
+                    val main = (activity as MainActivity?)
+                    main?.openBook(b.url, ZLTextIndexPosition(bm.start, bm.end))
                 }
 
-                @Override
-                public void onSave(Storage.Book book, Storage.Bookmark bm) {
-                    storage.save(book);
+                override fun onSave(book: Storage.Book, bm: Storage.Bookmark?) {
+                    storage.save(book)
                 }
 
-                @Override
-                public void onDelete(Storage.Book book, Storage.Bookmark bm) {
-                    book.info.bookmarks.remove(bm);
-                    storage.save(book);
+                override fun onDelete(book: Storage.Book, bm: Storage.Bookmark?) {
+                    book.info.bookmarks.remove(bm)
+                    storage.save(book)
                 }
-            };
-            dialog.load(books.all);
-            dialog.show();
-            return true;
+            }
+            dialog.load(books.all)
+            dialog.show()
+            return true
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
-    public void search(String s) {
-        books.filter = s;
-        books.refresh();
-        lastSearch = books.filter;
+    override fun search(s: String?) {
+        books.filter = s
+        books.refresh()
+        lastSearch = books.filter
     }
 
-    @Override
-    public void searchClose() {
-        search("");
+    override fun searchClose() {
+        search("")
     }
 
-    @Override
-    public String getHint() {
-        return getString(R.string.search_local);
+    override val hint: String?
+        get() = getString(R.string.search_local)
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
     }
 
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+    class FragmentHolder(val context: Context) {
 
-    public static class FragmentHolder {
-        public int layout;
-        RecyclerView grid;
-        View toolbar;
-        View searchpanel;
-        LinearLayout searchtoolbar;
-        View footer;
-        View footerButtons;
-        View footerNext;
-        View footerProgress;
-        View footerStop;
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-        Context context;
-        AdapterView.OnItemClickListener clickListener;
-        AdapterView.OnItemLongClickListener longClickListener;
+        var layout: Int = 0
+        var grid: RecyclerView? = null
+        var toolbar: View? = null
+        var searchpanel: View? = null
+        var searchtoolbar: LinearLayout? = null
+        var footer: View? = null
+        var footerButtons: View? = null
+        var footerNext: View? = null
+        var footerProgress: View? = null
+        var footerStop: View? = null
 
-        public FragmentHolder(Context context) {
-            this.context = context;
-        }
+        var clickListener: OnItemClickListener? = null
+        var longClickListener: OnItemLongClickListener? = null
 
-        public void create(View v) {
-            grid = (RecyclerView) v.findViewById(R.id.grid);
+        fun create(v: View) {
+            grid = v.findViewById<View?>(R.id.grid) as RecyclerView
 
-            // DividerItemDecoration divider = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-            // grid.addItemDecoration(divider);
+            toolbar = v.findViewById<View>(R.id.search_header_toolbar_parent)
+            searchpanel = v.findViewById<View?>(ZlibraryR.id.search_panel)
+            searchtoolbar = v.findViewById<View?>(R.id.search_header_toolbar) as LinearLayout?
 
-            LayoutInflater inflater = LayoutInflater.from(context);
+            toolbar?.visibility = View.GONE
 
-            toolbar = v.findViewById(R.id.search_header_toolbar_parent);
-            searchpanel = v.findViewById(org.geometerplus.zlibrary.ui.android.R.id.search_panel);
-            searchtoolbar = (LinearLayout) v.findViewById(R.id.search_header_toolbar);
+            footer = inflater.inflate(R.layout.library_footer, null)
+            footerButtons = footer!!.findViewById<View?>(R.id.search_footer_buttons)
+            footerNext = footer!!.findViewById<View>(R.id.search_footer_next)
+            footerProgress = footer!!.findViewById<View?>(R.id.search_footer_progress)
+            footerStop = footer!!.findViewById<View?>(R.id.search_footer_stop)
 
-            toolbar.setVisibility(View.GONE);
+            footerNext?.setOnClickListener(View.OnClickListener { v1: View? ->
+                Log.d(TAG, "footer next")
+            })
 
-            footer = inflater.inflate(R.layout.library_footer, null);
-            footerButtons = footer.findViewById(R.id.search_footer_buttons);
-            footerNext = footer.findViewById(R.id.search_footer_next);
-            footerProgress = footer.findViewById(R.id.search_footer_progress);
-            footerStop = footer.findViewById(R.id.search_footer_stop);
+            addFooterView(footer)
 
-            footerNext.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "footer next");
-                }
-            });
-
-            addFooterView(footer);
-
-            updateGrid();
+            updateGrid()
         }
 
-        public String getLayout() {
-            return "library";
+        fun getLayout(): String {
+            return "library"
         }
 
-        public void updateGrid() {
-            final SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
-            if (shared.getString(BookApplication.PREFERENCE_LIBRARY_LAYOUT + getLayout(), "").equals("book_list_item")) {
-                setNumColumns(1);
-                layout = R.layout.book_list_item;
+        fun updateGrid() {
+            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+            if (shared.getString(
+                    BookApplication.PREFERENCE_LIBRARY_LAYOUT + getLayout(),
+                    ""
+                ) == "book_list_item"
+            ) {
+                setNumColumns(1)
+                layout = R.layout.book_list_item
             } else {
-                setNumColumns(4);
-                layout = R.layout.book_item;
+                setNumColumns(4)
+                layout = R.layout.book_item
             }
         }
 
-        void onCreateOptionsMenu(Menu menu) {
-            MenuItem grid = menu.findItem(R.id.action_grid);
+        fun onCreateOptionsMenu(menu: Menu) {
+            val grid = menu.findItem(R.id.action_grid)
 
-            updateGrid();
+            updateGrid()
 
-            if (layout == R.layout.book_item)
-                grid.setIcon(R.drawable.ic_view_module_black_24dp);
-            else
-                grid.setIcon(R.drawable.ic_view_list_black_24dp);
+            if (layout == R.layout.book_item) grid.setIcon(R.drawable.ic_view_module_black_24dp)
+            else grid.setIcon(R.drawable.ic_view_list_black_24dp)
         }
 
-        public boolean onOptionsItemSelected(MenuItem item) {
-            final SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
-            int id = item.getItemId();
+        fun onOptionsItemSelected(item: MenuItem): Boolean {
+            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+            val id = item.itemId
             if (id == R.id.action_grid) {
-                SharedPreferences.Editor editor = shared.edit();
-                if (layout == R.layout.book_list_item)
-                    editor.putString(BookApplication.PREFERENCE_LIBRARY_LAYOUT + getLayout(), "book_item");
-                else
-                    editor.putString(BookApplication.PREFERENCE_LIBRARY_LAYOUT + getLayout(), "book_list_item");
-                editor.commit();
-                updateGrid();
-                return true;
-            }
-            return false;
-        }
-
-        public void addFooterView(View v) {
-        }
-
-        public void setNumColumns(int i) {
-            LinearLayoutManager reset = null;
-            if (i == 1) {
-                LinearLayoutManager lm = new LinearLayoutManager(context);
-                RecyclerView.LayoutManager l = grid.getLayoutManager();
-                if (l == null || l instanceof GridLayoutManager)
-                    reset = lm;
-            } else {
-                GridLayoutManager lm = new GridLayoutManager(context, i);
-                lm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                    @Override
-                    public int getSpanSize(int position) {
-                        return FragmentHolder.this.getSpanSize(position);
+                shared.edit(commit = true) {
+                    if (layout == R.layout.book_list_item) {
+                        putString(
+                            BookApplication.PREFERENCE_LIBRARY_LAYOUT + getLayout(),
+                            "book_item"
+                        )
+                    } else {
+                        putString(
+                            BookApplication.PREFERENCE_LIBRARY_LAYOUT + getLayout(),
+                            "book_list_item"
+                        )
                     }
-                });
-                RecyclerView.LayoutManager l = grid.getLayoutManager();
-                if (l == null || !(l instanceof GridLayoutManager) || ((GridLayoutManager) l).getSpanCount() != i)
-                    reset = lm;
+                }
+                updateGrid()
+                return true
             }
-            if (reset != null)
-                grid.setLayoutManager(reset);
+            return false
         }
 
-        public int getSpanSize(int position) {
-            return 1;
+        fun addFooterView(v: View?) {
+
         }
 
-        public void setOnItemClickListener(AdapterView.OnItemClickListener l) {
-            clickListener = l;
-        }
-
-        public void setOnItemLongClickListener(AdapterView.OnItemLongClickListener l) {
-            longClickListener = l;
-        }
-    }
-
-    public static class ByRecent implements Comparator<Storage.Book> {
-        @Override
-        public int compare(Storage.Book o1, Storage.Book o2) {
-            return Long.compare(o1.info.last, o2.info.last);
-        }
-    }
-
-    public static class ByCreated implements Comparator<Storage.Book> {
-        @Override
-        public int compare(Storage.Book o1, Storage.Book o2) {
-            return Long.compare(o1.info.created, o2.info.created);
-        }
-    }
-
-    public static class ByName implements Comparator<Storage.Book> {
-        @Override
-        public int compare(Storage.Book o1, Storage.Book o2) {
-            return Storage.getTitle(o1.info).compareTo(Storage.getTitle(o2.info));
-        }
-    }
-
-    public static abstract class BooksAdapter extends CacheImagesRecyclerAdapter<BooksAdapter.BookHolder> {
-        String filter;
-        FragmentHolder holder;
-        HttpClient client = new HttpClient(); // images client
-
-        public BooksAdapter(Context context, FragmentHolder holder) {
-            super(context);
-            this.holder = holder;
-        }
-
-        public Uri getCover(int position) {
-            return null;
-        }
-
-        public String getAuthors(int position) {
-            return "";
-        }
-
-        public String getTitle(int position) {
-            return "";
-        }
-
-        public void refresh() {
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            return -1;
-        }
-
-        @Override
-        public BookHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            View convertView = inflater.inflate(viewType, parent, false);
-            return new BookHolder(convertView);
-        }
-
-        @Override
-        public void onBindViewHolder(final BookHolder h, int position) {
-            h.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (holder.clickListener != null)
-                        holder.clickListener.onItemClick(null, v, h.getAdapterPosition(), -1);
+        fun setNumColumns(i: Int) {
+            var reset: LinearLayoutManager? = null
+            if (i == 1) {
+                val lm = LinearLayoutManager(context)
+                val l = grid!!.layoutManager
+                if (l == null || l is GridLayoutManager) reset = lm
+            } else {
+                val lm = GridLayoutManager(context, i)
+                lm.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        return this@FragmentHolder.getSpanSize(position)
+                    }
                 }
-            });
-            h.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (holder.longClickListener != null)
-                        holder.longClickListener.onItemLongClick(null, v, h.getAdapterPosition(), -1);
-                    return true;
-                }
-            });
-            setText(h.aa, getAuthors(position));
-            setText(h.tt, getTitle(position));
+                val l = grid!!.layoutManager
+                if (l == null || (l !is GridLayoutManager) || l.spanCount != i) reset = lm
+            }
+            if (reset != null) grid!!.setLayoutManager(reset)
         }
 
-        @Override
-        public Bitmap downloadImage(Uri cover, File f) throws IOException {
-            HttpClient.DownloadResponse w = client.getResponse(null, cover.toString());
-            FileOutputStream out = new FileOutputStream(f);
-            IOUtils.copy(w.getInputStream(), out);
-            w.getInputStream().close();
-            out.close();
-            Bitmap bm = CacheImagesAdapter.createScaled(new FileInputStream(f));
-            FileOutputStream os = new FileOutputStream(f);
-            bm.compress(Bitmap.CompressFormat.PNG, 100, os);
-            os.close();
-            return bm;
+        fun getSpanSize(position: Int): Int {
+            return 1
         }
 
-        @Override
-        public void downloadTaskUpdate(CacheImagesAdapter.DownloadImageTask task, Object item, Object view) {
-            BookHolder h = new BookHolder((View) view);
-            updateView(task, h.image, h.progress);
+        fun setOnItemClickListener(l: OnItemClickListener?) {
+            clickListener = l
         }
 
-        @Override
-        public Bitmap downloadImageTask(CacheImagesAdapter.DownloadImageTask task) {
-            Uri u = (Uri) task.item;
-            return downloadImage(u);
+        fun setOnItemLongClickListener(l: OnItemLongClickListener?) {
+            longClickListener = l
+        }
+    }
+
+    class ByRecent : Comparator<Storage.Book> {
+        override fun compare(o1: Storage.Book, o2: Storage.Book): Int {
+            return o1.info.last.compareTo(o2.info.last)
+        }
+    }
+
+    class ByCreated : Comparator<Storage.Book> {
+        override fun compare(o1: Storage.Book, o2: Storage.Book): Int {
+            return o1.info.created.compareTo(o2.info.created)
+        }
+    }
+
+    class ByName : Comparator<Storage.Book> {
+        override fun compare(o1: Storage.Book, o2: Storage.Book): Int {
+            return Storage.getTitle(o1.info).compareTo(Storage.getTitle(o2.info))
+        }
+    }
+
+    abstract class BooksAdapter(context: Context?, var holder: FragmentHolder) :
+        CacheImagesRecyclerAdapter<BookHolder?>(context) {
+        var filter: String? = null
+        var client: HttpClient = HttpClient() // images client
+
+        fun getCover(position: Int): Uri? {
+            return null
         }
 
-        void setText(TextView t, String s) {
-            if (t == null)
-                return;
-            TextMax m = null;
-            if (t.getParent() instanceof TextMax)
-                m = (TextMax) t.getParent();
-            ViewParent p = t.getParent();
+        open fun getAuthors(position: Int): String? {
+            return ""
+        }
+
+        open fun getTitle(position: Int): String? {
+            return ""
+        }
+
+        open fun refresh() {
+        }
+
+        override fun getItemId(position: Int): Long {
+            return position.toLong()
+        }
+
+        override fun getItemViewType(position: Int): Int {
+            return -1
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookHolder {
+            val inflater = LayoutInflater.from(context)
+            val convertView = inflater.inflate(viewType, parent, false)
+            return BookHolder(convertView)
+        }
+
+        override fun onBindViewHolder(h: BookHolder, position: Int) {
+            h.itemView.setOnClickListener(View.OnClickListener { v: View? ->
+                if (holder.clickListener != null) holder.clickListener!!.onItemClick(
+                    null,
+                    v,
+                    h.getAdapterPosition(),
+                    -1
+                )
+            })
+            h.itemView.setOnLongClickListener(OnLongClickListener { v: View? ->
+                if (holder.longClickListener != null) holder.longClickListener!!.onItemLongClick(
+                    null,
+                    v,
+                    h.getAdapterPosition(),
+                    -1
+                )
+                true
+            })
+            setText(h.aa, getAuthors(position))
+            setText(h.tt, getTitle(position))
+        }
+
+        @Throws(IOException::class)
+        override fun downloadImage(cover: Uri, f: File?): Bitmap {
+            val w = client.getResponse(null, cover.toString())
+            val out = FileOutputStream(f)
+            IOUtils.copy(w.inputStream, out)
+            w.inputStream.close()
+            out.close()
+            val bm = CacheImagesAdapter.createScaled(FileInputStream(f))
+            val os = FileOutputStream(f)
+            bm.compress(Bitmap.CompressFormat.PNG, 100, os)
+            os.close()
+            return bm
+        }
+
+        override fun downloadTaskUpdate(task: DownloadImageTask?, item: Any?, view: Any?) {
+            val h = BookHolder((view as View?)!!)
+            updateView(task, h.image, h.progress)
+        }
+
+        override fun downloadImageTask(task: DownloadImageTask): Bitmap? {
+            val u = task.item as Uri?
+            return downloadImage(u)
+        }
+
+        fun setText(t: TextView?, s: String?) {
+            if (t == null) return
+            var m: TextMax? = null
+            if (t.parent is TextMax) m = t.parent as TextMax?
+            t.parent
             if (s == null || s.isEmpty()) {
-                t.setVisibility(View.GONE);
-                if (m != null)
-                    m.setVisibility(View.GONE);
-                return;
+                t.visibility = View.GONE
+                if (m != null) m.visibility = View.GONE
+                return
             }
-            t.setVisibility(View.VISIBLE);
-            t.setText(s);
-            if (m != null)
-                m.setVisibility(View.VISIBLE);
+            t.visibility = View.VISIBLE
+            t.text = s
+            if (m != null) m.visibility = View.VISIBLE
         }
 
-        public static class BookHolder extends RecyclerView.ViewHolder {
-            TextView aa;
-            TextView tt;
-            ImageView image;
-            ProgressBar progress;
-
-            public BookHolder(View itemView) {
-                super(itemView);
-                aa = (TextView) itemView.findViewById(R.id.book_authors);
-                tt = (TextView) itemView.findViewById(R.id.book_title);
-                image = (ImageView) itemView.findViewById(R.id.book_cover);
-                progress = (ProgressBar) itemView.findViewById(R.id.book_progress);
-            }
+        class BookHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            var aa: TextView = itemView.findViewById<TextView>(R.id.book_authors)
+            var tt: TextView = itemView.findViewById<TextView>(R.id.book_title)
+            var image: ImageView = itemView.findViewById<ImageView>(R.id.book_cover)
+            var progress: ProgressBar = itemView.findViewById<ProgressBar>(R.id.book_progress)
         }
     }
 
-    public class LibraryAdapter extends BooksAdapter {
-        ArrayList<Storage.Book> all = new ArrayList<>();
-        ArrayList<Storage.Book> list = new ArrayList<>();
+    inner class LibraryAdapter(holder: FragmentHolder) :
+        BooksAdapter(this@LibraryFragment.context, holder) {
+        var all: ArrayList<Storage.Book> = ArrayList<Storage.Book>()
+        var list: ArrayList<Storage.Book> = ArrayList<Storage.Book>()
 
-        public LibraryAdapter(FragmentHolder holder) {
-            super(LibraryFragment.this.getContext(), holder);
+        override fun getItemViewType(position: Int): Int {
+            return holder.layout
         }
 
-        @Override
-        public int getItemViewType(int position) {
-            return holder.layout;
+        override fun getAuthors(position: Int): String? {
+            val b = list[position]
+            return b.info.authors
         }
 
-        @Override
-        public String getAuthors(int position) {
-            Storage.Book b = list.get(position);
-            return b.info.authors;
+        override fun getTitle(position: Int): String? {
+            val b = list[position]
+            return b.info.title
         }
 
-        @Override
-        public String getTitle(int position) {
-            Storage.Book b = list.get(position);
-            return b.info.title;
+        override fun getItemCount(): Int {
+            return list.size
         }
 
-        @Override
-        public int getItemCount() {
-            return list.size();
+        fun getItem(position: Int): Storage.Book {
+            return list[position]
         }
 
-        public Storage.Book getItem(int position) {
-            return list.get(position);
+        fun load() {
+            all = storage.list()
         }
 
-        public void load() {
-            all = storage.list();
-        }
-
-        public boolean hasBookmarks() {
-            for (Storage.Book b : all) {
-                if (b.info.bookmarks != null)
-                    return true;
+        fun hasBookmarks(): Boolean {
+            for (b in all) {
+                if (b.info.bookmarks != null) return true
             }
-            return false;
+            return false
         }
 
-        public void delete(Storage.Book b) {
-            all.remove(b);
-            int i = list.indexOf(b);
-            list.remove(i);
-            notifyItemRemoved(i);
+        fun delete(b: Storage.Book?) {
+            all.remove(b)
+            val i = list.indexOf(b)
+            list.removeAt(i)
+            notifyItemRemoved(i)
         }
 
-        public void refresh() {
-            list.clear();
-            if (filter == null || filter.isEmpty()) {
-                list = new ArrayList<>(all);
-                clearTasks();
+        override fun refresh() {
+            list.clear()
+            if (filter == null || filter!!.isEmpty()) {
+                list = ArrayList<Storage.Book>(all)
+                clearTasks()
             } else {
-                for (Storage.Book b : all) {
-                    if (SearchView.filter(filter, Storage.getTitle(b.info)))
-                        list.add(b);
+                for (b in all) {
+                    if (SearchView.filter(filter, Storage.getTitle(b.info))) list.add(b)
                 }
             }
-            sort();
+            sort()
         }
 
-        public void sort() {
-            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getContext());
-            int selected = getContext().getResources().getIdentifier(shared.getString(BookApplication.PREFERENCE_SORT, getContext().getResources().getResourceEntryName(R.id.sort_add_ask)), "id", getContext().getPackageName());
-            if (selected == R.id.sort_name_ask) {
-                list.sort(new ByName());
-            } else if (selected == R.id.sort_name_desc) {
-                list.sort(Collections.reverseOrder(new ByName()));
-            } else if (selected == R.id.sort_add_ask) {
-                list.sort(new ByCreated());
-            } else if (selected == R.id.sort_add_desc) {
-                list.sort(Collections.reverseOrder(new ByCreated()));
-            } else if (selected == R.id.sort_open_ask) {
-                list.sort(new ByRecent());
-            } else if (selected == R.id.sort_open_desc) {
-                list.sort(Collections.reverseOrder(new ByRecent()));
-            } else {
-                list.sort(new ByCreated());
+        fun sort() {
+            val shared = PreferenceManager.getDefaultSharedPreferences(context)
+            val selected = context.resources.getIdentifier(
+                shared.getString(
+                    BookApplication.PREFERENCE_SORT,
+                    context.resources.getResourceEntryName(R.id.sort_add_ask)
+                ), "id", context.packageName
+            )
+
+            when (selected) {
+                R.id.sort_name_ask -> list.sortWith(ByName())
+                R.id.sort_name_desc -> list.sortWith(reverseOrder<Storage.Book>(ByName()))
+                R.id.sort_add_ask -> list.sortWith(ByCreated())
+                R.id.sort_add_desc -> list.sortWith(reverseOrder<Storage.Book>(ByCreated()))
+                R.id.sort_open_ask -> list.sortWith(ByRecent())
+                R.id.sort_open_desc -> list.sortWith(reverseOrder<Storage.Book>(ByRecent()))
+                else -> list.sortWith(ByCreated())
             }
-            notifyDataSetChanged();
+
+            notifyDataSetChanged()
         }
 
-        @Override
-        public void onBindViewHolder(final BookHolder h, int position) {
-            super.onBindViewHolder(h, position);
+        override fun onBindViewHolder(h: BookHolder, position: Int) {
+            super.onBindViewHolder(h, position)
 
-            Storage.Book b = list.get(position);
+            val b = list[position]
 
-            View convertView = h.itemView;
+            val convertView = h.itemView
 
             if (b.cover == null || !b.cover.exists()) {
-                downloadTask(b, convertView);
+                downloadTask(b, convertView)
             } else {
-                downloadTaskClean(convertView);
-                downloadTaskUpdate(null, b, convertView);
+                downloadTaskClean(convertView)
+                downloadTaskUpdate(null, b, convertView)
             }
         }
 
-        @Override
-        public Bitmap downloadImageTask(CacheImagesAdapter.DownloadImageTask task) {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST);
-            Storage.Book book = (Storage.Book) task.item;
-            Storage.FBook fbook = null;
+        override fun downloadImageTask(task: DownloadImageTask): Bitmap? {
+            Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
+            val book = task.item as Storage.Book
+            var fbook: FBook? = null
             try {
-                fbook = storage.read(book);
-                File cover = Storage.coverFile(getContext(), book);
-                if (!cover.exists() || cover.length() == 0)
-                    storage.createCover(fbook, cover);
-                book.cover = cover;
+                fbook = storage.read(book)
+                val cover = Storage.coverFile(context, book)
+                if (!cover.exists() || cover.length() == 0L) storage.createCover(fbook, cover)
+                book.cover = cover
                 try {
-                    Bitmap bm = BitmapFactory.decodeStream(new FileInputStream(cover));
-                    return bm;
-                } catch (IOException e) {
-                    cover.delete();
-                    throw new RuntimeException(e);
+                    val bm = BitmapFactory.decodeStream(FileInputStream(cover))
+                    return bm
+                } catch (e: IOException) {
+                    cover.delete()
+                    throw RuntimeException(e)
                 }
-            } catch (RuntimeException e) {
-                Log.e(TAG, "Unable to load cover", e);
+            } catch (e: RuntimeException) {
+                Log.e(CacheImagesRecyclerAdapter.TAG, "Unable to load cover", e)
             } finally {
-                if (fbook != null)
-                    fbook.close();
+                fbook?.close()
             }
-            return null;
+            return null
         }
 
-
-        @Override
-        public void downloadTaskUpdate(CacheImagesAdapter.DownloadImageTask task, Object item, Object view) {
-            super.downloadTaskUpdate(task, item, view);
-            BookHolder h = new BookHolder((View) view);
-            Storage.Book b = (Storage.Book) item;
+        override fun downloadTaskUpdate(task: DownloadImageTask?, item: Any?, view: Any?) {
+            super.downloadTaskUpdate(task, item, view)
+            val h = BookHolder((view as View?)!!)
+            val b = item as Storage.Book
             if (b.cover != null && b.cover.exists()) {
                 try {
-                    Bitmap bm = BitmapFactory.decodeStream(new FileInputStream(b.cover));
-                    h.image.setImageBitmap(bm);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    val bm = BitmapFactory.decodeStream(FileInputStream(b.cover))
+                    h.image.setImageBitmap(bm)
+                } catch (e: Exception) {
+                    throw RuntimeException(e)
                 }
             }
         }
+    }
 
+    companion object {
+        @JvmField
+        val TAG: String = LibraryFragment::class.java.getSimpleName()
+
+        @JvmStatic
+        fun newInstance(): LibraryFragment {
+            val fragment = LibraryFragment()
+            val args = Bundle()
+            fragment.setArguments(args)
+            return fragment
+        }
     }
 }
