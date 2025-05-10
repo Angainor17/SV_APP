@@ -109,6 +109,10 @@ class RootBooksCatalogViewModel @Inject constructor(
                 _oneTimeEffect.trySend(BooksListOneTimeEffect.OpenBook(action.book))
             }
 
+            is RootBookActions.OnToolbarBooksClick -> {
+                _oneTimeEffect.trySend(BooksListOneTimeEffect.OpenStoredBooksList)
+            }
+
             is RootBookActions.OnDownloadBookClick -> {
                 loadBook(action.book)
             }

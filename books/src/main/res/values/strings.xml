@@ -12,4 +12,7 @@
     <string name="books_read">Читать</string>
     <string name="books_download">Скачать</string>
 
+    <string name="books_title">Книги</string>
+    <string name="books_menu_action_content_description">Скачанные книги</string>
+
 </resources>

@@ -11,7 +11,7 @@
             android:required="false" />
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.BookReaderMainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false"
             android:label="@string/reader_app_name"

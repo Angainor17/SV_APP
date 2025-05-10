@@ -20,6 +20,9 @@ sealed class RootBookActions {
     /** Нажатие на сам элемент списка */
     data class OnBookClick(val book: UiBook) : RootBookActions()
 
+    /** Нажатие на иконку книг в тулбаре */
+    object OnToolbarBooksClick : RootBookActions()
+
     /** Получение уведомления о скачивании */
     data class OnBookStateHandle(val bookState: BookState) : RootBookActions()
 }

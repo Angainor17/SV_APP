@@ -55,7 +55,7 @@ import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import java.util.Collections
 import com.github.axet.androidlibrary.R as AxetR
 
-class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelectedListener,
+class BookReaderMainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelectedListener,
     OnSharedPreferenceChangeListener {
     @JvmField
     var volumeEnabled: Boolean = true // tmp enabled / disable volume keys
@@ -284,12 +284,12 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
                 fbook.close()
                 for (u in uu) {
                     try {
-                        val info = RecentInfo(this@MainActivity, u)
+                        val info = RecentInfo(this@BookReaderMainActivity, u)
                         book.info.merge(info)
                     } catch (e: Exception) {
                         Log.d(TAG, "unable to merge info", e)
                     }
-                    Storage.delete(this@MainActivity, u)
+                    Storage.delete(this@BookReaderMainActivity, u)
                 }
                 book.info.position = selected[0]
                 storage.save(book)
@@ -319,7 +319,7 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
 
             for (u in uu) {
                 try {
-                    val info = RecentInfo(this@MainActivity, u)
+                    val info = RecentInfo(this@BookReaderMainActivity, u)
                     if (info.position != null) {
                         var found = false
                         for (i in rr.indices) {
@@ -587,7 +587,7 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
     }
 
     companion object {
-        private val TAG: String = MainActivity::class.java.getSimpleName()
+        private val TAG: String = BookReaderMainActivity::class.java.getSimpleName()
 
         private const val RESULT_FILE: Int = 1
         private const val RESULT_ADD_CATALOG: Int = 2

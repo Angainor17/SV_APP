@@ -124,7 +124,7 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
             if (id == androidR.id.home) {
                 val activity: Activity? = activity
                 activity?.finish()
-                startActivity(Intent(activity, MainActivity::class.java))
+                startActivity(Intent(activity, BookReaderMainActivity::class.java))
                 return true
             }
             return super.onOptionsItemSelected(item)
