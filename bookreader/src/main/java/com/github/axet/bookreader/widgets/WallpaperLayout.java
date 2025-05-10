@@ -1,6 +1,5 @@
 package com.github.axet.bookreader.widgets;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
@@ -26,7 +25,6 @@ public class WallpaperLayout extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(21)
     public WallpaperLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }

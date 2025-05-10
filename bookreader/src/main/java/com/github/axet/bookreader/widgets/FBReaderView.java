@@ -3,7 +3,6 @@ package com.github.axet.bookreader.widgets;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -156,7 +155,6 @@ public class FBReaderView extends RelativeLayout {
         create();
     }
 
-    @TargetApi(21)
     public FBReaderView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         create();
@@ -165,12 +163,7 @@ public class FBReaderView extends RelativeLayout {
     public static void showControls(final ViewGroup p, final View areas) {
         p.removeCallbacks((Runnable) areas.getTag());
         p.addView(areas);
-        Runnable hide = new Runnable() {
-            @Override
-            public void run() {
-                hideControls(p, areas);
-            }
-        };
+        Runnable hide = () -> hideControls(p, areas);
         areas.setTag(hide);
         p.postDelayed(hide, 3000);
     }
@@ -178,26 +171,21 @@ public class FBReaderView extends RelativeLayout {
     public static void hideControls(final ViewGroup p, final View areas) {
         p.removeCallbacks((Runnable) areas.getTag());
         areas.setTag(null);
-        if (Build.VERSION.SDK_INT >= 11) {
-            ValueAnimator v = ValueAnimator.ofFloat(1f, 0f);
-            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                @TargetApi(11)
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    ViewCompat.setAlpha(areas, (float) animation.getAnimatedValue());
-                }
-            });
-            v.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    p.removeView(areas);
-                }
-            });
-            v.setDuration(500);
-            v.start();
-        } else {
-            p.removeView(areas);
-        }
+        ValueAnimator v = ValueAnimator.ofFloat(1f, 0f);
+        v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                ViewCompat.setAlpha(areas, (float) animation.getAnimatedValue());
+            }
+        });
+        v.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                p.removeView(areas);
+            }
+        });
+        v.setDuration(500);
+        v.start();
     }
 
     public static Intent translateIntent(String text) {
@@ -455,47 +443,39 @@ public class FBReaderView extends RelativeLayout {
             protected void run(Object... params) {
                 app.hideActivePopup();
                 final String pattern = (String) params[0];
-                final Runnable runnable = new Runnable() {
-                    public void run() {
-                        final TextSearchPopup popup = (TextSearchPopup) app.getPopupById(TextSearchPopup.ID);
-                        popup.initPosition();
-                        config.setValue(app.MiscOptions.TextSearchPattern, pattern);
-                        if (pluginview != null) {
-                            searchClose();
-                            search = pluginview.search(pattern);
-                            search.setPage(getPosition().getParagraphIndex());
-                            a.runOnUiThread(new Runnable() {
-                                public void run() {
-                                    if (search.getCount() == 0) {
-                                        UIMessageUtil.showErrorMessage(a, "textNotFound");
-                                        popup.StartPosition = null;
-                                    } else {
-                                        if (widget instanceof ScrollWidget)
-                                            ((ScrollWidget) widget).updateOverlays();
-                                        if (widget instanceof PagerWidget)
-                                            ((PagerWidget) widget).updateOverlaysReset();
-                                        app.showPopup(popup.getId());
-                                    }
-                                }
-                            });
-                            return;
-                        }
-                        if (app.getTextView().search(pattern, true, false, false, false) != 0) {
-                            a.runOnUiThread(new Runnable() {
-                                public void run() {
-                                    app.showPopup(popup.getId());
-                                    if (widget instanceof ScrollWidget)
-                                        reset();
-                                }
-                            });
-                        } else {
-                            a.runOnUiThread(new Runnable() {
-                                public void run() {
-                                    UIMessageUtil.showErrorMessage(a, "textNotFound");
-                                    popup.StartPosition = null;
-                                }
-                            });
-                        }
+                final Runnable runnable = () -> {
+                    final TextSearchPopup popup = (TextSearchPopup) app.getPopupById(TextSearchPopup.ID);
+                    popup.initPosition();
+                    config.setValue(app.MiscOptions.TextSearchPattern, pattern);
+                    if (pluginview != null) {
+                        searchClose();
+                        search = pluginview.search(pattern);
+                        search.setPage(getPosition().getParagraphIndex());
+                        a.runOnUiThread(() -> {
+                            if (search.getCount() == 0) {
+                                UIMessageUtil.showErrorMessage(a, "textNotFound");
+                                popup.StartPosition = null;
+                            } else {
+                                if (widget instanceof ScrollWidget)
+                                    ((ScrollWidget) widget).updateOverlays();
+                                if (widget instanceof PagerWidget)
+                                    ((PagerWidget) widget).updateOverlaysReset();
+                                app.showPopup(popup.getId());
+                            }
+                        });
+                        return;
+                    }
+                    if (app.getTextView().search(pattern, true, false, false, false) != 0) {
+                        a.runOnUiThread(() -> {
+                            app.showPopup(popup.getId());
+                            if (widget instanceof ScrollWidget)
+                                reset();
+                        });
+                    } else {
+                        a.runOnUiThread(() -> {
+                            UIMessageUtil.showErrorMessage(a, "textNotFound");
+                            popup.StartPosition = null;
+                        });
                     }
                 };
                 UIUtil.wait("search", runnable, getContext());
@@ -642,12 +622,8 @@ public class FBReaderView extends RelativeLayout {
                             FBReaderView.this.removeView(anchor);
                         }
                     });
-                    FBReaderView.this.post(new Runnable() { // allow anchor view to be placed
-                        @Override
-                        public void run() {
-                            menu.show();
-                        }
-                    });
+                    // allow anchor view to be placed
+                    FBReaderView.this.post(() -> menu.show());
                 } else if (soul instanceof ZLTextWordRegionSoul) {
                     DictionaryUtil.openTextInDictionary(
                             a,
@@ -655,10 +631,8 @@ public class FBReaderView extends RelativeLayout {
                             true,
                             region.getTop(),
                             region.getBottom(),
-                            new Runnable() {
-                                public void run() {
-                                    // a.outlineRegion(soul);
-                                }
+                            () -> {
+                                // a.outlineRegion(soul);
                             }
                     );
                 }
@@ -752,12 +726,10 @@ public class FBReaderView extends RelativeLayout {
                 a.startActivity(Intent.createChooser(intent, null));
 
                 if (widget instanceof ScrollWidget) {
-                    FBReaderView.this.post(new Runnable() { // do not clear immidiallty. let onPause to be called before p.text = null
-                        @Override
-                        public void run() {
-                            ((ScrollWidget) widget).adapter.processInvalidate();
-                            ((ScrollWidget) widget).adapter.processClear();
-                        }
+                    // do not clear immidiallty. let onPause to be called before p.text = null
+                    FBReaderView.this.post(() -> {
+                        ((ScrollWidget) widget).adapter.processInvalidate();
+                        ((ScrollWidget) widget).adapter.processClear();
                     });
                 }
             }
@@ -820,12 +792,7 @@ public class FBReaderView extends RelativeLayout {
                             bookmarksUpdate();
                         }
                     };
-                    FBReaderView.this.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            b.show();
-                        }
-                    });
+                    FBReaderView.this.post(() -> b.show());
                 } else {
                     if (book.info.bookmarks == null)
                         book.info.bookmarks = new Storage.Bookmarks();
@@ -859,26 +826,20 @@ public class FBReaderView extends RelativeLayout {
             @Override
             protected void run(Object... params) {
                 if (search != null) {
-                    Runnable run = new Runnable() {
-                        @Override
-                        public void run() {
-                            final int page = search.prev();
-                            if (page == -1)
+                    Runnable run = () -> {
+                        final int page = search.prev();
+                        if (page == -1)
+                            return;
+                        FBReaderView.this.post(() -> {
+                            if (widget instanceof ScrollWidget) {
+                                ((ScrollWidget) widget).searchPage(page);
                                 return;
-                            FBReaderView.this.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (widget instanceof ScrollWidget) {
-                                        ((ScrollWidget) widget).searchPage(page);
-                                        return;
-                                    }
-                                    if (widget instanceof PagerWidget) {
-                                        ((PagerWidget) widget).searchPage(page);
-                                        return;
-                                    }
-                                }
-                            });
-                        }
+                            }
+                            if (widget instanceof PagerWidget) {
+                                ((PagerWidget) widget).searchPage(page);
+                                return;
+                            }
+                        });
                     };
                     UIUtil.wait("search", run, getContext());
                     return;
@@ -892,26 +853,20 @@ public class FBReaderView extends RelativeLayout {
             @Override
             protected void run(Object... params) {
                 if (search != null) {
-                    Runnable run = new Runnable() {
-                        @Override
-                        public void run() {
-                            final int page = search.next();
-                            if (page == -1)
+                    Runnable run = () -> {
+                        final int page = search.next();
+                        if (page == -1)
+                            return;
+                        FBReaderView.this.post(() -> {
+                            if (widget instanceof ScrollWidget) {
+                                ((ScrollWidget) widget).searchPage(page);
                                 return;
-                            FBReaderView.this.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (widget instanceof ScrollWidget) {
-                                        ((ScrollWidget) widget).searchPage(page);
-                                        return;
-                                    }
-                                    if (widget instanceof PagerWidget) {
-                                        ((PagerWidget) widget).searchPage(page);
-                                        return;
-                                    }
-                                }
-                            });
-                        }
+                            }
+                            if (widget instanceof PagerWidget) {
+                                ((PagerWidget) widget).searchPage(page);
+                                return;
+                            }
+                        });
                     };
                     UIUtil.wait("search", run, getContext());
                     return;
@@ -1828,12 +1783,10 @@ public class FBReaderView extends RelativeLayout {
 
         public void close() {
             final ArrayList<View> old = new ArrayList<>(links);
-            fb.post(new Runnable() { // can be called during RelativeLayout onLayout
-                @Override
-                public void run() {
-                    for (View v : old)
-                        fb.removeView(v);
-                }
+            // can be called during RelativeLayout onLayout
+            fb.post(() -> {
+                for (View v : old)
+                    fb.removeView(v);
             });
             links.clear();
         }
@@ -1927,12 +1880,9 @@ public class FBReaderView extends RelativeLayout {
 
         public void close() {
             final ArrayList<View> old = new ArrayList<>(bookmarks); // can be called during RelativeLayout onLayout
-            fb.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (View v : old)
-                        fb.removeView(v);
-                }
+            fb.post(() -> {
+                for (View v : old)
+                    fb.removeView(v);
             });
             bookmarks.clear();
         }
@@ -2028,12 +1978,10 @@ public class FBReaderView extends RelativeLayout {
 
         public void close() {
             final ArrayList<View> old = new ArrayList<>(words);
-            fb.post(new Runnable() { // can be called during RelativeLayout onLayout
-                @Override
-                public void run() {
-                    for (View v : old)
-                        fb.removeView(v);
-                }
+            // can be called during RelativeLayout onLayout
+            fb.post(() -> {
+                for (View v : old)
+                    fb.removeView(v);
             });
             words.clear();
         }

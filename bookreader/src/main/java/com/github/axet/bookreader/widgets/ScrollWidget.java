@@ -441,22 +441,12 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         if (fb.search != null) {
             if (fb.searchPagePending != -1) {
                 final int p = fb.searchPagePending;
-                fb.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        searchPage(p);
-                    }
-                });
+                fb.post(() -> searchPage(p));
                 fb.searchPagePending = -1;
             }
         }
         if (fb.selection != null) {
-            fb.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateOverlays();
-                }
-            });
+            fb.post(() -> updateOverlays());
         }
         if (fb.scrollDelayed != null) {
             adapter.loadPages(fb.pluginview.reflower);
@@ -486,12 +476,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                             int off = info.src.get(s).top - screen;
                             if (off > 0)
                                 scrollBy(0, off);
-                            fb.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateOverlays();
-                                }
-                            });
+                            fb.post(() -> updateOverlays());
                             adapter.oldTurn = new ZLTextFixedPosition(c.start);
                             fb.scrollDelayed = null;
                             return;
@@ -1350,21 +1335,11 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                                 if (time == null) {
                                     PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
                                     if (Build.VERSION.SDK_INT >= 21 && pm.isPowerSaveMode()) {
-                                        fb.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                invalidate();
-                                            }
-                                        }, 1000);
+                                        fb.postDelayed(() -> invalidate(), 1000);
                                     } else {
                                         time = new TimeAnimatorCompat();
                                         time.start();
-                                        time.setTimeListener(new TimeAnimatorCompat.TimeListener() {
-                                            @Override
-                                            public void onTimeUpdate(TimeAnimatorCompat animation, long totalTime, long deltaTime) {
-                                                invalidate();
-                                            }
-                                        });
+                                        time.setTimeListener((animation, totalTime, deltaTime) -> invalidate());
                                     }
                                 }
                                 drawProgress(draw, page, index);

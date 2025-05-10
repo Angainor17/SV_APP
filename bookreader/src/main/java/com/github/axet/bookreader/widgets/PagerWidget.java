@@ -223,12 +223,7 @@ public class PagerWidget extends ZLAndroidWidget {
             }
 
             if (selectionPage != null && !selectionPage.samePositionAs(position)) {
-                fb.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        fb.selectionClose();
-                    }
-                });
+                fb.post(() -> fb.selectionClose());
                 selectionPage = null;
             }
         }
@@ -377,15 +372,12 @@ public class PagerWidget extends ZLAndroidWidget {
                     selectionPage = pos;
                     fb.selectionOpen(s);
                     final Plugin.View.Selection.Page page = fb.pluginview.selectPage(pos, getInfo(), dst.width(), dst.height());
-                    final Runnable run = new Runnable() {
-                        @Override
-                        public void run() {
-                            int x = dst.left;
-                            int y = dst.top;
-                            if (fb.pluginview.reflow)
-                                x += getInfo().margin.left;
-                            fb.selection.update((SelectionView.PageView) fb.selection.getChildAt(0), x, y);
-                        }
+                    final Runnable run = () -> {
+                        int x = dst.left;
+                        int y = dst.top;
+                        if (fb.pluginview.reflow)
+                            x += getInfo().margin.left;
+                        fb.selection.update((SelectionView.PageView) fb.selection.getChildAt(0), x, y);
                     };
                     Plugin.View.Selection.Setter setter = new Plugin.View.Selection.Setter() {
                         @Override

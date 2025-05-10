@@ -53,7 +53,6 @@ public class FBFooterView extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(21)
     public FBFooterView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
