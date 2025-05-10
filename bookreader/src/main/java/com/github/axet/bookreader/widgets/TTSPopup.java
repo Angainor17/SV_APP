@@ -3,7 +3,6 @@ package com.github.axet.bookreader.widgets;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
@@ -73,15 +72,6 @@ public class TTSPopup {
         }
     };
     Runnable speakRetry = null;
-    Runnable speakNext = new Runnable() {
-        @Override
-        public void run() {
-            Log.d(TAG, "speakNext");
-            selectNext();
-            speakNext();
-        }
-    };
-
     public TTSPopup(FBReaderView v) {
         this.context = v.getContext();
         fb = v;
@@ -122,12 +112,7 @@ public class TTSPopup {
                         if (first != -1) {
                             ScrollWidget.ScrollAdapter.PageCursor cur = ((ScrollWidget) fb.widget).adapter.pages.get(first);
                             if (!c.equals(cur)) {
-                                Runnable gravity = new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        updateGravity();
-                                    }
-                                };
+                                Runnable gravity = () -> updateGravity();
                                 if (c.end != null && cur.start != null && c.end.compareTo(cur.start) <= 0) {
                                     onScrollFinished.add(gravity);
                                     fb.scrollPrevPage();
@@ -154,12 +139,7 @@ public class TTSPopup {
                     delayed = null;
                     dones.remove(speakNext); // remove done
                     fragment.retry++;
-                    ttsShowError("TTS Unknown error", 2000, new Runnable() {
-                        @Override
-                        public void run() {
-                            speakNext();
-                        }
-                    });
+                    ttsShowError("TTS Unknown error", 2000, () -> speakNext());
                 } else {
                     done.run(); // speakNext
                 }
@@ -175,31 +155,22 @@ public class TTSPopup {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View view = inflater.inflate(R.layout.tts_popup, null);
         View left = view.findViewById(R.id.tts_left);
-        left.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stop();
-                selectPrev();
-            }
+        left.setOnClickListener(v1 -> {
+            stop();
+            selectPrev();
         });
         View right = view.findViewById(R.id.tts_right);
-        right.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stop();
-                selectNext();
-            }
+        right.setOnClickListener(v2 -> {
+            stop();
+            selectNext();
         });
         play = (ImageView) view.findViewById(R.id.tts_play);
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (tts.dones.contains(speakNext) || speakRetry != null) {
-                    stop();
-                } else {
-                    resetColor();
-                    speakNext();
-                }
+        play.setOnClickListener(v3 -> {
+            if (tts.dones.contains(speakNext) || speakRetry != null) {
+                stop();
+            } else {
+                resetColor();
+                speakNext();
             }
         });
         View close = view.findViewById(R.id.tts_close);
@@ -219,14 +190,34 @@ public class TTSPopup {
         f.setPadding(dp20, dp20, dp20, dp20);
         this.view = f;
         this.panel = round;
-    }
+    }    Runnable speakNext = () -> {
+        Log.d(TAG, "speakNext");
+        selectNext();
+        speakNext();
+    };
 
     public static int getMaxSpeechInputLength(int max) {
-        if (Build.VERSION.SDK_INT >= 18) {
-            if (max > TextToSpeech.getMaxSpeechInputLength())
-                return TextToSpeech.getMaxSpeechInputLength();
-        }
+        if (max > TextToSpeech.getMaxSpeechInputLength())
+            return TextToSpeech.getMaxSpeechInputLength();
         return max;
+    }
+
+    public void speakNext() {
+        if (fragment == null)
+            selectNext();
+        Runnable r = () -> {
+            fragment.last = System.currentTimeMillis();
+            tts.playSpeech(new TTS.Speak(tts.getTTSLocale(), fragment.fragmentText), speakNext);
+            updatePlay();
+        };
+        if (fb.widget instanceof ScrollWidget) {
+            if (((ScrollWidget) fb.widget).getScrollState() == RecyclerView.SCROLL_STATE_IDLE)
+                onScrollingFinished(ZLViewEnums.PageIndex.current);
+        }
+        if (onScrollFinished.isEmpty())
+            r.run();
+        else
+            onScrollFinished.add(r);
     }
 
     public static Rect getRect(Plugin.View pluginview, ScrollWidget.ScrollAdapter.PageView v, Storage.Bookmark bm) {
@@ -322,33 +313,6 @@ public class TTSPopup {
         return context;
     }
 
-    public void speakNext() {
-        if (fragment == null)
-            selectNext();
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                fragment.last = System.currentTimeMillis();
-                tts.playSpeech(new TTS.Speak(tts.getTTSLocale(), fragment.fragmentText), speakNext);
-                updatePlay();
-            }
-        };
-        if (fb.widget instanceof ScrollWidget) {
-            if (((ScrollWidget) fb.widget).getScrollState() == RecyclerView.SCROLL_STATE_IDLE)
-                onScrollingFinished(ZLViewEnums.PageIndex.current);
-        }
-        if (onScrollFinished.isEmpty())
-            r.run();
-        else
-            onScrollFinished.add(r);
-    }
-
-    public void updatePlay() {
-        boolean p = tts.dones.contains(speakNext) || speakRetry != null;
-        play.setImageResource(p ? R.drawable.ic_outline_pause_24 : R.drawable.ic_outline_play_arrow_24);
-        fb.listener.ttsStatus(p);
-    }
-
     public void selectPrev() {
         marks.clear();
         if (fragment == null) {
@@ -377,10 +341,7 @@ public class TTSPopup {
             int first = ((ScrollWidget) fb.widget).findFirstPage();
             ScrollWidget.ScrollAdapter.PageCursor cur = ((ScrollWidget) fb.widget).adapter.pages.get(first);
             if (!nc.equals(cur)) {
-                onScrollFinished.add(new Runnable() {
-                    @Override
-                    public void run() {
-                    }
+                onScrollFinished.add(() -> {
                 });
                 fb.scrollPrevPage();
             } else {
@@ -392,12 +353,7 @@ public class TTSPopup {
             if (fb.pluginview == null) {
                 ZLTextPosition start = fb.app.BookTextView.getStartCursor();
                 if (start.compareTo(fragment.fragment.end) >= 0) {
-                    onScrollFinished.add(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateGravity();
-                        }
-                    });
+                    onScrollFinished.add(() -> updateGravity());
                     fb.scrollPrevPage();
                 } else {
                     updateGravity();
@@ -407,12 +363,7 @@ public class TTSPopup {
                 Rect dst = ((PagerWidget) fb.widget).getPageRect();
                 ZLTextPosition px = fb.pluginview.getPosition();
                 if (px.getParagraphIndex() > fragment.fragment.start.getParagraphIndex()) {
-                    onScrollFinished.add(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateGravity();
-                        }
-                    });
+                    onScrollFinished.add(() -> updateGravity());
                     fb.scrollPrevPage();
                 } else {
                     Plugin.View.Selection.Page page = fb.pluginview.selectPage(px, ((PagerWidget) fb.widget).getInfo(), dst.width(), dst.height());
@@ -426,12 +377,7 @@ public class TTSPopup {
                     Collections.sort(ii, new SelectionView.LinesUL(ii));
                     s.close();
                     if (ii.get(ii.size() - 1).bottom < ((PagerWidget) fb.widget).getTop() + fb.pluginview.current.pageOffset / fb.pluginview.current.ratio) {
-                        onScrollFinished.add(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateGravity();
-                            }
-                        });
+                        onScrollFinished.add(() -> updateGravity());
                         fb.scrollPrevPage();
                     } else {
                         Rect r = SelectionView.union(Arrays.asList(bounds.rr));
@@ -444,6 +390,12 @@ public class TTSPopup {
             }
         }
         fb.ttsUpdate();
+    }
+
+    public void updatePlay() {
+        boolean p = tts.dones.contains(speakNext) || speakRetry != null;
+        play.setImageResource(p ? R.drawable.ic_outline_pause_24 : R.drawable.ic_outline_play_arrow_24);
+        fb.listener.ttsStatus(p);
     }
 
     public void selectNext() {
@@ -474,12 +426,7 @@ public class TTSPopup {
             ScrollWidget.ScrollAdapter.PageCursor cur = ((ScrollWidget) fb.widget).adapter.pages.get(first);
             if (!nc.equals(cur)) {
                 int page = ((ScrollWidget) fb.widget).adapter.findPage(nc);
-                onScrollFinished.add(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateGravity();
-                    }
-                });
+                onScrollFinished.add(() -> updateGravity());
                 ((ScrollWidget) fb.widget).smoothScrollToPosition(page);
             } else {
                 ensureVisible(fragment.fragment);
@@ -491,12 +438,7 @@ public class TTSPopup {
                 ZLTextPosition end;
                 end = fb.app.BookTextView.getEndCursor();
                 if (end.compareTo(fragment.fragment.start) <= 0) {
-                    onScrollFinished.add(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateGravity();
-                        }
-                    });
+                    onScrollFinished.add(() -> updateGravity());
                     fb.scrollNextPage();
                 } else {
                     updateGravity();
@@ -519,12 +461,7 @@ public class TTSPopup {
                     Collections.sort(ii, new SelectionView.LinesUL(ii));
                     s.close();
                     if (ii.get(0).bottom > ((PagerWidget) fb.widget).getBottom() + fb.pluginview.current.pageOffset / fb.pluginview.current.ratio) {
-                        onScrollFinished.add(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateGravity();
-                            }
-                        });
+                        onScrollFinished.add(() -> updateGravity());
                         fb.scrollNextPage();
                     } else {
                         Rect r = SelectionView.union(Arrays.asList(bounds.rr));
@@ -537,6 +474,20 @@ public class TTSPopup {
             }
         }
         fb.ttsUpdate();
+    }
+
+    public void ttsShowError(String text, int delay, final Runnable done) {
+        for (Storage.Bookmark m : marks)
+            m.color = TTS_BG_ERROR_COLOR;
+        fb.ttsUpdate();
+        handler.removeCallbacks(speakRetry);
+        speakRetry = () -> {
+            resetColor();
+            done.run();
+            speakRetry = null;
+        };
+        handler.postDelayed(speakRetry, delay);
+        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
     }
 
     public Storage.Bookmark selectNext(Storage.Bookmark bm) {
@@ -888,22 +839,7 @@ public class TTSPopup {
         return new Storage.Bookmark(getText(start, end), start, end);
     }
 
-    public void ttsShowError(String text, int delay, final Runnable done) {
-        for (Storage.Bookmark m : marks)
-            m.color = TTS_BG_ERROR_COLOR;
-        fb.ttsUpdate();
-        handler.removeCallbacks(speakRetry);
-        speakRetry = new Runnable() {
-            @Override
-            public void run() {
-                resetColor();
-                done.run();
-                speakRetry = null;
-            }
-        };
-        handler.postDelayed(speakRetry, delay);
-        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
-    }
+
 
     public void resetColor() {
         for (Storage.Bookmark m : marks)

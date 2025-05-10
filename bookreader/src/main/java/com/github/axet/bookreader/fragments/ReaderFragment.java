@@ -209,24 +209,19 @@ public class ReaderFragment extends Fragment implements MainActivity.SearchListe
                 fb.gotoPosition(pos);
         } catch (RuntimeException e) {
             ErrorDialog.Error(main, e);
-            handler.post(new Runnable() { // or openLibrary crash with java.lang.IllegalStateException on FragmentActivity.onResume
-                @Override
-                public void run() {
-                    if (!main.isFinishing())
-                        main.openLibrary();
-                }
+            // or openLibrary crash with java.lang.IllegalStateException on FragmentActivity.onResume
+            handler.post(() -> {
+                if (!main.isFinishing())
+                    main.openLibrary();
             });
             return v; // ignore post called
         }
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (getActivity().isFinishing())
-                    return;
-                updateToolbar(); // update toolbar after page been drawn to detect RTL
-                fb.showControls(); //  update toolbar after page been drawn, getWidth() == 0
-            }
+        handler.post(() -> {
+            if (getActivity().isFinishing())
+                return;
+            updateToolbar(); // update toolbar after page been drawn to detect RTL
+            fb.showControls(); //  update toolbar after page been drawn, getWidth() == 0
         });
 
         return v;

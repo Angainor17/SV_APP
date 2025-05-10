@@ -1,7 +1,6 @@
 package com.github.axet.bookreader.widgets;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -38,7 +37,6 @@ public class ToolbarButtonView extends FrameLayout {
         create();
     }
 
-    @TargetApi(21)
     public ToolbarButtonView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         create();

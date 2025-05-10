@@ -1,6 +1,5 @@
 package com.github.axet.bookreader.widgets;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 
@@ -25,7 +24,6 @@ public class ToolbarRTLView extends ToolbarButtonView {
         super(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(21)
     public ToolbarRTLView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }

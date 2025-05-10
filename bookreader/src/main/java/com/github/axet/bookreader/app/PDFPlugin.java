@@ -1,6 +1,5 @@
 package com.github.axet.bookreader.app;
 
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -725,7 +724,6 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
         }
     }
 
-    @TargetApi(21)
     public static class NativePage extends Page {
         public PdfRenderer doc;
         public PdfRenderer.Page page;
@@ -763,7 +761,6 @@ public class PDFPlugin extends BuiltinFormatPlugin implements Plugin {
         }
     }
 
-    @TargetApi(21)
     public static class NativeView extends View {
         public PdfRenderer doc;
 

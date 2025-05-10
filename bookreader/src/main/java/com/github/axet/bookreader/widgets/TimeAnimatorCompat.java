@@ -2,8 +2,6 @@ package com.github.axet.bookreader.widgets;
 
 import android.animation.TimeAnimator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Handler;
 
 public class TimeAnimatorCompat {
@@ -12,10 +10,7 @@ public class TimeAnimatorCompat {
     ValueAnimator v;
 
     public TimeAnimatorCompat() {
-        if (Build.VERSION.SDK_INT >= 16)
-            v = new TimeAnimator();
-        else if (Build.VERSION.SDK_INT >= 11)
-            v = ValueAnimator.ofFloat(0f, 1f);
+        v = new TimeAnimator();
     }
 
     Runnable run = new Runnable() {
@@ -28,38 +23,18 @@ public class TimeAnimatorCompat {
     };
 
     public void start() {
-        if (Build.VERSION.SDK_INT >= 11)
-            v.start();
-        else
-            run.run();
+        v.start();
     }
 
     public void cancel() {
-        if (Build.VERSION.SDK_INT >= 11)
-            v.cancel();
-        else
-            handler.removeCallbacks(run);
+        v.cancel();
     }
 
     public void setTimeListener(TimeListener l) {
-        if (Build.VERSION.SDK_INT >= 16) {
-            ((TimeAnimator) v).setTimeListener(new TimeAnimator.TimeListener() {
-                @Override
-                public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
-                    if (listener != null)
-                        listener.onTimeUpdate(TimeAnimatorCompat.this, totalTime, deltaTime);
-                }
-            });
-        } else if (Build.VERSION.SDK_INT >= 11) {
-            v.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @TargetApi(11)
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    if (listener != null)
-                        listener.onTimeUpdate(TimeAnimatorCompat.this, 0, 0);
-                }
-            });
-        }
+        ((TimeAnimator) v).setTimeListener((animation, totalTime, deltaTime) -> {
+            if (listener != null)
+                listener.onTimeUpdate(TimeAnimatorCompat.this, totalTime, deltaTime);
+        });
         listener = l;
     }
 
