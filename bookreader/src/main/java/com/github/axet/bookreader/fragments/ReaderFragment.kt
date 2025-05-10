@@ -433,8 +433,8 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
             )
         }
         if (id == R.id.action_rtl) {
-            fb!!.app.BookTextView.rtlMode = !fb!!.app.BookTextView.rtlMode
-            fb!!.reset()
+            fb?.app?.BookTextView?.rtlMode = !fb!!.app.BookTextView.rtlMode
+            fb?.reset()
             updateToolbar()
         }
         if (id == R.id.action_mode) {
@@ -443,16 +443,16 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
             shared.edit {
                 putString(BookApplication.PREFERENCE_VIEW_MODE, m.toString())
             }
-            fb!!.setWidget(m)
-            fb!!.reset()
+            fb?.setWidget(m)
+            fb?.reset()
             updateToolbar()
         }
         if (id == R.id.action_tts) {
             if (fb!!.tts != null) {
-                fb!!.tts.dismiss()
-                fb!!.tts = null
+                fb?.tts?.dismiss()
+                fb?.tts = null
             } else {
-                fb!!.ttsOpen()
+                fb?.ttsOpen()
             }
         }
 
@@ -460,7 +460,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
     }
 
     fun updateTheme() {
-        fb!!.updateTheme()
+        fb?.updateTheme()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -561,30 +561,30 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
                 }
             })
         tocdialog = builder.create()
-        tocdialog!!.setOnShowListener(object : OnShowListener {
+        tocdialog?.setOnShowListener(object : OnShowListener {
             override fun onShow(dialog: DialogInterface?) {
                 val i = a.getCurrent() - 1
                 if (i > 0) tree.setSelection(i)
             }
         })
-        tocdialog!!.show()
+        tocdialog?.show()
     }
 
     override fun search(s: String?) {
-        fb!!.app.runAction(ActionCode.SEARCH, s)
+        fb?.app?.runAction(ActionCode.SEARCH, s)
     }
 
     override fun searchClose() {
-        fb!!.searchClose()
+        fb?.searchClose()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         if (key == BookApplication.PREFERENCE_VIEW_MODE) {
-            fb!!.configWidget(sharedPreferences)
-            fb!!.showControls()
+            fb?.configWidget(sharedPreferences)
+            fb?.showControls()
         }
         if (key == BookApplication.PREFERENCE_THEME) {
-            fb!!.configColorProfile(sharedPreferences)
+            fb?.configColorProfile(sharedPreferences) // FIXME Воронин тут ловил баг
         }
     }
 
@@ -592,7 +592,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         get() = getString(R.string.search_book)
 
     override fun onFullscreenChanged(f: Boolean) {
-        fb!!.onConfigurationChanged(null)
+        fb?.onConfigurationChanged(null)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

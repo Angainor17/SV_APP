@@ -47,6 +47,8 @@ dependencies {
         exclude("org.apache.httpcomponents", "httpmime")
     } //{ exclude group: 'org.json', module: 'json' }
 
+    implementation(libs.timber)
+
     implementation(libs.appcompat)
     implementation(libs.material)
 }

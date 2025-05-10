@@ -2,7 +2,6 @@ package com.github.axet.bookreader.activities
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
-import android.content.ContentResolver
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -28,15 +27,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.github.axet.androidlibrary.app.MainApplication
-import com.github.axet.androidlibrary.preferences.AboutPreferenceCompat
 import com.github.axet.androidlibrary.preferences.RotatePreferenceCompat
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.androidlibrary.widgets.OpenChoicer
-import com.github.axet.androidlibrary.widgets.OpenFileDialog
 import com.github.axet.androidlibrary.widgets.SearchView
 import com.github.axet.androidlibrary.widgets.SearchView.OnCloseButtonListener
 import com.github.axet.androidlibrary.widgets.SearchView.OnCollapsedListener
@@ -76,8 +74,20 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
+    private fun changeStatusBarColor() {
+        val shared = PreferenceManager.getDefaultSharedPreferences(this)
+        val currentTheme = shared.getString(BookApplication.PREFERENCE_THEME, "").orEmpty()
+        val isLightTheme = currentTheme == getString(AxetR.string.Theme_Light)
+
+        // true - чёрная иконка
+        // false - белая иконка
+        WindowInsetsControllerCompat(window, decorView).isAppearanceLightStatusBars = isLightTheme
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        changeStatusBarColor()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             registerReceiver(
@@ -128,22 +138,25 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
 
         val shared = PreferenceManager.getDefaultSharedPreferences(this)
         val theme = menu.findItem(R.id.action_theme)
-        val t: String = shared.getString(BookApplication.PREFERENCE_THEME, "")!!
-        if (t == getString(AxetR.string.Theme_System)) {
+        val currentTheme = shared.getString(BookApplication.PREFERENCE_THEME, "").orEmpty()
+        val isLightTheme = currentTheme == getString(AxetR.string.Theme_System)
+
+        if (isLightTheme) {
             theme.isVisible = false
         } else {
             theme.isVisible = true
             val d = getString(AxetR.string.Theme_Dark)
             theme.setIcon(
-                if (t == d) R.drawable.ic_brightness_night_white_24dp else R.drawable.ic_brightness_day_white_24dp
+                if (currentTheme == d) R.drawable.ic_brightness_night_white_24dp else R.drawable.ic_brightness_day_white_24dp
             )
             val map = ResourcesMap(
                 this,
                 AxetR.array.themes_values,
                 AxetR.array.themes_text
             )
-            theme.title =
-                map.get(getString(if (t == d) AxetR.string.Theme_Dark else AxetR.string.Theme_Light))
+            theme.title = map.get(
+                getString(if (currentTheme == d) AxetR.string.Theme_Dark else AxetR.string.Theme_Light)
+            )
         }
 
         val searchView = MenuItemCompat.getActionView(searchMenu) as SearchView
@@ -203,54 +216,25 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
 
-        if (id == R.id.action_about) {
-            AboutPreferenceCompat.buildDialog(this, R.raw.about).show()
-            return true
-        }
-
         if (id == R.id.action_settings) {
             SettingsActivity.startActivity(this)
             return true
         }
 
         val shared = PreferenceManager.getDefaultSharedPreferences(this)
-        if (id == R.id.action_file) {
-            val last = shared.getString(BookApplication.PREFERENCE_LAST_PATH, null)
-            var old: Uri? = null
-            if (last != null) {
-                old = last.toUri()
-                var f = Storage.getFile(old)
-                while (f != null && !f.exists()) f = f.getParentFile()
-                if (f != null) old = Uri.fromFile(f)
-            } else {
-                old = (ContentResolver.SCHEME_CONTENT + Storage.CSS).toUri() // show SAF default
-            }
-            choicer = object : OpenChoicer(OpenFileDialog.DIALOG_TYPE.FILE_DIALOG, true) {
-                override fun onResult(uri: Uri) {
-                    val s = uri.scheme
-                    if (s == ContentResolver.SCHEME_FILE) {
-                        var f = Storage.getFile(uri)
-                        f = f!!.getParentFile()
-                        shared.edit(commit = true) {
-                            putString(BookApplication.PREFERENCE_LAST_PATH, f.toString())
-                        }
-                    }
-                    loadBookFromUri(uri)
-                }
-            }
-            choicer?.setStorageAccessFramework(this, RESULT_FILE)
-            choicer?.setPermissionsDialog(this, Storage.PERMISSIONS_RO, RESULT_FILE)
-            choicer?.show(old)
-        }
 
         if (id == R.id.action_theme) {
             shared.edit(commit = true) {
-                val t: String = shared.getString(BookApplication.PREFERENCE_THEME, "").orEmpty()
-                val d = getString(AxetR.string.Theme_Dark)
+                val theme: String = shared.getString(BookApplication.PREFERENCE_THEME, "").orEmpty()
+                val dartTheme = getString(AxetR.string.Theme_Dark)
+                val inNowDartTheme = theme == dartTheme
                 putString(
                     BookApplication.PREFERENCE_THEME,
-                    if (t == d) getString(AxetR.string.Theme_Light) else d
+                    if (inNowDartTheme) getString(AxetR.string.Theme_Light) else dartTheme
                 )
+                WindowInsetsControllerCompat(window, decorView).isAppearanceLightStatusBars =
+                    inNowDartTheme // FIXME
+//                WindowInsetsControllerCompat(window, decorView).isAppearanceLightStatusBars = isLightTheme // FIXME
             }
             restartActivity()
             return true
