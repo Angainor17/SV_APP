@@ -27,7 +27,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -72,16 +71,6 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == FBReaderView.ACTION_MENU) toggle()
         }
-    }
-
-    private fun changeStatusBarColor() {
-        val shared = PreferenceManager.getDefaultSharedPreferences(this)
-        val currentTheme = shared.getString(BookApplication.PREFERENCE_THEME, "").orEmpty()
-        val isLightTheme = currentTheme == getString(AxetR.string.Theme_Light)
-
-        // true - чёрная иконка
-        // false - белая иконка
-        WindowInsetsControllerCompat(window, decorView).isAppearanceLightStatusBars = isLightTheme
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -232,9 +221,6 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
                     BookApplication.PREFERENCE_THEME,
                     if (inNowDartTheme) getString(AxetR.string.Theme_Light) else dartTheme
                 )
-                WindowInsetsControllerCompat(window, decorView).isAppearanceLightStatusBars =
-                    inNowDartTheme // FIXME
-//                WindowInsetsControllerCompat(window, decorView).isAppearanceLightStatusBars = isLightTheme // FIXME
             }
             restartActivity()
             return true
@@ -274,7 +260,7 @@ class MainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelect
     }
 
     /**
-     * Доработка Воронин
+     * Доработка @Воронин
      */
     fun loadBookFromUri(u: Uri?) {
         val book = Storage.Book(applicationContext, u)

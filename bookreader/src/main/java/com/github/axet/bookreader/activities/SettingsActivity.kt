@@ -7,17 +7,21 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.MenuItem
+import android.view.View
+import androidx.core.view.updatePadding
 import androidx.preference.PreferenceFragmentCompat
 import com.github.axet.androidlibrary.activities.AppCompatSettingsThemeActivity
 import com.github.axet.androidlibrary.preferences.RotatePreferenceCompat
 import com.github.axet.androidlibrary.preferences.StoragePathPreferenceCompat
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.BookApplication.Companion.PREFERENCE_STORAGE
 import com.github.axet.bookreader.app.Storage
+import android.R as androidR
 
 class SettingsActivity : AppCompatSettingsThemeActivity() {
 
-    var storage: Storage? = null
+    private val storage: Storage by lazy { Storage(this) }
 
     override fun getAppTheme(): Int {
         return BookApplication.getTheme(this, R.style.AppThemeLight, R.style.AppThemeDark)
@@ -29,18 +33,19 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        storage = Storage(this)
+
+        changeStatusBarColor()
+
         RotatePreferenceCompat.onCreate(this, BookApplication.PREFERENCE_ROTATE)
         setupActionBar()
-        if (savedInstanceState == null && intent.getParcelableExtra<Parcelable?>(
-                SAVE_INSTANCE_STATE
-            ) == null
-        ) showSettingsFragment(GeneralPreferenceFragment())
+        if (savedInstanceState == null && intent.getParcelableExtra<Parcelable?>(SAVE_INSTANCE_STATE) == null) {
+            showSettingsFragment(GeneralPreferenceFragment())
+        }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         super.onSharedPreferenceChanged(sharedPreferences, key)
-        if (key == BookApplication.PREFERENCE_STORAGE) storage!!.migrateLocalStorageDialog(this)
+        if (key == PREFERENCE_STORAGE) storage.migrateLocalStorageDialog(this)
     }
 
     class GeneralPreferenceFragment : PreferenceFragmentCompat() {
@@ -53,11 +58,34 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
             bindPreferenceSummaryToValue(findPreference(BookApplication.PREFERENCE_THEME))
             bindPreferenceSummaryToValue(findPreference(BookApplication.PREFERENCE_VIEW_MODE))
 
-            val s =
-                findPreference(BookApplication.PREFERENCE_STORAGE) as StoragePathPreferenceCompat
+            val s = findPreference(PREFERENCE_STORAGE) as StoragePathPreferenceCompat
             s.setStorage(Storage(context))
             s.setPermissionsDialog(this, Storage.PERMISSIONS_RW, RESULT_STORAGE)
             s.setStorageAccessFramework(this, RESULT_STORAGE)
+        }
+
+        override fun onViewCreated(
+            view: View,
+            savedInstanceState: Bundle?
+        ) {
+            super.onViewCreated(view, savedInstanceState)
+
+            /**
+             * @Воронин
+             * Фикс бага с отступом на экране настрое
+             */
+            val listContainer = view.findViewById<View?>(androidR.id.list_container)
+            listContainer?.updatePadding(
+                top = getToolBarHeight() + resources.getDimensionPixelSize(R.dimen.activity_vertical_margin),
+            )
+        }
+
+        private fun getToolBarHeight(): Int {
+            val attrs = intArrayOf(androidR.attr.actionBarSize)
+            val ta = requireContext().obtainStyledAttributes(attrs)
+            val toolBarHeight = ta.getDimensionPixelSize(0, -1)
+            ta.recycle()
+            return toolBarHeight
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -76,7 +104,7 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
         ) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             val s =
-                findPreference(BookApplication.PREFERENCE_STORAGE) as StoragePathPreferenceCompat
+                findPreference(PREFERENCE_STORAGE) as StoragePathPreferenceCompat
             when (requestCode) {
                 RESULT_STORAGE -> s.onRequestPermissionsResult(permissions, grantResults)
             }
@@ -85,7 +113,7 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
         override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
             super.onActivityResult(requestCode, resultCode, data)
             val s =
-                findPreference(BookApplication.PREFERENCE_STORAGE) as StoragePathPreferenceCompat
+                findPreference(PREFERENCE_STORAGE) as StoragePathPreferenceCompat
             when (requestCode) {
                 RESULT_STORAGE -> s.onActivityResult(resultCode, data)
             }
@@ -93,9 +121,9 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             val id = item.itemId
-            if (id == android.R.id.home) {
-                val a: Activity? = activity
-                a!!.finish()
+            if (id == androidR.id.home) {
+                val activity: Activity? = activity
+                activity?.finish()
                 startActivity(Intent(activity, MainActivity::class.java))
                 return true
             }
