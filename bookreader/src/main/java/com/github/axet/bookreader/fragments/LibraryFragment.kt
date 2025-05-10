@@ -41,8 +41,8 @@ import com.github.axet.androidlibrary.widgets.OpenFileDialog.EditTextDialog
 import com.github.axet.androidlibrary.widgets.SearchView
 import com.github.axet.androidlibrary.widgets.TextMax
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.activities.MainActivity
-import com.github.axet.bookreader.activities.MainActivity.SearchListener
+import com.github.axet.bookreader.activities.BookReaderMainActivity
+import com.github.axet.bookreader.activities.BookReaderMainActivity.SearchListener
 import com.github.axet.bookreader.app.BookApplication
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.app.Storage.FBook
@@ -90,7 +90,7 @@ class LibraryFragment : Fragment(), SearchListener {
         holder.create(v)
         holder.footer?.visibility = View.GONE
 
-        val main = activity as MainActivity?
+        val main = activity as BookReaderMainActivity?
         main?.toolbar?.setTitle(R.string.reader_app_name)
         holder.grid?.setAdapter(books)
         holder.setOnItemClickListener(OnItemClickListener { parent, view, position, id ->
@@ -154,7 +154,7 @@ class LibraryFragment : Fragment(), SearchListener {
 
     override fun onStart() {
         super.onStart()
-        val main = (requireActivity() as MainActivity?)
+        val main = (requireActivity() as BookReaderMainActivity?)
         main?.setFullscreen(false)
     }
 
@@ -241,7 +241,7 @@ class LibraryFragment : Fragment(), SearchListener {
         } else if (id == R.id.action_bm) {
             val dialog: BookmarksDialog = object : BookmarksDialog(context) {
                 override fun onSelected(b: Storage.Book, bm: Storage.Bookmark) {
-                    val main = (activity as MainActivity?)
+                    val main = (activity as BookReaderMainActivity?)
                     main?.openBook(b.url, ZLTextIndexPosition(bm.start, bm.end))
                 }
 

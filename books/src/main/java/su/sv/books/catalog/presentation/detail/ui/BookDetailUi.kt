@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.axet.bookreader.activities.MainActivity
+import com.github.axet.bookreader.activities.BookReaderMainActivity
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import kotlinx.coroutines.launch
@@ -131,7 +131,7 @@ private fun HandleEffects(
 }
 
 private fun openBook(context: Context, uiBook: UiBook) {
-    val intent = Intent(context, MainActivity::class.java).apply {
+    val intent = Intent(context, BookReaderMainActivity::class.java).apply {
         action = Intent.ACTION_VIEW
         data = uiBook.fileUri
     }

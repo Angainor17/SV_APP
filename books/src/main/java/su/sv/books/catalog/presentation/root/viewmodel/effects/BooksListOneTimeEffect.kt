@@ -16,4 +16,7 @@ sealed class BooksListOneTimeEffect {
     data class OpenBook(
         val book: UiBook,
     ) : BooksListOneTimeEffect()
+
+    /** Отображение экрана со скачанными книгами */
+    object OpenStoredBooksList : BooksListOneTimeEffect()
 }

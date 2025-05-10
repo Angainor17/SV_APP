@@ -43,10 +43,10 @@ import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.androidlibrary.widgets.TreeListView
 import com.github.axet.androidlibrary.widgets.TreeRecyclerView
 import com.github.axet.bookreader.R
+import com.github.axet.bookreader.activities.BookReaderMainActivity
+import com.github.axet.bookreader.activities.BookReaderMainActivity.OnBackPressed
+import com.github.axet.bookreader.activities.BookReaderMainActivity.SearchListener
 import com.github.axet.bookreader.activities.FullscreenActivity.FullscreenListener
-import com.github.axet.bookreader.activities.MainActivity
-import com.github.axet.bookreader.activities.MainActivity.OnBackPressed
-import com.github.axet.bookreader.activities.MainActivity.SearchListener
 import com.github.axet.bookreader.app.BookApplication
 import com.github.axet.bookreader.app.ComicsPlugin.ComicsView
 import com.github.axet.bookreader.app.Storage
@@ -108,7 +108,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
     ): View {
         val v = inflater.inflate(R.layout.fragment_reader, container, false)
 
-        val main = activity as MainActivity?
+        val main = activity as BookReaderMainActivity?
         fb = v.findViewById<View?>(R.id.main_view) as FBReaderView?
 
         fb!!.listener = object : FBReaderView.Listener {
@@ -133,7 +133,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
             }
 
             override fun ttsStatus(speaking: Boolean) {
-                val main = activity as MainActivity?
+                val main = activity as BookReaderMainActivity?
                 main!!.volumeEnabled = !speaking
             }
         }
