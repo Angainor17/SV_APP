@@ -231,7 +231,7 @@ public class FBReaderView extends RelativeLayout {
                     View t = myWindow.findViewById(org.geometerplus.zlibrary.ui.android.R.id.selection_panel_translate);
                     PackageManager packageManager = getContext().getPackageManager();
                     List<ResolveInfo> rr = packageManager.queryIntentActivities(translateIntent(null), 0);
-                    if (rr == null || rr.isEmpty())
+                    if (rr.isEmpty())
                         t.setVisibility(View.GONE);
                     else
                         t.setVisibility(View.VISIBLE);

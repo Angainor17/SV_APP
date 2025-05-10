@@ -39,7 +39,6 @@ open class BookApplication : MainApplication() {
         const val PREFERENCE_LIBRARY_LAYOUT: String = "layout_"
         const val PREFERENCE_SCREENLOCK: String = "screen_lock"
         const val PREFERENCE_VOLUME_KEYS: String = "volume_keys"
-        const val PREFERENCE_LAST_PATH: String = "last_path"
         const val PREFERENCE_ROTATE: String = "rotate"
         const val PREFERENCE_VIEW_MODE: String = "view_mode"
         const val PREFERENCE_STORAGE: String = "storage_path"

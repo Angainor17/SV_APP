@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/app_name" />
+                    android:text="@string/reader_app_name" />
             </com.github.axet.androidlibrary.widgets.TextMax>
 
             <com.github.axet.androidlibrary.widgets.TextMax
@@ -84,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@string/app_name"
+                    android:text="@string/reader_app_name"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
             </com.github.axet.androidlibrary.widgets.TextMax>
         </LinearLayout>

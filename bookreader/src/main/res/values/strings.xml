@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Книги</string>
+    <string name="reader_app_name">Книги</string>
 
     <string-array name="viewmode_text">
         <item>@string/view_mode_paging</item>

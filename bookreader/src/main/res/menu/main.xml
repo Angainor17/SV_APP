@@ -92,19 +92,11 @@
             </group>
         </menu>
     </item>
-    <item
-        android:id="@+id/action_file"
-        android:orderInCategory="100"
-        android:title="@string/open_file"
-        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/menu_settings"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_about"
-        android:orderInCategory="100"
-        android:title="@string/menu_about"
-        app:showAsAction="never" />
+
 </menu>

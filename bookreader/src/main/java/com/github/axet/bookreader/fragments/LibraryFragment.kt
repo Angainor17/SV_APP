@@ -91,7 +91,7 @@ class LibraryFragment : Fragment(), SearchListener {
         holder.footer?.visibility = View.GONE
 
         val main = activity as MainActivity?
-        main?.toolbar?.setTitle(R.string.app_name)
+        main?.toolbar?.setTitle(R.string.reader_app_name)
         holder.grid?.setAdapter(books)
         holder.setOnItemClickListener(OnItemClickListener { parent, view, position, id ->
             val b = books.getItem(position)
