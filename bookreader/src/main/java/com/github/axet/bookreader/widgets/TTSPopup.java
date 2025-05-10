@@ -72,6 +72,7 @@ public class TTSPopup {
         }
     };
     Runnable speakRetry = null;
+
     public TTSPopup(FBReaderView v) {
         this.context = v.getContext();
         fb = v;
@@ -164,7 +165,7 @@ public class TTSPopup {
             stop();
             selectNext();
         });
-        play = (ImageView) view.findViewById(R.id.tts_play);
+        play = view.findViewById(R.id.tts_play);
         play.setOnClickListener(v3 -> {
             if (tts.dones.contains(speakNext) || speakRetry != null) {
                 stop();
@@ -190,7 +191,9 @@ public class TTSPopup {
         f.setPadding(dp20, dp20, dp20, dp20);
         this.view = f;
         this.panel = round;
-    }    Runnable speakNext = () -> {
+    }
+
+    Runnable speakNext = () -> {
         Log.d(TAG, "speakNext");
         selectNext();
         speakNext();
@@ -838,7 +841,6 @@ public class TTSPopup {
         ZLTextPosition end = expandRight(bm.end);
         return new Storage.Bookmark(getText(start, end), start, end);
     }
-
 
 
     public void resetColor() {

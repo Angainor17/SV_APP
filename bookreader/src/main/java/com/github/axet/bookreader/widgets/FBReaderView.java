@@ -17,7 +17,6 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.PowerManager;
@@ -837,7 +836,6 @@ public class FBReaderView extends RelativeLayout {
                             }
                             if (widget instanceof PagerWidget) {
                                 ((PagerWidget) widget).searchPage(page);
-                                return;
                             }
                         });
                     };
@@ -864,7 +862,6 @@ public class FBReaderView extends RelativeLayout {
                             }
                             if (widget instanceof PagerWidget) {
                                 ((PagerWidget) widget).searchPage(page);
-                                return;
                             }
                         });
                     };
@@ -1101,7 +1098,7 @@ public class FBReaderView extends RelativeLayout {
             pluginview.updateTheme();
         if (widget instanceof ScrollWidget) {
             ((ScrollWidget) widget).requestLayout(); // repaint views
-            ((ScrollWidget) widget).reset();
+            widget.reset();
         } else {
             widget.reset();
             widget.repaint();
@@ -1680,7 +1677,7 @@ public class FBReaderView extends RelativeLayout {
         public void pinchOpen(int page, Rect v) {
             Bitmap bm = fb.pluginview.render(v.width(), v.height(), page);
             pinch = new PinchView(context, v, bm) {
-                public int clip;
+                public final int clip;
 
                 {
                     if (fb.widget instanceof ScrollWidget)
@@ -2041,7 +2038,7 @@ public class FBReaderView extends RelativeLayout {
         @Override
         public Animation getAnimationType() {
             PowerManager pm = (PowerManager) FBReaderView.this.getContext().getSystemService(Context.POWER_SERVICE);
-            if (Build.VERSION.SDK_INT >= 21 && pm.isPowerSaveMode())
+            if (pm.isPowerSaveMode())
                 return Animation.none;
             else
                 return super.getAnimationType();

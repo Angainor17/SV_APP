@@ -60,10 +60,10 @@ public class FontsPopup extends PopupWindow {
     public FontsPopup(Context context, final TTFManager ttf) {
         this.ttf = ttf;
         fontsize_popup = LayoutInflater.from(context).inflate(R.layout.font_popup, new FrameLayout(context), false);
-        fontsizepopup_text = (TextView) fontsize_popup.findViewById(R.id.fontsize_text);
+        fontsizepopup_text = fontsize_popup.findViewById(R.id.fontsize_text);
         fontsizepopup_plus = fontsize_popup.findViewById(R.id.fontsize_plus);
         fontsizepopup_minus = fontsize_popup.findViewById(R.id.fontsize_minus);
-        fontsizepopup_seek = (SeekBar) fontsize_popup.findViewById(R.id.fontsize_seek);
+        fontsizepopup_seek = fontsize_popup.findViewById(R.id.fontsize_seek);
         fonts = new FontAdapter(context);
         fonts.clickListener = new AdapterView.OnItemClickListener() {
             @Override
@@ -73,7 +73,7 @@ public class FontsPopup extends PopupWindow {
             }
         };
         fontsFrame = fontsize_popup.findViewById(R.id.fonts_frame);
-        fontsText = (TextView) fontsize_popup.findViewById(R.id.fonts_text);
+        fontsText = fontsize_popup.findViewById(R.id.fonts_text);
         fontsBrowse = fontsize_popup.findViewById(R.id.fonts_browse);
         fontsBrowse.setVisibility(View.GONE);
         fontsText.setText(context.getString(R.string.add_more_fonts_to, TTFManager.USER_FONTS.toString()));
@@ -98,14 +98,14 @@ public class FontsPopup extends PopupWindow {
                 }
             });
             updatePath();
-        } else if (Build.VERSION.SDK_INT >= 21) {
+        } else {
             if (!Storage.permitted(context, Storage.PERMISSIONS_RO))
                 fontsText.setText(context.getString(R.string.add_more_fonts_to, ttf.appFonts.toString()));
         }
-        fontsList = (RecyclerView) fontsize_popup.findViewById(R.id.fonts_list);
+        fontsList = fontsize_popup.findViewById(R.id.fonts_list);
         fontsList.setLayoutManager(new LinearLayoutManager(context));
 
-        ignore_embedded_fonts = (CheckBox) fontsize_popup.findViewById(R.id.ignore_embedded_fonts);
+        ignore_embedded_fonts = fontsize_popup.findViewById(R.id.ignore_embedded_fonts);
         ignore_embedded_fonts.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -226,7 +226,7 @@ public class FontsPopup extends PopupWindow {
 
         public FontHolder(View itemView) {
             super(itemView);
-            tv = (CheckedTextView) itemView.findViewById(android.R.id.text1);
+            tv = itemView.findViewById(android.R.id.text1);
         }
     }
 
