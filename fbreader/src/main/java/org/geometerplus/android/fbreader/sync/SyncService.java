@@ -69,6 +69,37 @@ public class SyncService extends Service implements IBookCollection.Listener<Boo
 
     private final SyncNetworkContext myBookUploadContext =
             new SyncNetworkContext(this, mySyncOptions, mySyncOptions.UploadAllBooks);
+    private final SyncNetworkContext mySyncPositionsContext =
+            new SyncNetworkContext(this, mySyncOptions, mySyncOptions.Positions);
+    private final SyncNetworkContext mySyncBookmarksContext =
+            new SyncNetworkContext(this, mySyncOptions, mySyncOptions.Bookmarks);
+    private final Runnable myQuickSynchroniser = new Runnable() {
+        @Override
+        public synchronized void run() {
+            if (!mySyncOptions.Enabled.getValue()) {
+                return;
+            }
+            mySyncPositionsContext.reloadCookie();
+
+            if (ourQuickSynchronizationThread == null) {
+                ourQuickSynchronizationThread = new Thread() {
+                    public void run() {
+                        try {
+                            syncPositions();
+                            syncCustomShelves();
+                            BookmarkSyncUtil.sync(mySyncBookmarksContext, myCollection);
+                        } finally {
+                            ourQuickSynchronizationThread = null;
+                        }
+                    }
+                };
+                ourQuickSynchronizationThread.setPriority(Thread.MAX_PRIORITY);
+                ourQuickSynchronizationThread.start();
+            }
+        }
+    };
+    private final List<Book> myQueue = Collections.synchronizedList(new LinkedList<Book>());
+    private final Hashes myHashesFromServer = new Hashes();
     private final Runnable myStandardSynchroniser = new Runnable() {
         @Override
         public synchronized void run() {
@@ -129,37 +160,6 @@ public class SyncService extends Service implements IBookCollection.Listener<Boo
             }
         }
     };
-    private final SyncNetworkContext mySyncPositionsContext =
-            new SyncNetworkContext(this, mySyncOptions, mySyncOptions.Positions);
-    private final SyncNetworkContext mySyncBookmarksContext =
-            new SyncNetworkContext(this, mySyncOptions, mySyncOptions.Bookmarks);
-    private final Runnable myQuickSynchroniser = new Runnable() {
-        @Override
-        public synchronized void run() {
-            if (!mySyncOptions.Enabled.getValue()) {
-                return;
-            }
-            mySyncPositionsContext.reloadCookie();
-
-            if (ourQuickSynchronizationThread == null) {
-                ourQuickSynchronizationThread = new Thread() {
-                    public void run() {
-                        try {
-                            syncPositions();
-                            syncCustomShelves();
-                            BookmarkSyncUtil.sync(mySyncBookmarksContext, myCollection);
-                        } finally {
-                            ourQuickSynchronizationThread = null;
-                        }
-                    }
-                };
-                ourQuickSynchronizationThread.setPriority(Thread.MAX_PRIORITY);
-                ourQuickSynchronizationThread.start();
-            }
-        }
-    };
-    private final List<Book> myQueue = Collections.synchronizedList(new LinkedList<Book>());
-    private final Hashes myHashesFromServer = new Hashes();
     ;
 
     private static void log(String message) {
