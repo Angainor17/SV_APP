@@ -27,20 +27,23 @@ class Book;
 class HtmlDescriptionReader : public HtmlReader {
 
 public:
-	HtmlDescriptionReader(Book &book);
-	~HtmlDescriptionReader();
+    HtmlDescriptionReader(Book &book);
+
+    ~HtmlDescriptionReader();
 
 protected:
-	void startDocumentHandler();
-	void endDocumentHandler();
+    void startDocumentHandler();
 
-	bool tagHandler(const HtmlTag &tag);
-	bool characterDataHandler(const char *text, std::size_t len, bool convert);
+    void endDocumentHandler();
+
+    bool tagHandler(const HtmlTag &tag);
+
+    bool characterDataHandler(const char *text, std::size_t len, bool convert);
 
 private:
-	bool myReadTitle;
-	std::string myBuffer;
-	Book &myBook;
+    bool myReadTitle;
+    std::string myBuffer;
+    Book &myBook;
 };
 
 inline HtmlDescriptionReader::~HtmlDescriptionReader() {}

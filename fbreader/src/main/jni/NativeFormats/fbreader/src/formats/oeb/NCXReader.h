@@ -30,40 +30,45 @@
 class NCXReader : public ZLXMLReader {
 
 public:
-	struct NavPoint {
-		NavPoint();
-		NavPoint(int order, std::size_t level);
+    struct NavPoint {
+        NavPoint();
 
-		int Order;
-		std::size_t Level;
-		std::string Text;
-		std::string ContentHRef;
-	};
+        NavPoint(int order, std::size_t level);
+
+        int Order;
+        std::size_t Level;
+        std::string Text;
+        std::string ContentHRef;
+    };
 
 public:
-	NCXReader(BookReader &modelReader);
-	const std::map<int,NavPoint> &navigationMap() const;
+    NCXReader(BookReader &modelReader);
+
+    const std::map<int, NavPoint> &navigationMap() const;
 
 private:
-	void startElementHandler(const char *tag, const char **attributes);
-	void endElementHandler(const char *tag);
-	void characterDataHandler(const char *text, std::size_t len);
-	const std::vector<std::string> &externalDTDs() const;
+    void startElementHandler(const char *tag, const char **attributes);
+
+    void endElementHandler(const char *tag);
+
+    void characterDataHandler(const char *text, std::size_t len);
+
+    const std::vector<std::string> &externalDTDs() const;
 
 private:
-	BookReader &myModelReader;
-	std::map<int,NavPoint> myNavigationMap;
-	std::vector<NavPoint> myPointStack;
+    BookReader &myModelReader;
+    std::map<int, NavPoint> myNavigationMap;
+    std::vector<NavPoint> myPointStack;
 
-	enum {
-		READ_NONE,
-		READ_MAP,
-		READ_POINT,
-		READ_LABEL,
-		READ_TEXT
-	} myReadState;
+    enum {
+        READ_NONE,
+        READ_MAP,
+        READ_POINT,
+        READ_LABEL,
+        READ_TEXT
+    } myReadState;
 
-	int myPlayIndex;
+    int myPlayIndex;
 };
 
 #endif /* __NCXREADER_H__ */

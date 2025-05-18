@@ -19,7 +19,7 @@ import java.util.List;
  * <b>Note:</b> This class does not support storing its {@link HistoryListener}
  * 's into {@link Parcelable}. You must re-build all listeners after getting
  * your {@link HistoryStore} from a {@link Bundle} for example.
- * 
+ *
  * @author Hai Bison
  * @since v2.0 alpha
  */
@@ -43,9 +43,8 @@ public class HistoryStore<A extends Parcelable> implements History<A> {
     /**
      * Creates new {@link HistoryStore}
      *
-     * @param maxSize
-     *            the maximum size that allowed, if it is &lt;= {@code 0},
-     *            {@code 100} will be used
+     * @param maxSize the maximum size that allowed, if it is &lt;= {@code 0},
+     *                {@code 100} will be used
      */
     public HistoryStore(int maxSize) {
         this.mMaxSize = maxSize > 0 ? maxSize : 100;

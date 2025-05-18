@@ -27,29 +27,29 @@ import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.util.ZLColor;
 
 class ZLColorPreference extends ColorPreference {
-	private final ZLColorOption myOption;
-	private final String myTitle;
+    private final ZLColorOption myOption;
+    private final String myTitle;
 
-	ZLColorPreference(Context context, ZLResource resource, String resourceKey, ZLColorOption option) {
-		super(context);
-		myOption = option;
-		setWidgetLayoutResource(R.layout.color_preference);
+    ZLColorPreference(Context context, ZLResource resource, String resourceKey, ZLColorOption option) {
+        super(context);
+        myOption = option;
+        setWidgetLayoutResource(R.layout.color_preference);
 
-		myTitle = resource.getResource(resourceKey).getValue();
-	}
+        myTitle = resource.getResource(resourceKey).getValue();
+    }
 
-	@Override
-	public String getTitle() {
-		return myTitle;
-	}
+    @Override
+    public String getTitle() {
+        return myTitle;
+    }
 
-	@Override
-	protected ZLColor getSavedColor() {
-		return myOption.getValue();
-	}
+    @Override
+    protected ZLColor getSavedColor() {
+        return myOption.getValue();
+    }
 
-	@Override
-	protected void saveColor(ZLColor color) {
-		myOption.setValue(color);
-	}
+    @Override
+    protected void saveColor(ZLColor color) {
+        myOption.setValue(color);
+    }
 }

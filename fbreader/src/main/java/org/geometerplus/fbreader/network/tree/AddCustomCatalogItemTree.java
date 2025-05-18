@@ -23,22 +23,22 @@ import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.fbreader.network.NetworkTree;
 
 public class AddCustomCatalogItemTree extends NetworkTree {
-	public AddCustomCatalogItemTree(NetworkTree parent) {
-		super(parent);
-	}
+    public AddCustomCatalogItemTree(NetworkTree parent) {
+        super(parent);
+    }
 
-	@Override
-	public String getName() {
-		return NetworkLibrary.resource().getResource("addCustomCatalog").getValue();
-	}
+    @Override
+    public String getName() {
+        return NetworkLibrary.resource().getResource("addCustomCatalog").getValue();
+    }
 
-	@Override
-	public String getSummary() {
-		return NetworkLibrary.resource().getResource("addCustomCatalogSummary").getValue();
-	}
+    @Override
+    public String getSummary() {
+        return NetworkLibrary.resource().getResource("addCustomCatalogSummary").getValue();
+    }
 
-	@Override
-	protected String getStringId() {
-		return "@Add Custom Catalog";
-	}
+    @Override
+    protected String getStringId() {
+        return "@Add Custom Catalog";
+    }
 }

@@ -24,94 +24,99 @@
 #include "ZLZDecompressor.h"
 #include "../ZLFSManager.h"
 
-ZLZipInputStream::ZLZipInputStream(shared_ptr<ZLInputStream> base, const std::string &baseName, const std::string &entryName) : myBaseStream(new ZLInputStreamDecorator(base)), myBaseName(baseName), myEntryName(entryName), myIsOpen(false), myUncompressedSize(0) {
+ZLZipInputStream::ZLZipInputStream(shared_ptr<ZLInputStream> base, const std::string &baseName,
+                                   const std::string &entryName) : myBaseStream(
+        new ZLInputStreamDecorator(base)), myBaseName(baseName), myEntryName(entryName),
+                                                                   myIsOpen(false),
+                                                                   myUncompressedSize(0) {
 }
 
 ZLZipInputStream::~ZLZipInputStream() {
-	close();
+    close();
 }
 
 bool ZLZipInputStream::open() {
-	close();
+    close();
 
-	ZLZipEntryCache::Info info = ZLZipEntryCache::cache(myBaseName, *myBaseStream)->info(myEntryName);
+    ZLZipEntryCache::Info info = ZLZipEntryCache::cache(myBaseName, *myBaseStream)->info(
+            myEntryName);
 
-	if (!myBaseStream->open()) {
-		return false;
-	}
+    if (!myBaseStream->open()) {
+        return false;
+    }
 
-	if (info.Offset == -1) {
-		close();
-		return false;
-	}
-	myBaseStream->seek(info.Offset, true);
+    if (info.Offset == -1) {
+        close();
+        return false;
+    }
+    myBaseStream->seek(info.Offset, true);
 
-	if (info.CompressionMethod == 0) {
-		myIsDeflated = false;
-	} else if (info.CompressionMethod == 8) {
-		myIsDeflated = true;
-	} else {
-		close();
-		return false;
-	}
-	myUncompressedSize = info.UncompressedSize;
-	myAvailableSize = info.CompressedSize;
-	if (myAvailableSize == 0) {
-		myAvailableSize = (std::size_t)-1;
-	}
+    if (info.CompressionMethod == 0) {
+        myIsDeflated = false;
+    } else if (info.CompressionMethod == 8) {
+        myIsDeflated = true;
+    } else {
+        close();
+        return false;
+    }
+    myUncompressedSize = info.UncompressedSize;
+    myAvailableSize = info.CompressedSize;
+    if (myAvailableSize == 0) {
+        myAvailableSize = (std::size_t) -1;
+    }
 
-	if (myIsDeflated) {
-		myDecompressor = new ZLZDecompressor(myAvailableSize);
-	}
+    if (myIsDeflated) {
+        myDecompressor = new ZLZDecompressor(myAvailableSize);
+    }
 
-	myOffset = 0;
-	myIsOpen = true;
-	return true;
+    myOffset = 0;
+    myIsOpen = true;
+    return true;
 }
 
 std::size_t ZLZipInputStream::read(char *buffer, std::size_t maxSize) {
-	if (!myIsOpen) {
-		return 0;
-	}
+    if (!myIsOpen) {
+        return 0;
+    }
 
-	std::size_t realSize = 0;
-	if (myIsDeflated) {
-		realSize = myDecompressor->decompress(*myBaseStream, buffer, maxSize);
-		myOffset += realSize;
-	} else {
-		realSize = myBaseStream->read(buffer, std::min(maxSize, myAvailableSize));
-		myAvailableSize -= realSize;
-		myOffset += realSize;
-	}
-	return realSize;
+    std::size_t realSize = 0;
+    if (myIsDeflated) {
+        realSize = myDecompressor->decompress(*myBaseStream, buffer, maxSize);
+        myOffset += realSize;
+    } else {
+        realSize = myBaseStream->read(buffer, std::min(maxSize, myAvailableSize));
+        myAvailableSize -= realSize;
+        myOffset += realSize;
+    }
+    return realSize;
 }
 
 void ZLZipInputStream::close() {
-	myIsOpen = false;
-	myDecompressor = 0;
-	if (!myBaseStream.isNull()) {
-		myBaseStream->close();
-	}
+    myIsOpen = false;
+    myDecompressor = 0;
+    if (!myBaseStream.isNull()) {
+        myBaseStream->close();
+    }
 }
 
 void ZLZipInputStream::seek(int offset, bool absoluteOffset) {
-	if (absoluteOffset) {
-		offset -= this->offset();
-	}
-	if (offset > 0) {
-		read(0, offset);
-	} else if (offset < 0) {
-		offset += this->offset();
-		if (open() && offset > 0) {
-			read(0, offset);
-		}
-	}
+    if (absoluteOffset) {
+        offset -= this->offset();
+    }
+    if (offset > 0) {
+        read(0, offset);
+    } else if (offset < 0) {
+        offset += this->offset();
+        if (open() && offset > 0) {
+            read(0, offset);
+        }
+    }
 }
 
 std::size_t ZLZipInputStream::offset() const {
-	return myOffset;
+    return myOffset;
 }
 
 std::size_t ZLZipInputStream::sizeOfOpened() {
-	return myUncompressedSize;
+    return myUncompressedSize;
 }

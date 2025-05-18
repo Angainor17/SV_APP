@@ -23,9 +23,9 @@ import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.zlibrary.core.util.SystemInfo;
 
 public abstract class BuiltinFormatPlugin extends FormatPlugin {
-	protected BuiltinFormatPlugin(SystemInfo systemInfo, String fileType) {
-		super(systemInfo, fileType);
-	}
+    protected BuiltinFormatPlugin(SystemInfo systemInfo, String fileType) {
+        super(systemInfo, fileType);
+    }
 
-	public abstract void readModel(BookModel model) throws BookReadingException;
+    public abstract void readModel(BookModel model) throws BookReadingException;
 }

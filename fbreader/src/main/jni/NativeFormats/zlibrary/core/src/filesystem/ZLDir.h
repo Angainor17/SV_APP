@@ -28,31 +28,37 @@
 class ZLDir {
 
 public:
-	static shared_ptr<ZLDir> root();
+    static shared_ptr<ZLDir> root();
 
 protected:
-	ZLDir(const std::string &path);
+    ZLDir(const std::string &path);
 
 public:
-	virtual ~ZLDir();
-	const std::string &path() const;
-	std::string name() const;
-	std::string parentPath() const;
-	std::string itemPath(const std::string &name) const;
-	bool isRoot() const;
+    virtual ~ZLDir();
 
-	//virtual void collectSubDirs(std::vector<std::string> &names, bool includeSymlinks) = 0;
-	virtual void collectFiles(std::vector<std::string> &names, bool includeSymlinks) = 0;
+    const std::string &path() const;
+
+    std::string name() const;
+
+    std::string parentPath() const;
+
+    std::string itemPath(const std::string &name) const;
+
+    bool isRoot() const;
+
+    //virtual void collectSubDirs(std::vector<std::string> &names, bool includeSymlinks) = 0;
+    virtual void collectFiles(std::vector<std::string> &names, bool includeSymlinks) = 0;
 
 protected:
-	virtual std::string delimiter() const = 0;
+    virtual std::string delimiter() const = 0;
 
 private:
-	std::string myPath;
+    std::string myPath;
 
 private:
-	ZLDir(const ZLDir&);
-	const ZLDir &operator = (const ZLDir&);
+    ZLDir(const ZLDir &);
+
+    const ZLDir &operator=(const ZLDir &);
 };
 
 #endif /* __ZLDIR_H__ */

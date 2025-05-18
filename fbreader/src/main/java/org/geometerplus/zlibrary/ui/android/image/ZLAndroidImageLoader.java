@@ -31,68 +31,70 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 class ZLAndroidImageLoader {
-	private static final int IMAGE_LOADING_THREADS_NUMBER = 3; // TODO: how many threads ???
-	private final ExecutorService myPool = Executors.newFixedThreadPool(IMAGE_LOADING_THREADS_NUMBER, new MinPriorityThreadFactory());
-	private final ExecutorService mySinglePool = Executors.newFixedThreadPool(1, new MinPriorityThreadFactory());
-	private final HashMap<String,LinkedList<Runnable>> myOnImageSyncRunnables = new HashMap<String,LinkedList<Runnable>>();
-	private final ImageSynchronizedHandler myImageSynchronizedHandler = new ImageSynchronizedHandler();
+    private static final int IMAGE_LOADING_THREADS_NUMBER = 3; // TODO: how many threads ???
+    private final ExecutorService myPool = Executors.newFixedThreadPool(IMAGE_LOADING_THREADS_NUMBER, new MinPriorityThreadFactory());
+    private final ExecutorService mySinglePool = Executors.newFixedThreadPool(1, new MinPriorityThreadFactory());
+    private final HashMap<String, LinkedList<Runnable>> myOnImageSyncRunnables = new HashMap<String, LinkedList<Runnable>>();
+    private final ImageSynchronizedHandler myImageSynchronizedHandler = new ImageSynchronizedHandler();
 
-	void startImageLoading(final ZLImageProxy.Synchronizer synchronizer, final ZLImageProxy image, Runnable postAction) {
-		synchronized (myOnImageSyncRunnables) {
-			LinkedList<Runnable> runnables = myOnImageSyncRunnables.get(image.getId());
-			if (runnables != null) {
-				if (postAction != null && !runnables.contains(postAction)) {
-					runnables.add(postAction);
-				}
-				return;
-			}
+    void startImageLoading(final ZLImageProxy.Synchronizer synchronizer, final ZLImageProxy image, Runnable postAction) {
+        synchronized (myOnImageSyncRunnables) {
+            LinkedList<Runnable> runnables = myOnImageSyncRunnables.get(image.getId());
+            if (runnables != null) {
+                if (postAction != null && !runnables.contains(postAction)) {
+                    runnables.add(postAction);
+                }
+                return;
+            }
 
-			runnables = new LinkedList<Runnable>();
-			if (postAction != null) {
-				runnables.add(postAction);
-			}
-			myOnImageSyncRunnables.put(image.getId(), runnables);
-		}
+            runnables = new LinkedList<Runnable>();
+            if (postAction != null) {
+                runnables.add(postAction);
+            }
+            myOnImageSyncRunnables.put(image.getId(), runnables);
+        }
 
-		final ExecutorService pool =
-			image.sourceType() == ZLImageProxy.SourceType.FILE
-				? mySinglePool : myPool;
-		pool.execute(new Runnable() {
-			public void run() {
-				synchronizer.synchronize(image, new Runnable() {
-					public void run() {
-						myImageSynchronizedHandler.fireMessage(image.getId());
-					}
-				});
-			}
-		});
-	}
+        final ExecutorService pool =
+                image.sourceType() == ZLImageProxy.SourceType.FILE
+                        ? mySinglePool : myPool;
+        pool.execute(new Runnable() {
+            public void run() {
+                synchronizer.synchronize(image, new Runnable() {
+                    public void run() {
+                        myImageSynchronizedHandler.fireMessage(image.getId());
+                    }
+                });
+            }
+        });
+    }
 
-		private static class MinPriorityThreadFactory implements ThreadFactory {
-		private final ThreadFactory myDefaultThreadFactory = Executors.defaultThreadFactory();
+    private static class MinPriorityThreadFactory implements ThreadFactory {
+        private final ThreadFactory myDefaultThreadFactory = Executors.defaultThreadFactory();
 
-		public Thread newThread(Runnable r) {
-			final Thread th = myDefaultThreadFactory.newThread(r);
-			th.setPriority(Thread.MIN_PRIORITY);
-			return th;
-		}
-	};
+        public Thread newThread(Runnable r) {
+            final Thread th = myDefaultThreadFactory.newThread(r);
+            th.setPriority(Thread.MIN_PRIORITY);
+            return th;
+        }
+    }
 
-private class ImageSynchronizedHandler extends Handler {
-		@Override
-		public void handleMessage(Message message) {
-			final String imageUrl = (String)message.obj;
-			final LinkedList<Runnable> runables;
-			synchronized (myOnImageSyncRunnables) {
-				runables = myOnImageSyncRunnables.remove(imageUrl);
-			}
-			for (Runnable runnable : runables) {
-				runnable.run();
-			}
-		}
+    ;
 
-		public void fireMessage(String imageUrl) {
-			sendMessage(obtainMessage(0, imageUrl));
-		}
-	}
+    private class ImageSynchronizedHandler extends Handler {
+        @Override
+        public void handleMessage(Message message) {
+            final String imageUrl = (String) message.obj;
+            final LinkedList<Runnable> runables;
+            synchronized (myOnImageSyncRunnables) {
+                runables = myOnImageSyncRunnables.remove(imageUrl);
+            }
+            for (Runnable runnable : runables) {
+                runnable.run();
+            }
+        }
+
+        public void fireMessage(String imageUrl) {
+            sendMessage(obtainMessage(0, imageUrl));
+        }
+    }
 }

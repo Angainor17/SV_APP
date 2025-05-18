@@ -29,25 +29,27 @@
 class FB2TagInfoReader : public ZLXMLReader {
 
 public:
-	FB2TagInfoReader(std::map<std::string,std::vector<std::string> > &tagMap);
+    FB2TagInfoReader(std::map<std::string, std::vector<std::string> > &tagMap);
 
-	void startElementHandler(const char *tag, const char **attributes);
-	void endElementHandler(const char *tag);
+    void startElementHandler(const char *tag, const char **attributes);
+
+    void endElementHandler(const char *tag);
 
 private:
-	std::map<std::string,std::vector<std::string> > &myTagMap;
+    std::map<std::string, std::vector<std::string> > &myTagMap;
 
-	std::string myCategoryName;
-	std::string mySubCategoryName;
-	std::vector<std::string> myGenreIds;
-	std::string myLanguage;
+    std::string myCategoryName;
+    std::string mySubCategoryName;
+    std::vector<std::string> myGenreIds;
+    std::string myLanguage;
 };
 
-FB2TagInfoReader::FB2TagInfoReader(std::map<std::string,std::vector<std::string> > &tagMap) : myTagMap(tagMap) {
-	myLanguage = ZLibrary::Language();
-	if (myLanguage != "ru") {
-		myLanguage = "en";
-	}
+FB2TagInfoReader::FB2TagInfoReader(std::map<std::string, std::vector<std::string> > &tagMap)
+        : myTagMap(tagMap) {
+    myLanguage = ZLibrary::Language();
+    if (myLanguage != "ru") {
+        myLanguage = "en";
+    }
 }
 
 static const std::string CATEGORY_NAME_TAG = "root-descr";
@@ -57,68 +59,69 @@ static const std::string SUBGENRE_TAG = "subgenre";
 static const std::string SUBGENRE_ALT_TAG = "genre-alt";
 
 void FB2TagInfoReader::startElementHandler(const char *tag, const char **attributes) {
-	if ((SUBGENRE_TAG == tag) || (SUBGENRE_ALT_TAG == tag)) {
-		const char *id = attributeValue(attributes, "value");
-		if (id != 0) {
-			myGenreIds.push_back(id);
-		}
-	} else if (CATEGORY_NAME_TAG == tag) {
-		const char *lang = attributeValue(attributes, "lang");
-		if ((lang != 0) && (myLanguage == lang)) {
-			const char *name = attributeValue(attributes, "genre-title");
-			if (name != 0) {
-				myCategoryName = name;
-				ZLUnicodeUtil::utf8Trim(myCategoryName);
-			}
-		}
-	} else if (SUBCATEGORY_NAME_TAG == tag) {
-		const char *lang = attributeValue(attributes, "lang");
-		if ((lang != 0) && (myLanguage == lang)) {
-			const char *name = attributeValue(attributes, "title");
-			if (name != 0) {
-				mySubCategoryName = name;
-				ZLUnicodeUtil::utf8Trim(mySubCategoryName);
-			}
-		}
-	}
+    if ((SUBGENRE_TAG == tag) || (SUBGENRE_ALT_TAG == tag)) {
+        const char *id = attributeValue(attributes, "value");
+        if (id != 0) {
+            myGenreIds.push_back(id);
+        }
+    } else if (CATEGORY_NAME_TAG == tag) {
+        const char *lang = attributeValue(attributes, "lang");
+        if ((lang != 0) && (myLanguage == lang)) {
+            const char *name = attributeValue(attributes, "genre-title");
+            if (name != 0) {
+                myCategoryName = name;
+                ZLUnicodeUtil::utf8Trim(myCategoryName);
+            }
+        }
+    } else if (SUBCATEGORY_NAME_TAG == tag) {
+        const char *lang = attributeValue(attributes, "lang");
+        if ((lang != 0) && (myLanguage == lang)) {
+            const char *name = attributeValue(attributes, "title");
+            if (name != 0) {
+                mySubCategoryName = name;
+                ZLUnicodeUtil::utf8Trim(mySubCategoryName);
+            }
+        }
+    }
 }
 
 void FB2TagInfoReader::endElementHandler(const char *tag) {
-	if (GENRE_TAG == tag) {
-		myCategoryName.erase();
-		mySubCategoryName.erase();
-		myGenreIds.clear();
-	} else if (SUBGENRE_TAG == tag) {
-		if (!myCategoryName.empty() && !mySubCategoryName.empty()) {
-			const std::string fullTagName = myCategoryName + '/' + mySubCategoryName;
-			for (std::vector<std::string>::const_iterator it = myGenreIds.begin(); it != myGenreIds.end(); ++it) {
-				myTagMap[*it].push_back(fullTagName);
-			}
-		}
-		mySubCategoryName.erase();
-		myGenreIds.clear();
-	}
+    if (GENRE_TAG == tag) {
+        myCategoryName.erase();
+        mySubCategoryName.erase();
+        myGenreIds.clear();
+    } else if (SUBGENRE_TAG == tag) {
+        if (!myCategoryName.empty() && !mySubCategoryName.empty()) {
+            const std::string fullTagName = myCategoryName + '/' + mySubCategoryName;
+            for (std::vector<std::string>::const_iterator it = myGenreIds.begin();
+                 it != myGenreIds.end(); ++it) {
+                myTagMap[*it].push_back(fullTagName);
+            }
+        }
+        mySubCategoryName.erase();
+        myGenreIds.clear();
+    }
 }
 
 FB2TagManager *FB2TagManager::ourInstance = 0;
 
 const FB2TagManager &FB2TagManager::Instance() {
-	if (ourInstance == 0) {
-		ourInstance = new FB2TagManager();
-	}
-	return *ourInstance;
+    if (ourInstance == 0) {
+        ourInstance = new FB2TagManager();
+    }
+    return *ourInstance;
 }
 
 FB2TagManager::FB2TagManager() {
-	FB2TagInfoReader(myTagMap).readDocument(ZLFile(
-		ZLibrary::ApplicationDirectory() + ZLibrary::FileNameDelimiter +
-		"formats" + ZLibrary::FileNameDelimiter + "fb2" +
-		ZLibrary::FileNameDelimiter + "fb2genres.xml"
-	));
+    FB2TagInfoReader(myTagMap).readDocument(ZLFile(
+            ZLibrary::ApplicationDirectory() + ZLibrary::FileNameDelimiter +
+            "formats" + ZLibrary::FileNameDelimiter + "fb2" +
+            ZLibrary::FileNameDelimiter + "fb2genres.xml"
+    ));
 }
 
 const std::vector<std::string> &FB2TagManager::humanReadableTags(const std::string &id) const {
-	static const std::vector<std::string> EMPTY;
-	std::map<std::string,std::vector<std::string> >::const_iterator it = myTagMap.find(id);
-	return (it != myTagMap.end()) ? it->second : EMPTY;
+    static const std::vector<std::string> EMPTY;
+    std::map<std::string, std::vector<std::string> >::const_iterator it = myTagMap.find(id);
+    return (it != myTagMap.end()) ? it->second : EMPTY;
 }

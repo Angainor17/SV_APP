@@ -28,46 +28,53 @@ class DocReader;
 class DocStream : public ZLInputStream {
 
 public:
-	DocStream(const ZLFile& file, std::size_t maxSize);
-	~DocStream();
+    DocStream(const ZLFile &file, std::size_t maxSize);
+
+    ~DocStream();
 
 private:
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    bool open();
 
-	void seek(int offset, bool absoluteOffset);
-	std::size_t offset() const;
-	std::size_t sizeOfOpened();
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
+
+    void seek(int offset, bool absoluteOffset);
+
+    std::size_t offset() const;
+
+    std::size_t sizeOfOpened();
 
 protected:
-	virtual shared_ptr<DocReader> createReader(char *buffer, std::size_t maxSize) = 0;
+    virtual shared_ptr<DocReader> createReader(char *buffer, std::size_t maxSize) = 0;
 
 private:
-	const ZLFile myFile;
-	char *myBuffer;
-	std::size_t mySize;
-	std::size_t myOffset;
+    const ZLFile myFile;
+    char *myBuffer;
+    std::size_t mySize;
+    std::size_t myOffset;
 };
 
 class DocAnsiStream : public DocStream {
 
 public:
-	DocAnsiStream(const ZLFile& file, std::size_t maxSize);
-	~DocAnsiStream();
+    DocAnsiStream(const ZLFile &file, std::size_t maxSize);
+
+    ~DocAnsiStream();
 
 private:
-	shared_ptr<DocReader> createReader(char *buffer, std::size_t maxSize);
+    shared_ptr<DocReader> createReader(char *buffer, std::size_t maxSize);
 };
 
 class DocUcs2Stream : public DocStream {
 
 public:
-	DocUcs2Stream(const ZLFile& file, std::size_t maxSize);
-	~DocUcs2Stream();
+    DocUcs2Stream(const ZLFile &file, std::size_t maxSize);
+
+    ~DocUcs2Stream();
 
 private:
-	shared_ptr<DocReader> createReader(char *buffer, std::size_t maxSize);
+    shared_ptr<DocReader> createReader(char *buffer, std::size_t maxSize);
 };
 
 #endif /* __DOCSTREAMS_H__ */

@@ -24,20 +24,22 @@
 #include <ZLXMLReader.h>
 
 class ZLFile;
+
 class ZLImage;
 
 class XHTMLImageFinder : public ZLXMLReader {
 
 public:
-	shared_ptr<const ZLImage> readImage(const ZLFile &file);
+    shared_ptr<const ZLImage> readImage(const ZLFile &file);
 
 private:
-	bool processNamespaces() const;
-	void startElementHandler(const char *tag, const char **attributes);
+    bool processNamespaces() const;
+
+    void startElementHandler(const char *tag, const char **attributes);
 
 private:
-	std::string myPathPrefix;
-	shared_ptr<const ZLImage> myImage;
+    std::string myPathPrefix;
+    shared_ptr<const ZLImage> myImage;
 };
 
 #endif /* __XHTMLIMAGEFINDER_H__ */

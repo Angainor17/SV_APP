@@ -41,11 +41,11 @@ PlainTextFormat::PlainTextFormat(const ZLFile &file) :
 //	IgnoredIndentOption(FBCategoryKey::BOOKS, file.path(), OPTION_IgnoredIndent, 1, 100, 1),
 //	EmptyLinesBeforeNewSectionOption(FBCategoryKey::BOOKS, file.path(), OPTION_EmptyLinesBeforeNewSection, 1, 100, 1),
 //	CreateContentsTableOption(FBCategoryKey::BOOKS, file.path(), OPTION_CreateContentsTable, false) {
-	myInitialized(false),
-	myBreakType(1),
-	myIgnoredIndent(1),
-	myEmptyLinesBeforeNewSection(1),
-	myCreateContentsTable(false) {
+        myInitialized(false),
+        myBreakType(1),
+        myIgnoredIndent(1),
+        myEmptyLinesBeforeNewSection(1),
+        myCreateContentsTable(false) {
 }
 
 /*PlainTextInfoPage::PlainTextInfoPage(ZLOptionsDialog &dialog, const ZLFile &file, const ZLResourceKey &key, bool showContentsEntry) : myFormat(file) {
@@ -80,124 +80,125 @@ PlainTextFormat::PlainTextFormat(const ZLFile &file) :
 const int BUFFER_SIZE = 4096;
 
 void PlainTextFormatDetector::detect(ZLInputStream &stream, PlainTextFormat &format) {
-	if (!stream.open()) {
-		return;
-	}
+    if (!stream.open()) {
+        return;
+    }
 
-	const unsigned int tableSize = 10;
+    const unsigned int tableSize = 10;
 
-	unsigned int lineCounter = 0;
-	int emptyLineCounter = -1;
-	unsigned int stringsWithLengthLessThan81Counter = 0;
-	unsigned int stringIndentTable[tableSize] = { 0 };
-	unsigned int emptyLinesTable[tableSize] = { 0 };
-	unsigned int emptyLinesBeforeShortStringTable[tableSize] = { 0 };
+    unsigned int lineCounter = 0;
+    int emptyLineCounter = -1;
+    unsigned int stringsWithLengthLessThan81Counter = 0;
+    unsigned int stringIndentTable[tableSize] = {0};
+    unsigned int emptyLinesTable[tableSize] = {0};
+    unsigned int emptyLinesBeforeShortStringTable[tableSize] = {0};
 
-	bool currentLineIsEmpty = true;
-	unsigned int currentLineLength = 0;
-	unsigned int currentLineIndent = 0;
-	int currentNumberOfEmptyLines = -1;
+    bool currentLineIsEmpty = true;
+    unsigned int currentLineLength = 0;
+    unsigned int currentLineIndent = 0;
+    int currentNumberOfEmptyLines = -1;
 
-	char *buffer = new char[BUFFER_SIZE];
-	int length;
-	char previous = 0;
-	do {
-		length = stream.read(buffer, BUFFER_SIZE);
-		const char *end = buffer + length;
-		for (const char *ptr = buffer; ptr != end; ++ptr) {
-			++currentLineLength;
-			if (*ptr == '\n') {
-				++lineCounter;
-				if (currentLineIsEmpty) {
-					++emptyLineCounter;
-					++currentNumberOfEmptyLines;
-				} else {
-					if (currentNumberOfEmptyLines >= 0) {
-						int index = std::min(currentNumberOfEmptyLines, (int)tableSize - 1);
-						emptyLinesTable[index]++;
-						if (currentLineLength < 51) {
-							emptyLinesBeforeShortStringTable[index]++;
-						}
-					}
-					currentNumberOfEmptyLines = -1;
-				}
-				if (currentLineLength < 81) {
-					++stringsWithLengthLessThan81Counter;
-				}
-				if (!currentLineIsEmpty) {
-					stringIndentTable[std::min(currentLineIndent, tableSize - 1)]++;
-				}
+    char *buffer = new char[BUFFER_SIZE];
+    int length;
+    char previous = 0;
+    do {
+        length = stream.read(buffer, BUFFER_SIZE);
+        const char *end = buffer + length;
+        for (const char *ptr = buffer; ptr != end; ++ptr) {
+            ++currentLineLength;
+            if (*ptr == '\n') {
+                ++lineCounter;
+                if (currentLineIsEmpty) {
+                    ++emptyLineCounter;
+                    ++currentNumberOfEmptyLines;
+                } else {
+                    if (currentNumberOfEmptyLines >= 0) {
+                        int index = std::min(currentNumberOfEmptyLines, (int) tableSize - 1);
+                        emptyLinesTable[index]++;
+                        if (currentLineLength < 51) {
+                            emptyLinesBeforeShortStringTable[index]++;
+                        }
+                    }
+                    currentNumberOfEmptyLines = -1;
+                }
+                if (currentLineLength < 81) {
+                    ++stringsWithLengthLessThan81Counter;
+                }
+                if (!currentLineIsEmpty) {
+                    stringIndentTable[std::min(currentLineIndent, tableSize - 1)]++;
+                }
 
-				currentLineIsEmpty = true;
-				currentLineLength = 0;
-				currentLineIndent = 0;
-			} else if (*ptr == '\r') {
-				continue;
-			} else if (std::isspace((unsigned char)*ptr)) {
-				if (currentLineIsEmpty) {
-					++currentLineIndent;
-				}
-			} else {
-				currentLineIsEmpty = false;
-			}
-			previous = *ptr;
-		}
-	} while (length == BUFFER_SIZE);
-	delete[] buffer;
+                currentLineIsEmpty = true;
+                currentLineLength = 0;
+                currentLineIndent = 0;
+            } else if (*ptr == '\r') {
+                continue;
+            } else if (std::isspace((unsigned char) *ptr)) {
+                if (currentLineIsEmpty) {
+                    ++currentLineIndent;
+                }
+            } else {
+                currentLineIsEmpty = false;
+            }
+            previous = *ptr;
+        }
+    } while (length == BUFFER_SIZE);
+    delete[] buffer;
 
-	unsigned int nonEmptyLineCounter = lineCounter - emptyLineCounter;
+    unsigned int nonEmptyLineCounter = lineCounter - emptyLineCounter;
 
-	{
-		unsigned int indent = 0;
-		unsigned int lineWithIndent = 0;
-		for (; indent < tableSize; ++indent) {
-			lineWithIndent += stringIndentTable[indent];
-			if (lineWithIndent > 0.1 * nonEmptyLineCounter) {
-				break;
-			}
-		}
-		format.myIgnoredIndent = (indent + 1);
-	}
+    {
+        unsigned int indent = 0;
+        unsigned int lineWithIndent = 0;
+        for (; indent < tableSize; ++indent) {
+            lineWithIndent += stringIndentTable[indent];
+            if (lineWithIndent > 0.1 * nonEmptyLineCounter) {
+                break;
+            }
+        }
+        format.myIgnoredIndent = (indent + 1);
+    }
 
-	{
-		int breakType = 0;
-		breakType |= PlainTextFormat::BREAK_PARAGRAPH_AT_EMPTY_LINE;
-		if (stringsWithLengthLessThan81Counter < 0.3 * nonEmptyLineCounter) {
-			breakType |= PlainTextFormat::BREAK_PARAGRAPH_AT_NEW_LINE;
-		} else {
-			breakType |= PlainTextFormat::BREAK_PARAGRAPH_AT_LINE_WITH_INDENT;
-		}
-		format.myBreakType = (breakType);
-	}
+    {
+        int breakType = 0;
+        breakType |= PlainTextFormat::BREAK_PARAGRAPH_AT_EMPTY_LINE;
+        if (stringsWithLengthLessThan81Counter < 0.3 * nonEmptyLineCounter) {
+            breakType |= PlainTextFormat::BREAK_PARAGRAPH_AT_NEW_LINE;
+        } else {
+            breakType |= PlainTextFormat::BREAK_PARAGRAPH_AT_LINE_WITH_INDENT;
+        }
+        format.myBreakType = (breakType);
+    }
 
-	{
-		unsigned int max = 0;
-		unsigned index;
-		int emptyLinesBeforeNewSection = -1;
-		for (index = 2; index < tableSize; ++index) {
-			if (max < emptyLinesBeforeShortStringTable[index]) {
-				max = emptyLinesBeforeShortStringTable[index];
-				emptyLinesBeforeNewSection = index;
-			}
-		}
-		if (emptyLinesBeforeNewSection > 0) {
-			for (index = tableSize - 1; index > 0; --index) {
-				emptyLinesTable[index - 1] += emptyLinesTable[index];
-				emptyLinesBeforeShortStringTable[index - 1] += emptyLinesBeforeShortStringTable[index];
-			}
-			for (index = emptyLinesBeforeNewSection; index < tableSize; ++index) {
-				if ((emptyLinesBeforeShortStringTable[index] > 2) &&
-						(emptyLinesBeforeShortStringTable[index] > 0.7 * emptyLinesTable[index])) {
-					break;
-				}
-			}
-			emptyLinesBeforeNewSection = (index == tableSize) ? -1 : (int)index;
-		}
-		format.myEmptyLinesBeforeNewSection = (emptyLinesBeforeNewSection);
-		format.myCreateContentsTable = (emptyLinesBeforeNewSection > 0);
-	}
+    {
+        unsigned int max = 0;
+        unsigned index;
+        int emptyLinesBeforeNewSection = -1;
+        for (index = 2; index < tableSize; ++index) {
+            if (max < emptyLinesBeforeShortStringTable[index]) {
+                max = emptyLinesBeforeShortStringTable[index];
+                emptyLinesBeforeNewSection = index;
+            }
+        }
+        if (emptyLinesBeforeNewSection > 0) {
+            for (index = tableSize - 1; index > 0; --index) {
+                emptyLinesTable[index - 1] += emptyLinesTable[index];
+                emptyLinesBeforeShortStringTable[index -
+                                                 1] += emptyLinesBeforeShortStringTable[index];
+            }
+            for (index = emptyLinesBeforeNewSection; index < tableSize; ++index) {
+                if ((emptyLinesBeforeShortStringTable[index] > 2) &&
+                    (emptyLinesBeforeShortStringTable[index] > 0.7 * emptyLinesTable[index])) {
+                    break;
+                }
+            }
+            emptyLinesBeforeNewSection = (index == tableSize) ? -1 : (int) index;
+        }
+        format.myEmptyLinesBeforeNewSection = (emptyLinesBeforeNewSection);
+        format.myCreateContentsTable = (emptyLinesBeforeNewSection > 0);
+    }
 
-	format.myInitialized = (true);
+    format.myInitialized = (true);
 }
 
 /*BreakTypeOptionEntry::BreakTypeOptionEntry(PlainTextInfoPage &page, ZLIntegerOption &breakTypeOption) : myPage(page), myBreakTypeOption(breakTypeOption) {

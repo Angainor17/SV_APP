@@ -34,104 +34,105 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public class CoverManager {
-	final CoverCache Cache = new CoverCache();
-	private final ExecutorService myPool = Executors.newFixedThreadPool(1, new MinPriorityThreadFactory());
-	private final Activity myActivity;
-	private final ZLImageProxy.Synchronizer myImageSynchronizer;
-	private final int myCoverWidth;
-	private final int myCoverHeight;
-	public CoverManager(Activity activity, ZLImageProxy.Synchronizer synchronizer, int coverWidth, int coverHeight) {
-		myActivity = activity;
-		myImageSynchronizer = synchronizer;
-		myCoverWidth = coverWidth;
-		myCoverHeight = coverHeight;
-	}
+    final CoverCache Cache = new CoverCache();
+    private final ExecutorService myPool = Executors.newFixedThreadPool(1, new MinPriorityThreadFactory());
+    private final Activity myActivity;
+    private final ZLImageProxy.Synchronizer myImageSynchronizer;
+    private final int myCoverWidth;
+    private final int myCoverHeight;
 
-	void runOnUiThread(Runnable runnable) {
-		myActivity.runOnUiThread(runnable);
-	}
+    public CoverManager(Activity activity, ZLImageProxy.Synchronizer synchronizer, int coverWidth, int coverHeight) {
+        myActivity = activity;
+        myImageSynchronizer = synchronizer;
+        myCoverWidth = coverWidth;
+        myCoverHeight = coverHeight;
+    }
 
-	void setupCoverView(ImageView coverView) {
-		coverView.getLayoutParams().width = myCoverWidth;
-		coverView.getLayoutParams().height = myCoverHeight;
-		coverView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-		coverView.requestLayout();
-	}
+    void runOnUiThread(Runnable runnable) {
+        myActivity.runOnUiThread(runnable);
+    }
 
-	Bitmap getBitmap(ZLImage image) {
-		final ZLAndroidImageManager mgr = (ZLAndroidImageManager)ZLAndroidImageManager.Instance();
-		final ZLAndroidImageData data = mgr.getImageData(image);
-		if (data == null) {
-			return null;
-		}
-		return data.getBitmap(2 * myCoverWidth, 2 * myCoverHeight);
-	}
+    void setupCoverView(ImageView coverView) {
+        coverView.getLayoutParams().width = myCoverWidth;
+        coverView.getLayoutParams().height = myCoverHeight;
+        coverView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        coverView.requestLayout();
+    }
 
-	void setCoverForView(CoverHolder holder, ZLImageProxy image) {
-		synchronized (holder) {
-			try {
-				final Bitmap coverBitmap = Cache.getBitmap(holder.Key);
-				if (coverBitmap != null) {
-					holder.CoverView.setImageBitmap(coverBitmap);
-				} else if (holder.coverBitmapTask == null) {
-					holder.coverBitmapTask = myPool.submit(holder.new CoverBitmapRunnable(image));
-				}
-			} catch (CoverCache.NullObjectException e) {
-			}
-		}
-	}
+    Bitmap getBitmap(ZLImage image) {
+        final ZLAndroidImageManager mgr = (ZLAndroidImageManager) ZLAndroidImageManager.Instance();
+        final ZLAndroidImageData data = mgr.getImageData(image);
+        if (data == null) {
+            return null;
+        }
+        return data.getBitmap(2 * myCoverWidth, 2 * myCoverHeight);
+    }
 
-	private CoverHolder getHolder(ImageView coverView, FBTree tree) {
-		CoverHolder holder = (CoverHolder)coverView.getTag();
-		if (holder == null) {
-			holder = new CoverHolder(this, coverView, tree.getUniqueKey());
-			coverView.setTag(holder);
-		} else {
-			holder.setKey(tree.getUniqueKey());
-		}
-		return holder;
-	}
+    void setCoverForView(CoverHolder holder, ZLImageProxy image) {
+        synchronized (holder) {
+            try {
+                final Bitmap coverBitmap = Cache.getBitmap(holder.Key);
+                if (coverBitmap != null) {
+                    holder.CoverView.setImageBitmap(coverBitmap);
+                } else if (holder.coverBitmapTask == null) {
+                    holder.coverBitmapTask = myPool.submit(holder.new CoverBitmapRunnable(image));
+                }
+            } catch (CoverCache.NullObjectException e) {
+            }
+        }
+    }
 
-	public boolean trySetCoverImage(ImageView coverView, FBTree tree) {
-		final CoverHolder holder = getHolder(coverView, tree);
+    private CoverHolder getHolder(ImageView coverView, FBTree tree) {
+        CoverHolder holder = (CoverHolder) coverView.getTag();
+        if (holder == null) {
+            holder = new CoverHolder(this, coverView, tree.getUniqueKey());
+            coverView.setTag(holder);
+        } else {
+            holder.setKey(tree.getUniqueKey());
+        }
+        return holder;
+    }
 
-		Bitmap coverBitmap;
-		try {
-			coverBitmap = Cache.getBitmap(holder.Key);
-		} catch (CoverCache.NullObjectException e) {
-			return false;
-		}
+    public boolean trySetCoverImage(ImageView coverView, FBTree tree) {
+        final CoverHolder holder = getHolder(coverView, tree);
 
-		if (coverBitmap == null) {
-			final ZLImage cover = tree.getCover();
-			if (cover instanceof ZLImageProxy) {
-				final ZLImageProxy img = (ZLImageProxy)cover;
-				if (img.isSynchronized()) {
-					setCoverForView(holder, img);
-				} else {
-					img.startSynchronization(
-						myImageSynchronizer,
-						holder.new CoverSyncRunnable(img)
-					);
-				}
-			} else if (cover != null) {
-				coverBitmap = getBitmap(cover);
-			}
-		}
-		if (coverBitmap != null) {
-			holder.CoverView.setImageBitmap(coverBitmap);
-			return true;
-		}
-		return false;
-	}
+        Bitmap coverBitmap;
+        try {
+            coverBitmap = Cache.getBitmap(holder.Key);
+        } catch (CoverCache.NullObjectException e) {
+            return false;
+        }
 
-	private static class MinPriorityThreadFactory implements ThreadFactory {
-		private final ThreadFactory myDefaultThreadFactory = Executors.defaultThreadFactory();
+        if (coverBitmap == null) {
+            final ZLImage cover = tree.getCover();
+            if (cover instanceof ZLImageProxy) {
+                final ZLImageProxy img = (ZLImageProxy) cover;
+                if (img.isSynchronized()) {
+                    setCoverForView(holder, img);
+                } else {
+                    img.startSynchronization(
+                            myImageSynchronizer,
+                            holder.new CoverSyncRunnable(img)
+                    );
+                }
+            } else if (cover != null) {
+                coverBitmap = getBitmap(cover);
+            }
+        }
+        if (coverBitmap != null) {
+            holder.CoverView.setImageBitmap(coverBitmap);
+            return true;
+        }
+        return false;
+    }
 
-		public Thread newThread(Runnable r) {
-			final Thread th = myDefaultThreadFactory.newThread(r);
-			th.setPriority(Thread.MIN_PRIORITY);
-			return th;
-		}
-	}
+    private static class MinPriorityThreadFactory implements ThreadFactory {
+        private final ThreadFactory myDefaultThreadFactory = Executors.defaultThreadFactory();
+
+        public Thread newThread(Runnable r) {
+            final Thread th = myDefaultThreadFactory.newThread(r);
+            th.setPriority(Thread.MIN_PRIORITY);
+            return th;
+        }
+    }
 }

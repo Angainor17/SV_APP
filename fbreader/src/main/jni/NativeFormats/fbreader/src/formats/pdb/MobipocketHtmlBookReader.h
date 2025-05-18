@@ -27,72 +27,87 @@
 class MobipocketHtmlBookReader : public HtmlBookReader {
 
 public:
-	MobipocketHtmlBookReader(const ZLFile &file, BookModel &model, const PlainTextFormat &format, const std::string &encoding);
-	void readDocument(ZLInputStream &stream);
+    MobipocketHtmlBookReader(const ZLFile &file, BookModel &model, const PlainTextFormat &format,
+                             const std::string &encoding);
+
+    void readDocument(ZLInputStream &stream);
 
 private:
-	void startDocumentHandler();
-	bool tagHandler(const HtmlTag &tag);
-	bool characterDataHandler(const char *text, size_t len, bool convert);
-	shared_ptr<HtmlTagAction> createAction(const std::string &tag);
+    void startDocumentHandler();
+
+    bool tagHandler(const HtmlTag &tag);
+
+    bool characterDataHandler(const char *text, size_t len, bool convert);
+
+    shared_ptr<HtmlTagAction> createAction(const std::string &tag);
 
 public:
-	class TOCReader {
+    class TOCReader {
 
-	public:
-		struct Entry {
-			std::string Text;
-			size_t Level;
+    public:
+        struct Entry {
+            std::string Text;
+            size_t Level;
 
-			Entry();
-			Entry(const std::string &text, size_t level);
-		};
-	
-	public:
-		TOCReader(MobipocketHtmlBookReader &reader);
-		void reset();
+            Entry();
 
-		void addReference(size_t position, const std::string &text, size_t level);
+            Entry(const std::string &text, size_t level);
+        };
 
-		void setStartOffset(size_t position);
-		void setEndOffset(size_t position);
+    public:
+        TOCReader(MobipocketHtmlBookReader &reader);
 
-		bool rangeContainsPosition(size_t position);
+        void reset();
 
-		void startReadEntry(size_t position);
-		void endReadEntry(size_t level);
-		void appendText(const char *text, size_t len);
+        void addReference(size_t position, const std::string &text, size_t level);
 
-		const std::map<size_t,Entry> &entries() const;
+        void setStartOffset(size_t position);
 
-	private:	
-		MobipocketHtmlBookReader &myReader;
+        void setEndOffset(size_t position);
 
-		std::map<size_t,Entry> myEntries;
+        bool rangeContainsPosition(size_t position);
 
-		bool myIsActive;
-		size_t myStartOffset;
-		size_t myEndOffset;
+        void startReadEntry(size_t position);
 
-		size_t myCurrentReference;
-		std::string myCurrentEntryText;
-	};
+        void endReadEntry(size_t level);
+
+        void appendText(const char *text, size_t len);
+
+        const std::map<size_t, Entry> &entries() const;
+
+    private:
+        MobipocketHtmlBookReader &myReader;
+
+        std::map<size_t, Entry> myEntries;
+
+        bool myIsActive;
+        size_t myStartOffset;
+        size_t myEndOffset;
+
+        size_t myCurrentReference;
+        std::string myCurrentEntryText;
+    };
 
 private:
-	std::set<int> myImageIndexes;
-	const std::string myFileName;
+    std::set<int> myImageIndexes;
+    const std::string myFileName;
 
-	std::vector<std::pair<size_t,size_t> > myPositionToParagraphMap;
-	std::set<size_t> myFileposReferences;
-	bool myInsideGuide;
-	TOCReader myTocReader;
+    std::vector<std::pair<size_t, size_t> > myPositionToParagraphMap;
+    std::set<size_t> myFileposReferences;
+    bool myInsideGuide;
+    TOCReader myTocReader;
 
-friend class MobipocketHtmlImageTagAction;
-friend class MobipocketHtmlHrefTagAction;
-friend class MobipocketHtmlGuideTagAction;
-friend class MobipocketHtmlReferenceTagAction;
-friend class MobipocketHtmlPagebreakTagAction;
-friend class TOCReader;
+    friend class MobipocketHtmlImageTagAction;
+
+    friend class MobipocketHtmlHrefTagAction;
+
+    friend class MobipocketHtmlGuideTagAction;
+
+    friend class MobipocketHtmlReferenceTagAction;
+
+    friend class MobipocketHtmlPagebreakTagAction;
+
+    friend class TOCReader;
 };
 
 #endif /* __MOBIPOCKETHTMLBOOKREADER_H__ */

@@ -20,17 +20,17 @@
 package org.geometerplus.zlibrary.core.network;
 
 public class ZLNetworkAuthenticationException extends ZLNetworkException {
-	public static final String ERROR_AUTHENTICATION_FAILED = "authenticationFailed";
+    public static final String ERROR_AUTHENTICATION_FAILED = "authenticationFailed";
 
-	public ZLNetworkAuthenticationException() {
-		super(errorMessage(ERROR_AUTHENTICATION_FAILED));
-	}
+    public ZLNetworkAuthenticationException() {
+        super(errorMessage(ERROR_AUTHENTICATION_FAILED));
+    }
 
-	public ZLNetworkAuthenticationException(String message) {
-		super(message);
-	}
+    public ZLNetworkAuthenticationException(String message) {
+        super(message);
+    }
 
-	public ZLNetworkAuthenticationException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ZLNetworkAuthenticationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -1,234 +1,214 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <known-encodings>
-	<group name="West European">
-		<encoding name="ISO-8859-1" region="Western">
-			<code number="28591"/>
-		</encoding>
-		<encoding name="ISO-8859-15" region="Western">
-			<code number="28605"/>
-		</encoding>
-		<encoding name="IBM850" region="Western">
-			<code number="850"/>
-		</encoding>
-		<encoding name="MacRoman" region="Western">
-			<code number="10000"/>
-			<alias name="Macintosh"/>
-		</encoding>
-		<encoding name="US-ASCII" region="Western">
-			<code number="20127"/>
-		</encoding>
-		<encoding name="windows-1252" region="Western">
-			<code number="1252"/>
-		</encoding>
-		<encoding name="ISO-8859-14" region="Celtic">
-			<code number="28604"/>
-		</encoding>
-		<encoding name="ISO-8859-7" region="Greek">
-		</encoding>
-			<code number="28597"/>
-		<encoding name="MacGreek" region="Greek">
-			<code number="10006"/>
-		</encoding>
-		<encoding name="windows-1253" region="Greek">
-			<code number="1253"/>
-		</encoding>
-		<encoding name="MacIcelandic" region="Icelandic">
-			<code number="10079"/>
-		</encoding>
-		<encoding name="ISO-8859-10" region="Nordic">
-			<code number="28600"/>
-		</encoding>
-		<encoding name="ISO-8859-3" region="South European">
-			<code number="28593"/>
-		</encoding>
-	</group>
-	<group name="East European">
-		<encoding name="ISO-8859-4" region="Baltic">
-			<code number="28594"/>
-		</encoding>
-		<encoding name="ISO-8859-13" region="Baltic">
-			<code number="28603"/>
-		</encoding>
-		<encoding name="windows-1257" region="Baltic">
-			<code number="1257"/>
-		</encoding>
-		<encoding name="IBM852" region="Central European">
-			<code number="852"/>
-		</encoding>
-		<encoding name="ISO-8859-2" region="Central European">
-			<code number="28592"/>
-		</encoding>
-		<encoding name="MacCE" region="Central European">
-			<code number="10029"/>
-		</encoding>
-		<encoding name="windows-1250" region="Central European">
-			<code number="1250"/>
-		</encoding>
-		<encoding name="MacCroatian" region="Croatian">
-			<code number="10082"/>
-		</encoding>
-		<encoding name="IBM855" region="Cyrillic">
-			<code number="855"/>
-		</encoding>
-		<encoding name="ISO-8859-5" region="Cyrillic">
-			<code number="28595"/>
-		</encoding>
-		<encoding name="ISO-IR-111" region="Cyrillic">
-		</encoding>
-		<encoding name="KOI8-R" region="Cyrillic">
-			<code number="20866"/>
-		</encoding>
-		<encoding name="MacCyrillic" region="Cyrillic">
-			<code number="10007"/>
-		</encoding>
-		<encoding name="windows-1251" region="Cyrillic">
-			<code number="1251"/>
-		</encoding>
-		<encoding name="IBM866" region="Cyrillic/Russian">
-			<code number="866"/>
-		</encoding>
-		<encoding name="KOI8-U" region="Cyrillic/Ukrainian">
-			<code number="21866"/>
-		</encoding>
-		<encoding name="MacUkrainian" region="Cyrillic/Ukrainian">
-			<code number="10017"/>
-		</encoding>
-		<encoding name="ISO-8859-16" region="Romanian">
-			<code number="28606"/>
-		</encoding>
-		<encoding name="MacRomanian" region="Romanian">
-			<code number="10010"/>
-		</encoding>
-	</group>
-	<group name="East Asia">
-		<encoding name="GB2312" region="Chinese Simplified">
-			<code number="936"/>
-		</encoding>
-		<encoding name="GB18030" region="Chinese Simplified">
-			<code number="54936"/>
-		</encoding>
-		<encoding name="GBK" region="Chinese Simplified">
-		</encoding>
-		<encoding name="HZ" region="Chinese Simplified">
-		</encoding>
-		<encoding name="ISO-2022-CN" region="Chinese Simplified">
-		</encoding>
-		<encoding name="Big5" region="Chinese Traditional">
-			<code number="950"/>
-		</encoding>
-		<encoding name="Big5-HKSCS" region="Chinese Traditional">
-		</encoding>
-		<encoding name="EUC-TW" region="Chinese Traditional">
-		</encoding>
-		<encoding name="EUC-JP" region="Japanese">
-			<code number="51932"/>
-		</encoding>
-		<encoding name="ISO-2022-JP" region="Japanese">
-			<code number="50222"/>
-		</encoding>
-		<encoding name="Shift_JIS" region="Japanese">
-			<code number="932"/>
-		</encoding>
-		<encoding name="EUC-KR" region="Korean">
-			<code number="51949"/>
-		</encoding>
-		<encoding name="ISO-2022-KR" region="Korean">
-			<code number="50225"/>
-		</encoding>
-		<encoding name="JOHAB" region="Korean">
-			<code number="1361"/>
-		</encoding>
-		<encoding name="UHC" region="Korean">
-		</encoding>
-	</group>
-	<group name="SW &amp; SE Asia">
-		<encoding name="ARMSCII-8" region="Armenian">
-		</encoding>
-		<encoding name="GEOSTD8" region="Georgian">
-		</encoding>
-		<encoding name="IBM874" region="Thai">
-			<code number="874"/>
-		</encoding>
-		<encoding name="ISO-8859-11" region="Thai">
-			<code number="28601"/>
-		</encoding>
-		<encoding name="TIS-620" region="Thai">
-		</encoding>
-		<encoding name="IBM857" region="Turkish">
-			<code number="857"/>
-		</encoding>
-		<encoding name="ISO-8859-9" region="Turkish">
-			<code number="28599"/>
-		</encoding>
-		<encoding name="MacTurkish" region="Turkish">
-			<code number="10081"/>
-		</encoding>
-		<encoding name="windows-1254" region="Turkish">
-			<code number="1254"/>
-		</encoding>
-		<encoding name="TCVN" region="Vietnamese">
-		</encoding>
-		<encoding name="VISCII" region="Vietnamese">
-		</encoding>
-		<encoding name="VPS" region="Vietnamese">
-		</encoding>
-		<encoding name="windows-1258" region="Vietnamese">
-			<code number="1258"/>
-		</encoding>
-		<encoding name="MacDevanagari" region="Hindi">
-		</encoding>
-		<encoding name="ISCII Devanagari" region="Hindi">
-			<code number="57002"/>
-		</encoding>
-		<encoding name="MacGujarati" region="Gujarati">
-		</encoding>
-		<encoding name="ISCII Gujarati" region="Gujarati">
-			<code number="57010"/>
-		</encoding>
-		<encoding name="MacGurmukhi" region="Gurmukhi">
-		</encoding>
-	</group>
-	<group name="Middle Eastern">
-		<encoding name="ISO-8859-6" region="Arabic">
-			<code number="28596"/>
-		</encoding>
-		<encoding name="IBM864" region="Arabic">
-			<code number="864"/>
-		</encoding>
-		<encoding name="windows-1256" region="Arabic">
-			<code number="1256"/>
-		</encoding>
-		<encoding name="MacArabic" region="Arabic">
-			<code number="10004"/>
-		</encoding>
-		<encoding name="MacFarsi" region="Farsi">
-		</encoding>
-		<encoding name="IBM862" region="Hebrew">
-			<code number="862"/>
-		</encoding>
-		<encoding name="ISO-8859-8" region="Hebrew">
-			<code number="28598"/>
-		</encoding>
-		<encoding name="ISO-8859-8-I" region="Hebrew">
-			<code number="38598"/>
-		</encoding>
-		<encoding name="MacHebrew" region="Hebrew">
-			<code number="10005"/>
-		</encoding>
-		<encoding name="windows-1255" region="Hebrew">
-			<code number="1255"/>
-		</encoding>
-	</group>
-	<group name="Unicode">
-		<encoding name="UTF-8" region="Unicode">
-			<code number="65001"/>
-		</encoding>
-		<encoding name="UTF-7" region="Unicode">
-			<code number="65000"/>
-		</encoding>
-		<encoding name="UTF-16" region="Unicode">
-		</encoding>
-		<encoding name="UTF-16BE" region="Unicode">
-		</encoding>
-	</group>
+    <group name="West European">
+        <encoding name="ISO-8859-1" region="Western">
+            <code number="28591" />
+        </encoding>
+        <encoding name="ISO-8859-15" region="Western">
+            <code number="28605" />
+        </encoding>
+        <encoding name="IBM850" region="Western">
+            <code number="850" />
+        </encoding>
+        <encoding name="MacRoman" region="Western">
+            <code number="10000" />
+            <alias name="Macintosh" />
+        </encoding>
+        <encoding name="US-ASCII" region="Western">
+            <code number="20127" />
+        </encoding>
+        <encoding name="windows-1252" region="Western">
+            <code number="1252" />
+        </encoding>
+        <encoding name="ISO-8859-14" region="Celtic">
+            <code number="28604" />
+        </encoding>
+        <encoding name="ISO-8859-7" region="Greek"></encoding>
+        <code number="28597" />
+        <encoding name="MacGreek" region="Greek">
+            <code number="10006" />
+        </encoding>
+        <encoding name="windows-1253" region="Greek">
+            <code number="1253" />
+        </encoding>
+        <encoding name="MacIcelandic" region="Icelandic">
+            <code number="10079" />
+        </encoding>
+        <encoding name="ISO-8859-10" region="Nordic">
+            <code number="28600" />
+        </encoding>
+        <encoding name="ISO-8859-3" region="South European">
+            <code number="28593" />
+        </encoding>
+    </group>
+    <group name="East European">
+        <encoding name="ISO-8859-4" region="Baltic">
+            <code number="28594" />
+        </encoding>
+        <encoding name="ISO-8859-13" region="Baltic">
+            <code number="28603" />
+        </encoding>
+        <encoding name="windows-1257" region="Baltic">
+            <code number="1257" />
+        </encoding>
+        <encoding name="IBM852" region="Central European">
+            <code number="852" />
+        </encoding>
+        <encoding name="ISO-8859-2" region="Central European">
+            <code number="28592" />
+        </encoding>
+        <encoding name="MacCE" region="Central European">
+            <code number="10029" />
+        </encoding>
+        <encoding name="windows-1250" region="Central European">
+            <code number="1250" />
+        </encoding>
+        <encoding name="MacCroatian" region="Croatian">
+            <code number="10082" />
+        </encoding>
+        <encoding name="IBM855" region="Cyrillic">
+            <code number="855" />
+        </encoding>
+        <encoding name="ISO-8859-5" region="Cyrillic">
+            <code number="28595" />
+        </encoding>
+        <encoding name="ISO-IR-111" region="Cyrillic"></encoding>
+        <encoding name="KOI8-R" region="Cyrillic">
+            <code number="20866" />
+        </encoding>
+        <encoding name="MacCyrillic" region="Cyrillic">
+            <code number="10007" />
+        </encoding>
+        <encoding name="windows-1251" region="Cyrillic">
+            <code number="1251" />
+        </encoding>
+        <encoding name="IBM866" region="Cyrillic/Russian">
+            <code number="866" />
+        </encoding>
+        <encoding name="KOI8-U" region="Cyrillic/Ukrainian">
+            <code number="21866" />
+        </encoding>
+        <encoding name="MacUkrainian" region="Cyrillic/Ukrainian">
+            <code number="10017" />
+        </encoding>
+        <encoding name="ISO-8859-16" region="Romanian">
+            <code number="28606" />
+        </encoding>
+        <encoding name="MacRomanian" region="Romanian">
+            <code number="10010" />
+        </encoding>
+    </group>
+    <group name="East Asia">
+        <encoding name="GB2312" region="Chinese Simplified">
+            <code number="936" />
+        </encoding>
+        <encoding name="GB18030" region="Chinese Simplified">
+            <code number="54936" />
+        </encoding>
+        <encoding name="GBK" region="Chinese Simplified"></encoding>
+        <encoding name="HZ" region="Chinese Simplified"></encoding>
+        <encoding name="ISO-2022-CN" region="Chinese Simplified"></encoding>
+        <encoding name="Big5" region="Chinese Traditional">
+            <code number="950" />
+        </encoding>
+        <encoding name="Big5-HKSCS" region="Chinese Traditional"></encoding>
+        <encoding name="EUC-TW" region="Chinese Traditional"></encoding>
+        <encoding name="EUC-JP" region="Japanese">
+            <code number="51932" />
+        </encoding>
+        <encoding name="ISO-2022-JP" region="Japanese">
+            <code number="50222" />
+        </encoding>
+        <encoding name="Shift_JIS" region="Japanese">
+            <code number="932" />
+        </encoding>
+        <encoding name="EUC-KR" region="Korean">
+            <code number="51949" />
+        </encoding>
+        <encoding name="ISO-2022-KR" region="Korean">
+            <code number="50225" />
+        </encoding>
+        <encoding name="JOHAB" region="Korean">
+            <code number="1361" />
+        </encoding>
+        <encoding name="UHC" region="Korean"></encoding>
+    </group>
+    <group name="SW &amp; SE Asia">
+        <encoding name="ARMSCII-8" region="Armenian"></encoding>
+        <encoding name="GEOSTD8" region="Georgian"></encoding>
+        <encoding name="IBM874" region="Thai">
+            <code number="874" />
+        </encoding>
+        <encoding name="ISO-8859-11" region="Thai">
+            <code number="28601" />
+        </encoding>
+        <encoding name="TIS-620" region="Thai"></encoding>
+        <encoding name="IBM857" region="Turkish">
+            <code number="857" />
+        </encoding>
+        <encoding name="ISO-8859-9" region="Turkish">
+            <code number="28599" />
+        </encoding>
+        <encoding name="MacTurkish" region="Turkish">
+            <code number="10081" />
+        </encoding>
+        <encoding name="windows-1254" region="Turkish">
+            <code number="1254" />
+        </encoding>
+        <encoding name="TCVN" region="Vietnamese"></encoding>
+        <encoding name="VISCII" region="Vietnamese"></encoding>
+        <encoding name="VPS" region="Vietnamese"></encoding>
+        <encoding name="windows-1258" region="Vietnamese">
+            <code number="1258" />
+        </encoding>
+        <encoding name="MacDevanagari" region="Hindi"></encoding>
+        <encoding name="ISCII Devanagari" region="Hindi">
+            <code number="57002" />
+        </encoding>
+        <encoding name="MacGujarati" region="Gujarati"></encoding>
+        <encoding name="ISCII Gujarati" region="Gujarati">
+            <code number="57010" />
+        </encoding>
+        <encoding name="MacGurmukhi" region="Gurmukhi"></encoding>
+    </group>
+    <group name="Middle Eastern">
+        <encoding name="ISO-8859-6" region="Arabic">
+            <code number="28596" />
+        </encoding>
+        <encoding name="IBM864" region="Arabic">
+            <code number="864" />
+        </encoding>
+        <encoding name="windows-1256" region="Arabic">
+            <code number="1256" />
+        </encoding>
+        <encoding name="MacArabic" region="Arabic">
+            <code number="10004" />
+        </encoding>
+        <encoding name="MacFarsi" region="Farsi"></encoding>
+        <encoding name="IBM862" region="Hebrew">
+            <code number="862" />
+        </encoding>
+        <encoding name="ISO-8859-8" region="Hebrew">
+            <code number="28598" />
+        </encoding>
+        <encoding name="ISO-8859-8-I" region="Hebrew">
+            <code number="38598" />
+        </encoding>
+        <encoding name="MacHebrew" region="Hebrew">
+            <code number="10005" />
+        </encoding>
+        <encoding name="windows-1255" region="Hebrew">
+            <code number="1255" />
+        </encoding>
+    </group>
+    <group name="Unicode">
+        <encoding name="UTF-8" region="Unicode">
+            <code number="65001" />
+        </encoding>
+        <encoding name="UTF-7" region="Unicode">
+            <code number="65000" />
+        </encoding>
+        <encoding name="UTF-16" region="Unicode"></encoding>
+        <encoding name="UTF-16BE" region="Unicode"></encoding>
+    </group>
 </known-encodings>

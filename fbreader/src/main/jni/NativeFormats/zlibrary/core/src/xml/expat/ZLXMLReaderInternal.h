@@ -29,26 +29,32 @@ class ZLXMLReader;
 class ZLXMLReaderInternal {
 
 private:
-	static void fStartElementHandler(void *userData, const char *name, const char **attributes);
-	static void fEndElementHandler(void *userData, const char *name);
-	static void fCharacterDataHandler(void *userData, const char *text, int len);
+    static void fStartElementHandler(void *userData, const char *name, const char **attributes);
+
+    static void fEndElementHandler(void *userData, const char *name);
+
+    static void fCharacterDataHandler(void *userData, const char *text, int len);
 
 public:
-	ZLXMLReaderInternal(ZLXMLReader &reader, const char *encoding);
-	~ZLXMLReaderInternal();
-	void init(const char *encoding = 0);
-	bool parseBuffer(const char *buffer, std::size_t len);
-	std::size_t getCurrentPosition() const;
+    ZLXMLReaderInternal(ZLXMLReader &reader, const char *encoding);
+
+    ~ZLXMLReaderInternal();
+
+    void init(const char *encoding = 0);
+
+    bool parseBuffer(const char *buffer, std::size_t len);
+
+    std::size_t getCurrentPosition() const;
 
 private:
-	void setupEntities();
+    void setupEntities();
 
 private:
-	ZLXMLReader &myReader;
-	XML_Parser myParser;
-	bool myInitialized;
+    ZLXMLReader &myReader;
+    XML_Parser myParser;
+    bool myInitialized;
 
-	std::set<shared_ptr<ZLInputStream> > myDTDStreamLocks;
+    std::set<shared_ptr<ZLInputStream> > myDTDStreamLocks;
 };
 
 #endif /* __ZLXMLREADERINTERNAL_H__ */

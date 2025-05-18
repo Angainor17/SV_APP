@@ -26,11 +26,12 @@
 class DocAnsiConverter {
 
 private:
-	std::vector<std::string> myCharMap;
+    std::vector<std::string> myCharMap;
 
 public:
-	DocAnsiConverter();
-	void convert(std::string &dst, const char *srcStart, const char *srcEnd);
+    DocAnsiConverter();
+
+    void convert(std::string &dst, const char *srcStart, const char *srcEnd);
 };
 
 #endif /* __DOCANSICONVERTER_H__ */

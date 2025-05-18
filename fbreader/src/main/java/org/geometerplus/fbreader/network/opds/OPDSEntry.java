@@ -26,27 +26,27 @@ import java.util.LinkedList;
 import java.util.List;
 
 class OPDSEntry extends ATOMEntry {
-	public final List<String> DCIdentifiers = new LinkedList<String>();
-	public String DCLanguage;
-	public String DCPublisher;
-	public DCDate DCIssued;
-	public String SeriesTitle;
-	public float SeriesIndex;
+    public final List<String> DCIdentifiers = new LinkedList<String>();
+    public String DCLanguage;
+    public String DCPublisher;
+    public DCDate DCIssued;
+    public String SeriesTitle;
+    public float SeriesIndex;
 
-	protected OPDSEntry(ZLStringMap attributes) {
-		super(attributes);
-	}
+    protected OPDSEntry(ZLStringMap attributes) {
+        super(attributes);
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder buf = new StringBuilder("[");
-		buf.append(super.toString());
-		buf.append(",DCLanguage=").append(DCLanguage);
-		buf.append(",DCPublisher=").append(DCPublisher);
-		buf.append(",DCIssued=").append(DCIssued);
-		buf.append(",SeriesTitle=").append(SeriesTitle);
-		buf.append(",SeriesIndex=").append(SeriesIndex);
-		buf.append("]");
-		return buf.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder("[");
+        buf.append(super.toString());
+        buf.append(",DCLanguage=").append(DCLanguage);
+        buf.append(",DCPublisher=").append(DCPublisher);
+        buf.append(",DCIssued=").append(DCIssued);
+        buf.append(",SeriesTitle=").append(SeriesTitle);
+        buf.append(",SeriesIndex=").append(SeriesIndex);
+        buf.append("]");
+        return buf.toString();
+    }
 }

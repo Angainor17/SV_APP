@@ -10,7 +10,8 @@ News
 ----
 
 **April 2, 2013**: Hey all. If you want to send a pull request,
-please read the [Contributing](https://github.com/bauerca/drag-sort-listview#contributing) section first. Thanks!
+please read the [Contributing](https://github.com/bauerca/drag-sort-listview#contributing) section
+first. Thanks!
 
 **Feb. 9, 2013**: Version 0.6.0. Consolidated remove modes to
 `click_remove` and `fling_remove`. No more fling remove while
@@ -24,12 +25,14 @@ Check out the new demos.
 
 **Nov. 23, 2012**: Hmmm, what's this? &rarr; [Gittip](https://www.gittip.com/bauerca) :)
 
-**Nov. 17, 2012**: [Drag-Sort Demos](https://play.google.com/store/apps/details?id=com.mobeta.android.demodslv)
+**Nov. 17, 2012
+**: [Drag-Sort Demos](https://play.google.com/store/apps/details?id=com.mobeta.android.demodslv)
 app in Google Play Store!
 
 **Nov. 15, 2012**: Smooth operation! Drops and removals are animated.
 Also, DragSortController now provides a convenience
-click-to-remove feature (see [XML attrs](https://github.com/bauerca/drag-sort-listview#xml-layout-declaration)
+click-to-remove feature (
+see [XML attrs](https://github.com/bauerca/drag-sort-listview#xml-layout-declaration)
 and [RemoveListener](https://github.com/bauerca/drag-sort-listview#dragsortlistviewremovelistener)
 sections).
 
@@ -62,7 +65,8 @@ Overview
 DragSortListView (DSLV) is an extension of the Android ListView that enables
 drag-and-drop reordering of list items. It is a ~~major overhaul~~ complete
 rewrite of
-the [TouchInterceptor](https://github.com/android/platform_packages_apps_music/blob/master/src/com/android/music/TouchInterceptor.java) (TI) 
+the [TouchInterceptor](https://github.com/android/platform_packages_apps_music/blob/master/src/com/android/music/TouchInterceptor.java) (
+TI)
 meant to give drag-sorting a polished feel. Some key features are:
 
 1. Clean drag and drop (no visual glitches; I hope!)
@@ -83,26 +87,25 @@ Three major elements define the drag-sort process. Roughly, in
 order of importance, they are:
 
 1. **Data reordering**. Drag-sorts reorder the data
-underlying your list. Since DSLV
-cannot know how you organize your data, the reordering must be
-performed by you using the provided Listener interfaces.
+   underlying your list. Since DSLV
+   cannot know how you organize your data, the reordering must be
+   performed by you using the provided Listener interfaces.
 2. **Drag start/stop**. Drags are started and stopped by
-calling `startDrag()` and
-`stopDrag()` on your DSLV instance; but some help that is.
-The convenience class, DragSortController, provides all kinds of
-boiler-plate for common start/stop/remove drag patterns.
+   calling `startDrag()` and
+   `stopDrag()` on your DSLV instance; but some help that is.
+   The convenience class, DragSortController, provides all kinds of
+   boiler-plate for common start/stop/remove drag patterns.
 3. **Floating View**. The floating View appearance and behavior is
-controlled by an
-implementation of the FloatViewManager interface. With this, you
-can display any View you like as the floating View, and update its
-appearance/location on every touch event. The DragSortController
-helper class also implements this interface for convenience.
+   controlled by an
+   implementation of the FloatViewManager interface. With this, you
+   can display any View you like as the floating View, and update its
+   appearance/location on every touch event. The DragSortController
+   helper class also implements this interface for convenience.
 
 Number 1 is essential. As mentioned above, 2 and 3 can
 be handled by the DragSortController helper class. Keep reading,
 then head to the
 demo and start studying some examples.
-
 
 ### XML layout declaration
 
@@ -117,18 +120,18 @@ ListView attributes) are given below. Read each bullet as
 #### XML attributes
 
 * `collapsed_height`: (dimension, 1px) Height of placeholder at original
-drag position. Cannot be zero.
+  drag position. Cannot be zero.
 * `drag_scroll_start`: (float, 0.3) Start of drag-scroll regions
-(defined by a
-fraction of the total DSLV height; i.e. between 0 and 1).
+  (defined by a
+  fraction of the total DSLV height; i.e. between 0 and 1).
 * `max_drag_scroll_speed`: (float, 0.5) Maximum drag-scroll speed for
-default linear drag-scroll profile. Units of pixels/millisecond.
+  default linear drag-scroll profile. Units of pixels/millisecond.
 * `float_alpha`: (float, 1.0) Transparency of floating View. Value from
-0 to 1 where 1 is opaque.
+  0 to 1 where 1 is opaque.
 * `slide_shuffle_speed`: (float, 0.7) Speed of shuffle animations
-underneath floating View. A value
-of 0 means a shuffle animation is always in progress, whereas a value
-of 1 means items snap from position to position without animation.
+  underneath floating View. A value
+  of 0 means a shuffle animation is always in progress, whereas a value
+  of 1 means items snap from position to position without animation.
 * `drop_animation_duration`: (int, 150) Drop animation smoothly centers
   the floating View over the drop slot before destroying it. Duration
   in milliseconds.
@@ -178,7 +181,8 @@ of 1 means items snap from position to position without animation.
 
 ### Listeners
 
-DragSortListView is a ListView, and thus requires a [ListAdapter](http://developer.android.com/reference/android/widget/ListAdapter.html)
+DragSortListView is a ListView, and thus requires
+a [ListAdapter](http://developer.android.com/reference/android/widget/ListAdapter.html)
 to populate
 its items. Drag-sorting additionally implies a reordering of the items
 in the ListAdapter, achieved through callbacks to special Listener
@@ -187,20 +191,22 @@ defined in DSLV. Listeners can be registered with DSLV in two ways:
 
 1. Pass them individually to the `set*Listener()` methods
 2. Implement the Listener interfaces you require in a custom
-ListAdapter; when `DragSortListView.setAdapter()` is called
-with your custom
-Adapter, DSLV detects which interfaces are implemented and calls
-the appropriate `set*Listener()` methods on itself with the
-provided ListAdapter as argument.
+   ListAdapter; when `DragSortListView.setAdapter()` is called
+   with your custom
+   Adapter, DSLV detects which interfaces are implemented and calls
+   the appropriate `set*Listener()` methods on itself with the
+   provided ListAdapter as argument.
 
 Each Listener interface is described below:
 
 #### DragSortListView.DropListener
 
 The DropListener interface has a single callback:
+
 ```java
 public void drop(int from, int to);
 ```
+
 This is called upon completion of the drag-sort; i.e. when the
 floating View is dropped.
 The parameter `from` is the ListView item that was originally dragged,
@@ -221,7 +227,8 @@ DropListener interface. See Issue #20 for a discussion of this.
 
 If your DSLV instance `android:choiceMode` is not `"none"`, and your
 ListAdapter does not have stable ids, you must call
-[DragSortListView.moveCheckState(int from, int to)](http://bauerca.github.com/drag-sort-listview/reference/com/mobeta/android/dslv/DragSortListView.html#moveCheckState(int, int\))
+[DragSortListView.moveCheckState(int from, int to)](http://bauerca.github.com/drag-sort-listview/reference/com/mobeta/android/dslv/DragSortListView.html#moveCheckState(int,
+int\))
 within `drop(from, to)`. See the documentation in the DSLV API for more
 info.
 
@@ -230,9 +237,11 @@ info.
 As the TI did, DSLV provides gestures for removing the floating
 View (and its associated list item) from the list. Upon completion of
 a remove gesture, DSLV calls the RemoveListener method:
+
 ```java
 public void remove(int which);
 ```
+
 The position `which` should be "removed" from your ListAdapter; i.e.
 the mapping from your data (e.g. in a Cursor) to your ListAdapter
 should henceforth neglect the item previously pointed to by `which`.
@@ -250,9 +259,11 @@ info.
 #### DragSortListView.DragListener
 
 The callback in the DragListener is
+
 ```java
 public void drag(int from, int to);
 ```
+
 This is called whenever the floating View hovers to a new potential
 drop position; `to` is the current potential drop position, and `from` is
 the previous one. The TI provided this callback; an example of usage
@@ -334,7 +345,8 @@ broken links at the moment. I am slowly getting to this.
 Installation
 ------------
 
-Download and install the [Android sdk](http://developer.android.com/sdk/index.html). Clone/Download/Fork the repo
+Download and install the [Android sdk](http://developer.android.com/sdk/index.html).
+Clone/Download/Fork the repo
 through GitHub or via (read-only)
 
     git clone https://github.com/bauerca/drag-sort-listview.git
@@ -416,7 +428,6 @@ only one (of course, you should help me add more). Here's the list:
   for your particular needs. That said, if a "must-have" touch
   pattern arises, I think there is some wiggle room in this rule.
 
-
 Debugging
 ---------
 
@@ -428,9 +439,9 @@ is found in the project tools/ directory.
 To enable, just set the `dslv:track_drag_sort` attribute to
 `"true"` in XML. While drag-sorting on your emulator or device,
 this tracking causes the DSLV to periodically dump its state to
-a file called dslv_state.txt in the device/emulator /sdcard/ directory. 
+a file called dslv_state.txt in the device/emulator /sdcard/ directory.
 
-Navigate to the location of dslv.py, and do 
+Navigate to the location of dslv.py, and do
 
     adb [-e|-d|-s device] pull /sdcard/dslv_state.txt
 

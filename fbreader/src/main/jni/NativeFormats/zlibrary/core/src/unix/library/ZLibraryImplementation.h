@@ -23,20 +23,21 @@
 class ZLibraryImplementation {
 
 public:
-	static ZLibraryImplementation *Instance;
+    static ZLibraryImplementation *Instance;
 
 protected:
-	ZLibraryImplementation();
-	virtual ~ZLibraryImplementation();
+    ZLibraryImplementation();
+
+    virtual ~ZLibraryImplementation();
 
 public:
-	virtual void init(int &argc, char **&argv) = 0;
+    virtual void init(int &argc, char **&argv) = 0;
 //	virtual ZLPaintContext *createContext() = 0;
 //	virtual void run(ZLApplication *application) = 0;
 };
 
 extern "C" {
-	void initLibrary();
+void initLibrary();
 }
 
 #endif /* __ZLIBRARYIMPLEMENTATION_H__ */

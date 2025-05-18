@@ -29,22 +29,22 @@ import org.geometerplus.fbreader.network.NetworkTree;
 import org.geometerplus.fbreader.network.tree.NetworkCatalogRootTree;
 
 public class EditCustomCatalogAction extends CatalogAction {
-	public EditCustomCatalogAction(Activity activity) {
-		super(activity, ActionCode.CUSTOM_CATALOG_EDIT, "editCustomCatalog");
-	}
+    public EditCustomCatalogAction(Activity activity) {
+        super(activity, ActionCode.CUSTOM_CATALOG_EDIT, "editCustomCatalog");
+    }
 
-	@Override
-	public boolean isVisible(NetworkTree tree) {
-		return
-			tree instanceof NetworkCatalogRootTree &&
-			tree.getLink() instanceof ICustomNetworkLink;
-	}
+    @Override
+    public boolean isVisible(NetworkTree tree) {
+        return
+                tree instanceof NetworkCatalogRootTree &&
+                        tree.getLink() instanceof ICustomNetworkLink;
+    }
 
-	@Override
-	public void run(NetworkTree tree) {
-		final Intent intent = new Intent(myActivity, AddCustomCatalogActivity.class);
-		Util.intentByLink(intent, tree.getLink());
-		intent.setAction(Util.EDIT_CATALOG_ACTION);
-		myActivity.startActivity(intent);
-	}
+    @Override
+    public void run(NetworkTree tree) {
+        final Intent intent = new Intent(myActivity, AddCustomCatalogActivity.class);
+        Util.intentByLink(intent, tree.getLink());
+        intent.setAction(Util.EDIT_CATALOG_ACTION);
+        myActivity.startActivity(intent);
+    }
 }

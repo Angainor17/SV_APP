@@ -1,18 +1,17 @@
 /**
- *  Copyright 2014 John Persano
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
- *
+ * Copyright 2014 John Persano
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.github.johnpersano.supertoasts;
@@ -369,7 +368,7 @@ public class SuperCardToast {
 
         SuperCardToast superCardToast;
 
-        if(referenceHolder.mType == Type.BUTTON) {
+        if (referenceHolder.mType == Type.BUTTON) {
 
             superCardToast = new SuperCardToast(activity, Type.BUTTON);
             superCardToast.setButtonText(referenceHolder.mButtonText);
@@ -379,7 +378,7 @@ public class SuperCardToast {
             superCardToast.setDividerColor(referenceHolder.mButtonDivider);
             superCardToast.setButtonTypefaceStyle(referenceHolder.mButtonTypefaceStyle);
 
-            if(wrappers != null) {
+            if (wrappers != null) {
 
                 for (OnClickWrapper onClickWrapper : wrappers.getOnClickWrappers()) {
 
@@ -907,41 +906,41 @@ public class SuperCardToast {
      */
     private int checkForKitKatBackgrounds(int background) {
 
-        if(background == R.drawable.background_kitkat_black) {
+        if (background == R.drawable.background_kitkat_black) {
 
             return (R.drawable.background_standard_black);
 
-        } else if(background == R.drawable.background_kitkat_blue) {
+        } else if (background == R.drawable.background_kitkat_blue) {
 
             return (R.drawable.background_standard_blue);
 
-        } else if(background == R.drawable.background_kitkat_gray) {
+        } else if (background == R.drawable.background_kitkat_gray) {
 
             return (R.drawable.background_standard_gray);
 
-        } else if(background == R.drawable.background_kitkat_green) {
+        } else if (background == R.drawable.background_kitkat_green) {
 
             return (R.drawable.background_standard_green);
 
-        } else if(background == R.drawable.background_kitkat_orange) {
+        } else if (background == R.drawable.background_kitkat_orange) {
 
             return (R.drawable.background_standard_orange);
 
-        } else if(background == R.drawable.background_kitkat_purple) {
+        } else if (background == R.drawable.background_kitkat_purple) {
 
             return (R.drawable.background_standard_purple);
 
-        } else if(background == R.drawable.background_kitkat_red) {
+        } else if (background == R.drawable.background_kitkat_red) {
 
             return (R.drawable.background_standard_red);
 
-        } else if(background == R.drawable.background_kitkat_white) {
+        } else if (background == R.drawable.background_kitkat_white) {
 
             return (R.drawable.background_standard_white);
 
         } else {
 
-           return background;
+            return background;
 
         }
 
@@ -1322,7 +1321,7 @@ public class SuperCardToast {
     /**
      * Used in orientation change recreation.
      */
-    private Parcelable getToken(){
+    private Parcelable getToken() {
 
         return mToken;
 
@@ -1446,7 +1445,7 @@ public class SuperCardToast {
      */
     public CharSequence getButtonText() {
 
-        if(mButton != null) {
+        if (mButton != null) {
 
             return mButton.getText();
 
@@ -1526,7 +1525,7 @@ public class SuperCardToast {
      */
     public int getButtonTextColor() {
 
-        if(mButton != null) {
+        if (mButton != null) {
 
             return mButton.getCurrentTextColor();
 
@@ -1579,7 +1578,7 @@ public class SuperCardToast {
      */
     public float getButtonTextSize() {
 
-        if(mButton != null){
+        if (mButton != null) {
 
             return mButton.getTextSize();
 
@@ -1623,7 +1622,7 @@ public class SuperCardToast {
      */
     public int getProgress() {
 
-        if(mProgressBar != null) {
+        if (mProgressBar != null) {
 
             return mProgressBar.getProgress();
 
@@ -1667,7 +1666,7 @@ public class SuperCardToast {
      */
     public int getMaxProgress() {
 
-        if(mProgressBar != null){
+        if (mProgressBar != null) {
 
             return mProgressBar.getMax();
 
@@ -1702,7 +1701,8 @@ public class SuperCardToast {
         }
 
     }
-/**
+
+    /**
      * Returns an indeterminate value to the progressbar of a PROGRESS
      * {@link com.github.johnpersano.supertoasts.SuperToast.Type} {@value #TAG}.
      *
@@ -1713,6 +1713,7 @@ public class SuperCardToast {
         return this.isProgressIndeterminate;
 
     }
+
     /**
      * Sets an indeterminate value to the progressbar of a PROGRESS
      * {@link com.github.johnpersano.supertoasts.SuperToast.Type} {@value #TAG}.
@@ -1735,6 +1736,27 @@ public class SuperCardToast {
 
         }
 
+    }
+
+    /**
+     * Returns the {@value #TAG} message textview.
+     *
+     * @return {@link android.widget.TextView}
+     */
+    public TextView getTextView() {
+
+        return mMessageTextView;
+
+    }
+    /**
+     * Returns the {@value #TAG} view.
+     *
+     * @return {@link android.view.View}
+     */
+    public View getView() {
+
+        return mToastView;
+
     }/**
      * Runnable to dismiss the {@value #TAG} with animation.
      */
@@ -1749,28 +1771,7 @@ public class SuperCardToast {
 
     };
 
-/**
-     * Returns the {@value #TAG} message textview.
-     *
-     * @return {@link android.widget.TextView}
-     */
-    public TextView getTextView() {
-
-        return mMessageTextView;
-
-    }
-
-        /**
-     * Returns the {@value #TAG} view.
-     *
-     * @return {@link android.view.View}
-     */
-    public View getView() {
-
-        return mToastView;
-
-    }
-/**
+    /**
      * Returns true if the {@value #TAG} is showing.
      *
      * @return boolean
@@ -1779,19 +1780,18 @@ public class SuperCardToast {
 
         return mToastView != null && mToastView.isShown();
 
-    }/**
-     * Runnable to dismiss the {@value #TAG} without animation.
+    }
+
+/**
+     * Returns the viewgroup that the {@value #TAG} is attached to.
+     *
+     * @return {@link android.view.ViewGroup}
      */
-    private final Runnable mHideImmediateRunnable = new Runnable() {
+    public ViewGroup getViewGroup() {
 
-        @Override
-        public void run() {
+        return mViewGroup;
 
-            dismissImmediately();
-
-        }
-
-    };
+    }
 
     /**
      * Returns the calling activity of the {@value #TAG}.
@@ -1804,17 +1804,7 @@ public class SuperCardToast {
 
     }
 
-    /**
-     * Returns the viewgroup that the {@value #TAG} is attached to.
-     *
-     * @return {@link android.view.ViewGroup}
-     */
-    public ViewGroup getViewGroup() {
-
-        return mViewGroup;
-
-    }
-    /**
+        /**
      * Private method used to set a default style to the {@value #TAG}
      */
     private void setStyle(Style style) {
@@ -1824,151 +1814,15 @@ public class SuperCardToast {
         this.setTextColor(style.textColor);
         this.setBackground(style.background);
 
-        if(this.mType == Type.BUTTON) {
+        if (this.mType == Type.BUTTON) {
 
             this.setDividerColor(style.dividerColor);
             this.setButtonTextColor(style.buttonTextColor);
 
         }
 
-    }/**
-     * Runnable to dismiss the {@value #TAG} with layout animation.
-     */
-    private final Runnable mHideWithAnimationRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-
-            dismissWithLayoutAnimation();
-
-        }
-
-    };
-
-    private Animation getShowAnimation() {
-
-        if (this.getAnimations() == Animations.FLYIN) {
-
-            TranslateAnimation translateAnimation = new TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0.75f, Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(translateAnimation);
-            animationSet.addAnimation(alphaAnimation);
-            animationSet.setInterpolator(new DecelerateInterpolator());
-            animationSet.setDuration(250);
-
-            return animationSet;
-
-        } else if (this.getAnimations() == Animations.SCALE) {
-
-            ScaleAnimation scaleAnimation = new ScaleAnimation(0.9f, 1.0f, 0.9f, 1.0f,
-                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(scaleAnimation);
-            animationSet.addAnimation(alphaAnimation);
-            animationSet.setInterpolator(new DecelerateInterpolator());
-            animationSet.setDuration(250);
-
-            return animationSet;
-
-        } else if (this.getAnimations() == Animations.POPUP) {
-
-            TranslateAnimation translateAnimation = new TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 0.1f, Animation.RELATIVE_TO_SELF, 0.0f);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
-
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(translateAnimation);
-            animationSet.addAnimation(alphaAnimation);
-            animationSet.setInterpolator(new DecelerateInterpolator());
-            animationSet.setDuration(250);
-
-            return animationSet;
-
-        } else {
-
-            Animation animation = new AlphaAnimation(0f, 1f);
-            animation.setDuration(500);
-            animation.setInterpolator(new DecelerateInterpolator());
-
-            return animation;
-
-        }
-
-
     }
-
-    private Animation getDismissAnimation() {
-
-        if (this.getAnimations() == Animations.FLYIN) {
-
-            TranslateAnimation translateAnimation = new TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, .75f,
-                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
-
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(translateAnimation);
-            animationSet.addAnimation(alphaAnimation);
-            animationSet.setInterpolator(new AccelerateInterpolator());
-            animationSet.setDuration(250);
-
-            return animationSet;
-
-        } else if (this.getAnimations() == Animations.SCALE) {
-
-            ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 0.9f, 1.0f, 0.9f,
-                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
-
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(scaleAnimation);
-            animationSet.addAnimation(alphaAnimation);
-            animationSet.setInterpolator(new DecelerateInterpolator());
-            animationSet.setDuration(250);
-
-            return animationSet;
-
-        } else if (this.getAnimations() == Animations.POPUP) {
-
-            TranslateAnimation translateAnimation = new TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.1f);
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
-
-            AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(translateAnimation);
-            animationSet.addAnimation(alphaAnimation);
-            animationSet.setInterpolator(new DecelerateInterpolator());
-            animationSet.setDuration(250);
-
-            return animationSet;
-
-        } else {
-
-            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
-            alphaAnimation.setDuration(500);
-            alphaAnimation.setInterpolator(new AccelerateInterpolator());
-
-            return alphaAnimation;
-
-        }
-
-    }
-
-    /**
+/**
      * Parcelable class that saves all data on orientation change
      */
     private static class ReferenceHolder implements Parcelable {
@@ -2142,16 +1996,158 @@ public class SuperCardToast {
 
         }
 
+    }/**
+     * Runnable to dismiss the {@value #TAG} without animation.
+     */
+    private final Runnable mHideImmediateRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+
+            dismissImmediately();
+
+        }
+
+    };
+
+
+
+    private Animation getShowAnimation() {
+
+        if (this.getAnimations() == Animations.FLYIN) {
+
+            TranslateAnimation translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.75f, Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+
+            AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
+
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(translateAnimation);
+            animationSet.addAnimation(alphaAnimation);
+            animationSet.setInterpolator(new DecelerateInterpolator());
+            animationSet.setDuration(250);
+
+            return animationSet;
+
+        } else if (this.getAnimations() == Animations.SCALE) {
+
+            ScaleAnimation scaleAnimation = new ScaleAnimation(0.9f, 1.0f, 0.9f, 1.0f,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+
+            AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
+
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(scaleAnimation);
+            animationSet.addAnimation(alphaAnimation);
+            animationSet.setInterpolator(new DecelerateInterpolator());
+            animationSet.setDuration(250);
+
+            return animationSet;
+
+        } else if (this.getAnimations() == Animations.POPUP) {
+
+            TranslateAnimation translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.1f, Animation.RELATIVE_TO_SELF, 0.0f);
+
+            AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
+
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(translateAnimation);
+            animationSet.addAnimation(alphaAnimation);
+            animationSet.setInterpolator(new DecelerateInterpolator());
+            animationSet.setDuration(250);
+
+            return animationSet;
+
+        } else {
+
+            Animation animation = new AlphaAnimation(0f, 1f);
+            animation.setDuration(500);
+            animation.setInterpolator(new DecelerateInterpolator());
+
+            return animation;
+
+        }
+
+
     }
 
+    private Animation getDismissAnimation() {
 
+        if (this.getAnimations() == Animations.FLYIN) {
 
+            TranslateAnimation translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, .75f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
 
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
 
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(translateAnimation);
+            animationSet.addAnimation(alphaAnimation);
+            animationSet.setInterpolator(new AccelerateInterpolator());
+            animationSet.setDuration(250);
 
+            return animationSet;
 
+        } else if (this.getAnimations() == Animations.SCALE) {
 
+            ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 0.9f, 1.0f, 0.9f,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
+
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(scaleAnimation);
+            animationSet.addAnimation(alphaAnimation);
+            animationSet.setInterpolator(new DecelerateInterpolator());
+            animationSet.setDuration(250);
+
+            return animationSet;
+
+        } else if (this.getAnimations() == Animations.POPUP) {
+
+            TranslateAnimation translateAnimation = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.1f);
+
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
+
+            AnimationSet animationSet = new AnimationSet(true);
+            animationSet.addAnimation(translateAnimation);
+            animationSet.addAnimation(alphaAnimation);
+            animationSet.setInterpolator(new DecelerateInterpolator());
+            animationSet.setDuration(250);
+
+            return animationSet;
+
+        } else {
+
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
+            alphaAnimation.setDuration(500);
+            alphaAnimation.setInterpolator(new AccelerateInterpolator());
+
+            return alphaAnimation;
+
+        }
+
+    }
+
+        /**
+     * Runnable to dismiss the {@value #TAG} with layout animation.
+     */
+    private final Runnable mHideWithAnimationRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+
+            dismissWithLayoutAnimation();
+
+        }
+
+    };
 
 
 
@@ -2206,8 +2202,6 @@ public class SuperCardToast {
 
         }
     };
-
-
 
 
 }

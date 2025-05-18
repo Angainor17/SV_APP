@@ -22,6 +22,7 @@ package org.geometerplus.fbreader.network;
 import org.geometerplus.zlibrary.core.network.ZLNetworkContext;
 
 public interface ISyncNetworkLink extends INetworkLink {
-	boolean isLoggedIn(ZLNetworkContext context);
-	void logout(ZLNetworkContext context);
+    boolean isLoggedIn(ZLNetworkContext context);
+
+    void logout(ZLNetworkContext context);
 }

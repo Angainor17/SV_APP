@@ -29,60 +29,61 @@ RtfDescriptionReader::RtfDescriptionReader(Book &book) : RtfReader(book.encoding
 }
 
 void RtfDescriptionReader::setEncoding(int code) {
-	ZLEncodingCollection &collection = ZLEncodingCollection::Instance();
-	myConverter = collection.converter(code);
-	if (!myConverter.isNull()) {
-		myBook.setEncoding(myConverter->name());
-	} else {
-		myConverter = collection.defaultConverter();
-	}
+    ZLEncodingCollection &collection = ZLEncodingCollection::Instance();
+    myConverter = collection.converter(code);
+    if (!myConverter.isNull()) {
+        myBook.setEncoding(myConverter->name());
+    } else {
+        myConverter = collection.defaultConverter();
+    }
 }
 
 bool RtfDescriptionReader::readDocument(const ZLFile &file) {
-	myDoRead = false;
-	return RtfReader::readDocument(file);
+    myDoRead = false;
+    return RtfReader::readDocument(file);
 }
 
 void RtfDescriptionReader::addCharData(const char *data, std::size_t len, bool convert) {
-	if (myDoRead && len > 0) {
-		if (convert) {
-			myConverter->convert(myBuffer, data, data + len);
-		} else {
-			myBuffer.append(data, len);
-		}
-	}
+    if (myDoRead && len > 0) {
+        if (convert) {
+            myConverter->convert(myBuffer, data, data + len);
+        } else {
+            myBuffer.append(data, len);
+        }
+    }
 }
 
 void RtfDescriptionReader::switchDestination(DestinationType destination, bool on) {
-	switch (destination) {
-		case DESTINATION_INFO:
-			if (!on) {
-				interrupt();
-			}
-			break;
-		case DESTINATION_TITLE:
-			myDoRead = on;
-			if (!on) {
-				myBook.setTitle(myBuffer);
-				myBuffer.erase();
-			}
-			break;
-		case DESTINATION_AUTHOR:
-			myDoRead = on;
-			if (!on) {
-				myBook.addAuthor(myBuffer);
-				myBuffer.erase();
-			}
-			break;
-		default:
-			break;
-	}
-	if (!myBook.title().empty() && !myBook.authors().empty() && !myBook.encoding().empty()) {
-		interrupt();
-	}
+    switch (destination) {
+        case DESTINATION_INFO:
+            if (!on) {
+                interrupt();
+            }
+            break;
+        case DESTINATION_TITLE:
+            myDoRead = on;
+            if (!on) {
+                myBook.setTitle(myBuffer);
+                myBuffer.erase();
+            }
+            break;
+        case DESTINATION_AUTHOR:
+            myDoRead = on;
+            if (!on) {
+                myBook.addAuthor(myBuffer);
+                myBuffer.erase();
+            }
+            break;
+        default:
+            break;
+    }
+    if (!myBook.title().empty() && !myBook.authors().empty() && !myBook.encoding().empty()) {
+        interrupt();
+    }
 }
 
-void RtfDescriptionReader::insertImage(const std::string&, const std::string&, std::size_t, std::size_t) {
+void RtfDescriptionReader::insertImage(const std::string &, const std::string &, std::size_t,
+                                       std::size_t) {
 }
 
 void RtfDescriptionReader::setFontProperty(FontProperty) {

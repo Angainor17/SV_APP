@@ -43,56 +43,55 @@
 int
 filemap(const char *name,
         void (*processor)(const void *, size_t, const char *, void *arg),
-        void *arg)
-{
-  size_t nbytes;
-  int fd;
-  int n;
-  struct stat sb;
-  void *p;
+        void *arg) {
+    size_t nbytes;
+    int fd;
+    int n;
+    struct stat sb;
+    void *p;
 
-  fd = open(name, O_RDONLY|O_BINARY);
-  if (fd < 0) {
-    perror(name);
-    return 0;
-  }
-  if (fstat(fd, &sb) < 0) {
-    perror(name);
-    return 0;
-  }
-  if (!S_ISREG(sb.st_mode)) {
-    fprintf(stderr, "%s: not a regular file\n", name);
-    return 0;
-  }
-  nbytes = sb.st_size;
-  /* malloc will return NULL with nbytes == 0, handle files with size 0 */
-  if (nbytes == 0) {
-    static const char c = '\0';
-    processor(&c, 0, name, arg);
+    fd = open(name, O_RDONLY | O_BINARY);
+    if (fd < 0) {
+        perror(name);
+        return 0;
+    }
+    if (fstat(fd, &sb) < 0) {
+        perror(name);
+        return 0;
+    }
+    if (!S_ISREG(sb.st_mode)) {
+        fprintf(stderr, "%s: not a regular file\n", name);
+        return 0;
+    }
+    nbytes = sb.st_size;
+    /* malloc will return NULL with nbytes == 0, handle files with size 0 */
+    if (nbytes == 0) {
+        static const char c = '\0';
+        processor(&c, 0, name, arg);
+        close(fd);
+        return 1;
+    }
+    p = malloc(nbytes);
+    if (!p) {
+        fprintf(stderr, "%s: out of memory\n", name);
+        close(fd);
+        return 0;
+    }
+    n = read(fd, p, nbytes);
+    if (n < 0) {
+        perror(name);
+        free(p);
+        close(fd);
+        return 0;
+    }
+    if (n != nbytes) {
+        fprintf(stderr, "%s: read unexpected number of bytes\n", name);
+        free(p);
+        close(fd);
+        return 0;
+    }
+    processor(p, nbytes, name, arg);
+    free(p);
     close(fd);
     return 1;
-  }
-  p = malloc(nbytes);
-  if (!p) {
-    fprintf(stderr, "%s: out of memory\n", name);
-    close(fd);
-    return 0;
-  }
-  n = read(fd, p, nbytes);
-  if (n < 0) {
-    perror(name);
-    free(p);
-    close(fd);
-    return 0;
-  }
-  if (n != nbytes) {
-    fprintf(stderr, "%s: read unexpected number of bytes\n", name);
-    free(p);
-    close(fd);
-    return 0;
-  }
-  processor(p, nbytes, name, arg);
-  free(p);
-  close(fd);
-  return 1;
 }

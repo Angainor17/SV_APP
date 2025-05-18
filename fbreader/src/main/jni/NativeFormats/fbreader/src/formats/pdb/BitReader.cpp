@@ -22,36 +22,36 @@
 
 #include "BitReader.h"
 
-BitReader::BitReader(const unsigned char* data, size_t size) : myOffset(0), myLength(size * 8) {
-	myData = new unsigned char[size + 4];
-	memcpy(myData, data, size);
-	memset(myData + size, 0x00, 4);
+BitReader::BitReader(const unsigned char *data, size_t size) : myOffset(0), myLength(size * 8) {
+    myData = new unsigned char[size + 4];
+    memcpy(myData, data, size);
+    memset(myData + size, 0x00, 4);
 }
 
 BitReader::~BitReader() {
-	delete[] myData;
+    delete[] myData;
 }
 
 unsigned long long BitReader::peek(size_t n) {
-	if (n > 32) {
-		return 0;
-	}
-	unsigned long long r = 0;
-	size_t g = 0;
-	while (g < n) {
-		r = (r << 8) | myData[(myOffset + g) >> 3]; 
-		g = g + 8 - ((myOffset + g) & 7);
-	}
-	unsigned long long mask = 1;
-	mask = (mask << n) - 1;
-	return (r >> (g - n)) & mask;
+    if (n > 32) {
+        return 0;
+    }
+    unsigned long long r = 0;
+    size_t g = 0;
+    while (g < n) {
+        r = (r << 8) | myData[(myOffset + g) >> 3];
+        g = g + 8 - ((myOffset + g) & 7);
+    }
+    unsigned long long mask = 1;
+    mask = (mask << n) - 1;
+    return (r >> (g - n)) & mask;
 }
 
 bool BitReader::eat(size_t n) {
-	myOffset += n;
-	return myOffset <= myLength;
+    myOffset += n;
+    return myOffset <= myLength;
 }
 
 size_t BitReader::left() const {
-	return myLength - myOffset;
+    return myLength - myOffset;
 }

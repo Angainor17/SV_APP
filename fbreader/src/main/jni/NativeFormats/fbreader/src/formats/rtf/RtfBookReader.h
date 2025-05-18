@@ -28,43 +28,53 @@
 class ZLFile;
 
 class BookModel;
+
 class RtfImage;
 
 class RtfBookReader : public RtfReader {
 
 public:
-	RtfBookReader(BookModel &model, const std::string &encoding);
-	~RtfBookReader();
+    RtfBookReader(BookModel &model, const std::string &encoding);
 
-	bool readDocument(const ZLFile &file);
+    ~RtfBookReader();
 
-	bool characterDataHandler(std::string &str);
-	void flushBuffer();
+    bool readDocument(const ZLFile &file);
 
-	void setEncoding(int code);
-	void setAlignment();
-	void switchDestination(DestinationType destination, bool on);
-	void addCharData(const char *data, std::size_t len, bool convert);
-	void insertImage(const std::string &mimeType, const std::string &fileName, std::size_t startOffset, std::size_t size);
+    bool characterDataHandler(std::string &str);
 
-	void setFontProperty(FontProperty property);
-	void newParagraph();
+    void flushBuffer();
+
+    void setEncoding(int code);
+
+    void setAlignment();
+
+    void switchDestination(DestinationType destination, bool on);
+
+    void addCharData(const char *data, std::size_t len, bool convert);
+
+    void
+    insertImage(const std::string &mimeType, const std::string &fileName, std::size_t startOffset,
+                std::size_t size);
+
+    void setFontProperty(FontProperty property);
+
+    void newParagraph();
 
 private:
-	BookReader myBookReader;
+    BookReader myBookReader;
 
-	std::string myOutputBuffer;
+    std::string myOutputBuffer;
 
-	int myImageIndex;
-	int myFootnoteIndex;
+    int myImageIndex;
+    int myFootnoteIndex;
 
-	struct RtfBookReaderState {
-		std::string Id;
-		bool ReadText;
-	};
+    struct RtfBookReaderState {
+        std::string Id;
+        bool ReadText;
+    };
 
-	RtfBookReaderState myCurrentState;
-	std::stack<RtfBookReaderState> myStateStack;
+    RtfBookReaderState myCurrentState;
+    std::stack<RtfBookReaderState> myStateStack;
 };
 
 inline RtfBookReader::~RtfBookReader() {}

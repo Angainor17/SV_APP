@@ -24,75 +24,77 @@ import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.zlibrary.core.xml.ZLStringMap;
 
 public class FormattedBuffer {
-		private final NetworkLibrary myLibrary;;
-	private Type myType;
-	private StringBuilder myBuffer = new StringBuilder();
-	public FormattedBuffer(NetworkLibrary library, Type type) {
-		myLibrary = library;
-		myType = type;
-	}
+    private final NetworkLibrary myLibrary;
+    ;
+    private Type myType;
+    private StringBuilder myBuffer = new StringBuilder();
 
-	public FormattedBuffer(NetworkLibrary library) {
-		this(library, Type.Text);
-	}
+    public FormattedBuffer(NetworkLibrary library, Type type) {
+        myLibrary = library;
+        myType = type;
+    }
 
-	public void appendText(CharSequence text) {
-		if (text != null) {
-			myBuffer.append(text);
-		}
-	}
+    public FormattedBuffer(NetworkLibrary library) {
+        this(library, Type.Text);
+    }
 
-	public void appendText(char[] data, int start, int length) {
-		myBuffer.append(data, start, length);
-	}
+    public void appendText(CharSequence text) {
+        if (text != null) {
+            myBuffer.append(text);
+        }
+    }
 
-	public void appendStartTag(String tag, ZLStringMap attributes) {
-		myBuffer.append("<").append(tag);
-		for (int i = 0; i < attributes.getSize(); ++i) {
-			final String key = attributes.getKey(i);
-			final String value = attributes.getValue(key);
-			myBuffer.append(" ").append(key).append("=\"");
-			if (value != null) {
-				myBuffer.append(value);
-			}
-			myBuffer.append("\"");
-		}
-		myBuffer.append(">");
-	}
+    public void appendText(char[] data, int start, int length) {
+        myBuffer.append(data, start, length);
+    }
 
-	public void appendEndTag(String tag) {
-		myBuffer.append("</").append(tag).append(">");
-	}
+    public void appendStartTag(String tag, ZLStringMap attributes) {
+        myBuffer.append("<").append(tag);
+        for (int i = 0; i < attributes.getSize(); ++i) {
+            final String key = attributes.getKey(i);
+            final String value = attributes.getValue(key);
+            myBuffer.append(" ").append(key).append("=\"");
+            if (value != null) {
+                myBuffer.append(value);
+            }
+            myBuffer.append("\"");
+        }
+        myBuffer.append(">");
+    }
 
-	public void reset(Type type) {
-		myType = type;
-		reset();
-	}
+    public void appendEndTag(String tag) {
+        myBuffer.append("</").append(tag).append(">");
+    }
 
-	public void reset() {
-		myBuffer.delete(0, myBuffer.length());
-	}
+    public void reset(Type type) {
+        myType = type;
+        reset();
+    }
 
-	public CharSequence getText() {
-		final String text = myBuffer.toString();
+    public void reset() {
+        myBuffer.delete(0, myBuffer.length());
+    }
 
-		switch (myType) {
-			case Html:
-			case XHtml:
-				return HtmlUtil.getHtmlText(myLibrary, text);
-			default:
-				return text;
-		}
-	}
+    public CharSequence getText() {
+        final String text = myBuffer.toString();
 
-	@Override
-	public String toString() {
-		return myBuffer.toString();
-	}
+        switch (myType) {
+            case Html:
+            case XHtml:
+                return HtmlUtil.getHtmlText(myLibrary, text);
+            default:
+                return text;
+        }
+    }
 
-public static enum Type {
-		Text,
-		Html,
-		XHtml
-	}
+    @Override
+    public String toString() {
+        return myBuffer.toString();
+    }
+
+    public static enum Type {
+        Text,
+        Html,
+        XHtml
+    }
 }

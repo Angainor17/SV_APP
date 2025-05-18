@@ -27,95 +27,119 @@
 #include <FileEncryptionInfo.h>
 
 class ZLDir;
+
 class ZLInputStream;
+
 class ZLOutputStream;
 
 class ZLFile {
 
 public:
-	static const ZLFile NO_FILE;
+    static const ZLFile NO_FILE;
 
 public:
-	static std::string fileNameToUtf8(const std::string &fileName);
-	static std::string replaceIllegalCharacters(const std::string &fileName, char replaceWith);
+    static std::string fileNameToUtf8(const std::string &fileName);
+
+    static std::string replaceIllegalCharacters(const std::string &fileName, char replaceWith);
 
 public:
-	enum ArchiveType {
-		NONE = 0,
-		GZIP = 0x0001,
-		//BZIP2 = 0x0002,
-		COMPRESSED = 0x00ff,
-		ZIP = 0x0100,
-		//TAR = 0x0200,
-		ARCHIVE = 0xff00,
-	};
+    enum ArchiveType {
+        NONE = 0,
+        GZIP = 0x0001,
+        //BZIP2 = 0x0002,
+        COMPRESSED = 0x00ff,
+        ZIP = 0x0100,
+        //TAR = 0x0200,
+        ARCHIVE = 0xff00,
+    };
 
 private:
-	ZLFile();
+    ZLFile();
 
 public:
-	explicit ZLFile(const std::string &path, const std::string &mimeType = std::string());
-	~ZLFile();
+    explicit ZLFile(const std::string &path, const std::string &mimeType = std::string());
 
-	bool exists() const;
-	std::size_t size() const;
-	std::size_t lastModified() const;
+    ~ZLFile();
 
-	void forceArchiveType(ArchiveType type) const;
+    bool exists() const;
 
-	bool isCompressed() const;
-	bool isDirectory() const;
-	bool isArchive() const;
+    std::size_t size() const;
 
-	ZLFile getContainerArchive() const;
+    std::size_t lastModified() const;
 
-	bool remove() const;
-	bool canRemove() const;
+    void forceArchiveType(ArchiveType type) const;
 
-	const std::string &path() const;
-	const std::string &name(bool hideExtension) const;
-	const std::string &extension() const;
+    bool isCompressed() const;
 
-	const std::string &mimeType() const;
+    bool isDirectory() const;
 
-	std::string physicalFilePath() const;
-	std::string resolvedPath() const;
+    bool isArchive() const;
 
-	shared_ptr<ZLInputStream> inputStream(shared_ptr<EncryptionMap> encryptionMap = 0) const;
-	shared_ptr<ZLOutputStream> outputStream(bool writeThrough = false) const;
-	shared_ptr<ZLDir> directory(bool createUnexisting = false) const;
+    ZLFile getContainerArchive() const;
 
-	bool operator == (const ZLFile &other) const;
-	bool operator != (const ZLFile &other) const;
-	bool operator < (const ZLFile &other) const;
+    bool remove() const;
+
+    bool canRemove() const;
+
+    const std::string &path() const;
+
+    const std::string &name(bool hideExtension) const;
+
+    const std::string &extension() const;
+
+    const std::string &mimeType() const;
+
+    std::string physicalFilePath() const;
+
+    std::string resolvedPath() const;
+
+    shared_ptr<ZLInputStream> inputStream(shared_ptr<EncryptionMap> encryptionMap = 0) const;
+
+    shared_ptr<ZLOutputStream> outputStream(bool writeThrough = false) const;
+
+    shared_ptr<ZLDir> directory(bool createUnexisting = false) const;
+
+    bool operator==(const ZLFile &other) const;
+
+    bool operator!=(const ZLFile &other) const;
+
+    bool operator<(const ZLFile &other) const;
 
 private:
-	void fillInfo() const;
-	shared_ptr<ZLInputStream> envelopeCompressedStream(shared_ptr<ZLInputStream> &base) const;
+    void fillInfo() const;
+
+    shared_ptr<ZLInputStream> envelopeCompressedStream(shared_ptr<ZLInputStream> &base) const;
 
 private:
-	std::string myPath;
-	std::string myNameWithExtension;
-	std::string myNameWithoutExtension;
-	std::string myExtension;
-	mutable std::string myMimeType;
-	mutable bool myMimeTypeIsUpToDate;
-	mutable ArchiveType myArchiveType;
-	mutable ZLFileInfo myInfo;
-	mutable bool myInfoIsFilled;
+    std::string myPath;
+    std::string myNameWithExtension;
+    std::string myNameWithoutExtension;
+    std::string myExtension;
+    mutable std::string myMimeType;
+    mutable bool myMimeTypeIsUpToDate;
+    mutable ArchiveType myArchiveType;
+    mutable ZLFileInfo myInfo;
+    mutable bool myInfoIsFilled;
 };
 
 inline ZLFile::~ZLFile() {}
 
 inline bool ZLFile::isCompressed() const { return (myArchiveType & COMPRESSED) != 0; }
+
 inline bool ZLFile::isArchive() const { return (myArchiveType & ARCHIVE) != 0; }
 
 inline const std::string &ZLFile::path() const { return myPath; }
-inline const std::string &ZLFile::name(bool hideExtension) const { return hideExtension ? myNameWithoutExtension : myNameWithExtension; }
+
+inline const std::string &ZLFile::name(bool hideExtension) const {
+    return hideExtension ? myNameWithoutExtension : myNameWithExtension;
+}
+
 inline const std::string &ZLFile::extension() const { return myExtension; }
 
-inline bool ZLFile::operator == (const ZLFile &other) const { return myPath == other.myPath; }
-inline bool ZLFile::operator != (const ZLFile &other) const { return myPath != other.myPath; }
-inline bool ZLFile::operator < (const ZLFile &other) const { return myPath < other.myPath; }
+inline bool ZLFile::operator==(const ZLFile &other) const { return myPath == other.myPath; }
+
+inline bool ZLFile::operator!=(const ZLFile &other) const { return myPath != other.myPath; }
+
+inline bool ZLFile::operator<(const ZLFile &other) const { return myPath < other.myPath; }
 
 #endif /* __ZLFILE_H__ */

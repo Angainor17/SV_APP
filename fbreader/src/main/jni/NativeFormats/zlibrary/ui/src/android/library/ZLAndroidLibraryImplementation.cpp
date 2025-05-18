@@ -29,31 +29,31 @@
 class ZLAndroidLibraryImplementation : public ZLibraryImplementation {
 
 private:
-	void init(int &argc, char **&argv);
+    void init(int &argc, char **&argv);
 };
 
 void initLibrary() {
-	new ZLAndroidLibraryImplementation();
+    new ZLAndroidLibraryImplementation();
 }
 
 void ZLAndroidLibraryImplementation::init(int &argc, char **&argv) {
-	ZLibrary::parseArguments(argc, argv);
+    ZLibrary::parseArguments(argc, argv);
 
-	ZLAndroidFSManager::createInstance();
+    ZLAndroidFSManager::createInstance();
 }
 
 std::string ZLibrary::Language() {
-	JNIEnv *env = AndroidUtil::getEnv();
-	jobject locale = AndroidUtil::StaticMethod_java_util_Locale_getDefault->call();
-	std::string lang = AndroidUtil::Method_java_util_Locale_getLanguage->callForCppString(locale);
-	env->DeleteLocalRef(locale);
-	return lang;
+    JNIEnv *env = AndroidUtil::getEnv();
+    jobject locale = AndroidUtil::StaticMethod_java_util_Locale_getDefault->call();
+    std::string lang = AndroidUtil::Method_java_util_Locale_getLanguage->callForCppString(locale);
+    env->DeleteLocalRef(locale);
+    return lang;
 }
 
 std::string ZLibrary::Version() {
-	JNIEnv *env = AndroidUtil::getEnv();
-	jobject zlibrary = AndroidUtil::StaticMethod_ZLibrary_Instance->call();
-	std::string version = AndroidUtil::Method_ZLibrary_getVersionName->callForCppString(zlibrary);
-	env->DeleteLocalRef(zlibrary);
-	return version;
+    JNIEnv *env = AndroidUtil::getEnv();
+    jobject zlibrary = AndroidUtil::StaticMethod_ZLibrary_Instance->call();
+    std::string version = AndroidUtil::Method_ZLibrary_getVersionName->callForCppString(zlibrary);
+    env->DeleteLocalRef(zlibrary);
+    return version;
 }

@@ -28,228 +28,228 @@ import java.util.Comparator;
 import java.util.UUID;
 
 public final class Bookmark extends ZLTextFixedPosition {
-	public final String Uid;
-	public final long BookId;
-	public final String BookTitle;
-	public final long CreationTimestamp;
-	public final String ModelId;
-	public final boolean IsVisible;
-	private long myId;
-	private String myVersionUid;
-	private String myText;
-	private String myOriginalText;
-	private Long myModificationTimestamp;
-	private Long myAccessTimestamp;
-	private ZLTextFixedPosition myEnd;
-	private int myLength;
-	private int myStyleId;
-	// used for migration only
-	private Bookmark(long bookId, Bookmark original) {
-		super(original);
-		myId = -1;
-		Uid = newUUID();
-		BookId = bookId;
-		BookTitle = original.BookTitle;
-		myText = original.myText;
-		myOriginalText = original.myOriginalText;
-		CreationTimestamp = original.CreationTimestamp;
-		myModificationTimestamp = original.myModificationTimestamp;
-		myAccessTimestamp = original.myAccessTimestamp;
-		myEnd = original.myEnd;
-		myLength = original.myLength;
-		myStyleId = original.myStyleId;
-		ModelId = original.ModelId;
-		IsVisible = original.IsVisible;
-	}
+    public final String Uid;
+    public final long BookId;
+    public final String BookTitle;
+    public final long CreationTimestamp;
+    public final String ModelId;
+    public final boolean IsVisible;
+    private long myId;
+    private String myVersionUid;
+    private String myText;
+    private String myOriginalText;
+    private Long myModificationTimestamp;
+    private Long myAccessTimestamp;
+    private ZLTextFixedPosition myEnd;
+    private int myLength;
+    private int myStyleId;
 
-	// create java object for existing bookmark
-	// uid parameter can be null when comes from old format plugin!
-	public Bookmark(
-		long id, String uid, String versionUid,
-		long bookId, String bookTitle, String text, String originalText,
-		long creationTimestamp, Long modificationTimestamp, Long accessTimestamp,
-		String modelId,
-		int start_paragraphIndex, int start_elementIndex, int start_charIndex,
-		int end_paragraphIndex, int end_elementIndex, int end_charIndex,
-		boolean isVisible,
-		int styleId
-	) {
-		super(start_paragraphIndex, start_elementIndex, start_charIndex);
+    // used for migration only
+    private Bookmark(long bookId, Bookmark original) {
+        super(original);
+        myId = -1;
+        Uid = newUUID();
+        BookId = bookId;
+        BookTitle = original.BookTitle;
+        myText = original.myText;
+        myOriginalText = original.myOriginalText;
+        CreationTimestamp = original.CreationTimestamp;
+        myModificationTimestamp = original.myModificationTimestamp;
+        myAccessTimestamp = original.myAccessTimestamp;
+        myEnd = original.myEnd;
+        myLength = original.myLength;
+        myStyleId = original.myStyleId;
+        ModelId = original.ModelId;
+        IsVisible = original.IsVisible;
+    }
 
-		myId = id;
-		Uid = verifiedUUID(uid);
-		myVersionUid = verifiedUUID(versionUid);
+    // create java object for existing bookmark
+    // uid parameter can be null when comes from old format plugin!
+    public Bookmark(
+            long id, String uid, String versionUid,
+            long bookId, String bookTitle, String text, String originalText,
+            long creationTimestamp, Long modificationTimestamp, Long accessTimestamp,
+            String modelId,
+            int start_paragraphIndex, int start_elementIndex, int start_charIndex,
+            int end_paragraphIndex, int end_elementIndex, int end_charIndex,
+            boolean isVisible,
+            int styleId
+    ) {
+        super(start_paragraphIndex, start_elementIndex, start_charIndex);
 
-		BookId = bookId;
-		BookTitle = bookTitle;
-		myText = text;
-		myOriginalText = originalText;
-		CreationTimestamp = creationTimestamp;
-		myModificationTimestamp = modificationTimestamp;
-		myAccessTimestamp = accessTimestamp;
-		ModelId = modelId;
-		IsVisible = isVisible;
+        myId = id;
+        Uid = verifiedUUID(uid);
+        myVersionUid = verifiedUUID(versionUid);
 
-		if (end_charIndex >= 0) {
-			myEnd = new ZLTextFixedPosition(end_paragraphIndex, end_elementIndex, end_charIndex);
-		} else {
-			myLength = end_paragraphIndex;
-		}
+        BookId = bookId;
+        BookTitle = bookTitle;
+        myText = text;
+        myOriginalText = originalText;
+        CreationTimestamp = creationTimestamp;
+        myModificationTimestamp = modificationTimestamp;
+        myAccessTimestamp = accessTimestamp;
+        ModelId = modelId;
+        IsVisible = isVisible;
 
-		myStyleId = styleId;
-	}
+        if (end_charIndex >= 0) {
+            myEnd = new ZLTextFixedPosition(end_paragraphIndex, end_elementIndex, end_charIndex);
+        } else {
+            myLength = end_paragraphIndex;
+        }
 
-	// creates new bookmark
-	public Bookmark(IBookCollection collection, Book book, String modelId, TextSnippet snippet, boolean visible) {
-		super(snippet.getStart());
+        myStyleId = styleId;
+    }
 
-		myId = -1;
-		Uid = newUUID();
-		BookId = book.getId();
-		BookTitle = book.getTitle();
-		myText = snippet.getText();
-		myOriginalText = null;
-		CreationTimestamp = System.currentTimeMillis();
-		ModelId = modelId;
-		IsVisible = visible;
-		myEnd = new ZLTextFixedPosition(snippet.getEnd());
-		myStyleId = collection.getDefaultHighlightingStyleId();
-	}
+    // creates new bookmark
+    public Bookmark(IBookCollection collection, Book book, String modelId, TextSnippet snippet, boolean visible) {
+        super(snippet.getStart());
 
-	private static String newUUID() {
-		return UUID.randomUUID().toString();
-	}
+        myId = -1;
+        Uid = newUUID();
+        BookId = book.getId();
+        BookTitle = book.getTitle();
+        myText = snippet.getText();
+        myOriginalText = null;
+        CreationTimestamp = System.currentTimeMillis();
+        ModelId = modelId;
+        IsVisible = visible;
+        myEnd = new ZLTextFixedPosition(snippet.getEnd());
+        myStyleId = collection.getDefaultHighlightingStyleId();
+    }
 
-	private static String verifiedUUID(String uid) {
-		if (uid == null || uid.length() == 36) {
-			return uid;
-		}
-		throw new RuntimeException("INVALID UUID: " + uid);
-	}
+    private static String newUUID() {
+        return UUID.randomUUID().toString();
+    }
 
-	public long getId() {
-		return myId;
-	}
+    private static String verifiedUUID(String uid) {
+        if (uid == null || uid.length() == 36) {
+            return uid;
+        }
+        throw new RuntimeException("INVALID UUID: " + uid);
+    }
 
-	void setId(long id) {
-		myId = id;
-	}
+    public long getId() {
+        return myId;
+    }
 
-	public String getVersionUid() {
-		return myVersionUid;
-	}
+    void setId(long id) {
+        myId = id;
+    }
 
-	private void onModification() {
-		myVersionUid = newUUID();
-		myModificationTimestamp = System.currentTimeMillis();
-	}
+    public String getVersionUid() {
+        return myVersionUid;
+    }
 
-	public int getStyleId() {
-		return myStyleId;
-	}
+    private void onModification() {
+        myVersionUid = newUUID();
+        myModificationTimestamp = System.currentTimeMillis();
+    }
 
-	public void setStyleId(int styleId) {
-		if (styleId != myStyleId) {
-			myStyleId = styleId;
-			onModification();
-		}
-	}
+    public int getStyleId() {
+        return myStyleId;
+    }
 
-	public String getText() {
-		return myText;
-	}
+    public void setStyleId(int styleId) {
+        if (styleId != myStyleId) {
+            myStyleId = styleId;
+            onModification();
+        }
+    }
 
-	public void setText(String text) {
-		if (!text.equals(myText)) {
-			if (myOriginalText == null) {
-				myOriginalText = myText;
-			} else if (myOriginalText.equals(text)) {
-				myOriginalText = null;
-			}
-			myText = text;
-			onModification();
-		}
-	}
+    public String getText() {
+        return myText;
+    }
 
-	public String getOriginalText() {
-		return myOriginalText;
-	}
+    public void setText(String text) {
+        if (!text.equals(myText)) {
+            if (myOriginalText == null) {
+                myOriginalText = myText;
+            } else if (myOriginalText.equals(text)) {
+                myOriginalText = null;
+            }
+            myText = text;
+            onModification();
+        }
+    }
 
-	public Long getTimestamp(DateType type) {
-		switch (type) {
-			case Creation:
-				return CreationTimestamp;
-			case Modification:
-				return myModificationTimestamp;
-			case Access:
-				return myAccessTimestamp;
-			default:
-			case Latest:
-			{
-				Long latest = myModificationTimestamp;
-				if (latest == null) {
-					latest = CreationTimestamp;
-				}
-				if (myAccessTimestamp != null && latest < myAccessTimestamp) {
-					return myAccessTimestamp;
-				} else {
-					return latest;
-				}
-			}
-		}
-	}
+    public String getOriginalText() {
+        return myOriginalText;
+    }
 
-	public ZLTextPosition getEnd() {
-		return myEnd;
-	}
+    public Long getTimestamp(DateType type) {
+        switch (type) {
+            case Creation:
+                return CreationTimestamp;
+            case Modification:
+                return myModificationTimestamp;
+            case Access:
+                return myAccessTimestamp;
+            default:
+            case Latest: {
+                Long latest = myModificationTimestamp;
+                if (latest == null) {
+                    latest = CreationTimestamp;
+                }
+                if (myAccessTimestamp != null && latest < myAccessTimestamp) {
+                    return myAccessTimestamp;
+                } else {
+                    return latest;
+                }
+            }
+        }
+    }
 
-	void setEnd(int paragraphsIndex, int elementIndex, int charIndex) {
-		myEnd = new ZLTextFixedPosition(paragraphsIndex, elementIndex, charIndex);
-	}
+    public ZLTextPosition getEnd() {
+        return myEnd;
+    }
 
-	public int getLength() {
-		return myLength;
-	}
+    void setEnd(int paragraphsIndex, int elementIndex, int charIndex) {
+        myEnd = new ZLTextFixedPosition(paragraphsIndex, elementIndex, charIndex);
+    }
 
-	public void markAsAccessed() {
-		myVersionUid = newUUID();
-		myAccessTimestamp = System.currentTimeMillis();
-	}
+    public int getLength() {
+        return myLength;
+    }
 
-	public void update(Bookmark other) {
-		// TODO: copy other fields (?)
-		if (other != null) {
-			myId = other.myId;
-		}
-	}
+    public void markAsAccessed() {
+        myVersionUid = newUUID();
+        myAccessTimestamp = System.currentTimeMillis();
+    }
 
-	Bookmark transferToBook(AbstractBook book) {
-		final long bookId = book.getId();
-		return bookId != -1 ? new Bookmark(bookId, this) : null;
-	}
+    public void update(Bookmark other) {
+        // TODO: copy other fields (?)
+        if (other != null) {
+            myId = other.myId;
+        }
+    }
 
-	// not equals, we do not compare ids
-	boolean sameAs(Bookmark other) {
-		return
-			ParagraphIndex == other.ParagraphIndex &&
-			ElementIndex == other.ElementIndex &&
-			CharIndex == other.CharIndex &&
-			ComparisonUtil.equal(myText, other.myText);
-	}
+    Bookmark transferToBook(AbstractBook book) {
+        final long bookId = book.getId();
+        return bookId != -1 ? new Bookmark(bookId, this) : null;
+    }
 
-	public enum DateType {
-		Creation,
-		Modification,
-		Access,
-		Latest
-	}
+    // not equals, we do not compare ids
+    boolean sameAs(Bookmark other) {
+        return
+                ParagraphIndex == other.ParagraphIndex &&
+                        ElementIndex == other.ElementIndex &&
+                        CharIndex == other.CharIndex &&
+                        ComparisonUtil.equal(myText, other.myText);
+    }
 
-	public static class ByTimeComparator implements Comparator<Bookmark> {
-		public int compare(Bookmark bm0, Bookmark bm1) {
-			final Long ts0 = bm0.getTimestamp(DateType.Latest);
-			final Long ts1 = bm1.getTimestamp(DateType.Latest);
-			// yes, reverse order; yes, latest ts is not null
-			return ts1.compareTo(ts0);
-		}
-	}
+    public enum DateType {
+        Creation,
+        Modification,
+        Access,
+        Latest
+    }
+
+    public static class ByTimeComparator implements Comparator<Bookmark> {
+        public int compare(Bookmark bm0, Bookmark bm1) {
+            final Long ts0 = bm0.getTimestamp(DateType.Latest);
+            final Long ts1 = bm1.getTimestamp(DateType.Latest);
+            // yes, reverse order; yes, latest ts is not null
+            return ts1.compareTo(ts0);
+        }
+    }
 }

@@ -27,39 +27,39 @@ PalmDocLikeStream::PalmDocLikeStream(const ZLFile &file) : PdbStream(file) {
 }
 
 PalmDocLikeStream::~PalmDocLikeStream() {
-	close();
+    close();
 }
 
 bool PalmDocLikeStream::open() {
-	myErrorCode = ERROR_NONE;
-	if (!PdbStream::open()) {
-		myErrorCode = ERROR_UNKNOWN;
-		return false;
-	}
-	
-	if (!processZeroRecord()) {
-		return false;
-	}
+    myErrorCode = ERROR_NONE;
+    if (!PdbStream::open()) {
+        myErrorCode = ERROR_UNKNOWN;
+        return false;
+    }
 
-	myBuffer = new char[myMaxRecordSize];
-	myRecordIndex = 0;
-	return true;
+    if (!processZeroRecord()) {
+        return false;
+    }
+
+    myBuffer = new char[myMaxRecordSize];
+    myRecordIndex = 0;
+    return true;
 }
 
 bool PalmDocLikeStream::fillBuffer() {
-	while (myBufferOffset == myBufferLength) {
-		if (myRecordIndex + 1 > myMaxRecordIndex) {
-			return false;
-		}
-		++myRecordIndex;
-		if (!processRecord()) {
-			return false;
-		} 
-	}
-	//myBufferOffset = 0;
-	return true;
+    while (myBufferOffset == myBufferLength) {
+        if (myRecordIndex + 1 > myMaxRecordIndex) {
+            return false;
+        }
+        ++myRecordIndex;
+        if (!processRecord()) {
+            return false;
+        }
+    }
+    //myBufferOffset = 0;
+    return true;
 }
 
 PalmDocLikeStream::ErrorCode PalmDocLikeStream::errorCode() const {
-	return myErrorCode;
+    return myErrorCode;
 }

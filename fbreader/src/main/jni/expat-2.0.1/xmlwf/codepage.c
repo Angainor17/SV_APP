@@ -54,15 +54,13 @@ codepageConvert(int cp, const char *p)
 #else /* not WIN32 */
 
 int
-codepageMap(int cp, int *map)
-{
-  return 0;
+codepageMap(int cp, int *map) {
+    return 0;
 }
 
 int
-codepageConvert(int cp, const char *p)
-{
-  return -1;
+codepageConvert(int cp, const char *p) {
+    return -1;
 }
 
 #endif /* not WIN32 */

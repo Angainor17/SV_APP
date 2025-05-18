@@ -22,11 +22,11 @@
 #include "../ZLFile.h"
 
 void ZLZipDir::collectFiles(std::vector<std::string> &names, bool) {
-	shared_ptr<ZLInputStream> stream = ZLFile(path()).inputStream();
-	shared_ptr<ZLZipEntryCache> cache = ZLZipEntryCache::cache(path(), *stream);
-	cache->collectFileNames(names);
+    shared_ptr<ZLInputStream> stream = ZLFile(path()).inputStream();
+    shared_ptr<ZLZipEntryCache> cache = ZLZipEntryCache::cache(path(), *stream);
+    cache->collectFileNames(names);
 }
 
 std::string ZLZipDir::delimiter() const {
-	return ":";
+    return ":";
 }

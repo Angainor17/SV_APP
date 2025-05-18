@@ -26,23 +26,28 @@
 class HtmlReaderStream : public ZLInputStream {
 
 public:
-	HtmlReaderStream(shared_ptr<ZLInputStream> base, std::size_t maxSize);
-	~HtmlReaderStream();
+    HtmlReaderStream(shared_ptr<ZLInputStream> base, std::size_t maxSize);
+
+    ~HtmlReaderStream();
 
 private:
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    bool open();
 
-	void seek(int offset, bool absoluteOffset);
-	std::size_t offset() const;
-	std::size_t sizeOfOpened();
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
+
+    void seek(int offset, bool absoluteOffset);
+
+    std::size_t offset() const;
+
+    std::size_t sizeOfOpened();
 
 private:
-	shared_ptr<ZLInputStream> myBase;
-	char *myBuffer;
-	std::size_t mySize;
-	std::size_t myOffset;
+    shared_ptr<ZLInputStream> myBase;
+    char *myBuffer;
+    std::size_t mySize;
+    std::size_t myOffset;
 };
 
 #endif /* __HTMLREADERSTREAM_H__ */

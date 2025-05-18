@@ -19,29 +19,23 @@ import group.pals.android.R;
 
 /**
  * Utilities for context menu.
- * 
+ *
  * @author Hai Bison
  * @since v4.3 beta
- * 
  */
 public class ContextMenuUtils {
 
     /**
      * Shows context menu.
-     * 
-     * @param context
-     *            {@link Context}
-     * @param iconId
-     *            resource icon ID of the dialog.
-     * @param title
-     *            title of the dialog.
-     * @param itemIds
-     *            array of resource IDs of strings.
-     * @param listener
-     *            {@link OnMenuItemClickListener}
+     *
+     * @param context  {@link Context}
+     * @param iconId   resource icon ID of the dialog.
+     * @param title    title of the dialog.
+     * @param itemIds  array of resource IDs of strings.
+     * @param listener {@link OnMenuItemClickListener}
      */
     public static void showContextMenu(Context context, int iconId, String title, final Integer[] itemIds,
-            final OnMenuItemClickListener listener) {
+                                       final OnMenuItemClickListener listener) {
         final MenuItemAdapter _adapter = new MenuItemAdapter(context, itemIds);
 
         View view = LayoutInflater.from(context).inflate(R.layout.afc_context_menu_view, null);
@@ -75,21 +69,16 @@ public class ContextMenuUtils {
 
     /**
      * Shows context menu.
-     * 
-     * @param context
-     *            {@link Context}
-     * @param iconId
-     *            resource icon ID of the dialog.
-     * @param titleId
-     *            resource ID of the title of the dialog. {@code 0} will be
-     *            ignored.
-     * @param itemIds
-     *            array of resource IDs of strings.
-     * @param listener
-     *            {@link OnMenuItemClickListener}
+     *
+     * @param context  {@link Context}
+     * @param iconId   resource icon ID of the dialog.
+     * @param titleId  resource ID of the title of the dialog. {@code 0} will be
+     *                 ignored.
+     * @param itemIds  array of resource IDs of strings.
+     * @param listener {@link OnMenuItemClickListener}
      */
     public static void showContextMenu(Context context, int iconId, int titleId, Integer[] itemIds,
-            OnMenuItemClickListener listener) {
+                                       OnMenuItemClickListener listener) {
         showContextMenu(context, iconId, titleId > 0 ? context.getString(titleId) : null, itemIds, listener);
     }// showContextMenu()
 
@@ -99,15 +88,13 @@ public class ContextMenuUtils {
     /**
      * @author Hai Bison
      * @since v4.3 beta
-     * 
      */
     public static interface OnMenuItemClickListener {
 
         /**
          * This method will be called after the menu dismissed.
-         * 
-         * @param resId
-         *            the resource ID of the title of the menu item.
+         *
+         * @param resId the resource ID of the title of the menu item.
          */
         void onClick(int resId);
     }// OnMenuItemClickListener

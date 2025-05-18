@@ -10,8 +10,10 @@ int filemap(const wchar_t *name,
                               const wchar_t *, void *arg),
             void *arg);
 #else
+
 int filemap(const char *name,
             void (*processor)(const void *, size_t,
                               const char *, void *arg),
             void *arg);
+
 #endif

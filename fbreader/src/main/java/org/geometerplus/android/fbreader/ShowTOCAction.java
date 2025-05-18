@@ -26,27 +26,27 @@ import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 
 class ShowTOCAction extends FBAndroidAction {
-	ShowTOCAction(FBReader baseActivity, FBReaderApp fbreader) {
-		super(baseActivity, fbreader);
-	}
+    ShowTOCAction(FBReader baseActivity, FBReaderApp fbreader) {
+        super(baseActivity, fbreader);
+    }
 
-	static boolean isTOCAvailable(FBReaderApp reader) {
-		if (reader == null) {
-			return false;
-		}
-		final BookModel model = reader.Model;
-		return model != null && model.TOCTree.hasChildren();
-	}
+    static boolean isTOCAvailable(FBReaderApp reader) {
+        if (reader == null) {
+            return false;
+        }
+        final BookModel model = reader.Model;
+        return model != null && model.TOCTree.hasChildren();
+    }
 
-	@Override
-	public boolean isVisible() {
-		return isTOCAvailable(Reader);
-	}
+    @Override
+    public boolean isVisible() {
+        return isTOCAvailable(Reader);
+    }
 
-	@Override
-	protected void run(Object ... params) {
-		OrientationUtil.startActivity(
-			BaseActivity, new Intent(BaseActivity.getApplicationContext(), TOCActivity.class)
-		);
-	}
+    @Override
+    protected void run(Object... params) {
+        OrientationUtil.startActivity(
+                BaseActivity, new Intent(BaseActivity.getApplicationContext(), TOCActivity.class)
+        );
+    }
 }

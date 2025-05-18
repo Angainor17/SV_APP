@@ -26,31 +26,31 @@
 ZLFSManager *ZLFSManager::ourInstance = 0;
 
 void ZLFSManager::deleteInstance() {
-	if (ourInstance != 0) {
-		delete ourInstance;
-		ourInstance = 0;
-	}
+    if (ourInstance != 0) {
+        delete ourInstance;
+        ourInstance = 0;
+    }
 }
 
 int ZLFSManager::findLastFileNameDelimiter(const std::string &path) const {
-	int index = findArchiveFileNameDelimiter(path);
-	if (index == -1) {
-		index = path.rfind(ZLibrary::FileNameDelimiter);
-	}
-	return index;
+    int index = findArchiveFileNameDelimiter(path);
+    if (index == -1) {
+        index = path.rfind(ZLibrary::FileNameDelimiter);
+    }
+    return index;
 }
 
 std::string ZLFSDir::delimiter() const {
-	return ZLibrary::FileNameDelimiter;
+    return ZLibrary::FileNameDelimiter;
 }
 
 void ZLFSManager::normalize(std::string &path) const {
-	int index = findArchiveFileNameDelimiter(path);
-	if (index == -1) {
-		normalizeRealPath(path);
-	} else {
-		std::string realPath = path.substr(0, index);
-		normalizeRealPath(realPath);
-		path = realPath + ':' + ZLFileUtil::normalizeUnixPath(path.substr(index + 1));
-	}
+    int index = findArchiveFileNameDelimiter(path);
+    if (index == -1) {
+        normalizeRealPath(path);
+    } else {
+        std::string realPath = path.substr(0, index);
+        normalizeRealPath(realPath);
+        path = realPath + ':' + ZLFileUtil::normalizeUnixPath(path.substr(index + 1));
+    }
 }

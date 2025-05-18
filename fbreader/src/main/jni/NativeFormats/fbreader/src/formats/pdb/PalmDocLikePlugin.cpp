@@ -26,11 +26,11 @@
 #include "../../library/Book.h"
 
 bool PalmDocLikePlugin::providesMetainfo() const {
-	return true;
+    return true;
 }
 
 shared_ptr<ZLInputStream> PalmDocLikePlugin::createStream(const ZLFile &file) const {
-	return new PalmDocContentStream(file);
+    return new PalmDocContentStream(file);
 }
 
 /*

@@ -44,106 +44,107 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AndroidImageSynchronizer implements ZLImageProxy.Synchronizer {
-	private final Context myContext;
-	private final Map<ExternalFormatPlugin,Connection> myConnections =
-		new HashMap<ExternalFormatPlugin,Connection>();
-	public AndroidImageSynchronizer(Activity activity) {
-		myContext = activity;
-	}
+    private final Context myContext;
+    private final Map<ExternalFormatPlugin, Connection> myConnections =
+            new HashMap<ExternalFormatPlugin, Connection>();
 
-	public AndroidImageSynchronizer(Service service) {
-		myContext = service;
-	}
+    public AndroidImageSynchronizer(Activity activity) {
+        myContext = activity;
+    }
 
-	@Override
-	public void startImageLoading(ZLImageProxy image, Runnable postAction) {
-		final ZLAndroidImageManager manager = (ZLAndroidImageManager)ZLAndroidImageManager.Instance();
-		manager.startImageLoading(this, image, postAction);
-	}
+    public AndroidImageSynchronizer(Service service) {
+        myContext = service;
+    }
 
-	@Override
-	public void synchronize(ZLImageProxy image, final Runnable postAction) {
-		if (image.isSynchronized()) {
-			// TODO: also check if image is under synchronization
-			if (postAction != null) {
-				postAction.run();
-			}
-		} else if (image instanceof ZLImageSimpleProxy) {
-			((ZLImageSimpleProxy)image).synchronize();
-			if (postAction != null) {
-				postAction.run();
-			}
-		} else if (image instanceof PluginImage) {
-			final PluginImage pluginImage = (PluginImage)image;
-			final Connection connection = getConnection(pluginImage.Plugin);
-			connection.runOrAddAction(new Runnable() {
-				public void run() {
-					try {
-						pluginImage.setRealImage(new ZLBitmapImage(connection.Reader.readBitmap(pluginImage.File.getPath(), Integer.MAX_VALUE, Integer.MAX_VALUE)));
-					} catch (Throwable t) {
-						t.printStackTrace();
-					}
-					if (postAction != null) {
-						postAction.run();
-					}
-				}
-			});
-		} else {
-			throw new RuntimeException("Cannot synchronize " + image.getClass());
-		}
-	}
+    @Override
+    public void startImageLoading(ZLImageProxy image, Runnable postAction) {
+        final ZLAndroidImageManager manager = (ZLAndroidImageManager) ZLAndroidImageManager.Instance();
+        manager.startImageLoading(this, image, postAction);
+    }
 
-	public synchronized void clear() {
-		for (ServiceConnection connection : myConnections.values()) {
-			myContext.unbindService(connection);
-		}
-		myConnections.clear();
-	}
+    @Override
+    public void synchronize(ZLImageProxy image, final Runnable postAction) {
+        if (image.isSynchronized()) {
+            // TODO: also check if image is under synchronization
+            if (postAction != null) {
+                postAction.run();
+            }
+        } else if (image instanceof ZLImageSimpleProxy) {
+            ((ZLImageSimpleProxy) image).synchronize();
+            if (postAction != null) {
+                postAction.run();
+            }
+        } else if (image instanceof PluginImage) {
+            final PluginImage pluginImage = (PluginImage) image;
+            final Connection connection = getConnection(pluginImage.Plugin);
+            connection.runOrAddAction(new Runnable() {
+                public void run() {
+                    try {
+                        pluginImage.setRealImage(new ZLBitmapImage(connection.Reader.readBitmap(pluginImage.File.getPath(), Integer.MAX_VALUE, Integer.MAX_VALUE)));
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                    if (postAction != null) {
+                        postAction.run();
+                    }
+                }
+            });
+        } else {
+            throw new RuntimeException("Cannot synchronize " + image.getClass());
+        }
+    }
 
-	private synchronized Connection getConnection(ExternalFormatPlugin plugin) {
-		Connection connection = myConnections.get(plugin);
-		if (connection == null) {
-			connection = new Connection(plugin);
-			myConnections.put(plugin, connection);
-			myContext.bindService(
-				new Intent(FBReaderIntents.Action.PLUGIN_CONNECT_COVER_SERVICE)
-					.setPackage(plugin.packageName()),
-				connection,
-				Context.BIND_AUTO_CREATE
-			);
-		}
-		return connection;
-	}
+    public synchronized void clear() {
+        for (ServiceConnection connection : myConnections.values()) {
+            myContext.unbindService(connection);
+        }
+        myConnections.clear();
+    }
 
-	private static final class Connection implements ServiceConnection {
-		private final ExecutorService myExecutor = Executors.newSingleThreadExecutor();
+    private synchronized Connection getConnection(ExternalFormatPlugin plugin) {
+        Connection connection = myConnections.get(plugin);
+        if (connection == null) {
+            connection = new Connection(plugin);
+            myConnections.put(plugin, connection);
+            myContext.bindService(
+                    new Intent(FBReaderIntents.Action.PLUGIN_CONNECT_COVER_SERVICE)
+                            .setPackage(plugin.packageName()),
+                    connection,
+                    Context.BIND_AUTO_CREATE
+            );
+        }
+        return connection;
+    }
 
-		private final ExternalFormatPlugin myPlugin;
-		private final List<Runnable> myPostActions = new LinkedList<Runnable>();
-		private volatile CoverReader Reader;
+    private static final class Connection implements ServiceConnection {
+        private final ExecutorService myExecutor = Executors.newSingleThreadExecutor();
 
-		Connection(ExternalFormatPlugin plugin) {
-			myPlugin = plugin;
-		}
+        private final ExternalFormatPlugin myPlugin;
+        private final List<Runnable> myPostActions = new LinkedList<Runnable>();
+        private volatile CoverReader Reader;
 
-		synchronized void runOrAddAction(Runnable action) {
-			if (Reader != null) {
-				myExecutor.execute(action);
-			} else {
-				myPostActions.add(action);
-			}
-		}
+        Connection(ExternalFormatPlugin plugin) {
+            myPlugin = plugin;
+        }
 
-		public synchronized void onServiceConnected(ComponentName className, IBinder binder) {
-			Reader = CoverReader.Stub.asInterface(binder);
-			for (Runnable action : myPostActions) {
-				myExecutor.execute(action);
-			}
-			myPostActions.clear();
-		}
+        synchronized void runOrAddAction(Runnable action) {
+            if (Reader != null) {
+                myExecutor.execute(action);
+            } else {
+                myPostActions.add(action);
+            }
+        }
 
-		public synchronized void onServiceDisconnected(ComponentName className) {
-			Reader = null;
-		}
-	}
+        public synchronized void onServiceConnected(ComponentName className, IBinder binder) {
+            Reader = CoverReader.Stub.asInterface(binder);
+            for (Runnable action : myPostActions) {
+                myExecutor.execute(action);
+            }
+            myPostActions.clear();
+        }
+
+        public synchronized void onServiceDisconnected(ComponentName className) {
+            Reader = null;
+        }
+    }
 }

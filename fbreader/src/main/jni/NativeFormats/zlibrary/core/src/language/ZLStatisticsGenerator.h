@@ -27,22 +27,26 @@ class ZLMapBasedStatistics;
 class ZLStatisticsGenerator {
 
 public:
-	ZLStatisticsGenerator(const std::string &breakSymbols);
-	~ZLStatisticsGenerator();
+    ZLStatisticsGenerator(const std::string &breakSymbols);
 
-	void generate(const std::string &inputFileName, std::size_t charSequenceSizpe, ZLMapBasedStatistics &statistics);
-	void generate(const char* buffer, std::size_t length, std::size_t charSequenceSize, ZLMapBasedStatistics &statistics);
+    ~ZLStatisticsGenerator();
+
+    void generate(const std::string &inputFileName, std::size_t charSequenceSizpe,
+                  ZLMapBasedStatistics &statistics);
+
+    void generate(const char *buffer, std::size_t length, std::size_t charSequenceSize,
+                  ZLMapBasedStatistics &statistics);
 
 private:
-	int read(const std::string &inputFileName);
+    int read(const std::string &inputFileName);
 
 private:
-	char *myBreakSymbolsTable;
+    char *myBreakSymbolsTable;
 
-	char *myStart;
-	char *myEnd;
+    char *myStart;
+    char *myEnd;
 
-	static std::size_t ourBufferSize;
+    static std::size_t ourBufferSize;
 };
 
 #endif //__ZLSTATISTICSGENERATOR_H__

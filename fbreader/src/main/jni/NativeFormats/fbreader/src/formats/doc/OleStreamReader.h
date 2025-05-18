@@ -27,20 +27,23 @@
 class OleStreamReader {
 
 public:
-	OleStreamReader();
-	bool readDocument(shared_ptr<ZLInputStream> stream, bool doReadFormattingData);
+    OleStreamReader();
+
+    bool readDocument(shared_ptr<ZLInputStream> stream, bool doReadFormattingData);
 
 protected:
-	virtual bool readStream(OleMainStream &stream) = 0;
+    virtual bool readStream(OleMainStream &stream) = 0;
 
-	bool readNextPiece(OleMainStream &stream);
+    bool readNextPiece(OleMainStream &stream);
 
-	virtual void ansiDataHandler(const char *buffer, std::size_t len) = 0;
-	virtual void ucs2SymbolHandler(ZLUnicodeUtil::Ucs2Char symbol) = 0;
-	virtual void footnotesStartHandler() = 0;
+    virtual void ansiDataHandler(const char *buffer, std::size_t len) = 0;
+
+    virtual void ucs2SymbolHandler(ZLUnicodeUtil::Ucs2Char symbol) = 0;
+
+    virtual void footnotesStartHandler() = 0;
 
 private:
-	std::size_t myNextPieceNumber;
+    std::size_t myNextPieceNumber;
 };
 
 #endif /* __OLESTREAMREADER_H__ */

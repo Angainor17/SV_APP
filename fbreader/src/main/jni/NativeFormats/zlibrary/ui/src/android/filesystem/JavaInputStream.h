@@ -29,37 +29,48 @@
 class JavaInputStream : public ZLInputStream {
 
 public:
-	JavaInputStream(const std::string &name, shared_ptr<FileEncryptionInfo> encryptionInfo = 0);
-	~JavaInputStream();
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    JavaInputStream(const std::string &name, shared_ptr<FileEncryptionInfo> encryptionInfo = 0);
 
-	void seek(int offset, bool absoluteOffset);
-	std::size_t offset() const;
-	std::size_t sizeOfOpened();
+    ~JavaInputStream();
 
-private:
-	void initStream(JNIEnv *env);
-	void closeStream(JNIEnv *env);
-	void rewind(JNIEnv *env);
-	void ensureBufferCapacity(JNIEnv *env, std::size_t maxSize);
-	std::size_t readToBuffer(JNIEnv *env, char *buffer, std::size_t maxSize);
-	std::size_t skip(JNIEnv *env, std::size_t offset);
+    bool open();
+
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
+
+    void seek(int offset, bool absoluteOffset);
+
+    std::size_t offset() const;
+
+    std::size_t sizeOfOpened();
 
 private:
-	const std::string myName;
-	const shared_ptr<FileEncryptionInfo> myEncryptionInfo;
-	bool myNeedRepositionToStart;
-	bool myMarkSupported;
+    void initStream(JNIEnv *env);
 
-	jobject myJavaFile;
+    void closeStream(JNIEnv *env);
 
-	jobject myJavaInputStream;
-	std::size_t myOffset;
+    void rewind(JNIEnv *env);
 
-	jbyteArray myJavaBuffer;
-	std::size_t myJavaBufferSize;
+    void ensureBufferCapacity(JNIEnv *env, std::size_t maxSize);
+
+    std::size_t readToBuffer(JNIEnv *env, char *buffer, std::size_t maxSize);
+
+    std::size_t skip(JNIEnv *env, std::size_t offset);
+
+private:
+    const std::string myName;
+    const shared_ptr<FileEncryptionInfo> myEncryptionInfo;
+    bool myNeedRepositionToStart;
+    bool myMarkSupported;
+
+    jobject myJavaFile;
+
+    jobject myJavaInputStream;
+    std::size_t myOffset;
+
+    jbyteArray myJavaBuffer;
+    std::size_t myJavaBufferSize;
 };
 
 #endif /* __JAVAINPUTSTREAM_H__ */

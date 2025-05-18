@@ -27,11 +27,12 @@
 class DocInlineImageReader {
 
 public:
-	DocInlineImageReader(shared_ptr<OleStream> dataStream);
-	ZLFileImage::Blocks getImagePieceInfo(unsigned int dataPos);
+    DocInlineImageReader(shared_ptr<OleStream> dataStream);
+
+    ZLFileImage::Blocks getImagePieceInfo(unsigned int dataPos);
 
 private:
-	shared_ptr<OleStream> myDataStream;
+    shared_ptr<OleStream> myDataStream;
 };
 
 #endif /* __DOCINLINEIMAGEREADER_H__ */

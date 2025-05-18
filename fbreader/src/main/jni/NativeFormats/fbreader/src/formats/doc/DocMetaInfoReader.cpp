@@ -24,15 +24,15 @@
 #include "DocMetaInfoReader.h"
 
 DocMetaInfoReader::DocMetaInfoReader(Book &book) : myBook(book) {
-	myBook.removeAllAuthors();
-	myBook.setTitle(std::string());
-	myBook.setLanguage(std::string());
-	myBook.removeAllTags();
+    myBook.removeAllAuthors();
+    myBook.setTitle(std::string());
+    myBook.setLanguage(std::string());
+    myBook.removeAllTags();
 }
 
 bool DocMetaInfoReader::readMetainfo() {
-	myBook.removeAllAuthors();
-	myBook.setTitle(myBook.file().name(true));
-	myBook.removeAllTags();
-	return true;
+    myBook.removeAllAuthors();
+    myBook.setTitle(myBook.file().name(true));
+    myBook.removeAllTags();
+    return true;
 }

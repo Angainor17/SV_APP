@@ -26,119 +26,126 @@
 class JavaEncodingConverter : public ZLEncodingConverter {
 
 private:
-	JavaEncodingConverter(const std::string &encoding);
+    JavaEncodingConverter(const std::string &encoding);
 
 public:
-	~JavaEncodingConverter();
-	std::string name() const;
-	void convert(std::string &dst, const char *srcStart, const char *srcEnd);
-	void reset();
-	bool fillTable(int *map);
+    ~JavaEncodingConverter();
+
+    std::string name() const;
+
+    void convert(std::string &dst, const char *srcStart, const char *srcEnd);
+
+    void reset();
+
+    bool fillTable(int *map);
 
 private:
-	jobject myJavaConverter;
-	int myBufferLength;
-	jbyteArray myInBuffer;
-	jcharArray myOutBuffer;
-	jchar *myCppOutBuffer;
+    jobject myJavaConverter;
+    int myBufferLength;
+    jbyteArray myInBuffer;
+    jcharArray myOutBuffer;
+    jchar *myCppOutBuffer;
 
-friend class JavaEncodingConverterProvider;
+    friend class JavaEncodingConverterProvider;
 };
 
 bool JavaEncodingConverterProvider::providesConverter(const std::string &encoding) {
-	if (encoding.empty()) {
-		return false;
-	}
-	JNIEnv *env = AndroidUtil::getEnv();
-	jobject collection = AndroidUtil::StaticMethod_JavaEncodingCollection_Instance->call();
-	jstring encodingName = AndroidUtil::createJavaString(env, encoding);
-	jboolean result = AndroidUtil::Method_JavaEncodingCollection_providesConverterFor->call(collection, encodingName);
-	env->DeleteLocalRef(encodingName);
-	env->DeleteLocalRef(collection);
-	return result != 0;
+    if (encoding.empty()) {
+        return false;
+    }
+    JNIEnv *env = AndroidUtil::getEnv();
+    jobject collection = AndroidUtil::StaticMethod_JavaEncodingCollection_Instance->call();
+    jstring encodingName = AndroidUtil::createJavaString(env, encoding);
+    jboolean result = AndroidUtil::Method_JavaEncodingCollection_providesConverterFor->call(
+            collection, encodingName);
+    env->DeleteLocalRef(encodingName);
+    env->DeleteLocalRef(collection);
+    return result != 0;
 }
 
-shared_ptr<ZLEncodingConverter> JavaEncodingConverterProvider::createConverter(const std::string &encoding) {
-	return new JavaEncodingConverter(encoding);
+shared_ptr<ZLEncodingConverter>
+JavaEncodingConverterProvider::createConverter(const std::string &encoding) {
+    return new JavaEncodingConverter(encoding);
 }
 
 JavaEncodingConverter::JavaEncodingConverter(const std::string &encoding) {
-	JNIEnv *env = AndroidUtil::getEnv();
-	jobject collection = AndroidUtil::StaticMethod_JavaEncodingCollection_Instance->call();
-	jstring encodingName = AndroidUtil::createJavaString(env, encoding);
-	jobject javaEncoding = AndroidUtil::Method_JavaEncodingCollection_getEncoding->call(collection, encodingName);
-	myJavaConverter = AndroidUtil::Method_Encoding_createConverter->call(javaEncoding);
-	env->DeleteLocalRef(javaEncoding);
-	env->DeleteLocalRef(encodingName);
-	env->DeleteLocalRef(collection);
+    JNIEnv *env = AndroidUtil::getEnv();
+    jobject collection = AndroidUtil::StaticMethod_JavaEncodingCollection_Instance->call();
+    jstring encodingName = AndroidUtil::createJavaString(env, encoding);
+    jobject javaEncoding = AndroidUtil::Method_JavaEncodingCollection_getEncoding->call(collection,
+                                                                                        encodingName);
+    myJavaConverter = AndroidUtil::Method_Encoding_createConverter->call(javaEncoding);
+    env->DeleteLocalRef(javaEncoding);
+    env->DeleteLocalRef(encodingName);
+    env->DeleteLocalRef(collection);
 
-	myBufferLength = 32768;
-	myInBuffer = env->NewByteArray(myBufferLength);
-	myOutBuffer = env->NewCharArray(myBufferLength);
-	myCppOutBuffer = new jchar[myBufferLength];
+    myBufferLength = 32768;
+    myInBuffer = env->NewByteArray(myBufferLength);
+    myOutBuffer = env->NewCharArray(myBufferLength);
+    myCppOutBuffer = new jchar[myBufferLength];
 }
 
 JavaEncodingConverter::~JavaEncodingConverter() {
-	JNIEnv *env = AndroidUtil::getEnv();
-	delete[] myCppOutBuffer;
-	env->DeleteLocalRef(myOutBuffer);
-	env->DeleteLocalRef(myInBuffer);
-	env->DeleteLocalRef(myJavaConverter);
+    JNIEnv *env = AndroidUtil::getEnv();
+    delete[] myCppOutBuffer;
+    env->DeleteLocalRef(myOutBuffer);
+    env->DeleteLocalRef(myInBuffer);
+    env->DeleteLocalRef(myJavaConverter);
 }
 
 std::string JavaEncodingConverter::name() const {
-	JNIEnv *env = AndroidUtil::getEnv();
-	jstring javaName = (jstring)AndroidUtil::Field_EncodingConverter_Name->value(myJavaConverter);
-	const std::string result = AndroidUtil::fromJavaString(env, javaName);
-	env->DeleteLocalRef(javaName);
-	return result;
+    JNIEnv *env = AndroidUtil::getEnv();
+    jstring javaName = (jstring) AndroidUtil::Field_EncodingConverter_Name->value(myJavaConverter);
+    const std::string result = AndroidUtil::fromJavaString(env, javaName);
+    env->DeleteLocalRef(javaName);
+    return result;
 }
 
 void JavaEncodingConverter::convert(std::string &dst, const char *srcStart, const char *srcEnd) {
-	JNIEnv *env = AndroidUtil::getEnv();
-	const int srcLen = srcEnd - srcStart;
-	if (srcLen > myBufferLength) {
-		delete[] myCppOutBuffer;
-		env->DeleteLocalRef(myOutBuffer);
-		env->DeleteLocalRef(myInBuffer);
-		myBufferLength = srcLen;
-		myInBuffer = env->NewByteArray(myBufferLength);
-		myOutBuffer = env->NewCharArray(myBufferLength);
-		myCppOutBuffer = new jchar[myBufferLength];
-	}
+    JNIEnv *env = AndroidUtil::getEnv();
+    const int srcLen = srcEnd - srcStart;
+    if (srcLen > myBufferLength) {
+        delete[] myCppOutBuffer;
+        env->DeleteLocalRef(myOutBuffer);
+        env->DeleteLocalRef(myInBuffer);
+        myBufferLength = srcLen;
+        myInBuffer = env->NewByteArray(myBufferLength);
+        myOutBuffer = env->NewCharArray(myBufferLength);
+        myCppOutBuffer = new jchar[myBufferLength];
+    }
 
-	env->SetByteArrayRegion(myInBuffer, 0, srcLen, (jbyte*)srcStart);
-	const jint decodedCount = AndroidUtil::Method_EncodingConverter_convert->call(
-		myJavaConverter, myInBuffer, 0, srcLen, myOutBuffer
-	);
-	dst.reserve(dst.length() + decodedCount * 3);
-	env->GetCharArrayRegion(myOutBuffer, 0, decodedCount, myCppOutBuffer);
-	const jchar *end = myCppOutBuffer + decodedCount;
-	char buffer[3];
-	for (const jchar *ptr = myCppOutBuffer; ptr < end; ++ptr) {
-		dst.append(buffer, ZLUnicodeUtil::ucs2ToUtf8(buffer, *ptr));
-	}
+    env->SetByteArrayRegion(myInBuffer, 0, srcLen, (jbyte *) srcStart);
+    const jint decodedCount = AndroidUtil::Method_EncodingConverter_convert->call(
+            myJavaConverter, myInBuffer, 0, srcLen, myOutBuffer
+    );
+    dst.reserve(dst.length() + decodedCount * 3);
+    env->GetCharArrayRegion(myOutBuffer, 0, decodedCount, myCppOutBuffer);
+    const jchar *end = myCppOutBuffer + decodedCount;
+    char buffer[3];
+    for (const jchar *ptr = myCppOutBuffer; ptr < end; ++ptr) {
+        dst.append(buffer, ZLUnicodeUtil::ucs2ToUtf8(buffer, *ptr));
+    }
 }
 
 void JavaEncodingConverter::reset() {
-	AndroidUtil::Method_EncodingConverter_reset->call(myJavaConverter);
+    AndroidUtil::Method_EncodingConverter_reset->call(myJavaConverter);
 }
 
 bool JavaEncodingConverter::fillTable(int *map) {
-	char in;
-	std::string out;
-	for (int i = 0; i < 256; ++i) {
-		in = i;
-		convert(out, &in, (&in)+1);
-		reset();
-		if (out.size() != 0) {
-			ZLUnicodeUtil::Ucs4Char ch;
-			ZLUnicodeUtil::firstChar(ch, out.data());
-			map[i] = ch;
-			out.clear();
-		} else {
-			map[i] = i;
-		}
-	}
-	return true;
+    char in;
+    std::string out;
+    for (int i = 0; i < 256; ++i) {
+        in = i;
+        convert(out, &in, (&in) + 1);
+        reset();
+        if (out.size() != 0) {
+            ZLUnicodeUtil::Ucs4Char ch;
+            ZLUnicodeUtil::firstChar(ch, out.data());
+            map[i] = ch;
+            out.clear();
+        } else {
+            map[i] = i;
+        }
+    }
+    return true;
 }

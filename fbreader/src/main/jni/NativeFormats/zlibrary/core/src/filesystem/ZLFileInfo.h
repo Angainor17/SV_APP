@@ -21,12 +21,12 @@
 #define __ZLFILEINFO_H__
 
 struct ZLFileInfo {
-	bool Exists;
-	bool IsDirectory;
-	std::size_t Size;
-	std::size_t MTime;
+    bool Exists;
+    bool IsDirectory;
+    std::size_t Size;
+    std::size_t MTime;
 
-	ZLFileInfo();
+    ZLFileInfo();
 };
 
 inline ZLFileInfo::ZLFileInfo() : Exists(false), IsDirectory(false), Size(0) {

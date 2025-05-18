@@ -27,32 +27,37 @@
 class OleStream {
 
 public:
-	OleStream(shared_ptr<OleStorage> storage, OleEntry oleEntry, shared_ptr<ZLInputStream> stream);
+    OleStream(shared_ptr<OleStorage> storage, OleEntry oleEntry, shared_ptr<ZLInputStream> stream);
 
 public:
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    bool open();
+
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
 
 public:
-	bool seek(unsigned int offset, bool absoluteOffset);
-	std::size_t offset();
+    bool seek(unsigned int offset, bool absoluteOffset);
+
+    std::size_t offset();
 
 public:
-	ZLFileImage::Blocks getBlockPieceInfoList(unsigned int offset, unsigned int size) const;
-	static ZLFileImage::Blocks concatBlocks(const ZLFileImage::Blocks &blocks);
-	std::size_t fileOffset();
+    ZLFileImage::Blocks getBlockPieceInfoList(unsigned int offset, unsigned int size) const;
+
+    static ZLFileImage::Blocks concatBlocks(const ZLFileImage::Blocks &blocks);
+
+    std::size_t fileOffset();
 
 public:
-	bool eof() const;
+    bool eof() const;
 
 protected:
-	shared_ptr<OleStorage> myStorage;
+    shared_ptr<OleStorage> myStorage;
 
-	OleEntry myOleEntry;
-	shared_ptr<ZLInputStream> myBaseStream;
+    OleEntry myOleEntry;
+    shared_ptr<ZLInputStream> myBaseStream;
 
-	unsigned int myOleOffset;
+    unsigned int myOleOffset;
 };
 
 #endif /* __OLESTREAM_H__ */

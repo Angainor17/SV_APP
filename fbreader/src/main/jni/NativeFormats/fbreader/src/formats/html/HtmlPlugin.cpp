@@ -31,49 +31,49 @@
 #include "../../bookmodel/BookModel.h"
 
 const std::string HtmlPlugin::supportedFileType() const {
-	return "HTML";
+    return "HTML";
 }
 
 bool HtmlPlugin::readMetainfo(Book &book) const {
-	shared_ptr<ZLInputStream> stream = book.file().inputStream();
-	if (stream.isNull()) {
-		return false;
-	}
+    shared_ptr<ZLInputStream> stream = book.file().inputStream();
+    if (stream.isNull()) {
+        return false;
+    }
 
-	shared_ptr<ZLInputStream> htmlStream = new HtmlReaderStream(stream, 50000);
-	detectEncodingAndLanguage(book, *htmlStream);
-	if (book.encoding().empty()) {
-		return false;
-	}
-	HtmlDescriptionReader(book).readDocument(*stream);
+    shared_ptr<ZLInputStream> htmlStream = new HtmlReaderStream(stream, 50000);
+    detectEncodingAndLanguage(book, *htmlStream);
+    if (book.encoding().empty()) {
+        return false;
+    }
+    HtmlDescriptionReader(book).readDocument(*stream);
 
-	return true;
+    return true;
 }
 
 bool HtmlPlugin::readUids(Book &/*book*/) const {
-	return true;
+    return true;
 }
 
 bool HtmlPlugin::readModel(BookModel &model) const {
-	const Book& book = *model.book();
-	const ZLFile &file = book.file();
-	shared_ptr<ZLInputStream> stream = file.inputStream();
-	if (stream.isNull()) {
-		return false;
-	}
+    const Book &book = *model.book();
+    const ZLFile &file = book.file();
+    shared_ptr<ZLInputStream> stream = file.inputStream();
+    if (stream.isNull()) {
+        return false;
+    }
 
-	PlainTextFormat format(file);
-	if (!format.initialized()) {
-		PlainTextFormatDetector detector;
-		detector.detect(*stream, format);
-	}
+    PlainTextFormat format(file);
+    if (!format.initialized()) {
+        PlainTextFormatDetector detector;
+        detector.detect(*stream, format);
+    }
 
-	std::string directoryPrefix = MiscUtil::htmlDirectoryPrefix(file.path());
-	HtmlBookReader reader(directoryPrefix, model, format, book.encoding());
-	reader.setFileName(MiscUtil::htmlFileName(file.path()));
-	reader.readDocument(*stream);
+    std::string directoryPrefix = MiscUtil::htmlDirectoryPrefix(file.path());
+    HtmlBookReader reader(directoryPrefix, model, format, book.encoding());
+    reader.setFileName(MiscUtil::htmlFileName(file.path()));
+    reader.readDocument(*stream);
 
-	return true;
+    return true;
 }
 
 //FormatInfoPage *HtmlPlugin::createInfoPage(ZLOptionsDialog &dialog, const ZLFile &file) {
@@ -81,5 +81,5 @@ bool HtmlPlugin::readModel(BookModel &model) const {
 //}
 
 bool HtmlPlugin::readLanguageAndEncoding(Book &book) const {
-	return true;
+    return true;
 }

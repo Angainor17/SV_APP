@@ -25,24 +25,32 @@
 class ZLUnixFSManager : public ZLFSManager {
 
 protected:
-	void normalizeRealPath(std::string &path) const;
+    void normalizeRealPath(std::string &path) const;
 
 protected:
-	std::string resolveSymlink(const std::string &path) const;
-	ZLFSDir *createNewDirectory(const std::string &path) const;
-	ZLFSDir *createPlainDirectory(const std::string &path) const;
-	ZLInputStream *createPlainInputStream(const std::string &path) const;
-	ZLOutputStream *createOutputStream(const std::string &path) const;
-	bool removeFile(const std::string &path) const;
+    std::string resolveSymlink(const std::string &path) const;
 
-	ZLFileInfo fileInfo(const std::string &path) const;
+    ZLFSDir *createNewDirectory(const std::string &path) const;
 
-	int findArchiveFileNameDelimiter(const std::string &path) const;
-	shared_ptr<ZLDir> rootDirectory() const;
-	const std::string &rootDirectoryPath() const;
-	std::string parentPath(const std::string &path) const;
+    ZLFSDir *createPlainDirectory(const std::string &path) const;
 
-	bool canRemoveFile(const std::string &path) const;
+    ZLInputStream *createPlainInputStream(const std::string &path) const;
+
+    ZLOutputStream *createOutputStream(const std::string &path) const;
+
+    bool removeFile(const std::string &path) const;
+
+    ZLFileInfo fileInfo(const std::string &path) const;
+
+    int findArchiveFileNameDelimiter(const std::string &path) const;
+
+    shared_ptr<ZLDir> rootDirectory() const;
+
+    const std::string &rootDirectoryPath() const;
+
+    std::string parentPath(const std::string &path) const;
+
+    bool canRemoveFile(const std::string &path) const;
 };
 
 #endif /* __ZLUNIXFSMANAGER_H__ */

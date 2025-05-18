@@ -29,43 +29,45 @@
 class CollectionReader : public ZLXMLReader {
 
 public:
-	CollectionReader(std::map<std::string,int> &collection);
-	void startElementHandler(const char *tag, const char **attributes);
+    CollectionReader(std::map<std::string, int> &collection);
+
+    void startElementHandler(const char *tag, const char **attributes);
 
 private:
-	std::map<std::string,int> &myCollection;
+    std::map<std::string, int> &myCollection;
 };
 
-std::map<std::string,int> HtmlEntityCollection::ourCollection;
+std::map<std::string, int> HtmlEntityCollection::ourCollection;
 
 int HtmlEntityCollection::symbolNumber(const std::string &name) {
-	if (ourCollection.empty()) {
-		CollectionReader(ourCollection).readDocument(ZLFile(
-			ZLibrary::ApplicationDirectory() + ZLibrary::FileNameDelimiter +
-			"formats" + ZLibrary::FileNameDelimiter +
-			"html" + ZLibrary::FileNameDelimiter + "html.ent"
-		));
-	}
-	std::map<std::string,int>::const_iterator it = ourCollection.find(name);
-	return (it == ourCollection.end()) ? 0 : it->second;
+    if (ourCollection.empty()) {
+        CollectionReader(ourCollection).readDocument(ZLFile(
+                ZLibrary::ApplicationDirectory() + ZLibrary::FileNameDelimiter +
+                "formats" + ZLibrary::FileNameDelimiter +
+                "html" + ZLibrary::FileNameDelimiter + "html.ent"
+        ));
+    }
+    std::map<std::string, int>::const_iterator it = ourCollection.find(name);
+    return (it == ourCollection.end()) ? 0 : it->second;
 }
 
-CollectionReader::CollectionReader(std::map<std::string,int> &collection) : myCollection(collection) {
+CollectionReader::CollectionReader(std::map<std::string, int> &collection) : myCollection(
+        collection) {
 }
 
 void CollectionReader::startElementHandler(const char *tag, const char **attributes) {
-	static const std::string ENTITY = "entity";
+    static const std::string ENTITY = "entity";
 
-	if (ENTITY == tag) {
-		for (int i = 0; i < 4; ++i) {
-			if (attributes[i] == 0) {
-				return;
-			}
-		}
-		static const std::string _name = "name";
-		static const std::string _number = "number";
-		if (_name == attributes[0] && _number == attributes[2]) {
-			myCollection[attributes[1]] = std::atoi(attributes[3]);
-		}
-	}
+    if (ENTITY == tag) {
+        for (int i = 0; i < 4; ++i) {
+            if (attributes[i] == 0) {
+                return;
+            }
+        }
+        static const std::string _name = "name";
+        static const std::string _number = "number";
+        if (_name == attributes[0] && _number == attributes[2]) {
+            myCollection[attributes[1]] = std::atoi(attributes[3]);
+        }
+    }
 }

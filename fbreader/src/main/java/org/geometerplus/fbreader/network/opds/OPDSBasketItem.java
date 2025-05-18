@@ -29,33 +29,33 @@ import org.geometerplus.zlibrary.core.util.MiscUtil;
 import java.util.List;
 
 class OPDSBasketItem extends BasketItem {
-	OPDSBasketItem(NetworkLibrary library, OPDSNetworkLink link) {
-		super(library, link);
-	}
+    OPDSBasketItem(NetworkLibrary library, OPDSNetworkLink link) {
+        super(library, link);
+    }
 
-	@Override
-	public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
-		final List<String> ids = bookIds();
-		if (ids.isEmpty()) {
-			return;
-		}
+    @Override
+    public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
+        final List<String> ids = bookIds();
+        if (ids.isEmpty()) {
+            return;
+        }
 
-		if (isFullyLoaded()) {
-			for (String id : ids) {
-				loader.onNewItem(getBook(id));
-			}
-			loader.Tree.confirmAllItems();
-			return;
-		}
+        if (isFullyLoaded()) {
+            for (String id : ids) {
+                loader.onNewItem(getBook(id));
+            }
+            loader.Tree.confirmAllItems();
+            return;
+        }
 
-		final OPDSNetworkLink opdsLink = (OPDSNetworkLink)Link;
-		String url = opdsLink.getUrl(UrlInfo.Type.ListBooks);
-		if (url == null) {
-			return;
-		}
-		url = url.replace("{ids}", MiscUtil.join(ids, ","));
+        final OPDSNetworkLink opdsLink = (OPDSNetworkLink) Link;
+        String url = opdsLink.getUrl(UrlInfo.Type.ListBooks);
+        if (url == null) {
+            return;
+        }
+        url = url.replace("{ids}", MiscUtil.join(ids, ","));
 
-		final OPDSCatalogItem.State state = opdsLink.createOperationData(loader);
-		doLoadChildren(state, opdsLink.createNetworkData(url, state));
-	}
+        final OPDSCatalogItem.State state = opdsLink.createOperationData(loader);
+        doLoadChildren(state, opdsLink.createNetworkData(url, state));
+    }
 }

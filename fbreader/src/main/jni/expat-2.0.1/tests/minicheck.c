@@ -13,8 +13,7 @@
 #include "minicheck.h"
 
 Suite *
-suite_create(char *name)
-{
+suite_create(char *name) {
     Suite *suite = (Suite *) calloc(1, sizeof(Suite));
     if (suite != NULL) {
         suite->name = name;
@@ -23,8 +22,7 @@ suite_create(char *name)
 }
 
 TCase *
-tcase_create(char *name)
-{
+tcase_create(char *name) {
     TCase *tc = (TCase *) calloc(1, sizeof(TCase));
     if (tc != NULL) {
         tc->name = name;
@@ -33,8 +31,7 @@ tcase_create(char *name)
 }
 
 void
-suite_add_tcase(Suite *suite, TCase *tc) 
-{
+suite_add_tcase(Suite *suite, TCase *tc) {
     assert(suite != NULL);
     assert(tc != NULL);
     assert(tc->next_tcase == NULL);
@@ -46,16 +43,14 @@ suite_add_tcase(Suite *suite, TCase *tc)
 void
 tcase_add_checked_fixture(TCase *tc,
                           tcase_setup_function setup,
-                          tcase_teardown_function teardown)
-{
+                          tcase_teardown_function teardown) {
     assert(tc != NULL);
     tc->setup = setup;
     tc->teardown = teardown;
 }
 
 void
-tcase_add_test(TCase *tc, tcase_test_function test)
-{
+tcase_add_test(TCase *tc, tcase_test_function test) {
     assert(tc != NULL);
     if (tc->allocated == tc->ntests) {
         int nalloc = tc->allocated + 100;
@@ -73,8 +68,7 @@ tcase_add_test(TCase *tc, tcase_test_function test)
 }
 
 SRunner *
-srunner_create(Suite *suite)
-{
+srunner_create(Suite *suite) {
     SRunner *runner = calloc(1, sizeof(SRunner));
     if (runner != NULL) {
         runner->suite = suite;
@@ -89,8 +83,7 @@ static int _check_current_lineno = -1;
 static char const *_check_current_filename = NULL;
 
 void
-_check_set_test_info(char const *function, char const *filename, int lineno)
-{
+_check_set_test_info(char const *function, char const *filename, int lineno) {
     _check_current_function = function;
     _check_current_lineno = lineno;
     _check_current_filename = filename;
@@ -98,8 +91,7 @@ _check_set_test_info(char const *function, char const *filename, int lineno)
 
 
 static void
-add_failure(SRunner *runner, int verbosity)
-{
+add_failure(SRunner *runner, int verbosity) {
     runner->nfailures++;
     if (verbosity >= CK_VERBOSE) {
         printf("%s:%d: %s\n", _check_current_filename,
@@ -108,8 +100,7 @@ add_failure(SRunner *runner, int verbosity)
 }
 
 void
-srunner_run_all(SRunner *runner, int verbosity)
-{
+srunner_run_all(SRunner *runner, int verbosity) {
     Suite *suite;
     TCase *tc;
     assert(runner != NULL);
@@ -156,8 +147,7 @@ srunner_run_all(SRunner *runner, int verbosity)
 }
 
 void
-_fail_unless(int condition, const char *file, int line, char *msg)
-{
+_fail_unless(int condition, const char *file, int line, char *msg) {
     /* Always print the error message so it isn't lost.  In this case,
        we have a failure, so there's no reason to be quiet about what
        it is.
@@ -168,15 +158,13 @@ _fail_unless(int condition, const char *file, int line, char *msg)
 }
 
 int
-srunner_ntests_failed(SRunner *runner)
-{
+srunner_ntests_failed(SRunner *runner) {
     assert(runner != NULL);
     return runner->nfailures;
 }
 
 void
-srunner_free(SRunner *runner)
-{
+srunner_free(SRunner *runner) {
     free(runner->suite);
     free(runner);
 }

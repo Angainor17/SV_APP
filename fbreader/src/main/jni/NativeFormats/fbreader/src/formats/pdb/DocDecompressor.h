@@ -27,10 +27,12 @@ class ZLInputStream;
 class DocDecompressor {
 
 public:
-	DocDecompressor() {}
-	~DocDecompressor() {}
+    DocDecompressor() {}
 
-	size_t decompress(ZLInputStream &stream, char *buffer, size_t compressedSize, size_t maxUncompressedSize);
+    ~DocDecompressor() {}
+
+    size_t decompress(ZLInputStream &stream, char *buffer, size_t compressedSize,
+                      size_t maxUncompressedSize);
 };
 
 #endif /* __DOCDECOMPRESSOR_H__ */

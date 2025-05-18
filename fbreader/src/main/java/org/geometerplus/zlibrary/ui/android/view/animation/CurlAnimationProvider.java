@@ -39,6 +39,7 @@ public final class CurlAnimationProvider extends AnimationProvider {
     private float mySpeedFactor = 1;
     private Bitmap myBuffer;
     private volatile boolean myUseCanvasHack = false;
+
     public CurlAnimationProvider(BitmapManager bitmapManager) {
         super(bitmapManager);
 

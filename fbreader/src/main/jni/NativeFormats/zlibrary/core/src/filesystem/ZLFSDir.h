@@ -25,15 +25,16 @@
 class ZLFSDir : public ZLDir {
 
 protected:
-	ZLFSDir(const std::string &path);
+    ZLFSDir(const std::string &path);
 
 public:
-	virtual ~ZLFSDir();
+    virtual ~ZLFSDir();
 
-	std::string delimiter() const;
+    std::string delimiter() const;
 };
 
 inline ZLFSDir::ZLFSDir(const std::string &path) : ZLDir(path) {}
+
 inline ZLFSDir::~ZLFSDir() {}
 
 #endif /* __ZLFSDIR_H__ */

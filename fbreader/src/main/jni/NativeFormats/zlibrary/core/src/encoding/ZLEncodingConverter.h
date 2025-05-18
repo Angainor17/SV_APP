@@ -29,25 +29,31 @@
 class ZLEncodingConverter {
 
 public:
-	static const std::string ASCII;
-	static const std::string UTF8;
-	static const std::string UTF16;
-	static const std::string UTF16BE;
+    static const std::string ASCII;
+    static const std::string UTF8;
+    static const std::string UTF16;
+    static const std::string UTF16BE;
 
 protected:
-	ZLEncodingConverter();
+    ZLEncodingConverter();
 
 public:
-	virtual ~ZLEncodingConverter();
-	virtual std::string name() const = 0;
-	virtual void convert(std::string &dst, const char *srcStart, const char *srcEnd) = 0;
-	void convert(std::string &dst, const std::string &src);
-	virtual void reset() = 0;
-	virtual bool fillTable(int *map) = 0;
+    virtual ~ZLEncodingConverter();
+
+    virtual std::string name() const = 0;
+
+    virtual void convert(std::string &dst, const char *srcStart, const char *srcEnd) = 0;
+
+    void convert(std::string &dst, const std::string &src);
+
+    virtual void reset() = 0;
+
+    virtual bool fillTable(int *map) = 0;
 
 private:
-	ZLEncodingConverter(const ZLEncodingConverter&);
-	ZLEncodingConverter &operator = (const ZLEncodingConverter&);
+    ZLEncodingConverter(const ZLEncodingConverter &);
+
+    ZLEncodingConverter &operator=(const ZLEncodingConverter &);
 };
 
 class ZLEncodingConverterProvider;
@@ -55,24 +61,29 @@ class ZLEncodingConverterProvider;
 class ZLEncodingCollection {
 
 public:
-	static ZLEncodingCollection &Instance();
-	static std::string encodingDescriptionPath();
+    static ZLEncodingCollection &Instance();
+
+    static std::string encodingDescriptionPath();
 
 private:
-	static ZLEncodingCollection *ourInstance;
+    static ZLEncodingCollection *ourInstance;
 
 public:
-	shared_ptr<ZLEncodingConverter> converter(const std::string &name) const;
-	shared_ptr<ZLEncodingConverter> converter(int code) const;
-	shared_ptr<ZLEncodingConverter> defaultConverter() const;
-	void registerProvider(shared_ptr<ZLEncodingConverterProvider> provider);
+    shared_ptr<ZLEncodingConverter> converter(const std::string &name) const;
+
+    shared_ptr<ZLEncodingConverter> converter(int code) const;
+
+    shared_ptr<ZLEncodingConverter> defaultConverter() const;
+
+    void registerProvider(shared_ptr<ZLEncodingConverterProvider> provider);
 
 private:
-	std::vector<shared_ptr<ZLEncodingConverterProvider> > myProviders;
+    std::vector<shared_ptr<ZLEncodingConverterProvider> > myProviders;
 
 private:
-	ZLEncodingCollection();
-	~ZLEncodingCollection();
+    ZLEncodingCollection();
+
+    ~ZLEncodingCollection();
 };
 
 #endif /* __ZLENCODINGCONVERTER_H__ */

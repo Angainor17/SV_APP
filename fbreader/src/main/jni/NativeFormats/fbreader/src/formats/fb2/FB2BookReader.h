@@ -28,33 +28,37 @@ class BookModel;
 class FB2BookReader : public FB2Reader {
 
 public:
-	FB2BookReader(BookModel &model);
-	bool readBook();
+    FB2BookReader(BookModel &model);
 
-	bool processNamespaces() const;
-	void startElementHandler(int tag, const char **attributes);
-	void endElementHandler(int tag);
-	void characterDataHandler(const char *text, std::size_t len);
+    bool readBook();
+
+    bool processNamespaces() const;
+
+    void startElementHandler(int tag, const char **attributes);
+
+    void endElementHandler(int tag);
+
+    void characterDataHandler(const char *text, std::size_t len);
 
 private:
-	int mySectionDepth;
-	int myBodyCounter;
-	bool myReadMainText;
-	int myFootnoteTagDepth;
-	bool myInsideCoverpage;
-	std::size_t myParagraphsBeforeBodyNumber;
-	std::string myCoverImageReference;
-	bool myInsidePoem;
-	int myListDepth;
-	BookReader myModelReader;
+    int mySectionDepth;
+    int myBodyCounter;
+    bool myReadMainText;
+    int myFootnoteTagDepth;
+    bool myInsideCoverpage;
+    std::size_t myParagraphsBeforeBodyNumber;
+    std::string myCoverImageReference;
+    bool myInsidePoem;
+    int myListDepth;
+    BookReader myModelReader;
 
-	int myCurrentImageStart;
-	std::string myCurrentImageId;
+    int myCurrentImageStart;
+    std::string myCurrentImageId;
 
-	bool mySectionStarted;
-	bool myInsideTitle;
+    bool mySectionStarted;
+    bool myInsideTitle;
 
-	FBTextKind myHyperlinkType;
+    FBTextKind myHyperlinkType;
 };
 
 #endif /* __FB2BOOKREADER_H__ */

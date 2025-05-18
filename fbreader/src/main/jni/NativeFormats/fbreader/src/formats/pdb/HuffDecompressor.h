@@ -23,41 +23,48 @@
 #include <string>
 
 class ZLInputStream;
+
 class BitReader;
 
 class HuffDecompressor {
 
 public:
-	HuffDecompressor(ZLInputStream& stream, 
-						const std::vector<unsigned long>::const_iterator beginHuffRecordOffsetIt, 
-						const std::vector<unsigned long>::const_iterator endHuffRecordOffsetIt,
-						const unsigned long endHuffDataOffset, const unsigned long extraFlags);
-	~HuffDecompressor();
+    HuffDecompressor(ZLInputStream &stream,
+                     const std::vector<unsigned long>::const_iterator beginHuffRecordOffsetIt,
+                     const std::vector<unsigned long>::const_iterator endHuffRecordOffsetIt,
+                     const unsigned long endHuffDataOffset, const unsigned long extraFlags);
 
-	size_t decompress(ZLInputStream &stream, char *buffer, size_t compressedSize, size_t maxUncompressedSize);
-	bool error() const;
+    ~HuffDecompressor();
+
+    size_t decompress(ZLInputStream &stream, char *buffer, size_t compressedSize,
+                      size_t maxUncompressedSize);
+
+    bool error() const;
+
 private:
-	size_t sizeOfTrailingEntries(unsigned char* data, size_t size) const;
-	size_t readVariableWidthIntegerBE(unsigned char* ptr, size_t psize) const;
-	void bitsDecompress(BitReader &bits, size_t depth = 0);
+    size_t sizeOfTrailingEntries(unsigned char *data, size_t size) const;
+
+    size_t readVariableWidthIntegerBE(unsigned char *ptr, size_t psize) const;
+
+    void bitsDecompress(BitReader &bits, size_t depth = 0);
 
 private:
-	unsigned long myEntryBits;
-	unsigned long myExtraFlags;
+    unsigned long myEntryBits;
+    unsigned long myExtraFlags;
 
-	unsigned long* myCacheTable;
-	unsigned long* myBaseTable;
-	unsigned char* myData;
-	unsigned char** myDicts;
+    unsigned long *myCacheTable;
+    unsigned long *myBaseTable;
+    unsigned char *myData;
+    unsigned char **myDicts;
 
-	char* myTargetBuffer;
-	char* myTargetBufferEnd;
-	char* myTargetBufferPtr;
+    char *myTargetBuffer;
+    char *myTargetBufferEnd;
+    char *myTargetBufferPtr;
 
-	enum {
-		ERROR_NONE,
-		ERROR_CORRUPTED_FILE
-	} myErrorCode;
+    enum {
+        ERROR_NONE,
+        ERROR_CORRUPTED_FILE
+    } myErrorCode;
 };
 
 #endif /* __HUFFDECOMPRESSOR_H__ */

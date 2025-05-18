@@ -23,12 +23,12 @@ import org.geometerplus.fbreader.fbreader.options.SyncOptions;
 import org.geometerplus.zlibrary.core.network.ZLNetworkContext;
 
 public abstract class SyncUtil {
-	public static String getAccountName(ZLNetworkContext context) {
-		return context.getAccountName(SyncOptions.DOMAIN, SyncOptions.REALM);
-	}
+    public static String getAccountName(ZLNetworkContext context) {
+        return context.getAccountName(SyncOptions.DOMAIN, SyncOptions.REALM);
+    }
 
-	public static void logout(ZLNetworkContext context) {
-		context.removeCookiesForDomain(SyncOptions.DOMAIN);
-		context.setAccountName(SyncOptions.DOMAIN, SyncOptions.REALM, null);
-	}
+    public static void logout(ZLNetworkContext context) {
+        context.removeCookiesForDomain(SyncOptions.DOMAIN);
+        context.setAccountName(SyncOptions.DOMAIN, SyncOptions.REALM, null);
+    }
 }

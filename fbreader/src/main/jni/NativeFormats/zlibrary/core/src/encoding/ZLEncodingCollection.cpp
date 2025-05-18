@@ -32,45 +32,46 @@
 ZLEncodingCollection *ZLEncodingCollection::ourInstance = 0;
 
 ZLEncodingCollection &ZLEncodingCollection::Instance() {
-	if (ourInstance == 0) {
-		ourInstance = new ZLEncodingCollection();
-	}
-	return *ourInstance;
+    if (ourInstance == 0) {
+        ourInstance = new ZLEncodingCollection();
+    }
+    return *ourInstance;
 }
 
 std::string ZLEncodingCollection::encodingDescriptionPath() {
-	return ZLibrary::ZLibraryDirectory() + ZLibrary::FileNameDelimiter + "encodings";
+    return ZLibrary::ZLibraryDirectory() + ZLibrary::FileNameDelimiter + "encodings";
 }
 
 ZLEncodingCollection::ZLEncodingCollection() {
-	registerProvider(new DummyEncodingConverterProvider());
-	registerProvider(new Utf8EncodingConverterProvider());
-	registerProvider(new Utf16EncodingConverterProvider());
-	registerProvider(new JavaEncodingConverterProvider());
+    registerProvider(new DummyEncodingConverterProvider());
+    registerProvider(new Utf8EncodingConverterProvider());
+    registerProvider(new Utf16EncodingConverterProvider());
+    registerProvider(new JavaEncodingConverterProvider());
 }
 
 void ZLEncodingCollection::registerProvider(shared_ptr<ZLEncodingConverterProvider> provider) {
-	myProviders.push_back(provider);
+    myProviders.push_back(provider);
 }
 
 ZLEncodingCollection::~ZLEncodingCollection() {
 }
 
 shared_ptr<ZLEncodingConverter> ZLEncodingCollection::converter(const std::string &name) const {
-	for (std::vector<shared_ptr<ZLEncodingConverterProvider> >::const_iterator it = myProviders.begin(); it != myProviders.end(); ++it) {
-		if ((*it)->providesConverter(name)) {
-			return (*it)->createConverter(name);
-		}
-	}
-	return 0;
+    for (std::vector<shared_ptr<ZLEncodingConverterProvider> >::const_iterator it = myProviders.begin();
+         it != myProviders.end(); ++it) {
+        if ((*it)->providesConverter(name)) {
+            return (*it)->createConverter(name);
+        }
+    }
+    return 0;
 }
 
 shared_ptr<ZLEncodingConverter> ZLEncodingCollection::converter(int code) const {
-	std::string name;
-	ZLStringUtil::appendNumber(name, code);
-	return converter(name);
+    std::string name;
+    ZLStringUtil::appendNumber(name, code);
+    return converter(name);
 }
 
 shared_ptr<ZLEncodingConverter> ZLEncodingCollection::defaultConverter() const {
-	return converter(ZLEncodingConverter::UTF8);
+    return converter(ZLEncodingConverter::UTF8);
 }

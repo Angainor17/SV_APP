@@ -27,11 +27,12 @@
 class EncodedTextReader {
 
 protected:
-	EncodedTextReader(const std::string &encoding);
-	virtual ~EncodedTextReader();
+    EncodedTextReader(const std::string &encoding);
+
+    virtual ~EncodedTextReader();
 
 protected:
-	shared_ptr<ZLEncodingConverter> myConverter;
+    shared_ptr<ZLEncodingConverter> myConverter;
 };
 
 #endif /* __ENCODEDTEXTREADER_H__ */

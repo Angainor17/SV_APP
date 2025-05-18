@@ -27,11 +27,12 @@
 class ZLImage {
 
 protected:
-	ZLImage();
+    ZLImage();
 
 public:
-	virtual ~ZLImage();
-	virtual bool isSingle() const = 0;
+    virtual ~ZLImage();
+
+    virtual bool isSingle() const = 0;
 };
 
 class ZLSingleImage : public ZLImage {
@@ -46,42 +47,52 @@ public:
 */
 
 protected:
-	ZLSingleImage(const std::string &mimeType);
-	virtual ~ZLSingleImage();
+    ZLSingleImage(const std::string &mimeType);
+
+    virtual ~ZLSingleImage();
 
 public:
-	bool isSingle() const { return true; }
-	const std::string &mimeType() const;
-	//virtual const shared_ptr<std::string> stringData() const = 0;
+    bool isSingle() const { return true; }
 
-	//virtual Kind kind() const;
+    const std::string &mimeType() const;
+    //virtual const shared_ptr<std::string> stringData() const = 0;
+
+    //virtual Kind kind() const;
 
 private:
-	std::string myMimeType;
+    std::string myMimeType;
 };
 
 class ZLMultiImage : public ZLImage {
 
 protected:
-	ZLMultiImage();
-	virtual ~ZLMultiImage();
+    ZLMultiImage();
+
+    virtual ~ZLMultiImage();
 
 public:
-	bool isSingle() const { return false; }
-	virtual unsigned int rows() const = 0;
-	virtual unsigned int columns() const = 0;
-	virtual shared_ptr<const ZLImage> subImage(unsigned int row, unsigned int column) const = 0;
+    bool isSingle() const { return false; }
+
+    virtual unsigned int rows() const = 0;
+
+    virtual unsigned int columns() const = 0;
+
+    virtual shared_ptr<const ZLImage> subImage(unsigned int row, unsigned int column) const = 0;
 };
 
 inline ZLImage::ZLImage() {}
+
 inline ZLImage::~ZLImage() {}
 
 inline ZLSingleImage::ZLSingleImage(const std::string &mimeType) : myMimeType(mimeType) {}
+
 inline ZLSingleImage::~ZLSingleImage() {}
+
 inline const std::string &ZLSingleImage::mimeType() const { return myMimeType; }
 //inline ZLSingleImage::Kind ZLSingleImage::kind() const { return REGULAR_IMAGE; }
 
 inline ZLMultiImage::ZLMultiImage() : ZLImage() {}
+
 inline ZLMultiImage::~ZLMultiImage() {}
 
 #endif /* __ZLIMAGE_H__ */

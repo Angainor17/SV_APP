@@ -27,18 +27,23 @@
 class ZLUnixFileOutputStream : public ZLOutputStream {
 
 public:
-	ZLUnixFileOutputStream(const std::string &name);
-	~ZLUnixFileOutputStream();
-	bool open();
-	void write(const char *data, std::size_t len);
-	void write(const std::string &str);
-	void close();
+    ZLUnixFileOutputStream(const std::string &name);
+
+    ~ZLUnixFileOutputStream();
+
+    bool open();
+
+    void write(const char *data, std::size_t len);
+
+    void write(const std::string &str);
+
+    void close();
 
 private:
-	std::string myName;
-	std::string myTemporaryName;
-	bool myHasErrors;
-	FILE *myFile;
+    std::string myName;
+    std::string myTemporaryName;
+    bool myHasErrors;
+    FILE *myFile;
 };
 
 #endif /* __ZLUNIXFILEOUTPUTSTREAM_H__ */

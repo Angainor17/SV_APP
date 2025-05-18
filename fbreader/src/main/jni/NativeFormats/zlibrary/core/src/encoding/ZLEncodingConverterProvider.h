@@ -29,16 +29,19 @@ class ZLEncodingConverter;
 class ZLEncodingConverterProvider {
 
 protected:
-	ZLEncodingConverterProvider();
+    ZLEncodingConverterProvider();
 
 public:
-	virtual ~ZLEncodingConverterProvider();
-	virtual bool providesConverter(const std::string &encoding) = 0;
-	virtual shared_ptr<ZLEncodingConverter> createConverter(const std::string &encoding) = 0;
+    virtual ~ZLEncodingConverterProvider();
+
+    virtual bool providesConverter(const std::string &encoding) = 0;
+
+    virtual shared_ptr<ZLEncodingConverter> createConverter(const std::string &encoding) = 0;
 
 private:
-	ZLEncodingConverterProvider(const ZLEncodingConverterProvider&);
-	const ZLEncodingConverterProvider &operator = (const ZLEncodingConverterProvider&);
+    ZLEncodingConverterProvider(const ZLEncodingConverterProvider &);
+
+    const ZLEncodingConverterProvider &operator=(const ZLEncodingConverterProvider &);
 };
 
 #endif /* __ZLENCODINGCONVERTERPROVIDER_H__ */

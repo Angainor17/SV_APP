@@ -23,13 +23,13 @@ import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata;
 import org.geometerplus.zlibrary.core.xml.ZLStringMap;
 
 class OPDSFeedMetadata extends ATOMFeedMetadata {
-	public int OpensearchTotalResults = -1;
-	public int OpensearchItemsPerPage;
-	public int OpensearchStartIndex = 1;
+    public int OpensearchTotalResults = -1;
+    public int OpensearchItemsPerPage;
+    public int OpensearchStartIndex = 1;
 
-	public String ViewType;
+    public String ViewType;
 
-	protected OPDSFeedMetadata(ZLStringMap attributes) {
-		super(attributes);
-	}
+    protected OPDSFeedMetadata(ZLStringMap attributes) {
+        super(attributes);
+    }
 }

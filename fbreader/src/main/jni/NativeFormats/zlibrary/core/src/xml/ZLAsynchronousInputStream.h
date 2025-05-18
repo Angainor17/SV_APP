@@ -26,47 +26,65 @@
 class ZLAsynchronousInputStream {
 
 public:
-	class Handler {
+    class Handler {
 
-	public:
-		virtual ~Handler();
-		virtual void initialize(const char *encoding) = 0;
-		virtual void shutdown() = 0;
-		virtual bool handleBuffer(const char *data, std::size_t len) = 0;
-	};
+    public:
+        virtual ~Handler();
+
+        virtual void initialize(const char *encoding) = 0;
+
+        virtual void shutdown() = 0;
+
+        virtual bool handleBuffer(const char *data, std::size_t len) = 0;
+    };
 
 public:
-	ZLAsynchronousInputStream(const char *encoding = 0);
-	virtual ~ZLAsynchronousInputStream();
+    ZLAsynchronousInputStream(const char *encoding = 0);
 
-	void setEof();
-	void setBuffer(const char *data, std::size_t len);
-	bool eof() const;
-	bool initialized() const;
+    virtual ~ZLAsynchronousInputStream();
 
-	bool processInput(Handler &handler);
+    void setEof();
+
+    void setBuffer(const char *data, std::size_t len);
+
+    bool eof() const;
+
+    bool initialized() const;
+
+    bool processInput(Handler &handler);
 
 protected:
-	virtual bool processInputInternal(Handler &handler) = 0;
+    virtual bool processInputInternal(Handler &handler) = 0;
 
 protected:
-	const char *myData;
-	std::size_t myDataLen;
+    const char *myData;
+    std::size_t myDataLen;
 
 private:
-	std::string myEncoding;
-	bool myInitialized;
-	bool myEof;
+    std::string myEncoding;
+    bool myInitialized;
+    bool myEof;
 
 private:
-	// disable copying
-	ZLAsynchronousInputStream(const ZLAsynchronousInputStream &);
-	const ZLAsynchronousInputStream &operator = (const ZLAsynchronousInputStream &);
+    // disable copying
+    ZLAsynchronousInputStream(const ZLAsynchronousInputStream &);
+
+    const ZLAsynchronousInputStream &operator=(const ZLAsynchronousInputStream &);
 };
 
-inline void ZLAsynchronousInputStream::setEof() { myEof = true; myData = 0; myDataLen = 0; }
-inline void ZLAsynchronousInputStream::setBuffer(const char *data, std::size_t len) { myData = data; myDataLen = len; }
+inline void ZLAsynchronousInputStream::setEof() {
+    myEof = true;
+    myData = 0;
+    myDataLen = 0;
+}
+
+inline void ZLAsynchronousInputStream::setBuffer(const char *data, std::size_t len) {
+    myData = data;
+    myDataLen = len;
+}
+
 inline bool ZLAsynchronousInputStream::eof() const { return myEof; }
+
 inline bool ZLAsynchronousInputStream::initialized() const { return myInitialized; }
 
 #endif /* __ZLASYNCHRONOUSINPUTSTREAM_H__ */

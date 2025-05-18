@@ -5,12 +5,16 @@
 */
 
 #ifdef HAVE_EXPAT_CONFIG_H
+
 #include <expat_config.h>
+
 #endif
 #ifdef HAVE_CHECK_H
 #include <check.h>
 #else
+
 #include "minicheck.h"
+
 #endif
 
 #include <assert.h>
@@ -21,8 +25,7 @@
 
 
 static int
-xmlstrlen(const XML_Char *s)
-{
+xmlstrlen(const XML_Char *s) {
     int len = 0;
     assert(s != NULL);
     while (s[len] != 0)
@@ -32,15 +35,13 @@ xmlstrlen(const XML_Char *s)
 
 
 void
-CharData_Init(CharData *storage)
-{
+CharData_Init(CharData *storage) {
     assert(storage != NULL);
     storage->count = -1;
 }
 
 void
-CharData_AppendString(CharData *storage, const char *s)
-{
+CharData_AppendString(CharData *storage, const char *s) {
     int maxchars = sizeof(storage->data) / sizeof(storage->data[0]);
     int len;
 
@@ -58,8 +59,7 @@ CharData_AppendString(CharData *storage, const char *s)
 }
 
 void
-CharData_AppendXMLChars(CharData *storage, const XML_Char *s, int len)
-{
+CharData_AppendXMLChars(CharData *storage, const XML_Char *s, int len) {
     int maxchars;
 
     assert(storage != NULL);
@@ -80,8 +80,7 @@ CharData_AppendXMLChars(CharData *storage, const XML_Char *s, int len)
 }
 
 int
-CharData_CheckString(CharData *storage, const char *expected)
-{
+CharData_CheckString(CharData *storage, const char *expected) {
     char buffer[1280];
     int len;
     int count;
@@ -93,7 +92,7 @@ CharData_CheckString(CharData *storage, const char *expected)
     if (len != count) {
         if (sizeof(XML_Char) == 1)
             sprintf(buffer, "wrong number of data characters:"
-                    " got %d, expected %d:\n%s", count, len, storage->data);
+                            " got %d, expected %d:\n%s", count, len, storage->data);
         else
             sprintf(buffer,
                     "wrong number of data characters: got %d, expected %d",
@@ -109,8 +108,7 @@ CharData_CheckString(CharData *storage, const char *expected)
 }
 
 int
-CharData_CheckXMLChars(CharData *storage, const XML_Char *expected)
-{
+CharData_CheckXMLChars(CharData *storage, const XML_Char *expected) {
     char buffer[1024];
     int len = xmlstrlen(expected);
     int count;

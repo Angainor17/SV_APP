@@ -27,45 +27,45 @@ import java.io.IOException;
 import java.io.InputStream;
 
 abstract class FileTypePalm extends FileType {
-	private final String myPalmId;
+    private final String myPalmId;
 
-	FileTypePalm(String id, String palmId) {
-		super(id);
-		myPalmId = palmId;
-	}
+    FileTypePalm(String id, String palmId) {
+        super(id);
+        myPalmId = palmId;
+    }
 
-	protected static String palmFileType(final ZLFile file) {
-		// TODO: use database instead of option (?)
-		final ZLStringOption palmTypeOption = new ZLStringOption(file.getPath(), "PalmType", "");
-		String palmType = palmTypeOption.getValue();
-		if (palmType.length() != 8) {
-			byte[] id = new byte[8];
-			try {
-				final InputStream stream = file.getInputStream();
-				if (stream == null) {
-					return null;
-				}
-				stream.skip(60);
-				stream.read(id);
-				stream.close();
-			} catch (IOException e) {
-			}
-			palmType = new String(id).intern();
-			palmTypeOption.setValue(palmType);
-		}
-		return palmType.intern();
-	}
+    protected static String palmFileType(final ZLFile file) {
+        // TODO: use database instead of option (?)
+        final ZLStringOption palmTypeOption = new ZLStringOption(file.getPath(), "PalmType", "");
+        String palmType = palmTypeOption.getValue();
+        if (palmType.length() != 8) {
+            byte[] id = new byte[8];
+            try {
+                final InputStream stream = file.getInputStream();
+                if (stream == null) {
+                    return null;
+                }
+                stream.skip(60);
+                stream.read(id);
+                stream.close();
+            } catch (IOException e) {
+            }
+            palmType = new String(id).intern();
+            palmTypeOption.setValue(palmType);
+        }
+        return palmType.intern();
+    }
 
-	@Override
-	public boolean acceptsFile(ZLFile file) {
-		final String extension = file.getExtension();
-		return
-			("pdb".equalsIgnoreCase(extension) || "prc".equalsIgnoreCase(extension)) &&
-			myPalmId.equals(palmFileType(file));
-	}
+    @Override
+    public boolean acceptsFile(ZLFile file) {
+        final String extension = file.getExtension();
+        return
+                ("pdb".equalsIgnoreCase(extension) || "prc".equalsIgnoreCase(extension)) &&
+                        myPalmId.equals(palmFileType(file));
+    }
 
-	@Override
-	public String defaultExtension(MimeType mime) {
-		return "pdb";
-	}
+    @Override
+    public String defaultExtension(MimeType mime) {
+        return "pdb";
+    }
 }

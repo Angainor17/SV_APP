@@ -27,20 +27,24 @@ import org.geometerplus.zlibrary.core.network.ZLNetworkException;
 import org.geometerplus.zlibrary.core.util.MimeType;
 
 public interface ICustomNetworkLink extends INetworkLink {
-	void setTitle(String title);
-	void setSummary(String summary);
+    void setTitle(String title);
 
-	UrlInfoCollection<UrlInfoWithDate> urlInfoMap();
-	void setUrl(UrlInfo.Type type, String url, MimeType mime);
-	void removeUrl(UrlInfo.Type type);
+    void setSummary(String summary);
 
-	boolean isObsolete(long milliSeconds);
-	void reloadInfo(ZLNetworkContext nc, boolean urlsOnly, boolean quietly) throws ZLNetworkException;
+    UrlInfoCollection<UrlInfoWithDate> urlInfoMap();
 
-	// returns true if next methods have changed link's data:
-	//   setTitle, setSummary, setIcon, setLink, removeLink
-	boolean hasChanges();
+    void setUrl(UrlInfo.Type type, String url, MimeType mime);
 
-	// resets hasChanged() result
-	void resetChanges();
+    void removeUrl(UrlInfo.Type type);
+
+    boolean isObsolete(long milliSeconds);
+
+    void reloadInfo(ZLNetworkContext nc, boolean urlsOnly, boolean quietly) throws ZLNetworkException;
+
+    // returns true if next methods have changed link's data:
+    //   setTitle, setSummary, setIcon, setLink, removeLink
+    boolean hasChanges();
+
+    // resets hasChanged() result
+    void resetChanges();
 }

@@ -76,6 +76,7 @@ import group.pals.android.lib.ui.filechooser.utils.ui.Dlg;
 import group.pals.android.lib.ui.filechooser.utils.ui.LoadingDialog;
 import group.pals.android.lib.ui.filechooser.utils.ui.TaskListener;
 import group.pals.android.lib.ui.filechooser.utils.ui.ViewFilesContextMenuUtils;
+
 /**
  * Main activity for this library.<br>
  * <br>
@@ -86,13 +87,12 @@ import group.pals.android.lib.ui.filechooser.utils.ui.ViewFilesContextMenuUtils;
  * {@link DisplayPrefs#isRememberLastLocation(Context)}, the priorities of them
  * are:<br>
  * <li>1. {@link FileChooserActivity#_SelectFile}</li>
- * 
+ *
  * <li>2. {@link DisplayPrefs#isRememberLastLocation(Context)}</li>
- * 
+ *
  * <li>3. {@link FileChooserActivity#_Rootpath}</li>
- * 
+ *
  * @author Hai Bison
- * 
  */
 public class FileChooserActivity extends Activity {
 
@@ -217,10 +217,10 @@ public class FileChooserActivity extends Activity {
      * &gt;), to restore it after screen orientation changed.
      */
     static final String _FullHistory = History.class.getName() + "_full";
-    private static final int[] _BtnSortIds = { R.id.afc_settings_sort_view_button_sort_by_name_asc,
+    private static final int[] _BtnSortIds = {R.id.afc_settings_sort_view_button_sort_by_name_asc,
             R.id.afc_settings_sort_view_button_sort_by_name_desc, R.id.afc_settings_sort_view_button_sort_by_size_asc,
             R.id.afc_settings_sort_view_button_sort_by_size_desc, R.id.afc_settings_sort_view_button_sort_by_date_asc,
-            R.id.afc_settings_sort_view_button_sort_by_date_desc };
+            R.id.afc_settings_sort_view_button_sort_by_date_desc};
 
     // ====================
     // "CONSTANT" VARIABLES
@@ -282,7 +282,7 @@ public class FileChooserActivity extends Activity {
         public void onClick(View v) {
             if (getLocation() instanceof File) {
                 if (mFileProvider.getFilterMode() != IFileProvider.FilterMode.AnyDirectories) {
-                    if (!((File)getLocation()).canWrite()) {
+                    if (!((File) getLocation()).canWrite()) {
                         Dlg.toast(FileChooserActivity.this, R.string.afc_msg_app_cant_choose_folder, Dlg._LengthShort);
                         return;
                     }
@@ -306,7 +306,7 @@ public class FileChooserActivity extends Activity {
                         && !mIsMultiSelection
                         && data.getFile().isDirectory()
                         && (IFileProvider.FilterMode.DirectoriesOnly.equals(mFileProvider.getFilterMode()) || IFileProvider.FilterMode.FilesAndDirectories
-                                .equals(mFileProvider.getFilterMode()))) {
+                        .equals(mFileProvider.getFilterMode()))) {
                     doFinish(data.getFile());
                 }
             }// single tap to choose files
@@ -417,7 +417,7 @@ public class FileChooserActivity extends Activity {
                 if (mIsSaveDialog) {
                     doCheckSaveasFilenameAndFinish(data.getFile().getName());
                 } else {
-                    final IFileAdapter.Bag bag = (IFileAdapter.Bag)view.getTag();
+                    final IFileAdapter.Bag bag = (IFileAdapter.Bag) view.getTag();
                     if (bag != null && bag.mIsAccessible) {
                         doFinish(data.getFile());
                     }
@@ -527,17 +527,19 @@ public class FileChooserActivity extends Activity {
         @Override
         public void onClick(View v) {
             doSwitchViewType();
-            if(mViewFoldersView.getId() == R.drawable.afc_selector_button_folders_view_list){
+            if (mViewFoldersView.getId() == R.drawable.afc_selector_button_folders_view_list) {
                 mViewFoldersView.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_folders_view_grid));
                 mViewFoldersView.setId(R.drawable.afc_selector_button_folders_view_grid);
-            }else{
+            } else {
                 mViewFoldersView.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_folders_view_list));
                 mViewFoldersView.setId(R.drawable.afc_selector_button_folders_view_list);
             }
         }
     };// mBtnFoldersViewOnClickListener
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         /*
@@ -576,11 +578,11 @@ public class FileChooserActivity extends Activity {
             mIsMultiSelection = false;
 
         mIsSaveLastLocation = getIntent().getBooleanExtra(_SaveLastLocation, true);
-        if(!mIsSaveLastLocation)
+        if (!mIsSaveLastLocation)
             DisplayPrefs.setRememberLastLocation(this, false);
         mDoubleTapToChooseFiles = getIntent().getBooleanExtra(_DoubleTapToChooseFiles, false);
 
-        mTextResources = (HashMap<String, String>)getIntent().getSerializableExtra(_TextResources);
+        mTextResources = (HashMap<String, String>) getIntent().getSerializableExtra(_TextResources);
 
         // load controls
         mViewSort = (ImageView) findViewById(R.id.afc_filechooser_activity_button_sort);
@@ -647,10 +649,10 @@ public class FileChooserActivity extends Activity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.afc_file_chooser_activity, menu);
         MenuItem item = menu.findItem(R.id.afc_filechooser_activity_menuitem_home);
-        if(item != null)
+        if (item != null)
             item.setTitle(mTextResources.get("menuOrigin"));
         item = menu.findItem(R.id.afc_filechooser_activity_menuitem_reload);
-        if(item != null)
+        if (item != null)
             item.setTitle(mTextResources.get("menuReload"));
         return true;
     }// onCreateOptionsMenu()
@@ -913,24 +915,24 @@ public class FileChooserActivity extends Activity {
         setTitle(mTextResources.get("title"));
 
         mViewSort.setOnClickListener(mBtnSortOnClickListener);
-        if(DisplayPrefs.isSortAscending(this)){
+        if (DisplayPrefs.isSortAscending(this)) {
             mViewSort.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_sort_as));
             mViewSort.setId(R.drawable.afc_selector_button_sort_as);
-        }else{
+        } else {
             mViewSort.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_sort_de));
             mViewSort.setId(R.drawable.afc_selector_button_sort_de);
         }
 
         mViewFoldersView.setOnClickListener(mBtnFoldersViewOnClickListener);
         switch (DisplayPrefs.getViewType(this)) {
-        case List:
-            mViewFoldersView.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_folders_view_grid));
-            mViewFoldersView.setId(R.drawable.afc_selector_button_folders_view_grid);
-            break;
-        case Grid:
-            mViewFoldersView.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_folders_view_list));
-            mViewFoldersView.setId(R.drawable.afc_selector_button_folders_view_list);
-            break;
+            case List:
+                mViewFoldersView.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_folders_view_grid));
+                mViewFoldersView.setId(R.drawable.afc_selector_button_folders_view_grid);
+                break;
+            case Grid:
+                mViewFoldersView.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_folders_view_list));
+                mViewFoldersView.setId(R.drawable.afc_selector_button_folders_view_list);
+                break;
         }
         mViewCreateFolder.setOnClickListener(mBtnCreateFolderOnClickListener);
 
@@ -940,7 +942,7 @@ public class FileChooserActivity extends Activity {
         mViewGoForward.setEnabled(false);
         mViewGoForward.setOnClickListener(mBtnGoForwardOnClickListener);
 
-        for (ImageView v : new ImageView[] { mViewGoBack, mViewGoForward })
+        for (ImageView v : new ImageView[]{mViewGoBack, mViewGoForward})
             v.setOnLongClickListener(mBtnGoBackForwardOnLongClickListener);
     }// setupHeader()
 
@@ -952,12 +954,12 @@ public class FileChooserActivity extends Activity {
      */
     private void setupViewFiles() {
         switch (DisplayPrefs.getViewType(this)) {
-        case Grid:
-            mViewFiles = (AbsListView) getLayoutInflater().inflate(R.layout.afc_gridview_files, null);
-            break;
-        case List:
-            mViewFiles = (AbsListView) getLayoutInflater().inflate(R.layout.afc_listview_files, null);
-            break;
+            case Grid:
+                mViewFiles = (AbsListView) getLayoutInflater().inflate(R.layout.afc_gridview_files, null);
+                break;
+            case List:
+                mViewFiles = (AbsListView) getLayoutInflater().inflate(R.layout.afc_listview_files, null);
+                break;
         }
 
         mViewFilesContainer.removeAllViews();
@@ -1038,7 +1040,7 @@ public class FileChooserActivity extends Activity {
             lp.height = size;
             mBtnSave.setLayoutParams(lp);
         }// this is in save mode
-        if(mIsActionBar){
+        if (mIsActionBar) {
             viewGroupFooterContainer.setVisibility(View.VISIBLE);
             viewGroupFooterBottom.setVisibility(View.VISIBLE);
             if (mFileProvider.getFilterMode() != IFileProvider.FilterMode.FilesOnly) {
@@ -1099,15 +1101,15 @@ public class FileChooserActivity extends Activity {
         // get the index of button of current sort type
         int btnCurrentSortTypeIdx = 0;
         switch (DisplayPrefs.getSortType(this)) {
-        case SortByName:
-            btnCurrentSortTypeIdx = 0;
-            break;
-        case SortBySize:
-            btnCurrentSortTypeIdx = 2;
-            break;
-        case SortByDate:
-            btnCurrentSortTypeIdx = 4;
-            break;
+            case SortByName:
+                btnCurrentSortTypeIdx = 0;
+                break;
+            case SortBySize:
+                btnCurrentSortTypeIdx = 2;
+                break;
+            case SortByDate:
+                btnCurrentSortTypeIdx = 4;
+                break;
         }
         if (!DisplayPrefs.isSortAscending(this))
             btnCurrentSortTypeIdx++;
@@ -1141,10 +1143,10 @@ public class FileChooserActivity extends Activity {
                 }
 
                 resortViewFiles();
-                if(DisplayPrefs.isSortAscending(c)){
+                if (DisplayPrefs.isSortAscending(c)) {
                     mViewSort.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_sort_as));
                     mViewSort.setId(R.drawable.afc_selector_button_sort_as);
-                }else{
+                } else {
                     mViewSort.setImageDrawable(getResources().getDrawable(R.drawable.afc_selector_button_sort_de));
                     mViewSort.setId(R.drawable.afc_selector_button_sort_de);
                 }
@@ -1208,12 +1210,12 @@ public class FileChooserActivity extends Activity {
                 super.onPreExecute();
 
                 switch (DisplayPrefs.getViewType(FileChooserActivity.this)) {
-                case Grid:
-                    DisplayPrefs.setViewType(FileChooserActivity.this, ViewType.List);
-                    break;
-                case List:
-                    DisplayPrefs.setViewType(FileChooserActivity.this, ViewType.Grid);
-                    break;
+                    case Grid:
+                        DisplayPrefs.setViewType(FileChooserActivity.this, ViewType.List);
+                        break;
+                    case List:
+                        DisplayPrefs.setViewType(FileChooserActivity.this, ViewType.Grid);
+                        break;
                 }
 
                 setupViewFiles();
@@ -1241,8 +1243,8 @@ public class FileChooserActivity extends Activity {
             return;
         }
 
-        if ((getLocation() instanceof File)){
-            if(!((File)getLocation()).canWrite()){
+        if ((getLocation() instanceof File)) {
+            if (!((File) getLocation()).canWrite()) {
                 Dlg.toast(this, R.string.afc_msg_app_cant_create_folder, Dlg._LengthShort);
                 return;
             }
@@ -1324,8 +1326,7 @@ public class FileChooserActivity extends Activity {
     /**
      * Updates UI that {@code data} will not be deleted.
      *
-     * @param data
-     *            {@link IFileDataModel}
+     * @param data {@link IFileDataModel}
      */
     private void notifyDataModelNotDeleted(IFileDataModel data) {
         data.setTobeDeleted(false);
@@ -1335,8 +1336,7 @@ public class FileChooserActivity extends Activity {
     /**
      * Deletes a file.
      *
-     * @param file
-     *            {@link IFile}
+     * @param file {@link IFile}
      */
     private void doDeleteFile(final IFileDataModel data) {
         if (mFileProvider instanceof LocalFileProvider
@@ -1355,7 +1355,7 @@ public class FileChooserActivity extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         new LoadingDialog(FileChooserActivity.this, getString(R.string.afc_pmsg_deleting_file, data
-                                .getFile().isFile() ? getString(R.string.afc_file) : getString(R.string.afc_folder),
+                                        .getFile().isFile() ? getString(R.string.afc_file) : getString(R.string.afc_folder),
                                 data.getFile().getName()), true) {
 
                             private final boolean _isFile = data.getFile().isFile();
@@ -1464,7 +1464,7 @@ public class FileChooserActivity extends Activity {
                 doFinish(_file);
         }
     }// doCheckSaveasFilenameAndFinish()
-    
+
     /**
      * Gets current location.
      *
@@ -1473,16 +1473,14 @@ public class FileChooserActivity extends Activity {
     private IFile getLocation() {
         return (IFile) mViewLocations.getTag();
     }// getLocation()
-    
+
     /**
      * Sets current location.
      *
-     * @param path
-     *            the path
-     * @param listener
-     *            {@link TaskListener}: the second parameter {@code any} in
-     *            {@link TaskListener#onFinish(boolean, Object)} will be
-     *            {@code path}.
+     * @param path     the path
+     * @param listener {@link TaskListener}: the second parameter {@code any} in
+     *                 {@link TaskListener#onFinish(boolean, Object)} will be
+     *                 {@code path}.
      */
     private void setLocation(final IFile path, final TaskListener listener) {
         setLocation(path, listener, null);
@@ -1491,15 +1489,12 @@ public class FileChooserActivity extends Activity {
     /**
      * Sets current location.
      *
-     * @param path
-     *            the path
-     * @param listener
-     *            {@link TaskListener}: the second parameter {@code any} in
-     *            {@link TaskListener#onFinish(boolean, Object)} will be
-     *            {@code path}.
-     * @param selectedFile
-     *            the file should be selected after loading location done. Can
-     *            be {@code null}.
+     * @param path         the path
+     * @param listener     {@link TaskListener}: the second parameter {@code any} in
+     *                     {@link TaskListener#onFinish(boolean, Object)} will be
+     *                     {@code path}.
+     * @param selectedFile the file should be selected after loading location done. Can
+     *                     be {@code null}.
      */
     private void setLocation(final IFile path, final TaskListener listener, final IFile selectedFile) {
         new LoadingDialog(this, R.string.afc_msg_loading, true) {
@@ -1626,12 +1621,11 @@ public class FileChooserActivity extends Activity {
             }// onPostExecute()
         }.execute();// new LoadingDialog()
     }// setLocation()
-    
+
     /**
      * Goes to a specified location.
      *
-     * @param dir
-     *            a directory, of course.
+     * @param dir a directory, of course.
      * @return {@code true} if {@code dir} <b><i>can</i></b> be browsed to.
      * @since v4.3 beta
      */
@@ -1667,7 +1661,7 @@ public class FileChooserActivity extends Activity {
         int count = 0;
         while (path != null) {
             TextView btnLoc = (TextView) inflater.inflate(R.layout.afc_button_location, null);
-            btnLoc.setText(path.parentFile() != null ? "/"+path.getName() : mTextResources.get("root"));
+            btnLoc.setText(path.parentFile() != null ? "/" + path.getName() : mTextResources.get("root"));
             btnLoc.setTag(path);
             btnLoc.setOnClickListener(mBtnLocationOnClickListener);
             btnLoc.setOnLongClickListener(mBtnLocationOnLongClickListener);
@@ -1715,10 +1709,9 @@ public class FileChooserActivity extends Activity {
     /**
      * Finishes this activity.
      *
-     * @param files
-     *            list of {@link IFile}
+     * @param files list of {@link IFile}
      */
-    private void doFinish(IFile ... files) {
+    private void doFinish(IFile... files) {
         final List<IFile> list = new ArrayList<IFile>();
         for (IFile f : files)
             list.add(f);
@@ -1732,13 +1725,12 @@ public class FileChooserActivity extends Activity {
     /**
      * Finishes this activity.
      *
-     * @param files
-     *            list of {@link IFile}
+     * @param files list of {@link IFile}
      */
     private void doFinish(ArrayList<IFile> files) {
         String returnPath = null;
         // set results
-        switch(mFileProvider.getFilterMode()){
+        switch (mFileProvider.getFilterMode()) {
             case FilesOnly:
                 if (files == null || files.isEmpty()) {
                     setResult(RESULT_CANCELED);
@@ -1746,41 +1738,40 @@ public class FileChooserActivity extends Activity {
                     return;
                 }
                 break;
-            case DirectoriesOnly:
-            {
-                final File file = (File)getLocation();
+            case DirectoriesOnly: {
+                final File file = (File) getLocation();
                 if (file != null && file.canWrite()) {
                     returnPath = getLocation().getAbsolutePath();
                 }
                 break;
             }
             case FilesAndDirectories:
-                if(files == null || files.isEmpty()){
+                if (files == null || files.isEmpty()) {
                     returnPath = getLocation().getAbsolutePath();
                 }
-            break;
+                break;
             default:
                 returnPath = getLocation().getAbsolutePath();
                 break;
         }
 
-		boolean hasData = false;
+        boolean hasData = false;
         Intent intent = new Intent();
         if (returnPath != null) {
             intent.putExtra(_FolderPath, returnPath);
-			hasData = true;
-		}
+            hasData = true;
+        }
 
         if (files != null) {
             intent.putExtra(_Results, files);
-			hasData = true;
+            hasData = true;
         } else {
             intent.putExtra(_Results, new ArrayList<IFile>());
         }
 
-		if (!hasData) {
-			return;
-		}
+        if (!hasData) {
+            return;
+        }
 
         // return flags for further use (in case the caller needs)
         intent.putExtra(_FilterMode, mFileProvider.getFilterMode());
@@ -1796,12 +1787,12 @@ public class FileChooserActivity extends Activity {
         finish();
     }// doFinish()
 
-    private void updateUI(IFile dir){
-        final boolean isDirectoryWriteable = ((File)dir).canWrite();
+    private void updateUI(IFile dir) {
+        final boolean isDirectoryWriteable = ((File) dir).canWrite();
         mViewCreateFolder.setEnabled(isDirectoryWriteable);
         mBtnOk.setEnabled(
-            isDirectoryWriteable ||
-            mFileProvider.getFilterMode() == IFileProvider.FilterMode.AnyDirectories
+                isDirectoryWriteable ||
+                        mFileProvider.getFilterMode() == IFileProvider.FilterMode.AnyDirectories
         );
     }
 

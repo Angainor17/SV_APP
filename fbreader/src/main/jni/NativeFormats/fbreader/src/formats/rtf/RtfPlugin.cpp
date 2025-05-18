@@ -30,46 +30,46 @@
 #include "../../library/Book.h"
 
 bool RtfPlugin::providesMetainfo() const {
-	return false;
+    return false;
 }
 
 const std::string RtfPlugin::supportedFileType() const {
-	return "RTF";
+    return "RTF";
 }
 
 bool RtfPlugin::readMetainfo(Book &book) const {
-	readLanguageAndEncoding(book);
+    readLanguageAndEncoding(book);
 
-	if (!RtfDescriptionReader(book).readDocument(book.file())) {
-		return false;
-	}
+    if (!RtfDescriptionReader(book).readDocument(book.file())) {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool RtfPlugin::readUids(Book &/*book*/) const {
-	return true;
+    return true;
 }
 
 bool RtfPlugin::readModel(BookModel &model) const {
-	const Book &book = *model.book();
-	return RtfBookReader(model, book.encoding()).readDocument(book.file());
+    const Book &book = *model.book();
+    return RtfBookReader(model, book.encoding()).readDocument(book.file());
 }
 
 bool RtfPlugin::readLanguageAndEncoding(Book &book) const {
-	if (book.encoding().empty()) {
-		shared_ptr<ZLInputStream> stream = new RtfReaderStream(book.file(), 50000);
-		if (!stream.isNull()) {
-			detectEncodingAndLanguage(book, *stream);
-		}
-		if (book.encoding().empty()) {
-			book.setEncoding(ZLEncodingConverter::UTF8);
-		}
-	} else if (book.language().empty()) {
-		shared_ptr<ZLInputStream> stream = new RtfReaderStream(book.file(), 50000);
-		if (!stream.isNull()) {
-			detectLanguage(book, *stream, book.encoding());
-		}
-	}
-	return true;
+    if (book.encoding().empty()) {
+        shared_ptr<ZLInputStream> stream = new RtfReaderStream(book.file(), 50000);
+        if (!stream.isNull()) {
+            detectEncodingAndLanguage(book, *stream);
+        }
+        if (book.encoding().empty()) {
+            book.setEncoding(ZLEncodingConverter::UTF8);
+        }
+    } else if (book.language().empty()) {
+        shared_ptr<ZLInputStream> stream = new RtfReaderStream(book.file(), 50000);
+        if (!stream.isNull()) {
+            detectLanguage(book, *stream, book.encoding());
+        }
+    }
+    return true;
 }

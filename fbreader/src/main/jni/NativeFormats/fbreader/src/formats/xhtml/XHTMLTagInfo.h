@@ -26,18 +26,20 @@
 class CSSSelector;
 
 struct XHTMLTagInfo {
-	const std::string Tag;
-	const std::vector<std::string> Classes;
+    const std::string Tag;
+    const std::vector<std::string> Classes;
 
-	XHTMLTagInfo(const std::string &tag, const std::vector<std::string> &classes);
-	bool matches(const CSSSelector &selector) const;
+    XHTMLTagInfo(const std::string &tag, const std::vector<std::string> &classes);
+
+    bool matches(const CSSSelector &selector) const;
 };
 
 class XHTMLTagInfoList : public std::vector<XHTMLTagInfo> {
 
 public:
-	int find(const CSSSelector &selector, int from, int to) const;
-	bool matches(const CSSSelector &selector, int index) const;
+    int find(const CSSSelector &selector, int from, int to) const;
+
+    bool matches(const CSSSelector &selector, int index) const;
 };
 
 #endif /* __XHTMLTAGINFO_H__ */

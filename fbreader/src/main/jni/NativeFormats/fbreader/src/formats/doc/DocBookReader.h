@@ -36,67 +36,84 @@
 class DocBookReader : public OleStreamParser {
 
 public:
-	DocBookReader(BookModel &model, const std::string &encoding);
-	~DocBookReader();
-	bool readBook();
+    DocBookReader(BookModel &model, const std::string &encoding);
+
+    ~DocBookReader();
+
+    bool readBook();
 
 private:
-	void ansiDataHandler(const char *buffer, std::size_t len);
-	void ucs2SymbolHandler(ZLUnicodeUtil::Ucs2Char symbol);
-	void footnotesStartHandler();
+    void ansiDataHandler(const char *buffer, std::size_t len);
 
-	void handleChar(ZLUnicodeUtil::Ucs2Char ucs2char);
-	void handleHardLinebreak();
-	void handleParagraphEnd();
-	void handlePageBreak();
-	void handleTableSeparator();
-	void handleTableEndRow();
-	void handleFootNoteMark();
-	void handleStartField();
-	void handleSeparatorField();
-	void handleEndField();
-	void handleImage(const ZLFileImage::Blocks &blocks);
-	void handleOtherControlChar(ZLUnicodeUtil::Ucs2Char ucs2char);
+    void ucs2SymbolHandler(ZLUnicodeUtil::Ucs2Char symbol);
 
-	//formatting:
-	void handleFontStyle(unsigned int fontStyle);
-	void handleParagraphStyle(const OleMainStream::Style &styleInfo);
-	void handleBookmark(const std::string &name);
+    void footnotesStartHandler();
+
+    void handleChar(ZLUnicodeUtil::Ucs2Char ucs2char);
+
+    void handleHardLinebreak();
+
+    void handleParagraphEnd();
+
+    void handlePageBreak();
+
+    void handleTableSeparator();
+
+    void handleTableEndRow();
+
+    void handleFootNoteMark();
+
+    void handleStartField();
+
+    void handleSeparatorField();
+
+    void handleEndField();
+
+    void handleImage(const ZLFileImage::Blocks &blocks);
+
+    void handleOtherControlChar(ZLUnicodeUtil::Ucs2Char ucs2char);
+
+    //formatting:
+    void handleFontStyle(unsigned int fontStyle);
+
+    void handleParagraphStyle(const OleMainStream::Style &styleInfo);
+
+    void handleBookmark(const std::string &name);
 
 private:
-	static std::string parseLink(ZLUnicodeUtil::Ucs2String s, bool urlencode = false);
+    static std::string parseLink(ZLUnicodeUtil::Ucs2String s, bool urlencode = false);
 
 private:
-	BookReader myModelReader;
+    BookReader myModelReader;
 
-	ZLUnicodeUtil::Ucs2String myFieldInfoBuffer;
+    ZLUnicodeUtil::Ucs2String myFieldInfoBuffer;
 
-	enum {
-		READ_FIELD,
-		READ_TEXT
-	} myReadState;
+    enum {
+        READ_FIELD,
+        READ_TEXT
+    } myReadState;
 
-	enum {
-		READ_FIELD_TEXT,
-		DONT_READ_FIELD_TEXT,
-		READ_FIELD_INFO
-	} myReadFieldState;
+    enum {
+        READ_FIELD_TEXT,
+        DONT_READ_FIELD_TEXT,
+        READ_FIELD_INFO
+    } myReadFieldState;
 
-	//maybe it should be flag?
-	enum {
-		NO_HYPERLINK,
-		EXT_HYPERLINK_INSERTED,
-		INT_HYPERLINK_INSERTED
-	} myHyperlinkTypeState;
+    //maybe it should be flag?
+    enum {
+        NO_HYPERLINK,
+        EXT_HYPERLINK_INSERTED,
+        INT_HYPERLINK_INSERTED
+    } myHyperlinkTypeState;
 
-	//formatting
-	std::vector<FBTextKind> myKindStack;
-	shared_ptr<ZLTextStyleEntry> myCurrentStyleEntry;
-	OleMainStream::Style myCurrentStyleInfo;
-	unsigned int myPictureCounter;
+    //formatting
+    std::vector<FBTextKind> myKindStack;
+    shared_ptr<ZLTextStyleEntry> myCurrentStyleEntry;
+    OleMainStream::Style myCurrentStyleInfo;
+    unsigned int myPictureCounter;
 
-	const std::string myEncoding;
-	DocAnsiConverter myConverter;
+    const std::string myEncoding;
+    DocAnsiConverter myConverter;
 };
 
 inline DocBookReader::~DocBookReader() {}

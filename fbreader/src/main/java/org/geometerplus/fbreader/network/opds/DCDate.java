@@ -23,9 +23,9 @@ import org.geometerplus.fbreader.network.atom.ATOMDateConstruct;
 import org.geometerplus.zlibrary.core.xml.ZLStringMap;
 
 class DCDate extends ATOMDateConstruct {
-	protected DCDate(ZLStringMap source) {
-		super(source);
-	}
+    protected DCDate(ZLStringMap source) {
+        super(source);
+    }
 
 	/*
 	public DCDate(int year) {

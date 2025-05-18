@@ -27,18 +27,20 @@ class Book;
 class DocMetaInfoReader {
 
 public:
-	DocMetaInfoReader(Book &book);
-	~DocMetaInfoReader();
-	bool readMetainfo();
+    DocMetaInfoReader(Book &book);
 
-	/*
-	void startElementHandler(int tag, const char **attributes);
-	void endElementHandler(int tag);
-	void characterDataHandler(const char *text, std::size_t len);
-	*/
+    ~DocMetaInfoReader();
+
+    bool readMetainfo();
+
+    /*
+    void startElementHandler(int tag, const char **attributes);
+    void endElementHandler(int tag);
+    void characterDataHandler(const char *text, std::size_t len);
+    */
 
 private:
-	Book &myBook;
+    Book &myBook;
 };
 
 inline DocMetaInfoReader::~DocMetaInfoReader() {}

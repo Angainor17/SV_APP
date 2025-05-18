@@ -29,34 +29,37 @@ class Book;
 class FB2MetaInfoReader : public FB2Reader {
 
 public:
-	FB2MetaInfoReader(Book &book);
-	bool readMetainfo();
+    FB2MetaInfoReader(Book &book);
 
-	void startElementHandler(int tag, const char **attributes);
-	void endElementHandler(int tag);
-	void characterDataHandler(const char *text, std::size_t len);
+    bool readMetainfo();
+
+    void startElementHandler(int tag, const char **attributes);
+
+    void endElementHandler(int tag);
+
+    void characterDataHandler(const char *text, std::size_t len);
 
 private:
-	Book &myBook;
+    Book &myBook;
 
-	bool myReturnCode;
+    bool myReturnCode;
 
-	enum {
-		READ_NOTHING,
-		READ_TITLE_INFO,
-		READ_TITLE,
-		READ_AUTHOR,
-		READ_AUTHOR_NAME_0,
-		READ_AUTHOR_NAME_1,
-		READ_AUTHOR_NAME_2,
-		READ_LANGUAGE,
-		READ_GENRE,
-		READ_DOCUMENT_INFO,
-		READ_ID
-	} myReadState;
+    enum {
+        READ_NOTHING,
+        READ_TITLE_INFO,
+        READ_TITLE,
+        READ_AUTHOR,
+        READ_AUTHOR_NAME_0,
+        READ_AUTHOR_NAME_1,
+        READ_AUTHOR_NAME_2,
+        READ_LANGUAGE,
+        READ_GENRE,
+        READ_DOCUMENT_INFO,
+        READ_ID
+    } myReadState;
 
-	std::string myAuthorNames[3];
-	std::string myBuffer;
+    std::string myAuthorNames[3];
+    std::string myBuffer;
 };
 
 #endif /* __FB2METAINFOREADER_H__ */

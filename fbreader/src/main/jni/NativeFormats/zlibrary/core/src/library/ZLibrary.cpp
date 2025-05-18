@@ -44,34 +44,34 @@ std::string ZLibrary::ourApplicationDirectory;
 //const std::string ZLibrary::BaseDirectory = std::string(BASEDIR);
 
 void ZLibrary::parseArguments(int &argc, char **&argv) {
-	static const std::string LANGUAGE_OPTION = "-lang";
-	static const std::string LOGGER_OPTION = "-log";
-	while ((argc > 2) && (argv[1] != 0) && (argv[2] != 0)) {
-		const std::string argument = argv[1];
-		/*if (LANGUAGE_OPTION == argument) {
-			ourLocaleIsInitialized = true;
-			std::string locale = argv[2];
-			int index = locale.find('_');
-			if (index >= 0) {
-				ourLanguage = locale.substr(0, index);
-				ourCountry = locale.substr(index + 1);
-			} else {
-				ourLanguage = locale;
-			}
-		} else*/ if (LOGGER_OPTION == argument) {
-			std::string loggerClasses = argv[2];
-			while (std::size_t index = loggerClasses.find(':') != std::string::npos) {
-				ZLLogger::Instance().registerClass(loggerClasses.substr(0, index));
-				loggerClasses.erase(0, index + 1);
-			}
-			ZLLogger::Instance().registerClass(loggerClasses);
-		} else {
-			ZLLogger::Instance().println(ZLLogger::DEFAULT_CLASS, "unknown argument: " + argument);
-		}
-		argc -= 2;
-		argv += 2;
-	}
-	ourZLibraryDirectory = ".";//BaseDirectory + FileNameDelimiter + "zlibrary";
+    static const std::string LANGUAGE_OPTION = "-lang";
+    static const std::string LOGGER_OPTION = "-log";
+    while ((argc > 2) && (argv[1] != 0) && (argv[2] != 0)) {
+        const std::string argument = argv[1];
+        /*if (LANGUAGE_OPTION == argument) {
+            ourLocaleIsInitialized = true;
+            std::string locale = argv[2];
+            int index = locale.find('_');
+            if (index >= 0) {
+                ourLanguage = locale.substr(0, index);
+                ourCountry = locale.substr(index + 1);
+            } else {
+                ourLanguage = locale;
+            }
+        } else*/ if (LOGGER_OPTION == argument) {
+            std::string loggerClasses = argv[2];
+            while (std::size_t index = loggerClasses.find(':') != std::string::npos) {
+                ZLLogger::Instance().registerClass(loggerClasses.substr(0, index));
+                loggerClasses.erase(0, index + 1);
+            }
+            ZLLogger::Instance().registerClass(loggerClasses);
+        } else {
+            ZLLogger::Instance().println(ZLLogger::DEFAULT_CLASS, "unknown argument: " + argument);
+        }
+        argc -= 2;
+        argv += 2;
+    }
+    ourZLibraryDirectory = ".";//BaseDirectory + FileNameDelimiter + "zlibrary";
 }
 
 void ZLibrary::shutdown() {
@@ -79,7 +79,7 @@ void ZLibrary::shutdown() {
 //	ZLImageManager::deleteInstance();
 //	ZLCommunicationManager::deleteInstance();
 //	ZLDialogManager::deleteInstance();
-	ZLFSManager::deleteInstance();
+    ZLFSManager::deleteInstance();
 //	ZLTimeManager::deleteInstance();
 //	ZLConfigManager::deleteInstance();
 }
@@ -101,10 +101,10 @@ void ZLibrary::shutdown() {
 }*/
 
 void ZLibrary::initApplication(const std::string &name) {
-	ourApplicationName = name;
+    ourApplicationName = name;
 //	ourImageDirectory = replaceRegExps(IMAGEDIR);
 //	ourApplicationImageDirectory = replaceRegExps(APPIMAGEDIR);
-	ourApplicationDirectory = ".";//BaseDirectory + FileNameDelimiter + ourApplicationName;
+    ourApplicationDirectory = ".";//BaseDirectory + FileNameDelimiter + ourApplicationName;
 //	ourApplicationWritableDirectory =
 //#ifdef XMLCONFIGHOMEDIR
 //		XMLCONFIGHOMEDIR + FileNameDelimiter + "." + name;

@@ -38,5 +38,5 @@ ZLEncodingConverter::~ZLEncodingConverter() {
 }
 
 void ZLEncodingConverter::convert(std::string &dst, const std::string &src) {
-	convert(dst, src.data(), src.data() + src.length());
+    convert(dst, src.data(), src.data() + src.length());
 }

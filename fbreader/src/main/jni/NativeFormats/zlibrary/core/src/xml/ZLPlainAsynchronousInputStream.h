@@ -26,15 +26,16 @@
 class ZLPlainAsynchronousInputStream : public ZLAsynchronousInputStream {
 
 public:
-	ZLPlainAsynchronousInputStream(const char *encoding = 0);
+    ZLPlainAsynchronousInputStream(const char *encoding = 0);
 
 private:
-	bool processInputInternal(Handler &handler);
+    bool processInputInternal(Handler &handler);
 
 private:
-	// disable copying
-	ZLPlainAsynchronousInputStream(const ZLPlainAsynchronousInputStream &);
-	const ZLPlainAsynchronousInputStream &operator = (const ZLPlainAsynchronousInputStream &);
+    // disable copying
+    ZLPlainAsynchronousInputStream(const ZLPlainAsynchronousInputStream &);
+
+    const ZLPlainAsynchronousInputStream &operator=(const ZLPlainAsynchronousInputStream &);
 };
 
 #endif /* __ZLPLAINASYNCHRONOUSINPUTSTREAM_H__ */

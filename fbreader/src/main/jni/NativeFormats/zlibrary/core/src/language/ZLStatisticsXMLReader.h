@@ -30,16 +30,16 @@ class ZLCharSequence;
 class ZLStatisticsXMLReader : public ZLXMLReader {
 
 public:
-	shared_ptr<ZLArrayBasedStatistics> readStatistics(const std::string &fileName);
+    shared_ptr<ZLArrayBasedStatistics> readStatistics(const std::string &fileName);
 
-	void startElementHandler(const char *tag, const char **attributes);
-
-private:
-	shared_ptr<ZLArrayBasedStatistics> myStatisticsPtr;
+    void startElementHandler(const char *tag, const char **attributes);
 
 private:
-	static const std::string ITEM_TAG;
-	static const std::string STATISTICS_TAG;
+    shared_ptr<ZLArrayBasedStatistics> myStatisticsPtr;
+
+private:
+    static const std::string ITEM_TAG;
+    static const std::string STATISTICS_TAG;
 };
 
 #endif /*__ZLSTATISTICSXMLREADER_H__*/

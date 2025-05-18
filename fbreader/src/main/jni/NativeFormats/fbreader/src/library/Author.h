@@ -33,39 +33,43 @@ class Author;
 class AuthorComparator {
 
 public:
-	bool operator () (
-		const shared_ptr<Author> author0,
-		const shared_ptr<Author> author1
-	) const;
+    bool operator()(
+            const shared_ptr<Author> author0,
+            const shared_ptr<Author> author1
+    ) const;
 };
 
 class Author {
 
 private:
-	static std::set<shared_ptr<Author>,AuthorComparator> ourAuthorSet;
+    static std::set<shared_ptr<Author>, AuthorComparator> ourAuthorSet;
 
 public:
-	static shared_ptr<Author> getAuthor(const std::string &name, const std::string &sortKey = "");
+    static shared_ptr<Author> getAuthor(const std::string &name, const std::string &sortKey = "");
 
 private:
-	Author(const std::string &name, const std::string &sortkey);
+    Author(const std::string &name, const std::string &sortkey);
 
 public:
-	const std::string &name() const;
-	const std::string &sortKey() const;
+    const std::string &name() const;
+
+    const std::string &sortKey() const;
 
 private:
-	const std::string myName;
-	const std::string mySortKey;
+    const std::string myName;
+    const std::string mySortKey;
 
 private: // disable copying:
-	Author(const Author &);
-	const Author &operator = (const Author &);
+    Author(const Author &);
+
+    const Author &operator=(const Author &);
 };
 
-inline Author::Author(const std::string &name, const std::string &sortkey) : myName(name), mySortKey(sortkey) {}
+inline Author::Author(const std::string &name, const std::string &sortkey) : myName(name),
+                                                                             mySortKey(sortkey) {}
 
 inline const std::string &Author::name() const { return myName; }
+
 inline const std::string &Author::sortKey() const { return mySortKey; }
 
 #endif /* __AUTHOR_H__ */

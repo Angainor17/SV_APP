@@ -20,14 +20,15 @@
 #include "ZLPlainAsynchronousInputStream.h"
 
 
-ZLPlainAsynchronousInputStream::ZLPlainAsynchronousInputStream(const char *encoding) : ZLAsynchronousInputStream(encoding) {
+ZLPlainAsynchronousInputStream::ZLPlainAsynchronousInputStream(const char *encoding)
+        : ZLAsynchronousInputStream(encoding) {
 }
 
 bool ZLPlainAsynchronousInputStream::processInputInternal(Handler &handler) {
-	if (eof()) {
-		handler.shutdown();
-		return true;
-	}
-	return handler.handleBuffer(myData, myDataLen);
+    if (eof()) {
+        handler.shutdown();
+        return true;
+    }
+    return handler.handleBuffer(myData, myDataLen);
 }
 

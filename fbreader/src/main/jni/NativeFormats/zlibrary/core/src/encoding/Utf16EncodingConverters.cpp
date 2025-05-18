@@ -24,98 +24,101 @@
 class Utf16EncodingConverter : public ZLEncodingConverter {
 
 protected:
-	Utf16EncodingConverter();
+    Utf16EncodingConverter();
 
 public:
-	void reset();
-	bool fillTable(int *map);
-	void convert(std::string &dst, const char *srcStart, const char *srcEnd);
+    void reset();
+
+    bool fillTable(int *map);
+
+    void convert(std::string &dst, const char *srcStart, const char *srcEnd);
 
 protected:
-	virtual ZLUnicodeUtil::Ucs2Char ucs2Char(unsigned char c0, unsigned char c1) = 0;
+    virtual ZLUnicodeUtil::Ucs2Char ucs2Char(unsigned char c0, unsigned char c1) = 0;
 
 private:
-	bool myHasStoredChar;
-	unsigned char myStoredChar;
+    bool myHasStoredChar;
+    unsigned char myStoredChar;
 };
 
 class Utf16BEEncodingConverter : public Utf16EncodingConverter {
 
 public:
-	std::string name() const;
+    std::string name() const;
 
 private:
-	ZLUnicodeUtil::Ucs2Char ucs2Char(unsigned char c0, unsigned char c1);
+    ZLUnicodeUtil::Ucs2Char ucs2Char(unsigned char c0, unsigned char c1);
 };
 
 class Utf16LEEncodingConverter : public Utf16EncodingConverter {
 
 public:
-	std::string name() const;
+    std::string name() const;
 
 private:
-	ZLUnicodeUtil::Ucs2Char ucs2Char(unsigned char c0, unsigned char c1);
+    ZLUnicodeUtil::Ucs2Char ucs2Char(unsigned char c0, unsigned char c1);
 };
 
 bool Utf16EncodingConverterProvider::providesConverter(const std::string &encoding) {
-	const std::string lowerCasedEncoding = ZLUnicodeUtil::toLower(encoding);
-	return
-		ZLEncodingConverter::UTF16 == lowerCasedEncoding ||
-		ZLEncodingConverter::UTF16BE == lowerCasedEncoding;
+    const std::string lowerCasedEncoding = ZLUnicodeUtil::toLower(encoding);
+    return
+            ZLEncodingConverter::UTF16 == lowerCasedEncoding ||
+            ZLEncodingConverter::UTF16BE == lowerCasedEncoding;
 }
 
-shared_ptr<ZLEncodingConverter> Utf16EncodingConverterProvider::createConverter(const std::string &name) {
-	if (ZLEncodingConverter::UTF16 == ZLUnicodeUtil::toLower(name)) {
-		return new Utf16LEEncodingConverter();
-	} else {
-		return new Utf16BEEncodingConverter();
-	}
+shared_ptr<ZLEncodingConverter>
+Utf16EncodingConverterProvider::createConverter(const std::string &name) {
+    if (ZLEncodingConverter::UTF16 == ZLUnicodeUtil::toLower(name)) {
+        return new Utf16LEEncodingConverter();
+    } else {
+        return new Utf16BEEncodingConverter();
+    }
 }
 
 Utf16EncodingConverter::Utf16EncodingConverter() : myHasStoredChar(false) {
 }
 
 void Utf16EncodingConverter::reset() {
-	myHasStoredChar = false;
+    myHasStoredChar = false;
 }
 
 bool Utf16EncodingConverter::fillTable(int *map) {
-	// is not possible
-	return false;
+    // is not possible
+    return false;
 }
 
 void Utf16EncodingConverter::convert(std::string &dst, const char *srcStart, const char *srcEnd) {
-	if (srcStart >= srcEnd) {
-		return;
-	}
-	char buffer[3];
-	if (myHasStoredChar) {
-		dst.append(buffer, ZLUnicodeUtil::ucs2ToUtf8(buffer, ucs2Char(myStoredChar, *srcStart)));
-		++srcStart;
-		myHasStoredChar = false;
-	}
-	if ((srcEnd - srcStart) % 2 == 1) {
-		--srcEnd;
-		myStoredChar = (unsigned char)*srcEnd;
-		myHasStoredChar = true;
-	}
-	for (; srcStart != srcEnd; srcStart += 2) {
-		dst.append(buffer, ZLUnicodeUtil::ucs2ToUtf8(buffer, ucs2Char(*srcStart, *(srcStart + 1))));
-	}
+    if (srcStart >= srcEnd) {
+        return;
+    }
+    char buffer[3];
+    if (myHasStoredChar) {
+        dst.append(buffer, ZLUnicodeUtil::ucs2ToUtf8(buffer, ucs2Char(myStoredChar, *srcStart)));
+        ++srcStart;
+        myHasStoredChar = false;
+    }
+    if ((srcEnd - srcStart) % 2 == 1) {
+        --srcEnd;
+        myStoredChar = (unsigned char) *srcEnd;
+        myHasStoredChar = true;
+    }
+    for (; srcStart != srcEnd; srcStart += 2) {
+        dst.append(buffer, ZLUnicodeUtil::ucs2ToUtf8(buffer, ucs2Char(*srcStart, *(srcStart + 1))));
+    }
 }
 
 std::string Utf16LEEncodingConverter::name() const {
-	return UTF16;
+    return UTF16;
 }
 
 ZLUnicodeUtil::Ucs2Char Utf16LEEncodingConverter::ucs2Char(unsigned char c0, unsigned char c1) {
-	return c0 + (((ZLUnicodeUtil::Ucs2Char)c1) << 8);
+    return c0 + (((ZLUnicodeUtil::Ucs2Char) c1) << 8);
 }
 
 std::string Utf16BEEncodingConverter::name() const {
-	return UTF16BE;
+    return UTF16BE;
 }
 
 ZLUnicodeUtil::Ucs2Char Utf16BEEncodingConverter::ucs2Char(unsigned char c0, unsigned char c1) {
-	return c1 + (((ZLUnicodeUtil::Ucs2Char)c0) << 8);
+    return c1 + (((ZLUnicodeUtil::Ucs2Char) c0) << 8);
 }

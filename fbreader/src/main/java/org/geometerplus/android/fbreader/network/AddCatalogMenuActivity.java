@@ -28,36 +28,36 @@ import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 public class AddCatalogMenuActivity extends MenuActivity {
-	private final ZLResource myResource = NetworkLibrary.resource().getResource("addCatalog");
+    private final ZLResource myResource = NetworkLibrary.resource().getResource("addCatalog");
 
-	private void addItem(String id, int weight) {
-		myInfos.add(new PluginApi.MenuActionInfo(
-			Uri.parse("http://data.fbreader.org/add_catalog/" + id),
-			myResource.getResource(id).getValue(),
-			weight
-		));
-	}
+    private void addItem(String id, int weight) {
+        myInfos.add(new PluginApi.MenuActionInfo(
+                Uri.parse("http://data.fbreader.org/add_catalog/" + id),
+                myResource.getResource(id).getValue(),
+                weight
+        ));
+    }
 
-	@Override
-	protected void init() {
-		setTitle(myResource.getResource("title").getValue());
-		addItem("editUrl", 1);
-		//addItem("scanLocalNetwork", 2);
-	}
+    @Override
+    protected void init() {
+        setTitle(myResource.getResource("title").getValue());
+        addItem("editUrl", 1);
+        //addItem("scanLocalNetwork", 2);
+    }
 
-	@Override
-	protected String getAction() {
-		return Util.ADD_CATALOG_ACTION;
-	}
+    @Override
+    protected String getAction() {
+        return Util.ADD_CATALOG_ACTION;
+    }
 
-	@Override
-	protected void runItem(final PluginApi.MenuActionInfo info) {
-		try {
-			startActivity(
-				new Intent(getAction()).addCategory(Intent.CATEGORY_DEFAULT).setData(info.getId())
-			);
-		} catch (ActivityNotFoundException e) {
-		}
-		finish();
-	}
+    @Override
+    protected void runItem(final PluginApi.MenuActionInfo info) {
+        try {
+            startActivity(
+                    new Intent(getAction()).addCategory(Intent.CATEGORY_DEFAULT).setData(info.getId())
+            );
+        } catch (ActivityNotFoundException e) {
+        }
+        finish();
+    }
 }

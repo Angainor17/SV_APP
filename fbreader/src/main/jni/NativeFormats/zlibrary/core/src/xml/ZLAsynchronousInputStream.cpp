@@ -24,20 +24,23 @@ ZLAsynchronousInputStream::Handler::~Handler() {
 }
 
 
-ZLAsynchronousInputStream::ZLAsynchronousInputStream(const char *encoding) : myData(0), myDataLen(0), myInitialized(false), myEof(false) {
-	if (encoding != 0) {
-		myEncoding.assign(encoding);
-	}
+ZLAsynchronousInputStream::ZLAsynchronousInputStream(const char *encoding) : myData(0),
+                                                                             myDataLen(0),
+                                                                             myInitialized(false),
+                                                                             myEof(false) {
+    if (encoding != 0) {
+        myEncoding.assign(encoding);
+    }
 }
 
 ZLAsynchronousInputStream::~ZLAsynchronousInputStream() {
 }
 
 bool ZLAsynchronousInputStream::processInput(Handler &handler) {
-	if (!myInitialized) {
-		handler.initialize(myEncoding.empty() ? 0 : myEncoding.c_str());
-		myInitialized = true;
-	}
-	return processInputInternal(handler);
+    if (!myInitialized) {
+        handler.initialize(myEncoding.empty() ? 0 : myEncoding.c_str());
+        myInitialized = true;
+    }
+    return processInputInternal(handler);
 }
 

@@ -31,46 +31,63 @@
 class ZLFileImage : public ZLSingleImage {
 
 public:
-	struct Block {
-		unsigned int offset;
-		unsigned int size;
+    struct Block {
+        unsigned int offset;
+        unsigned int size;
 
-		Block(unsigned int off, unsigned int s);
-	};
-	typedef std::vector<Block> Blocks;
+        Block(unsigned int off, unsigned int s);
+    };
+
+    typedef std::vector<Block> Blocks;
 
 public:
-	ZLFileImage(const ZLFile &file, const std::string &encoding, std::size_t offset, std::size_t size = 0, shared_ptr<FileEncryptionInfo> encryptionInfo = 0);
-	ZLFileImage(const ZLFile &file, const std::string &encoding, const Blocks &blocks);
+    ZLFileImage(const ZLFile &file, const std::string &encoding, std::size_t offset,
+                std::size_t size = 0, shared_ptr<FileEncryptionInfo> encryptionInfo = 0);
 
-	//Kind kind() const;
-	const ZLFile &file() const;
-	const std::string &encoding() const;
-	shared_ptr<FileEncryptionInfo> encryptionInfo() const;
-	const ZLFileImage::Blocks& blocks() const;
+    ZLFileImage(const ZLFile &file, const std::string &encoding, const Blocks &blocks);
+
+    //Kind kind() const;
+    const ZLFile &file() const;
+
+    const std::string &encoding() const;
+
+    shared_ptr<FileEncryptionInfo> encryptionInfo() const;
+
+    const ZLFileImage::Blocks &blocks() const;
 
 protected:
-	//shared_ptr<ZLInputStream> inputStream() const;
+    //shared_ptr<ZLInputStream> inputStream() const;
 
 private:
-	const ZLFile myFile;
-	const std::string myEncoding;
-	shared_ptr<FileEncryptionInfo> myEncryptionInfo;
-	Blocks myBlocks;
+    const ZLFile myFile;
+    const std::string myEncoding;
+    shared_ptr<FileEncryptionInfo> myEncryptionInfo;
+    Blocks myBlocks;
 };
 
 inline ZLFileImage::Block::Block(unsigned int off, unsigned int s) : offset(off), size(s) {}
 
-inline ZLFileImage::ZLFileImage(const ZLFile &file, const std::string &encoding, std::size_t offset, std::size_t size, shared_ptr<FileEncryptionInfo> encryptionInfo) : ZLSingleImage(file.mimeType()), myFile(file), myEncoding(encoding), myEncryptionInfo(encryptionInfo) {
-	myBlocks.push_back(Block(offset, size));
+inline ZLFileImage::ZLFileImage(const ZLFile &file, const std::string &encoding, std::size_t offset,
+                                std::size_t size, shared_ptr<FileEncryptionInfo> encryptionInfo)
+        : ZLSingleImage(file.mimeType()), myFile(file), myEncoding(encoding),
+          myEncryptionInfo(encryptionInfo) {
+    myBlocks.push_back(Block(offset, size));
 }
 
-inline ZLFileImage::ZLFileImage(const ZLFile &file, const std::string &encoding, const ZLFileImage::Blocks &blocks) : ZLSingleImage(file.mimeType()), myFile(file), myEncoding(encoding), myBlocks(blocks) { }
+inline ZLFileImage::ZLFileImage(const ZLFile &file, const std::string &encoding,
+                                const ZLFileImage::Blocks &blocks) : ZLSingleImage(file.mimeType()),
+                                                                     myFile(file),
+                                                                     myEncoding(encoding),
+                                                                     myBlocks(blocks) {}
 
 //inline ZLSingleImage::Kind ZLFileImage::kind() const { return FILE_IMAGE; }
 inline const ZLFile &ZLFileImage::file() const { return myFile; }
+
 inline const std::string &ZLFileImage::encoding() const { return myEncoding; }
-inline shared_ptr<FileEncryptionInfo> ZLFileImage::encryptionInfo() const { return myEncryptionInfo; }
+
+inline shared_ptr<FileEncryptionInfo>
+ZLFileImage::encryptionInfo() const { return myEncryptionInfo; }
+
 inline const ZLFileImage::Blocks &ZLFileImage::blocks() const { return myBlocks; }
 //inline shared_ptr<ZLInputStream> ZLFileImage::inputStream() const { return myFile.inputStream(); }
 

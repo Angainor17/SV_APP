@@ -110,16 +110,16 @@ extern "C" {
 #define XML_UTF16_ENCODE_MAX 2
 
 typedef struct position {
-  /* first line and first column are 0 not 1 */
-  XML_Size lineNumber;
-  XML_Size columnNumber;
+    /* first line and first column are 0 not 1 */
+    XML_Size lineNumber;
+    XML_Size columnNumber;
 } POSITION;
 
 typedef struct {
-  const char *name;
-  const char *valuePtr;
-  const char *valueEnd;
-  char normalized;
+    const char *name;
+    const char *valuePtr;
+    const char *valueEnd;
+    char normalized;
 } ATTRIBUTE;
 
 struct encoding;
@@ -131,46 +131,58 @@ typedef int (PTRCALL *SCANNER)(const ENCODING *,
                                const char **);
 
 struct encoding {
-  SCANNER scanners[XML_N_STATES];
-  SCANNER literalScanners[XML_N_LITERAL_TYPES];
-  int (PTRCALL *sameName)(const ENCODING *,
-                          const char *,
-                          const char *);
-  int (PTRCALL *nameMatchesAscii)(const ENCODING *,
-                                  const char *,
-                                  const char *,
-                                  const char *);
-  int (PTRFASTCALL *nameLength)(const ENCODING *, const char *);
-  const char *(PTRFASTCALL *skipS)(const ENCODING *, const char *);
-  int (PTRCALL *getAtts)(const ENCODING *enc,
-                         const char *ptr,
-                         int attsMax,
-                         ATTRIBUTE *atts);
-  int (PTRFASTCALL *charRefNumber)(const ENCODING *enc, const char *ptr);
-  int (PTRCALL *predefinedEntityName)(const ENCODING *,
-                                      const char *,
-                                      const char *);
-  void (PTRCALL *updatePosition)(const ENCODING *,
-                                 const char *ptr,
-                                 const char *end,
-                                 POSITION *);
-  int (PTRCALL *isPublicId)(const ENCODING *enc,
-                            const char *ptr,
-                            const char *end,
-                            const char **badPtr);
-  void (PTRCALL *utf8Convert)(const ENCODING *enc,
-                              const char **fromP,
-                              const char *fromLim,
-                              char **toP,
-                              const char *toLim);
-  void (PTRCALL *utf16Convert)(const ENCODING *enc,
-                               const char **fromP,
-                               const char *fromLim,
-                               unsigned short **toP,
-                               const unsigned short *toLim);
-  int minBytesPerChar;
-  char isUtf8;
-  char isUtf16;
+    SCANNER scanners[XML_N_STATES];
+    SCANNER literalScanners[XML_N_LITERAL_TYPES];
+
+    int (PTRCALL *sameName)(const ENCODING *,
+                            const char *,
+                            const char *);
+
+    int (PTRCALL *nameMatchesAscii)(const ENCODING *,
+                                    const char *,
+                                    const char *,
+                                    const char *);
+
+    int (PTRFASTCALL *nameLength)(const ENCODING *, const char *);
+
+    const char *(PTRFASTCALL *skipS)(const ENCODING *, const char *);
+
+    int (PTRCALL *getAtts)(const ENCODING *enc,
+                           const char *ptr,
+                           int attsMax,
+                           ATTRIBUTE *atts);
+
+    int (PTRFASTCALL *charRefNumber)(const ENCODING *enc, const char *ptr);
+
+    int (PTRCALL *predefinedEntityName)(const ENCODING *,
+                                        const char *,
+                                        const char *);
+
+    void (PTRCALL *updatePosition)(const ENCODING *,
+                                   const char *ptr,
+                                   const char *end,
+                                   POSITION *);
+
+    int (PTRCALL *isPublicId)(const ENCODING *enc,
+                              const char *ptr,
+                              const char *end,
+                              const char **badPtr);
+
+    void (PTRCALL *utf8Convert)(const ENCODING *enc,
+                                const char **fromP,
+                                const char *fromLim,
+                                char **toP,
+                                const char *toLim);
+
+    void (PTRCALL *utf16Convert)(const ENCODING *enc,
+                                 const char **fromP,
+                                 const char *fromLim,
+                                 unsigned short **toP,
+                                 const unsigned short *toLim);
+
+    int minBytesPerChar;
+    char isUtf8;
+    char isUtf16;
 };
 
 /* Scan the string starting at ptr until the end of the next complete
@@ -259,8 +271,8 @@ struct encoding {
   (((enc)->utf16Convert)(enc, fromP, fromLim, toP, toLim))
 
 typedef struct {
-  ENCODING initEnc;
-  const ENCODING **encPtr;
+    ENCODING initEnc;
+    const ENCODING **encPtr;
 } INIT_ENCODING;
 
 int XmlParseXmlDecl(int isGeneralTextEntity,
@@ -275,14 +287,19 @@ int XmlParseXmlDecl(int isGeneralTextEntity,
                     int *standalonePtr);
 
 int XmlInitEncoding(INIT_ENCODING *, const ENCODING **, const char *name);
+
 const ENCODING *XmlGetUtf8InternalEncoding(void);
+
 const ENCODING *XmlGetUtf16InternalEncoding(void);
+
 int FASTCALL XmlUtf8Encode(int charNumber, char *buf);
+
 int FASTCALL XmlUtf16Encode(int charNumber, unsigned short *buf);
+
 int XmlSizeOfUnknownEncoding(void);
 
 
-typedef int (XMLCALL *CONVERTER) (void *userData, const char *p);
+typedef int (XMLCALL *CONVERTER)(void *userData, const char *p);
 
 ENCODING *
 XmlInitUnknownEncoding(void *mem,
@@ -302,13 +319,17 @@ int XmlParseXmlDeclNS(int isGeneralTextEntity,
                       int *standalonePtr);
 
 int XmlInitEncodingNS(INIT_ENCODING *, const ENCODING **, const char *name);
+
 const ENCODING *XmlGetUtf8InternalEncodingNS(void);
+
 const ENCODING *XmlGetUtf16InternalEncodingNS(void);
+
 ENCODING *
 XmlInitUnknownEncodingNS(void *mem,
                          int *table,
                          CONVERTER convert,
                          void *userData);
+
 #ifdef __cplusplus
 }
 #endif
