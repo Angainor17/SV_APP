@@ -1187,6 +1187,10 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             invalidates.clear();
         }
 
+        /**
+         * @Воронин
+         * Отображает текст на странице
+         */
         public class PageView extends View {
             public PageHolder holder;
             TimeAnimatorCompat time;
@@ -1274,6 +1278,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                     drawCache(draw);
                     return;
                 }
+//                fb.selection
                 if (fb.pluginview != null) {
                     if (fb.pluginview.reflow) {
                         final int page;

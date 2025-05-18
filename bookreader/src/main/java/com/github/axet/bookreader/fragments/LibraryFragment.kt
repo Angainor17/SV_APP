@@ -55,7 +55,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Collections.reverseOrder
-import org.geometerplus.zlibrary.ui.android.R as ZlibraryR
+import org.geometerplus.R as ZlibraryR
 
 class LibraryFragment : Fragment(), SearchListener {
 

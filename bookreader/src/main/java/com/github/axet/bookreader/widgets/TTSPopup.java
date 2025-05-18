@@ -184,7 +184,7 @@ public class TTSPopup {
         int dp20 = ThemeUtils.dp2px(context, 20);
         FrameLayout f = new FrameLayout(context);
         FrameLayout round = new FrameLayout(context);
-        round.setBackgroundResource(org.geometerplus.zlibrary.ui.android.R.drawable.panel);
+        round.setBackgroundResource(org.geometerplus.R.drawable.panel);
         round.addView(view);
         gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
         f.addView(round, new FrameLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT, gravity));

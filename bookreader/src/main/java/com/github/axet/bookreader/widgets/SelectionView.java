@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class SelectionView extends FrameLayout {
     public static final int ARTIFACT_PERCENTS = 15;
     public static final int SELECTION_ALPHA = 0x99;
@@ -273,6 +275,7 @@ public class SelectionView extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Timber.tag("voronin").d("SelectionView onTouchEvent");
         if (this.margin != null) { // broken / empty window
             int x = (int) event.getX() + getLeft();
             int y = (int) event.getY() + getTop();
@@ -308,9 +311,11 @@ public class SelectionView extends FrameLayout {
     }
 
     public void onTouchLock() {
+
     }
 
     public void onTouchUnlock() {
+
     }
 
     public int getSelectionStartY() {
