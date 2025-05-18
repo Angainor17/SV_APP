@@ -58,19 +58,14 @@ class BookmarkSyncUtil {
             for (int pageNo = 0; ; ++pageNo) {
                 data.put("page_no", pageNo);
                 data.put("timestamp", System.currentTimeMillis());
-                infoRequest = new class HashCache {
-                final Map<Long, String> myHashByBookId = new HashMap<Long, String>();
-
-                String getHash(Bookmark b) {
-                    String hash = myHashByBookId.get(b.BookId);
-                    if (hash == null) {
-                        final Book book = collection.getBookById(b.BookId);
-                        hash = book != null ? collection.getHash(book, false) : "";
-                        myHashByBookId.put(b.BookId, hash);
+                infoRequest = new JsonRequest2(
+                        SyncOptions.BASE_URL + "sync/bookmarks.lite.paged", data
+                ) {
+                    @Override
+                    public void processResponse(Object response) {
+                        responseMap.putAll((Map<String, Object>) response);
                     }
-                    return "".equals(hash) ? null : hash;
-                }
-            };
+                };
                 context.perform(infoRequest);
                 for (Map<String, Object> info : (List<Map<String, Object>>) responseMap.get("actual")) {
                     final Info bmk = new Info(info);
@@ -227,23 +222,6 @@ class BookmarkSyncUtil {
             //    creating new objects on the client side
             if (!toGetFromServer.isEmpty()) {
                 context.perform(new JsonRequest2(
-                        SyncOptions.BASE_URL + "sync/bookmarks.lite.paged", data
-                ) {
-                    @Override
-                    public void processResponse(Object response) {
-                        responseMap.putAll((Map<String, Object>) response);
-                    }
-                });
-            }
-
-            // Step 3c: getting updated bookmarks from the server,
-            //    updating objects on the client side
-            if (!toUpdateOnClient.isEmpty()) {
-                final Map<String, Bookmark> bookmarksMap = new HashMap<String, Bookmark>();
-                for (Bookmark b : toUpdateOnClient) {
-                    bookmarksMap.put(b.Uid, b);
-                }
-                context.perform(new JsonRequest2(
                         SyncOptions.BASE_URL + "sync/bookmarks", fullRequestData(toGetFromServer)
                 ) {
                     @Override
@@ -258,8 +236,14 @@ class BookmarkSyncUtil {
                 });
             }
 
-            // Step 3d: sending locally updated information to the server
-            JsonRequest2(
+            // Step 3c: getting updated bookmarks from the server,
+            //    updating objects on the client side
+            if (!toUpdateOnClient.isEmpty()) {
+                final Map<String, Bookmark> bookmarksMap = new HashMap<String, Bookmark>();
+                for (Bookmark b : toUpdateOnClient) {
+                    bookmarksMap.put(b.Uid, b);
+                }
+                context.perform(new JsonRequest2(
                         SyncOptions.BASE_URL + "sync/bookmarks", fullRequestData(ids(toUpdateOnClient))
                 ) {
                     @Override
@@ -271,7 +255,23 @@ class BookmarkSyncUtil {
                             }
                         }
                     }
-                };
+                });
+            }
+
+            // Step 3d: sending locally updated information to the server
+            class HashCache {
+                final Map<Long, String> myHashByBookId = new HashMap<Long, String>();
+
+                String getHash(Bookmark b) {
+                    String hash = myHashByBookId.get(b.BookId);
+                    if (hash == null) {
+                        final Book book = collection.getBookById(b.BookId);
+                        hash = book != null ? collection.getHash(book, false) : "";
+                        myHashByBookId.put(b.BookId, hash);
+                    }
+                    return "".equals(hash) ? null : hash;
+                }
+            };
 
             final HashCache cache = new HashCache();
 
@@ -313,58 +313,6 @@ class BookmarkSyncUtil {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-    }
-
-    private static List<String> ids(List<Bookmark> bmks) {
-        final List<String> uids = new ArrayList<String>(bmks.size());
-        for (Bookmark b : bmks) {
-            uids.add(b.Uid);
-        }
-        return uids;
-    }
-
-    private static int getInt(Map<String, Object> data, String key) {
-        return (int) (long) (Long) data.get(key);
-    }
-
-    private static Map<String, Object> fullRequestData(List<String> uids) {
-        final Map<String, Object> requestData = new HashMap<String, Object>();
-        requestData.put("uids", uids);
-        requestData.put("timestamp", System.currentTimeMillis());
-        return requestData;
-    }
-
-    private static Bookmark bookmarkFromData(long id, Map<String, Object> data, long bookId, String bookTitle) {
-        return new Bookmark(
-                id, (String) data.get("uid"), (String) data.get("version_uid"),
-                bookId, bookTitle,
-                (String) data.get("text"),
-                (String) data.get("original_text"),
-                (Long) data.get("creation_timestamp"),
-                (Long) data.get("modification_timestamp"),
-                (Long) data.get("access_timestamp"),
-                (String) data.get("model_id"),
-                getInt(data, "para_start"), getInt(data, "elmt_start"), getInt(data, "char_start"),
-                getInt(data, "para_end"), getInt(data, "elmt_end"), getInt(data, "char_end"),
-                true,
-                getInt(data, "style_id")
-        );
-    }
-
-    private static Bookmark newBookmarkFromData(Map<String, Object> data, BooksByHash booksByHash) {
-        final Book book = booksByHash.getBook((String) data.get("book_hash"));
-        if (book == null) {
-            return null;
-        }
-        return bookmarkFromData(-1, data, book.getId(), book.getTitle());
-    }
-
-    private static Bookmark bookmarkToUpdate(Map<String, Object> data, Map<String, Bookmark> bookmarksMap) {
-        final Bookmark oldBookmark = bookmarksMap.get((String) data.get("uid"));
-        if (oldBookmark == null) {
-            return null;
-        }
-        return bookmarkFromData(oldBookmark.getId(), data, oldBookmark.BookId, oldBookmark.BookTitle);
     }
 
     private static final class BooksByHash extends HashMap<String, Book> {
@@ -486,5 +434,57 @@ class BookmarkSyncUtil {
             super("delete");
             put("uid", uid);
         }
+    }
+
+    private static List<String> ids(List<Bookmark> bmks) {
+        final List<String> uids = new ArrayList<String>(bmks.size());
+        for (Bookmark b : bmks) {
+            uids.add(b.Uid);
+        }
+        return uids;
+    }
+
+    private static int getInt(Map<String, Object> data, String key) {
+        return (int) (long) (Long) data.get(key);
+    }
+
+    private static Map<String, Object> fullRequestData(List<String> uids) {
+        final Map<String, Object> requestData = new HashMap<String, Object>();
+        requestData.put("uids", uids);
+        requestData.put("timestamp", System.currentTimeMillis());
+        return requestData;
+    }
+
+    private static Bookmark bookmarkFromData(long id, Map<String, Object> data, long bookId, String bookTitle) {
+        return new Bookmark(
+                id, (String) data.get("uid"), (String) data.get("version_uid"),
+                bookId, bookTitle,
+                (String) data.get("text"),
+                (String) data.get("original_text"),
+                (Long) data.get("creation_timestamp"),
+                (Long) data.get("modification_timestamp"),
+                (Long) data.get("access_timestamp"),
+                (String) data.get("model_id"),
+                getInt(data, "para_start"), getInt(data, "elmt_start"), getInt(data, "char_start"),
+                getInt(data, "para_end"), getInt(data, "elmt_end"), getInt(data, "char_end"),
+                true,
+                getInt(data, "style_id")
+        );
+    }
+
+    private static Bookmark newBookmarkFromData(Map<String, Object> data, BooksByHash booksByHash) {
+        final Book book = booksByHash.getBook((String) data.get("book_hash"));
+        if (book == null) {
+            return null;
+        }
+        return bookmarkFromData(-1, data, book.getId(), book.getTitle());
+    }
+
+    private static Bookmark bookmarkToUpdate(Map<String, Object> data, Map<String, Bookmark> bookmarksMap) {
+        final Bookmark oldBookmark = bookmarksMap.get((String) data.get("uid"));
+        if (oldBookmark == null) {
+            return null;
+        }
+        return bookmarkFromData(oldBookmark.getId(), data, oldBookmark.BookId, oldBookmark.BookTitle);
     }
 }
