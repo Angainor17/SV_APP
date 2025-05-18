@@ -26,13 +26,13 @@
 class HtmlEntityCollection {
 
 public:
-	static int symbolNumber(const std::string &name);
+    static int symbolNumber(const std::string &name);
 
 private:
-	static std::map<std::string,int> ourCollection;
+    static std::map<std::string, int> ourCollection;
 
 private:
-	HtmlEntityCollection();
+    HtmlEntityCollection();
 };
 
 #endif /* __HTMLENTITYCOLLECTION_H__ */

@@ -40,9 +40,8 @@ import group.pals.android.lib.ui.filechooser.utils.ui.LoadingDialog;
 
 /**
  * The adapter to be used in {@link android.widget.ListView}
- * 
+ *
  * @author Hai Bison
- * 
  */
 public class IFileAdapter extends BaseAdapter {
 
@@ -116,14 +115,10 @@ public class IFileAdapter extends BaseAdapter {
     /**
      * Creates new {@link IFileAdapter}
      *
-     * @param context
-     *            {@link Context}
-     * @param objects
-     *            the data
-     * @param filterMode
-     *            see {@link IFileProvider.FilterMode}
-     * @param multiSelection
-     *            see {@link FileChooserActivity#_MultiSelection}
+     * @param context        {@link Context}
+     * @param objects        the data
+     * @param filterMode     see {@link IFileProvider.FilterMode}
+     * @param multiSelection see {@link FileChooserActivity#_MultiSelection}
      */
     public IFileAdapter(Context context, List<IFileDataModel> objects, IFileProvider.FilterMode filterMode, String filenameRegexp, boolean multiSelection) {
         // DO NOT use getApplicationContext(), due to this bug:
@@ -137,16 +132,16 @@ public class IFileAdapter extends BaseAdapter {
         mMultiSelection = multiSelection;
 
         switch (mFilterMode) {
-        case DirectoriesOnly:
-        case FilesOnly:
-            mAdvancedSelectionOptions = new Integer[] { R.string.afc_cmd_advanced_selection_all,
-                    R.string.afc_cmd_advanced_selection_none, R.string.afc_cmd_advanced_selection_invert };
-            break;// DirectoriesOnly and FilesOnly
-        default:
-            mAdvancedSelectionOptions = new Integer[] { R.string.afc_cmd_advanced_selection_all,
-                    R.string.afc_cmd_advanced_selection_none, R.string.afc_cmd_advanced_selection_invert,
-                    R.string.afc_cmd_select_all_files, R.string.afc_cmd_select_all_folders };
-            break;// FilesAndDirectories
+            case DirectoriesOnly:
+            case FilesOnly:
+                mAdvancedSelectionOptions = new Integer[]{R.string.afc_cmd_advanced_selection_all,
+                        R.string.afc_cmd_advanced_selection_none, R.string.afc_cmd_advanced_selection_invert};
+                break;// DirectoriesOnly and FilesOnly
+            default:
+                mAdvancedSelectionOptions = new Integer[]{R.string.afc_cmd_advanced_selection_all,
+                        R.string.afc_cmd_advanced_selection_none, R.string.afc_cmd_advanced_selection_invert,
+                        R.string.afc_cmd_select_all_files, R.string.afc_cmd_select_all_folders};
+                break;// FilesAndDirectories
         }
 
         mFileTimeDisplay = new FileTimeDisplay(DisplayPrefs.isShowTimeForOldDaysThisYear(mContext),
@@ -203,8 +198,7 @@ public class IFileAdapter extends BaseAdapter {
      * {@link LoadingDialog}. This will not update adapter, you must do it
      * yourself.</li>
      *
-     * @param v
-     *            {@code true} if multi-selection is enabled
+     * @param v {@code true} if multi-selection is enabled
      */
     public void setMultiSelection(boolean v) {
         if (mMultiSelection != v) {
@@ -239,8 +233,7 @@ public class IFileAdapter extends BaseAdapter {
      * Adds an {@code item}. <b>Note:</b> this does not notify the adapter that
      * data set has been changed.
      *
-     * @param item
-     *            {@link IFileDataModel}
+     * @param item {@link IFileDataModel}
      */
     public void add(IFileDataModel item) {
         if (mData != null)
@@ -251,8 +244,7 @@ public class IFileAdapter extends BaseAdapter {
      * Removes {@code item}. <b>Note:</b> this does not notify the adapter that
      * data set has been changed.
      *
-     * @param item
-     *            {@link IFileDataModel}
+     * @param item {@link IFileDataModel}
      */
     public void remove(IFileDataModel item) {
         if (mData != null) {
@@ -264,8 +256,7 @@ public class IFileAdapter extends BaseAdapter {
      * Removes all {@code items}. <b>Note:</b> this does not notify the adapter
      * that data set has been changed.
      *
-     * @param items
-     *            the items you want to remove.
+     * @param items the items you want to remove.
      */
     public void removeAll(Collection<IFileDataModel> items) {
         if (mData != null)
@@ -309,17 +300,12 @@ public class IFileAdapter extends BaseAdapter {
 
     /**
      * Updates the view.
-     * 
-     * @param parent
-     *            the parent view
-     * @param childView
-     *            the child view.
-     * @param bag
-     *            the "view holder", see {@link Bag}
-     * @param data
-     *            {@link IFileDataModel}
-     * @param file
-     *            {@link IFile}
+     *
+     * @param parent    the parent view
+     * @param childView the child view.
+     * @param bag       the "view holder", see {@link Bag}
+     * @param data      {@link IFileDataModel}
+     * @param file      {@link IFile}
      * @since v2.0 alpha
      */
     private void updateView(ViewGroup parent, View childView, Bag bag, final IFileDataModel data, IFile file) {
@@ -347,9 +333,9 @@ public class IFileAdapter extends BaseAdapter {
             bag.mTxtFileInfo.setText(String.format("%s, %s", Converter.sizeToStr(file.length()), time));
 
         bag.mIsAccessible = FileUtils.isAccessible(file, mFilenameRegexp);
-		bag.mImageIcon.setEnabled(bag.mIsAccessible);
-		bag.mTxtFileName.setEnabled(bag.mIsAccessible);
-		bag.mTxtFileInfo.setEnabled(bag.mIsAccessible);
+        bag.mImageIcon.setEnabled(bag.mIsAccessible);
+        bag.mTxtFileName.setEnabled(bag.mIsAccessible);
+        bag.mTxtFileInfo.setEnabled(bag.mIsAccessible);
 
         // checkbox
         if (mMultiSelection) {
@@ -379,11 +365,9 @@ public class IFileAdapter extends BaseAdapter {
 
     /**
      * Selects all items.
-     * 
-     * @param notifyDataSetChanged
-     *            {@code true} if you want to notify that data set changed
-     * @param filter
-     *            {@link IFileFilter}
+     *
+     * @param notifyDataSetChanged {@code true} if you want to notify that data set changed
+     * @param filter               {@link IFileFilter}
      */
     public void selectAll(boolean notifyDataSetChanged, IFileFilter filter) {
         for (int i = 0; i < getCount(); i++) {
@@ -396,9 +380,8 @@ public class IFileAdapter extends BaseAdapter {
 
     /**
      * Selects no items.
-     * 
-     * @param notifyDataSetChanged
-     *            {@code true} if you want to notify that data set changed
+     *
+     * @param notifyDataSetChanged {@code true} if you want to notify that data set changed
      */
     public void selectNone(boolean notifyDataSetChanged) {
         for (int i = 0; i < getCount(); i++)
@@ -409,9 +392,8 @@ public class IFileAdapter extends BaseAdapter {
 
     /**
      * Inverts selection.
-     * 
-     * @param notifyDataSetChanged
-     *            {@code true} if you want to notify that data set changed
+     *
+     * @param notifyDataSetChanged {@code true} if you want to notify that data set changed
      */
     public void invertSelection(boolean notifyDataSetChanged) {
         for (int i = 0; i < getCount(); i++) {
@@ -429,10 +411,9 @@ public class IFileAdapter extends BaseAdapter {
      * The "view holder"
      *
      * @author Hai Bison
-     *
      */
     static final class Bag {
-		boolean mIsAccessible;
+        boolean mIsAccessible;
         ImageView mImageIcon;
         TextView mTxtFileName;
         TextView mTxtFileInfo;

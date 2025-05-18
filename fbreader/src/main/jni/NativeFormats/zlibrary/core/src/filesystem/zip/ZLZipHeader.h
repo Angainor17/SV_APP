@@ -23,29 +23,31 @@
 class ZLInputStream;
 
 struct ZLZipHeader {
-	static const int SignatureLocalFile;
-	static const int SignatureData;
-	static const int SignatureCentralDirectory;
-	static const int SignatureEndOfCentralDirectory;
+    static const int SignatureLocalFile;
+    static const int SignatureData;
+    static const int SignatureCentralDirectory;
+    static const int SignatureEndOfCentralDirectory;
 
-	unsigned long Signature;
-	unsigned short Version;
-	unsigned short Flags;
-	unsigned short CompressionMethod;
-	unsigned short ModificationTime;
-	unsigned short ModificationDate;
-	unsigned long CRC32;
-	unsigned long CompressedSize;
-	unsigned long UncompressedSize;
-	unsigned short NameLength;
-	unsigned short ExtraLength;
+    unsigned long Signature;
+    unsigned short Version;
+    unsigned short Flags;
+    unsigned short CompressionMethod;
+    unsigned short ModificationTime;
+    unsigned short ModificationDate;
+    unsigned long CRC32;
+    unsigned long CompressedSize;
+    unsigned long UncompressedSize;
+    unsigned short NameLength;
+    unsigned short ExtraLength;
 
-	bool readFrom(ZLInputStream &stream);
-	static void skipEntry(ZLInputStream &stream, ZLZipHeader &header);
+    bool readFrom(ZLInputStream &stream);
+
+    static void skipEntry(ZLInputStream &stream, ZLZipHeader &header);
 
 private:
-	unsigned short readShort(ZLInputStream &stream);
-	unsigned long readLong(ZLInputStream &stream);
+    unsigned short readShort(ZLInputStream &stream);
+
+    unsigned long readLong(ZLInputStream &stream);
 };
 
 #endif /* __ZLZIPHEADER_H__ */

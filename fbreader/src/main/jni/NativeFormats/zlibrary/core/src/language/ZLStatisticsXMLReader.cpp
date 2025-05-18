@@ -32,37 +32,41 @@ const std::string ZLStatisticsXMLReader::ITEM_TAG = "item";
 const std::string ZLStatisticsXMLReader::STATISTICS_TAG = "statistics";
 
 void ZLStatisticsXMLReader::startElementHandler(const char *tag, const char **attributes) {
-	if (STATISTICS_TAG == tag) {
-		std::size_t volume = atoi(attributeValue(attributes, "volume"));
-		unsigned long long squaresVolume = atoll(attributeValue(attributes, "squaresVolume"));
-		//std::cerr << "XMLReader: frequencies sum & ^2: " << volume << ":" << squaresVolume << "\n";
-		myStatisticsPtr = new ZLArrayBasedStatistics( atoi(attributeValue(attributes, "charSequenceSize")), atoi(attributeValue(attributes, "size")), volume, squaresVolume);
-	} else if (ITEM_TAG == tag) {
-		const char *sequence = attributeValue(attributes, "sequence");
-		const char *frequency = attributeValue(attributes, "frequency");
-		if ((sequence != 0) && (frequency != 0)) {
-			std::string hexString(sequence);
-			myStatisticsPtr->insert(ZLCharSequence(hexString), atoi(frequency));
-		}
-	}
+    if (STATISTICS_TAG == tag) {
+        std::size_t volume = atoi(attributeValue(attributes, "volume"));
+        unsigned long long squaresVolume = atoll(attributeValue(attributes, "squaresVolume"));
+        //std::cerr << "XMLReader: frequencies sum & ^2: " << volume << ":" << squaresVolume << "\n";
+        myStatisticsPtr = new ZLArrayBasedStatistics(
+                atoi(attributeValue(attributes, "charSequenceSize")),
+                atoi(attributeValue(attributes, "size")), volume, squaresVolume);
+    } else if (ITEM_TAG == tag) {
+        const char *sequence = attributeValue(attributes, "sequence");
+        const char *frequency = attributeValue(attributes, "frequency");
+        if ((sequence != 0) && (frequency != 0)) {
+            std::string hexString(sequence);
+            myStatisticsPtr->insert(ZLCharSequence(hexString), atoi(frequency));
+        }
+    }
 }
 
 static std::map<std::string, shared_ptr<ZLArrayBasedStatistics> > statisticsMap;
 
-shared_ptr<ZLArrayBasedStatistics> ZLStatisticsXMLReader::readStatistics(const std::string &fileName) {
-	std::map<std::string, shared_ptr<ZLArrayBasedStatistics> >::iterator it = statisticsMap.find(fileName);
-	if (it != statisticsMap.end()) {
-		return it->second;
-	}
+shared_ptr<ZLArrayBasedStatistics>
+ZLStatisticsXMLReader::readStatistics(const std::string &fileName) {
+    std::map<std::string, shared_ptr<ZLArrayBasedStatistics> >::iterator it = statisticsMap.find(
+            fileName);
+    if (it != statisticsMap.end()) {
+        return it->second;
+    }
 
-	shared_ptr<ZLInputStream> statisticsStream = ZLFile(fileName).inputStream();
-	if (statisticsStream.isNull() || !statisticsStream->open()) {
- 		return 0;
- 	}
-	readDocument(statisticsStream);
-	statisticsStream->close();
+    shared_ptr<ZLInputStream> statisticsStream = ZLFile(fileName).inputStream();
+    if (statisticsStream.isNull() || !statisticsStream->open()) {
+        return 0;
+    }
+    readDocument(statisticsStream);
+    statisticsStream->close();
 
-	statisticsMap.insert(std::make_pair(fileName, myStatisticsPtr));
+    statisticsMap.insert(std::make_pair(fileName, myStatisticsPtr));
 
-	return myStatisticsPtr;
+    return myStatisticsPtr;
 }

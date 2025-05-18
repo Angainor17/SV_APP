@@ -30,37 +30,37 @@ import org.geometerplus.fbreader.network.NetworkTree;
 import org.geometerplus.zlibrary.core.network.ZLNetworkContext;
 
 public class ShowBookInfoAction extends BookAction {
-	private final ZLNetworkContext myNetworkContext;
+    private final ZLNetworkContext myNetworkContext;
 
-	public ShowBookInfoAction(Activity activity, ZLNetworkContext nc) {
-		super(activity, ActionCode.SHOW_BOOK_ACTIVITY, "bookInfo");
-		myNetworkContext = nc;
-	}
+    public ShowBookInfoAction(Activity activity, ZLNetworkContext nc) {
+        super(activity, ActionCode.SHOW_BOOK_ACTIVITY, "bookInfo");
+        myNetworkContext = nc;
+    }
 
-	@Override
-	public void run(final NetworkTree tree) {
-		if (getBook(tree).isFullyLoaded()) {
-			showBookInfo(tree);
-		} else {
-			UIUtil.wait("loadInfo", new Runnable() {
-				public void run() {
-					getBook(tree).loadFullInformation(myNetworkContext);
-					myActivity.runOnUiThread(new Runnable() {
-						public void run() {
-							showBookInfo(tree);
-						}
-					});
-				}
-			}, myActivity);
-		}
-	}
+    @Override
+    public void run(final NetworkTree tree) {
+        if (getBook(tree).isFullyLoaded()) {
+            showBookInfo(tree);
+        } else {
+            UIUtil.wait("loadInfo", new Runnable() {
+                public void run() {
+                    getBook(tree).loadFullInformation(myNetworkContext);
+                    myActivity.runOnUiThread(new Runnable() {
+                        public void run() {
+                            showBookInfo(tree);
+                        }
+                    });
+                }
+            }, myActivity);
+        }
+    }
 
-	private void showBookInfo(NetworkTree tree) {
-		OrientationUtil.startActivityForResult(
-			myActivity,
-			new Intent(myActivity, NetworkBookInfoActivity.class)
-				.putExtra(NetworkLibraryActivity.TREE_KEY_KEY, tree.getUniqueKey()),
-			1
-		);
-	}
+    private void showBookInfo(NetworkTree tree) {
+        OrientationUtil.startActivityForResult(
+                myActivity,
+                new Intent(myActivity, NetworkBookInfoActivity.class)
+                        .putExtra(NetworkLibraryActivity.TREE_KEY_KEY, tree.getUniqueKey()),
+                1
+        );
+    }
 }

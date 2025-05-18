@@ -21,24 +21,24 @@
 #define __ZLBOOLEAN3_H__
 
 enum ZLBoolean3 {
-	B3_FALSE = 0,
-	B3_TRUE = 1,
-	B3_UNDEFINED = 2
+    B3_FALSE = 0,
+    B3_TRUE = 1,
+    B3_UNDEFINED = 2
 };
 
 inline ZLBoolean3 b3Value(bool value) {
-	return value ? B3_TRUE : B3_FALSE;
+    return value ? B3_TRUE : B3_FALSE;
 }
 
 inline bool boolValue(ZLBoolean3 value, bool defaultValue) {
-	switch (value) {
-		default:
-			return defaultValue;
-		case B3_TRUE:
-			return true;
-		case B3_FALSE:
-			return false;
-	}
+    switch (value) {
+        default:
+            return defaultValue;
+        case B3_TRUE:
+            return true;
+        case B3_FALSE:
+            return false;
+    }
 }
 
 #endif /* __ZLBOOLEAN3_H__ */

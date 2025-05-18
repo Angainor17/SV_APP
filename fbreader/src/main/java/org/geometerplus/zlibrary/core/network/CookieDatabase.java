@@ -25,19 +25,23 @@ import java.util.Date;
 import java.util.List;
 
 public abstract class CookieDatabase {
-	private static CookieDatabase ourInstance;
+    private static CookieDatabase ourInstance;
 
-	protected CookieDatabase() {
-		ourInstance = this;
-	}
+    protected CookieDatabase() {
+        ourInstance = this;
+    }
 
-	public static CookieDatabase getInstance() {
-		return ourInstance;
-	}
+    public static CookieDatabase getInstance() {
+        return ourInstance;
+    }
 
-	protected abstract void removeObsolete(Date date);
-	protected abstract void removeAll();
-	protected abstract void removeForDomain(String domain);
-	protected abstract void saveCookies(List<Cookie> cookies);
-	protected abstract List<Cookie> loadCookies();
+    protected abstract void removeObsolete(Date date);
+
+    protected abstract void removeAll();
+
+    protected abstract void removeForDomain(String domain);
+
+    protected abstract void saveCookies(List<Cookie> cookies);
+
+    protected abstract List<Cookie> loadCookies();
 }

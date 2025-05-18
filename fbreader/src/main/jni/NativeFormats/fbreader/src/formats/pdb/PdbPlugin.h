@@ -27,13 +27,13 @@
 class PdbPlugin : public FormatPlugin {
 
 public:
-	static std::string fileType(const ZLFile &file);
+    static std::string fileType(const ZLFile &file);
 
 protected:
-	PdbPlugin();
+    PdbPlugin();
 
 public:
-	virtual ~PdbPlugin();
+    virtual ~PdbPlugin();
 };
 
 /*
@@ -50,52 +50,66 @@ public:
 class SimplePdbPlugin : public PdbPlugin {
 
 public:
-	bool readMetainfo(Book &book) const;
-	//bool readModel(BookModel &model) const;
+    bool readMetainfo(Book &book) const;
+    //bool readModel(BookModel &model) const;
 
 protected:
-	virtual shared_ptr<ZLInputStream> createStream(const ZLFile &file) const = 0;
-	virtual void readDocumentInternal(const ZLFile &file, BookModel &model, const class PlainTextFormat &format, const std::string &encoding, ZLInputStream &stream) const;
+    virtual shared_ptr<ZLInputStream> createStream(const ZLFile &file) const = 0;
+
+    virtual void
+    readDocumentInternal(const ZLFile &file, BookModel &model, const class PlainTextFormat &format,
+                         const std::string &encoding, ZLInputStream &stream) const;
 };
 
 class PalmDocLikePlugin : public SimplePdbPlugin {
 
 public:
-	bool providesMetainfo() const;
-	const std::string &tryOpen(const ZLFile &file) const;
+    bool providesMetainfo() const;
+
+    const std::string &tryOpen(const ZLFile &file) const;
 
 protected:
-	shared_ptr<ZLInputStream> createStream(const ZLFile &file) const;
+    shared_ptr<ZLInputStream> createStream(const ZLFile &file) const;
 };
 
 class PalmDocPlugin : public PalmDocLikePlugin {
 
 public:
-	//bool acceptsFile(const ZLFile &file) const;
+    //bool acceptsFile(const ZLFile &file) const;
 
-	void readDocumentInternal(const ZLFile &file, BookModel &model, const class PlainTextFormat &format, const std::string &encoding, ZLInputStream &stream) const;
+    void
+    readDocumentInternal(const ZLFile &file, BookModel &model, const class PlainTextFormat &format,
+                         const std::string &encoding, ZLInputStream &stream) const;
 
 //private:
-	//FormatInfoPage *createInfoPage(ZLOptionsDialog &dialog, const ZLFile &file);
+    //FormatInfoPage *createInfoPage(ZLOptionsDialog &dialog, const ZLFile &file);
 };
 
 class MobipocketPlugin : public PalmDocLikePlugin {
 
 private:
-	//bool acceptsFile(const ZLFile &file) const;
-	const std::string supportedFileType() const;
-	//virtual FormatInfoPage *createInfoPage(ZLOptionsDialog &dialog, const ZLFile &file);
+    //bool acceptsFile(const ZLFile &file) const;
+    const std::string supportedFileType() const;
+    //virtual FormatInfoPage *createInfoPage(ZLOptionsDialog &dialog, const ZLFile &file);
 
-	//virtual const std::string &tryOpen(const ZLFile &file) const;
-	std::vector<shared_ptr<FileEncryptionInfo> > readEncryptionInfos(Book &book) const;
-	bool readUids(Book &book) const;
-	bool readLanguageAndEncoding(Book &book) const;
-	bool readMetainfo(Book &book) const;
-	bool readModel(BookModel &model) const;
+    //virtual const std::string &tryOpen(const ZLFile &file) const;
+    std::vector<shared_ptr<FileEncryptionInfo> > readEncryptionInfos(Book &book) const;
 
-	void readDocumentInternal(const ZLFile &file, BookModel &model, const class PlainTextFormat &format, const std::string &encoding, ZLInputStream &stream) const;
-	shared_ptr<const ZLImage> coverImage(const ZLFile &file) const;
-	std::string readAnnotation(const ZLFile &file) const;
+    bool readUids(Book &book) const;
+
+    bool readLanguageAndEncoding(Book &book) const;
+
+    bool readMetainfo(Book &book) const;
+
+    bool readModel(BookModel &model) const;
+
+    void
+    readDocumentInternal(const ZLFile &file, BookModel &model, const class PlainTextFormat &format,
+                         const std::string &encoding, ZLInputStream &stream) const;
+
+    shared_ptr<const ZLImage> coverImage(const ZLFile &file) const;
+
+    std::string readAnnotation(const ZLFile &file) const;
 };
 
 /*

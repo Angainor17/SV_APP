@@ -28,23 +28,28 @@
 class RtfReaderStream : public ZLInputStream {
 
 public:
-	RtfReaderStream(const ZLFile& file, std::size_t maxSize);
-	~RtfReaderStream();
+    RtfReaderStream(const ZLFile &file, std::size_t maxSize);
+
+    ~RtfReaderStream();
 
 private:
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    bool open();
 
-	void seek(int offset, bool absoluteOffset);
-	std::size_t offset() const;
-	std::size_t sizeOfOpened();
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
+
+    void seek(int offset, bool absoluteOffset);
+
+    std::size_t offset() const;
+
+    std::size_t sizeOfOpened();
 
 private:
-	const ZLFile myFile;
-	char *myBuffer;
-	std::size_t mySize;
-	std::size_t myOffset;
+    const ZLFile myFile;
+    char *myBuffer;
+    std::size_t mySize;
+    std::size_t myOffset;
 };
 
 #endif /* __RTFREADERSTREAM_H__ */

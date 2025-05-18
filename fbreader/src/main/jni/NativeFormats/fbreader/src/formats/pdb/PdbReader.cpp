@@ -22,54 +22,55 @@
 #include "PdbReader.h"
 
 unsigned short PdbUtil::readUnsignedShort(ZLInputStream &stream) {
-	unsigned char data[2];
-	stream.read((char*)data, 2);
-	return (((unsigned short)data[0]) << 8) + data[1];
+    unsigned char data[2];
+    stream.read((char *) data, 2);
+    return (((unsigned short) data[0]) << 8) + data[1];
 }
 
 unsigned long PdbUtil::readUnsignedLongBE(ZLInputStream &stream) {
-	unsigned char data[4];
-	stream.read((char*)data, 4);
-	return (((unsigned long)data[0]) << 24) +
-			(((unsigned long)data[1]) << 16) +
-			(((unsigned long)data[2]) << 8) +
-			(unsigned long)data[3];
+    unsigned char data[4];
+    stream.read((char *) data, 4);
+    return (((unsigned long) data[0]) << 24) +
+           (((unsigned long) data[1]) << 16) +
+           (((unsigned long) data[2]) << 8) +
+           (unsigned long) data[3];
 }
 
 unsigned long PdbUtil::readUnsignedLongLE(ZLInputStream &stream) {
-	unsigned char data[4];
-	stream.read((char*)data, 4);
-	return (((unsigned long)data[3]) << 24) +
-			(((unsigned long)data[2]) << 16) +
-			(((unsigned long)data[1]) << 8) +
-			(unsigned long)data[0];
+    unsigned char data[4];
+    stream.read((char *) data, 4);
+    return (((unsigned long) data[3]) << 24) +
+           (((unsigned long) data[2]) << 16) +
+           (((unsigned long) data[1]) << 8) +
+           (unsigned long) data[0];
 }
 
 bool PdbHeader::read(shared_ptr<ZLInputStream> stream) {
-	const size_t startOffset = stream->offset();
-	DocName.erase();
-	DocName.append(32, '\0');
-	stream->read((char*)DocName.data(), 32); 			// stream offset: +32
+    const size_t startOffset = stream->offset();
+    DocName.erase();
+    DocName.append(32, '\0');
+    stream->read((char *) DocName.data(), 32);            // stream offset: +32
 
-	Flags = PdbUtil::readUnsignedShort(*stream); 		// stream offset: +34
+    Flags = PdbUtil::readUnsignedShort(*stream);        // stream offset: +34
 
-	stream->seek(26, false);							// stream offset: +60
-	
-	Id.erase();
-	Id.append(8, '\0');
-	stream->read((char*)Id.data(), 8);					// stream offset: +68
+    stream->seek(26, false);                            // stream offset: +60
 
-	stream->seek(8, false);								// stream offset: +76
-	Offsets.clear();
-	const unsigned short numRecords = PdbUtil::readUnsignedShort(*stream); 	// stream offset: +78
-	Offsets.reserve(numRecords);
+    Id.erase();
+    Id.append(8, '\0');
+    stream->read((char *) Id.data(), 8);                    // stream offset: +68
 
-	for (int i = 0; i < numRecords; ++i) {				// stream offset: +78 + 8 * records number  
-		const unsigned long recordOffset = PdbUtil::readUnsignedLongBE(*stream);
-		Offsets.push_back(recordOffset);
-		stream->seek(4, false);
-	}
-	return stream->offset() == startOffset + 78 + 8 * numRecords;
+    stream->seek(8, false);                                // stream offset: +76
+    Offsets.clear();
+    const unsigned short numRecords = PdbUtil::readUnsignedShort(*stream);    // stream offset: +78
+    Offsets.reserve(numRecords);
+
+    for (int i = 0;
+         i < numRecords; ++i) {                // stream offset: +78 + 8 * records number
+        const unsigned long recordOffset = PdbUtil::readUnsignedLongBE(*stream);
+        Offsets.push_back(recordOffset);
+        stream->seek(4, false);
+    }
+    return stream->offset() == startOffset + 78 + 8 * numRecords;
 }
 
 /*bool PdbRecord0::read(shared_ptr<ZLInputStream> stream) {

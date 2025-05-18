@@ -27,178 +27,181 @@ import org.geometerplus.zlibrary.core.tree.ZLTree;
 import java.io.Serializable;
 
 public abstract class FBTree extends ZLTree<FBTree> implements Comparable<FBTree> {
-	private ZLImage myCover;
-	private boolean myCoverRequested;;
-	private Key myKey;
-	protected FBTree() {
-		super();
-	}
-	protected FBTree(FBTree parent) {
-		super(parent);
-	}
+    private ZLImage myCover;
+    private boolean myCoverRequested;
+    ;
+    private Key myKey;
 
-	protected FBTree(FBTree parent, int position) {
-		super(parent, position);
-	}
+    protected FBTree() {
+        super();
+    }
 
-	private static int compareStringsIgnoreCase(String s0, String s1) {
-	  	final int len = Math.min(s0.length(), s1.length());
-		for (int i = 0; i < len; ++i) {
-		  	char c0 = s0.charAt(i);
-		  	char c1 = s1.charAt(i);
-			if (c0 == c1) {
-			  	continue;
-			}
-			c0 = Character.toLowerCase(c0);
-			c1 = Character.toLowerCase(c1);
-			if (c0 == c1) {
-			  	continue;
-			}
-			return c0 - c1;
-		}
-		if (s0.length() > len) {
-		  	return 1;
-		}
-		if (s0.length() > len) {
-		  	return -1;
-		}
-		return 0;
-	}
+    protected FBTree(FBTree parent) {
+        super(parent);
+    }
 
-	public final Key getUniqueKey() {
-		if (myKey == null) {
-			myKey = new Key(Parent != null ? Parent.getUniqueKey() : null, getStringId());
-		}
-		return myKey;
-	}
+    protected FBTree(FBTree parent, int position) {
+        super(parent, position);
+    }
 
-	/**
-	 * Returns id used as a part of unique key above. This string must be not null
-	 * and be different for all children of same tree
-	 */
-	protected abstract String getStringId();
+    private static int compareStringsIgnoreCase(String s0, String s1) {
+        final int len = Math.min(s0.length(), s1.length());
+        for (int i = 0; i < len; ++i) {
+            char c0 = s0.charAt(i);
+            char c1 = s1.charAt(i);
+            if (c0 == c1) {
+                continue;
+            }
+            c0 = Character.toLowerCase(c0);
+            c1 = Character.toLowerCase(c1);
+            if (c0 == c1) {
+                continue;
+            }
+            return c0 - c1;
+        }
+        if (s0.length() > len) {
+            return 1;
+        }
+        if (s0.length() > len) {
+            return -1;
+        }
+        return 0;
+    }
 
-	public FBTree getSubtree(String id) {
-		for (FBTree tree : subtrees()) {
-			if (id.equals(tree.getStringId())) {
-				return tree;
-			}
-		}
-		return null;
-	}
+    public final Key getUniqueKey() {
+        if (myKey == null) {
+            myKey = new Key(Parent != null ? Parent.getUniqueKey() : null, getStringId());
+        }
+        return myKey;
+    }
 
-	public int indexOf(FBTree tree) {
-		return subtrees().indexOf(tree);
-	}
+    /**
+     * Returns id used as a part of unique key above. This string must be not null
+     * and be different for all children of same tree
+     */
+    protected abstract String getStringId();
 
-	public abstract String getName();
+    public FBTree getSubtree(String id) {
+        for (FBTree tree : subtrees()) {
+            if (id.equals(tree.getStringId())) {
+                return tree;
+            }
+        }
+        return null;
+    }
 
-	public Pair<String,String> getTreeTitle() {
-		return new Pair(getName(), null);
-	}
+    public int indexOf(FBTree tree) {
+        return subtrees().indexOf(tree);
+    }
 
-	protected String getSortKey() {
-		final String sortKey = getName();
-		if (sortKey == null ||
-			sortKey.length() <= 1 ||
-			Character.isLetterOrDigit(sortKey.charAt(0))) {
-			return sortKey;
-		}
+    public abstract String getName();
 
-		for (int i = 1; i < sortKey.length(); ++i) {
-			if (Character.isLetterOrDigit(sortKey.charAt(i))) {
-				return sortKey.substring(i);
-			}
-		}
-		return sortKey;
-	}
+    public Pair<String, String> getTreeTitle() {
+        return new Pair(getName(), null);
+    }
 
-	public int compareTo(FBTree tree) {
-		final String key0 = getSortKey();
-		final String key1 = tree.getSortKey();
-		if (key0 == null) {
-			return (key1 == null) ? 0 : -1;
-		}
-		if (key1 == null) {
-			return 1;
-		}
-		final int diff = compareStringsIgnoreCase(key0, key1);
-		return diff != 0 ? diff : getName().compareTo(tree.getName());
-	}
+    protected String getSortKey() {
+        final String sortKey = getName();
+        if (sortKey == null ||
+                sortKey.length() <= 1 ||
+                Character.isLetterOrDigit(sortKey.charAt(0))) {
+            return sortKey;
+        }
 
-	public abstract String getSummary();
+        for (int i = 1; i < sortKey.length(); ++i) {
+            if (Character.isLetterOrDigit(sortKey.charAt(i))) {
+                return sortKey.substring(i);
+            }
+        }
+        return sortKey;
+    }
 
-	protected ZLImage createCover() {
-		return null;
-	}
+    public int compareTo(FBTree tree) {
+        final String key0 = getSortKey();
+        final String key1 = tree.getSortKey();
+        if (key0 == null) {
+            return (key1 == null) ? 0 : -1;
+        }
+        if (key1 == null) {
+            return 1;
+        }
+        final int diff = compareStringsIgnoreCase(key0, key1);
+        return diff != 0 ? diff : getName().compareTo(tree.getName());
+    }
 
-	protected boolean canUseParentCover() {
-		return true;
-	}
+    public abstract String getSummary();
 
-	public final ZLImage getCover() {
-		if (!myCoverRequested) {
-			myCover = createCover();
-			if (myCover == null && Parent != null && canUseParentCover()) {
-				myCover = Parent.getCover();
-			}
-			myCoverRequested = true;
-		}
-		return myCover;
-	}
+    protected ZLImage createCover() {
+        return null;
+    }
 
-	public Status getOpeningStatus() {
-		return Status.READY_TO_OPEN;
-	}
+    protected boolean canUseParentCover() {
+        return true;
+    }
 
-	public String getOpeningStatusMessage() {
-		return null;
-	}
+    public final ZLImage getCover() {
+        if (!myCoverRequested) {
+            myCover = createCover();
+            if (myCover == null && Parent != null && canUseParentCover()) {
+                myCover = Parent.getCover();
+            }
+            myCoverRequested = true;
+        }
+        return myCover;
+    }
 
-	public void waitForOpening() {
-	}
+    public Status getOpeningStatus() {
+        return Status.READY_TO_OPEN;
+    }
 
-public static enum Status {
-		READY_TO_OPEN,
-		WAIT_FOR_OPEN,
-		ALWAYS_RELOAD_BEFORE_OPENING,
-		CANNOT_OPEN
-	}
+    public String getOpeningStatusMessage() {
+        return null;
+    }
 
-	public static class Key implements Serializable {
-		private static final long serialVersionUID = -6500763093522202052L;
+    public void waitForOpening() {
+    }
 
-		public final Key Parent;
-		public final String Id;
+    public static enum Status {
+        READY_TO_OPEN,
+        WAIT_FOR_OPEN,
+        ALWAYS_RELOAD_BEFORE_OPENING,
+        CANNOT_OPEN
+    }
 
-		private Key(Key parent, String id) {
-			if (id == null) {
-				throw new IllegalArgumentException("FBTree.Key string id must be non-null");
-			}
-			Parent = parent;
-			Id = id;
-		}
+    public static class Key implements Serializable {
+        private static final long serialVersionUID = -6500763093522202052L;
 
-		@Override
-		public boolean equals(Object other) {
-			if (other == this) {
-				return true;
-			}
-			if (!(other instanceof Key)) {
-				return false;
-			}
-			final Key key = (Key)other;
-			return Id.equals(key.Id) && ComparisonUtil.equal(Parent, key.Parent);
-		}
+        public final Key Parent;
+        public final String Id;
 
-		@Override
-		public int hashCode() {
-			return Id.hashCode();
-		}
+        private Key(Key parent, String id) {
+            if (id == null) {
+                throw new IllegalArgumentException("FBTree.Key string id must be non-null");
+            }
+            Parent = parent;
+            Id = id;
+        }
 
-		@Override
-		public String toString() {
-			return Parent == null ? Id : Parent.toString() + " :: " + Id;
-		}
-	}
+        @Override
+        public boolean equals(Object other) {
+            if (other == this) {
+                return true;
+            }
+            if (!(other instanceof Key)) {
+                return false;
+            }
+            final Key key = (Key) other;
+            return Id.equals(key.Id) && ComparisonUtil.equal(Parent, key.Parent);
+        }
+
+        @Override
+        public int hashCode() {
+            return Id.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return Parent == null ? Id : Parent.toString() + " :: " + Id;
+        }
+    }
 }

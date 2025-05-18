@@ -32,8 +32,11 @@
 #include "../css/StyleSheetTable.h"
 
 class BookModel;
+
 class PlainTextFormat;
+
 class StyleSheetParser;
+
 class ZLTextStyleEntry;
 
 class HtmlTagAction;
@@ -41,76 +44,98 @@ class HtmlTagAction;
 class HtmlBookReader : public HtmlReader {
 
 public:
-	struct TagData {
-		std::vector<shared_ptr<ZLTextStyleEntry> > StyleEntries;
+    struct TagData {
+        std::vector<shared_ptr<ZLTextStyleEntry> > StyleEntries;
 
-		void addEntry(shared_ptr<ZLTextStyleEntry> entry);
-	};
+        void addEntry(shared_ptr<ZLTextStyleEntry> entry);
+    };
 
 public:
-	HtmlBookReader(const std::string &baseDirectoryPath, BookModel &model, const PlainTextFormat &format, const std::string &encoding);
-	~HtmlBookReader();
-	void setFileName(const std::string fileName);
-	shared_ptr<StyleSheetParser> createCSSParser();
-	size_t listStackDepth() const;
+    HtmlBookReader(const std::string &baseDirectoryPath, BookModel &model,
+                   const PlainTextFormat &format, const std::string &encoding);
+
+    ~HtmlBookReader();
+
+    void setFileName(const std::string fileName);
+
+    shared_ptr<StyleSheetParser> createCSSParser();
+
+    size_t listStackDepth() const;
 
 protected:
-	virtual shared_ptr<HtmlTagAction> createAction(const std::string &tag);
-	void setBuildTableOfContent(bool build);
-	void setProcessPreTag(bool process);
+    virtual shared_ptr<HtmlTagAction> createAction(const std::string &tag);
+
+    void setBuildTableOfContent(bool build);
+
+    void setProcessPreTag(bool process);
 
 protected:
-	void startDocumentHandler();
-	void endDocumentHandler();
-	bool tagHandler(const HtmlTag &tag);
-	bool characterDataHandler(const char *text, std::size_t len, bool convert);
+    void startDocumentHandler();
+
+    void endDocumentHandler();
+
+    bool tagHandler(const HtmlTag &tag);
+
+    bool characterDataHandler(const char *text, std::size_t len, bool convert);
 
 private:
-	void preformattedCharacterDataHandler(const char *text, std::size_t len, bool convert);
-	void addConvertedDataToBuffer(const char *text, std::size_t len, bool convert);
+    void preformattedCharacterDataHandler(const char *text, std::size_t len, bool convert);
+
+    void addConvertedDataToBuffer(const char *text, std::size_t len, bool convert);
 
 protected:
-	BookReader myBookReader;
-	std::string myBaseDirPath;
+    BookReader myBookReader;
+    std::string myBaseDirPath;
 
 private:
-	const PlainTextFormat &myFormat;
-	int myIgnoreDataCounter;
-	bool myIsPreformatted;
-	bool myDontBreakParagraph;
+    const PlainTextFormat &myFormat;
+    int myIgnoreDataCounter;
+    bool myIsPreformatted;
+    bool myDontBreakParagraph;
 
-	bool myIsStarted;
-	bool myBuildTableOfContent;
-	bool myProcessPreTag;
-	bool myIgnoreTitles;
-	std::stack<int> myListNumStack;
-	std::vector<shared_ptr<TagData> > myTagDataStack;
+    bool myIsStarted;
+    bool myBuildTableOfContent;
+    bool myProcessPreTag;
+    bool myIgnoreTitles;
+    std::stack<int> myListNumStack;
+    std::vector<shared_ptr<TagData> > myTagDataStack;
 
-	StyleSheetTable myStyleSheetTable;
-	shared_ptr<StyleSheetParser> myStyleSheetParser;
-	shared_ptr<FontMap> myFontMap;
+    StyleSheetTable myStyleSheetTable;
+    shared_ptr<StyleSheetParser> myStyleSheetParser;
+    shared_ptr<FontMap> myFontMap;
 
-	int mySpaceCounter;
-	int myBreakCounter;
-	std::string myConverterBuffer;
+    int mySpaceCounter;
+    int myBreakCounter;
+    std::string myConverterBuffer;
 
-	std::map<std::string,shared_ptr<HtmlTagAction> > myActionMap;
-	std::vector<FBTextKind> myKindList;
+    std::map<std::string, shared_ptr<HtmlTagAction> > myActionMap;
+    std::vector<FBTextKind> myKindList;
 
-	std::string myFileName;
+    std::string myFileName;
 
-	friend class HtmlTagAction;
-	friend class HtmlControlTagAction;
-	friend class HtmlHeaderTagAction;
-	friend class HtmlIgnoreTagAction;
-	friend class HtmlHrefTagAction;
-	friend class HtmlImageTagAction;
-	friend class HtmlBreakTagAction;
-	friend class HtmlPreTagAction;
-	friend class HtmlListTagAction;
-	friend class HtmlListItemTagAction;
-	friend class HtmlTableTagAction;
-	friend class HtmlStyleTagAction;
+    friend class HtmlTagAction;
+
+    friend class HtmlControlTagAction;
+
+    friend class HtmlHeaderTagAction;
+
+    friend class HtmlIgnoreTagAction;
+
+    friend class HtmlHrefTagAction;
+
+    friend class HtmlImageTagAction;
+
+    friend class HtmlBreakTagAction;
+
+    friend class HtmlPreTagAction;
+
+    friend class HtmlListTagAction;
+
+    friend class HtmlListItemTagAction;
+
+    friend class HtmlTableTagAction;
+
+    friend class HtmlStyleTagAction;
 };
 
 #endif /* __HTMLBOOKREADER_H__ */

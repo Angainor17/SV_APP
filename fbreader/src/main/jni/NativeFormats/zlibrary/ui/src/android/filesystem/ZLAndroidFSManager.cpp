@@ -28,104 +28,104 @@
 
 
 std::string ZLAndroidFSManager::convertFilenameToUtf8(const std::string &name) const {
-	return name;
+    return name;
 }
 
 std::string ZLAndroidFSManager::mimeType(const std::string &path) const {
-	return std::string();
+    return std::string();
 }
 
 
 void ZLAndroidFSManager::normalizeRealPath(std::string &path) const {
-	if (path.empty()) {
-		return;
-	} else if (path[0] == '~') {
-		if (path.length() == 1 || path[1] == '/') {
-			path.erase(0, 1);
-		}
-	}
-	int last = path.length() - 1;
-	while ((last > 0) && (path[last] == '/')) {
-		--last;
-	}
-	if (last < (int)path.length() - 1) {
-		path = path.substr(0, last + 1);
-	}
+    if (path.empty()) {
+        return;
+    } else if (path[0] == '~') {
+        if (path.length() == 1 || path[1] == '/') {
+            path.erase(0, 1);
+        }
+    }
+    int last = path.length() - 1;
+    while ((last > 0) && (path[last] == '/')) {
+        --last;
+    }
+    if (last < (int) path.length() - 1) {
+        path = path.substr(0, last + 1);
+    }
 
-	int index;
-	while ((index = path.find("/../")) != -1) {
-		int prevIndex = std::max((int)path.rfind('/', index - 1), 0);
-		path.erase(prevIndex, index + 3 - prevIndex);
-	}
-	int len = path.length();
-	if ((len >= 3) && (path.substr(len - 3) == "/..")) {
-		int prevIndex = std::max((int)path.rfind('/', len - 4), 0);
-		path.erase(prevIndex);
-	}
-	while ((index = path.find("/./")) != -1) {
-		path.erase(index, 2);
-	}
-	while (path.length() >= 2 &&
-				 path.substr(path.length() - 2) == "/.") {
-		path.erase(path.length() - 2);
-	}
-	while ((index = path.find("//")) != -1) {
-		path.erase(index, 1);
-	}
+    int index;
+    while ((index = path.find("/../")) != -1) {
+        int prevIndex = std::max((int) path.rfind('/', index - 1), 0);
+        path.erase(prevIndex, index + 3 - prevIndex);
+    }
+    int len = path.length();
+    if ((len >= 3) && (path.substr(len - 3) == "/..")) {
+        int prevIndex = std::max((int) path.rfind('/', len - 4), 0);
+        path.erase(prevIndex);
+    }
+    while ((index = path.find("/./")) != -1) {
+        path.erase(index, 2);
+    }
+    while (path.length() >= 2 &&
+           path.substr(path.length() - 2) == "/.") {
+        path.erase(path.length() - 2);
+    }
+    while ((index = path.find("//")) != -1) {
+        path.erase(index, 1);
+    }
 }
 
 
 ZLFileInfo ZLAndroidFSManager::fileInfo(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::fileInfo(path);
-	}
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::fileInfo(path);
+    }
 
-	ZLFileInfo info;
+    ZLFileInfo info;
 
-	JNIEnv *env = AndroidUtil::getEnv();
-	jobject javaFile = AndroidUtil::createJavaFile(env, path);
-	if (javaFile == 0) {
-		return info;
-	}
+    JNIEnv *env = AndroidUtil::getEnv();
+    jobject javaFile = AndroidUtil::createJavaFile(env, path);
+    if (javaFile == 0) {
+        return info;
+    }
 
-	info.IsDirectory = AndroidUtil::Method_ZLFile_isDirectory->call(javaFile);
-	const jboolean exists = AndroidUtil::Method_ZLFile_exists->call(javaFile);
-	if (exists) {
-		info.Exists = true;
-		info.Size = AndroidUtil::Method_ZLFile_size->call(javaFile);
-		info.MTime = AndroidUtil::Method_ZLFile_lastModified->call(javaFile);
-	}
-	env->DeleteLocalRef(javaFile);
+    info.IsDirectory = AndroidUtil::Method_ZLFile_isDirectory->call(javaFile);
+    const jboolean exists = AndroidUtil::Method_ZLFile_exists->call(javaFile);
+    if (exists) {
+        info.Exists = true;
+        info.Size = AndroidUtil::Method_ZLFile_size->call(javaFile);
+        info.MTime = AndroidUtil::Method_ZLFile_lastModified->call(javaFile);
+    }
+    env->DeleteLocalRef(javaFile);
 
-	return info;
+    return info;
 }
 
 std::string ZLAndroidFSManager::resolveSymlink(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::resolveSymlink(path);
-	}
-	return path;
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::resolveSymlink(path);
+    }
+    return path;
 }
 
 ZLFSDir *ZLAndroidFSManager::createNewDirectory(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::createNewDirectory(path);
-	}
-	return 0;
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::createNewDirectory(path);
+    }
+    return 0;
 }
 
 ZLFSDir *ZLAndroidFSManager::createPlainDirectory(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::createPlainDirectory(path);
-	}
-	return new JavaFSDir(path);
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::createPlainDirectory(path);
+    }
+    return new JavaFSDir(path);
 }
 
 ZLInputStream *ZLAndroidFSManager::createPlainInputStream(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::createPlainInputStream(path);
-	}
-	return new JavaInputStream(path);
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::createPlainInputStream(path);
+    }
+    return new JavaInputStream(path);
 }
 
 /*ZLOutputStream *ZLAndroidFSManager::createOutputStream(const std::string &path) const {
@@ -136,15 +136,15 @@ ZLInputStream *ZLAndroidFSManager::createPlainInputStream(const std::string &pat
 }*/
 
 bool ZLAndroidFSManager::removeFile(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::removeFile(path);
-	}
-	return false;
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::removeFile(path);
+    }
+    return false;
 }
 
 bool ZLAndroidFSManager::canRemoveFile(const std::string &path) const {
-	if (useNativeImplementation(path)) {
-		return ZLUnixFSManager::canRemoveFile(path);
-	}
-	return false;
+    if (useNativeImplementation(path)) {
+        return ZLUnixFSManager::canRemoveFile(path);
+    }
+    return false;
 }

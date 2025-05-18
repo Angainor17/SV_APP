@@ -29,42 +29,46 @@ class ZLFile;
 class PdbStream : public ZLInputStream {
 
 public:
-	PdbStream(const ZLFile &file);
-	virtual ~PdbStream();
-	virtual void close();
+    PdbStream(const ZLFile &file);
+
+    virtual ~PdbStream();
+
+    virtual void close();
 
 protected:
-	virtual bool open();
-	void seek(int offset, bool absoluteOffset);
-	size_t offset() const;
+    virtual bool open();
+
+    void seek(int offset, bool absoluteOffset);
+
+    size_t offset() const;
 
 private:
-	size_t read(char *buffer, size_t maxSize);
+    size_t read(char *buffer, size_t maxSize);
 
 protected:
-	virtual bool fillBuffer() = 0;
+    virtual bool fillBuffer() = 0;
 
 protected:
-	size_t recordOffset(size_t index) const;
+    size_t recordOffset(size_t index) const;
 
 public:
-	const PdbHeader &header() const;
+    const PdbHeader &header() const;
 
 protected:
-	shared_ptr<ZLInputStream> myBase;
-	size_t myOffset;
+    shared_ptr<ZLInputStream> myBase;
+    size_t myOffset;
 
 private:
-	PdbHeader myHeader;
-	
+    PdbHeader myHeader;
+
 protected:
-	char *myBuffer;
-	unsigned short myBufferLength;
-	unsigned short myBufferOffset;
+    char *myBuffer;
+    unsigned short myBufferLength;
+    unsigned short myBufferOffset;
 };
 
 inline const PdbHeader &PdbStream::header() const {
-	return myHeader;
+    return myHeader;
 }
 
 #endif /* __PDBSTREAM_H__ */

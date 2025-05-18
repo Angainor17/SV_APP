@@ -24,26 +24,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ZLTextHyperlink {
-	public static final ZLTextHyperlink NO_LINK = new ZLTextHyperlink((byte)0, null);
-	public final byte Type;
-	public final String Id;
-	private List<Integer> myElementIndexes;
+    public static final ZLTextHyperlink NO_LINK = new ZLTextHyperlink((byte) 0, null);
+    public final byte Type;
+    public final String Id;
+    private List<Integer> myElementIndexes;
 
-	ZLTextHyperlink(byte type, String id) {
-		Type = type;
-		Id = id;
-	}
+    ZLTextHyperlink(byte type, String id) {
+        Type = type;
+        Id = id;
+    }
 
-	void addElementIndex(int elementIndex) {
-		if (myElementIndexes == null) {
-			myElementIndexes = new LinkedList<Integer>();
-		}
-		myElementIndexes.add(elementIndex);
-	}
+    void addElementIndex(int elementIndex) {
+        if (myElementIndexes == null) {
+            myElementIndexes = new LinkedList<Integer>();
+        }
+        myElementIndexes.add(elementIndex);
+    }
 
-	List<Integer> elementIndexes() {
-		return myElementIndexes != null
-			? Collections.unmodifiableList(myElementIndexes)
-			: Collections.<Integer>emptyList();
-	}
+    List<Integer> elementIndexes() {
+        return myElementIndexes != null
+                ? Collections.unmodifiableList(myElementIndexes)
+                : Collections.<Integer>emptyList();
+    }
 }

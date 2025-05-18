@@ -28,50 +28,52 @@
 #include "../formats/FormatPlugin.h"
 #include "../library/Book.h"
 
-BookModel::BookModel(const shared_ptr<Book> book, jobject javaModel, const std::string &cacheDir) : CacheDir(cacheDir), myBook(book) {
-	myJavaModel = AndroidUtil::getEnv()->NewGlobalRef(javaModel);
+BookModel::BookModel(const shared_ptr<Book> book, jobject javaModel, const std::string &cacheDir)
+        : CacheDir(cacheDir), myBook(book) {
+    myJavaModel = AndroidUtil::getEnv()->NewGlobalRef(javaModel);
 
-	myBookTextModel = new ZLTextPlainModel(std::string(), book->language(), 131072, CacheDir, "ncache", myFontManager);
-	myContentsTree = new ContentsTree();
-	/*shared_ptr<FormatPlugin> plugin = PluginCollection::Instance().plugin(book->file(), false);
-	if (!plugin.isNull()) {
-		plugin->readModel(*this);
-	}*/
+    myBookTextModel = new ZLTextPlainModel(std::string(), book->language(), 131072, CacheDir,
+                                           "ncache", myFontManager);
+    myContentsTree = new ContentsTree();
+    /*shared_ptr<FormatPlugin> plugin = PluginCollection::Instance().plugin(book->file(), false);
+    if (!plugin.isNull()) {
+        plugin->readModel(*this);
+    }*/
 }
 
 BookModel::~BookModel() {
-	AndroidUtil::getEnv()->DeleteGlobalRef(myJavaModel);
+    AndroidUtil::getEnv()->DeleteGlobalRef(myJavaModel);
 }
 
 void BookModel::setHyperlinkMatcher(shared_ptr<HyperlinkMatcher> matcher) {
-	myHyperlinkMatcher = matcher;
+    myHyperlinkMatcher = matcher;
 }
 
 BookModel::Label BookModel::label(const std::string &id) const {
-	if (!myHyperlinkMatcher.isNull()) {
-		return myHyperlinkMatcher->match(myInternalHyperlinks, id);
-	}
+    if (!myHyperlinkMatcher.isNull()) {
+        return myHyperlinkMatcher->match(myInternalHyperlinks, id);
+    }
 
-	std::map<std::string,Label>::const_iterator it = myInternalHyperlinks.find(id);
-	return (it != myInternalHyperlinks.end()) ? it->second : Label(0, -1);
+    std::map<std::string, Label>::const_iterator it = myInternalHyperlinks.find(id);
+    return (it != myInternalHyperlinks.end()) ? it->second : Label(0, -1);
 }
 
 const shared_ptr<Book> BookModel::book() const {
-	return myBook;
+    return myBook;
 }
 
 bool BookModel::flush() {
-	myBookTextModel->flush();
-	if (myBookTextModel->allocator().failed()) {
-		return false;
-	}
+    myBookTextModel->flush();
+    if (myBookTextModel->allocator().failed()) {
+        return false;
+    }
 
-	std::map<std::string,shared_ptr<ZLTextModel> >::const_iterator it = myFootnotes.begin();
-	for (; it != myFootnotes.end(); ++it) {
-		it->second->flush();
-		if (it->second->allocator().failed()) {
-			return false;
-		}
-	}
-	return true;
+    std::map<std::string, shared_ptr<ZLTextModel> >::const_iterator it = myFootnotes.begin();
+    for (; it != myFootnotes.end(); ++it) {
+        it->second->flush();
+        if (it->second->allocator().failed()) {
+            return false;
+        }
+    }
+    return true;
 }

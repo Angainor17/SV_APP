@@ -23,17 +23,20 @@
 class BitReader {
 
 public:
-	BitReader(const unsigned char* data, size_t size);
-	~BitReader();
+    BitReader(const unsigned char *data, size_t size);
 
-	unsigned long long peek(size_t n);
-	bool eat(size_t n);
-	size_t left() const;
+    ~BitReader();
+
+    unsigned long long peek(size_t n);
+
+    bool eat(size_t n);
+
+    size_t left() const;
 
 private:
-	unsigned char *myData;
-	size_t myOffset;
-	const size_t myLength;
+    unsigned char *myData;
+    size_t myOffset;
+    const size_t myLength;
 };
 
 #endif //__BITREADER_H__

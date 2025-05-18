@@ -3,38 +3,36 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@android:drawable/status_bar_item_app_background"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal"
-        >
-        
+        android:orientation="horizontal">
+
         <LinearLayout
             android:layout_width="40dp"
             android:layout_height="fill_parent"
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical"
-            android:paddingTop="8dp"
-            >
-            <ImageView 
+            android:paddingTop="8dp">
+
+            <ImageView
                 android:id="@+id/download_notification_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@android:drawable/stat_sys_download"
-                />
-            <TextView android:id="@+id/download_notification_progress_text" 
-                android:layout_width="wrap_content" 
+                android:src="@android:drawable/stat_sys_download" />
+
+            <TextView
+                android:id="@+id/download_notification_progress_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:singleLine="true"
                 android:textColor="#ff000000"
-                android:textSize="14sp"
-                />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -42,8 +40,8 @@
             android:layout_height="fill_parent"
             android:clickable="true"
             android:focusable="true"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -51,41 +49,41 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="horizontal"
-                android:paddingTop="10dp"
-                >
-                <TextView android:id="@+id/download_notification_title"
+                android:paddingTop="10dp">
+
+                <TextView
+                    android:id="@+id/download_notification_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="2dp"
                     android:singleLine="true"
                     android:textColor="#ff000000"
-                    android:textSize="18sp"
-                    />
-<!--                <TextView android:id="@+id/download_notification_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ff000000"
-                    android:singleLine="true"
-                    android:textSize="14sp"
-                    android:paddingLeft="5dp"
-                    /> -->
+                    android:textSize="18sp" />
+                <!--                <TextView android:id="@+id/download_notification_description"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="#ff000000"
+                                    android:singleLine="true"
+                                    android:textSize="14sp"
+                                    android:paddingLeft="5dp"
+                                    /> -->
             </LinearLayout>
-            <ProgressBar android:id="@+id/download_notification_progress_bar"
+
+            <ProgressBar
+                android:id="@+id/download_notification_progress_bar"
                 style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="fill_parent" 
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:paddingRight="25dp"
-                android:paddingBottom="8dp"
-                />
+                android:paddingBottom="8dp" />
         </RelativeLayout>
     </LinearLayout>
 
-    <ImageView 
+    <ImageView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/divider_horizontal_bright"
-        />
+        android:src="@android:drawable/divider_horizontal_bright" />
 
 </LinearLayout>
 

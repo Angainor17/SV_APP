@@ -27,66 +27,66 @@ FB2CoverReader::FB2CoverReader(const ZLFile &file) : myFile(file) {
 }
 
 shared_ptr<const ZLImage> FB2CoverReader::readCover() {
-	myReadCoverPage = false;
-	myLookForImage = false;
-	myImageId.erase();
-	myImageStart = -1;
+    myReadCoverPage = false;
+    myLookForImage = false;
+    myImageId.erase();
+    myImageStart = -1;
 
-	readDocument(myFile);
+    readDocument(myFile);
 
-	return myImage;
+    return myImage;
 }
 
 bool FB2CoverReader::processNamespaces() const {
-	return true;
+    return true;
 }
 
 void FB2CoverReader::startElementHandler(int tag, const char **attributes) {
-	switch (tag) {
-		case _COVERPAGE:
-			myReadCoverPage = true;
-			break;
-		case _IMAGE:
-			if (myReadCoverPage) {
-				const char *ref = attributeValue(attributes, myHrefPredicate);
-				if (ref != 0 && *ref == '#' && *(ref + 1) != '\0') {
-					myImageId = ref + 1;
-				}
-			}
-			break;
-		case _BINARY:
-		{
-			const char *id = attributeValue(attributes, "id");
-			const char *contentType = attributeValue(attributes, "content-type");
-			if (id != 0 && contentType != 0 && myImageId == id) {
-				myLookForImage = true;
-			}
-		}
-	}
+    switch (tag) {
+        case _COVERPAGE:
+            myReadCoverPage = true;
+            break;
+        case _IMAGE:
+            if (myReadCoverPage) {
+                const char *ref = attributeValue(attributes, myHrefPredicate);
+                if (ref != 0 && *ref == '#' && *(ref + 1) != '\0') {
+                    myImageId = ref + 1;
+                }
+            }
+            break;
+        case _BINARY: {
+            const char *id = attributeValue(attributes, "id");
+            const char *contentType = attributeValue(attributes, "content-type");
+            if (id != 0 && contentType != 0 && myImageId == id) {
+                myLookForImage = true;
+            }
+        }
+    }
 }
 
 void FB2CoverReader::endElementHandler(int tag) {
-	switch (tag) {
-		case _COVERPAGE:
-			myReadCoverPage = false;
-			break;
-		case _DESCRIPTION:
-			if (myImageId.empty()) {
-				interrupt();
-			}
-			break;
-		case _BINARY:
-			if (!myImageId.empty() && myImageStart >= 0) {
-				myImage = new ZLFileImage(myFile, "base64", myImageStart, getCurrentPosition() - myImageStart);
-				interrupt();
-			}
-			break;
-	}
+    switch (tag) {
+        case _COVERPAGE:
+            myReadCoverPage = false;
+            break;
+        case _DESCRIPTION:
+            if (myImageId.empty()) {
+                interrupt();
+            }
+            break;
+        case _BINARY:
+            if (!myImageId.empty() && myImageStart >= 0) {
+                myImage = new ZLFileImage(myFile, "base64", myImageStart,
+                                          getCurrentPosition() - myImageStart);
+                interrupt();
+            }
+            break;
+    }
 }
 
 void FB2CoverReader::characterDataHandler(const char *text, std::size_t len) {
-	if (len > 0 && myLookForImage) {
-		myImageStart = getCurrentPosition();
-		myLookForImage = false;
-	}
+    if (len > 0 && myLookForImage) {
+        myImageStart = getCurrentPosition();
+        myLookForImage = false;
+    }
 }

@@ -26,23 +26,25 @@
 class ZLLogger {
 
 public:
-	static const std::string DEFAULT_CLASS;
+    static const std::string DEFAULT_CLASS;
 
-	static ZLLogger &Instance();
-
-private:
-	static ZLLogger *ourInstance;
+    static ZLLogger &Instance();
 
 private:
-	ZLLogger();
+    static ZLLogger *ourInstance;
+
+private:
+    ZLLogger();
 
 public:
-	void registerClass(const std::string &className);
-	void print(const std::string &className, const std::string &message) const;
-	void println(const std::string &className, const std::string &message) const;
+    void registerClass(const std::string &className);
+
+    void print(const std::string &className, const std::string &message) const;
+
+    void println(const std::string &className, const std::string &message) const;
 
 private:
-	std::set<std::string> myRegisteredClasses;
+    std::set<std::string> myRegisteredClasses;
 };
 
 #endif /* __ZLLOGGER_H__ */

@@ -25,31 +25,31 @@ import org.geometerplus.fbreader.network.urlInfo.UrlInfoCollection;
 import org.geometerplus.zlibrary.core.network.ZLNetworkException;
 
 class RecentCatalogItem extends NetworkCatalogItem {
-	RecentCatalogItem(String title, String summary) {
-		super(
-			null,
-			title,
-			summary,
-			new UrlInfoCollection<UrlInfo>(),
-			Accessibility.ALWAYS,
-			FLAGS_DEFAULT
-		);
-	}
+    RecentCatalogItem(String title, String summary) {
+        super(
+                null,
+                title,
+                summary,
+                new UrlInfoCollection<UrlInfo>(),
+                Accessibility.ALWAYS,
+                FLAGS_DEFAULT
+        );
+    }
 
-	@Override
-	public String getStringId() {
-		// TODO: implement
-		return "@RecentCatalog#" + hashCode();
-	}
+    @Override
+    public String getStringId() {
+        // TODO: implement
+        return "@RecentCatalog#" + hashCode();
+    }
 
-	@Override
-	public boolean canBeOpened() {
-		// TODO: implement
-		return false;
-	}
+    @Override
+    public boolean canBeOpened() {
+        // TODO: implement
+        return false;
+    }
 
-	@Override
-	public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
-		// TODO: implement
-	}
+    @Override
+    public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
+        // TODO: implement
+    }
 }

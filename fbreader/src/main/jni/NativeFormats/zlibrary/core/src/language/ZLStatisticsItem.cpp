@@ -19,40 +19,45 @@
 
 #include "ZLStatisticsItem.h"
 
-ZLMapBasedStatisticsItem::ZLMapBasedStatisticsItem(const std::map<ZLCharSequence, std::size_t>::const_iterator it, std::size_t index) : 	ZLStatisticsItem(index),
-																																myIterator(it) {
+ZLMapBasedStatisticsItem::ZLMapBasedStatisticsItem(
+        const std::map<ZLCharSequence, std::size_t>::const_iterator it, std::size_t index)
+        : ZLStatisticsItem(index),
+          myIterator(it) {
 }
 
 ZLCharSequence ZLMapBasedStatisticsItem::sequence() const {
-	return myIterator->first;
+    return myIterator->first;
 }
 
 std::size_t ZLMapBasedStatisticsItem::frequency() const {
-	return myIterator->second;
+    return myIterator->second;
 }
 
 void ZLMapBasedStatisticsItem::next() {
-	++myIndex;
-	++myIterator;
+    ++myIndex;
+    ++myIterator;
 }
 
-ZLArrayBasedStatisticsItem::ZLArrayBasedStatisticsItem(std::size_t sequenceLength, char* sequencePtr, unsigned short* frequencyPtr, std::size_t index) :
-	ZLStatisticsItem(index),
-	mySequencePtr(sequencePtr),
-	myFrequencyPtr(frequencyPtr),
-	mySequenceLength(sequenceLength) {
+ZLArrayBasedStatisticsItem::ZLArrayBasedStatisticsItem(std::size_t sequenceLength,
+                                                       char *sequencePtr,
+                                                       unsigned short *frequencyPtr,
+                                                       std::size_t index) :
+        ZLStatisticsItem(index),
+        mySequencePtr(sequencePtr),
+        myFrequencyPtr(frequencyPtr),
+        mySequenceLength(sequenceLength) {
 }
 
 ZLCharSequence ZLArrayBasedStatisticsItem::sequence() const {
-	return ZLCharSequence(mySequencePtr, mySequenceLength);
+    return ZLCharSequence(mySequencePtr, mySequenceLength);
 }
 
 std::size_t ZLArrayBasedStatisticsItem::frequency() const {
-	return (std::size_t) *myFrequencyPtr;
+    return (std::size_t) *myFrequencyPtr;
 }
 
 void ZLArrayBasedStatisticsItem::next() {
-	++myIndex;
-	mySequencePtr += mySequenceLength;
-	++myFrequencyPtr;
+    ++myIndex;
+    mySequencePtr += mySequenceLength;
+    ++myFrequencyPtr;
 }

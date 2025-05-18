@@ -26,54 +26,54 @@
 
 
 JavaFSDir::JavaFSDir(const std::string &name) : ZLFSDir(name) {
-	myJavaFile = 0;
+    myJavaFile = 0;
 }
 
 JavaFSDir::~JavaFSDir() {
-	JNIEnv *env = AndroidUtil::getEnv();
-	env->DeleteGlobalRef(myJavaFile);
+    JNIEnv *env = AndroidUtil::getEnv();
+    env->DeleteGlobalRef(myJavaFile);
 }
 
 void JavaFSDir::initJavaFile(JNIEnv *env) {
-	if (myJavaFile == 0) {
-		jobject javaFile = AndroidUtil::createJavaFile(env, path());
-		myJavaFile = env->NewGlobalRef(javaFile);
-		env->DeleteLocalRef(javaFile);
-	}
+    if (myJavaFile == 0) {
+        jobject javaFile = AndroidUtil::createJavaFile(env, path());
+        myJavaFile = env->NewGlobalRef(javaFile);
+        env->DeleteLocalRef(javaFile);
+    }
 }
 
 jobjectArray JavaFSDir::getFileChildren(JNIEnv *env) {
-	initJavaFile(env);
-	if (myJavaFile == 0) {
-		return 0;
-	}
+    initJavaFile(env);
+    if (myJavaFile == 0) {
+        return 0;
+    }
 
-	jobject list = AndroidUtil::Method_ZLFile_children->call(myJavaFile);
-	if (list == 0) {
-		return 0;
-	}
-	jobjectArray array = AndroidUtil::Method_java_util_Collection_toArray->call(list);
-	env->DeleteLocalRef(list);
-	return array;
+    jobject list = AndroidUtil::Method_ZLFile_children->call(myJavaFile);
+    if (list == 0) {
+        return 0;
+    }
+    jobjectArray array = AndroidUtil::Method_java_util_Collection_toArray->call(list);
+    env->DeleteLocalRef(list);
+    return array;
 }
 
 void JavaFSDir::collectFiles(std::vector<std::string> &names, bool includeSymlinks) {
-	JNIEnv *env = AndroidUtil::getEnv();
-	jobjectArray array = getFileChildren(env);
-	if (array == 0) {
-		return;
-	}
+    JNIEnv *env = AndroidUtil::getEnv();
+    jobjectArray array = getFileChildren(env);
+    if (array == 0) {
+        return;
+    }
 
-	const jsize size = env->GetArrayLength(array);
-	for (jsize i = 0; i < size; ++i) {
-		jobject file = env->GetObjectArrayElement(array, i);
-		std::string path = AndroidUtil::Method_ZLFile_getPath->callForCppString(file);
-		env->DeleteLocalRef(file);
+    const jsize size = env->GetArrayLength(array);
+    for (jsize i = 0; i < size; ++i) {
+        jobject file = env->GetObjectArrayElement(array, i);
+        std::string path = AndroidUtil::Method_ZLFile_getPath->callForCppString(file);
+        env->DeleteLocalRef(file);
 
-		std::size_t index = path.rfind('/');
-		if (index != std::string::npos) {
-			path = path.substr(index + 1);
-		}
-		names.push_back(path);
-	}
+        std::size_t index = path.rfind('/');
+        if (index != std::string::npos) {
+            path = path.substr(index + 1);
+        }
+        names.push_back(path);
+    }
 }

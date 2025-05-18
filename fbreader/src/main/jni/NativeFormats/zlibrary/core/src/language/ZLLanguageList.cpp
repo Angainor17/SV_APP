@@ -28,7 +28,7 @@
 std::vector<std::string> ZLLanguageList::ourLanguageCodes;
 
 std::string ZLLanguageList::patternsDirectoryPath() {
-	return ZLibrary::ZLibraryDirectory() + ZLibrary::FileNameDelimiter + "languagePatterns";
+    return ZLibrary::ZLibraryDirectory() + ZLibrary::FileNameDelimiter + "languagePatterns";
 }
 
 /*std::string ZLLanguageList::languageName(const std::string &code) {
@@ -36,24 +36,25 @@ std::string ZLLanguageList::patternsDirectoryPath() {
 }*/
 
 const std::vector<std::string> &ZLLanguageList::languageCodes() {
-	if (ourLanguageCodes.empty()) {
-		std::set<std::string> codes;
-		shared_ptr<ZLDir> dir = ZLFile(patternsDirectoryPath()).directory(false);
-		if (!dir.isNull()) {
-			std::vector<std::string> fileNames;
-			dir->collectFiles(fileNames, false);
-			for (std::vector<std::string>::const_iterator it = fileNames.begin(); it != fileNames.end(); ++it) {
-				const int index = it->find('_');
-				if (index != -1) {
-					codes.insert(it->substr(0, index));
-				}
-			}
-		}
+    if (ourLanguageCodes.empty()) {
+        std::set<std::string> codes;
+        shared_ptr<ZLDir> dir = ZLFile(patternsDirectoryPath()).directory(false);
+        if (!dir.isNull()) {
+            std::vector<std::string> fileNames;
+            dir->collectFiles(fileNames, false);
+            for (std::vector<std::string>::const_iterator it = fileNames.begin();
+                 it != fileNames.end(); ++it) {
+                const int index = it->find('_');
+                if (index != -1) {
+                    codes.insert(it->substr(0, index));
+                }
+            }
+        }
 
-		for (std::set<std::string>::const_iterator it = codes.begin(); it != codes.end(); ++it) {
-			ourLanguageCodes.push_back(*it);
-		}
-	}
+        for (std::set<std::string>::const_iterator it = codes.begin(); it != codes.end(); ++it) {
+            ourLanguageCodes.push_back(*it);
+        }
+    }
 
-	return ourLanguageCodes;
+    return ourLanguageCodes;
 }

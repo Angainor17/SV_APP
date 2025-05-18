@@ -31,27 +31,30 @@ class BookModel;
 class TxtBookReader : public TxtReader, public BookReader {
 
 public:
-	TxtBookReader(BookModel &model, const PlainTextFormat &format, const std::string &encoding);
-	~TxtBookReader();
+    TxtBookReader(BookModel &model, const PlainTextFormat &format, const std::string &encoding);
+
+    ~TxtBookReader();
 
 protected:
-	void startDocumentHandler();
-	void endDocumentHandler();
+    void startDocumentHandler();
 
-	bool characterDataHandler(std::string &str);
-	bool newLineHandler();
+    void endDocumentHandler();
+
+    bool characterDataHandler(std::string &str);
+
+    bool newLineHandler();
 
 private:
-	void internalEndParagraph();
+    void internalEndParagraph();
 
 private:
-	const PlainTextFormat &myFormat;
+    const PlainTextFormat &myFormat;
 
-	int myLineFeedCounter;
-	bool myInsideContentsParagraph;
-	bool myLastLineIsEmpty;
-	bool myNewLine;
-	int mySpaceCounter;
+    int myLineFeedCounter;
+    bool myInsideContentsParagraph;
+    bool myLastLineIsEmpty;
+    bool myNewLine;
+    int mySpaceCounter;
 };
 
 inline TxtBookReader::~TxtBookReader() {}

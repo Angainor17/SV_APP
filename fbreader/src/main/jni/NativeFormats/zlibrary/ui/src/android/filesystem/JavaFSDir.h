@@ -27,20 +27,22 @@
 class JavaFSDir : public ZLFSDir {
 
 public:
-	JavaFSDir(const std::string &name);
-	~JavaFSDir();
+    JavaFSDir(const std::string &name);
 
-	//void collectSubDirs(std::vector<std::string> &names, bool includeSymlinks);
-	void collectFiles(std::vector<std::string> &names, bool includeSymlinks);
+    ~JavaFSDir();
 
-private:
-	void initJavaFile(JNIEnv *env);
-	jobjectArray getFileChildren(JNIEnv *env); // returns array of ZLFile or NULL
-
-	void collectChildren(std::vector<std::string> &names, bool filesNotDirs);
+    //void collectSubDirs(std::vector<std::string> &names, bool includeSymlinks);
+    void collectFiles(std::vector<std::string> &names, bool includeSymlinks);
 
 private:
-	jobject myJavaFile;
+    void initJavaFile(JNIEnv *env);
+
+    jobjectArray getFileChildren(JNIEnv *env); // returns array of ZLFile or NULL
+
+    void collectChildren(std::vector<std::string> &names, bool filesNotDirs);
+
+private:
+    jobject myJavaFile;
 };
 
 #endif /* __JAVAFSDIR_H__ */

@@ -44,17 +44,17 @@ Book::~Book() {
 }
 
 shared_ptr<Book> Book::createBook(
-	const ZLFile &file,
-	int id,
-	const std::string &encoding,
-	const std::string &language,
-	const std::string &title
+        const ZLFile &file,
+        int id,
+        const std::string &encoding,
+        const std::string &language,
+        const std::string &title
 ) {
-	Book *book = new Book(file, id);
-	book->setEncoding(encoding);
-	book->setLanguage(language);
-	book->setTitle(title);
-	return book;
+    Book *book = new Book(file, id);
+    book->setEncoding(encoding);
+    book->setLanguage(language);
+    book->setTitle(title);
+    return book;
 }
 
 /*
@@ -86,112 +86,113 @@ shared_ptr<Book> Book::loadFromFile(const ZLFile &file) {
 */
 
 shared_ptr<Book> Book::loadFromJavaBook(JNIEnv *env, jobject javaBook) {
-	const std::string path = AndroidUtil::Method_Book_getPath->callForCppString(javaBook);
-	const std::string title = AndroidUtil::Method_Book_getTitle->callForCppString(javaBook);
-	const std::string language = AndroidUtil::Method_Book_getLanguage->callForCppString(javaBook);
-	const std::string encoding = AndroidUtil::Method_Book_getEncodingNoDetection->callForCppString(javaBook);
+    const std::string path = AndroidUtil::Method_Book_getPath->callForCppString(javaBook);
+    const std::string title = AndroidUtil::Method_Book_getTitle->callForCppString(javaBook);
+    const std::string language = AndroidUtil::Method_Book_getLanguage->callForCppString(javaBook);
+    const std::string encoding = AndroidUtil::Method_Book_getEncodingNoDetection->callForCppString(
+            javaBook);
 
-	return createBook(ZLFile(path), 0, encoding, language, title);
+    return createBook(ZLFile(path), 0, encoding, language, title);
 }
 
 
 bool Book::addTag(shared_ptr<Tag> tag) {
-	if (tag.isNull()) {
-		return false;
-	}
-	TagList::const_iterator it = std::find(myTags.begin(), myTags.end(), tag);
-	if (it == myTags.end()) {
-		myTags.push_back(tag);
-		return true;
-	}
-	return false;
+    if (tag.isNull()) {
+        return false;
+    }
+    TagList::const_iterator it = std::find(myTags.begin(), myTags.end(), tag);
+    if (it == myTags.end()) {
+        myTags.push_back(tag);
+        return true;
+    }
+    return false;
 }
 
 bool Book::addTag(const std::string &fullName) {
-	return addTag(Tag::getTagByFullName(fullName));
+    return addTag(Tag::getTagByFullName(fullName));
 }
 
 bool Book::removeTag(shared_ptr<Tag> tag, bool includeSubTags) {
-	bool changed = false;
-	for (TagList::iterator it = myTags.begin(); it != myTags.end();) {
-		if (tag == *it || (includeSubTags && tag->isAncestorOf(*it))) {
-			it = myTags.erase(it);
-			changed = true;
-		} else {
-			++it;
-		}
-	}
-	return changed;
+    bool changed = false;
+    for (TagList::iterator it = myTags.begin(); it != myTags.end();) {
+        if (tag == *it || (includeSubTags && tag->isAncestorOf(*it))) {
+            it = myTags.erase(it);
+            changed = true;
+        } else {
+            ++it;
+        }
+    }
+    return changed;
 }
 
 bool Book::renameTag(shared_ptr<Tag> from, shared_ptr<Tag> to, bool includeSubTags) {
-	if (includeSubTags) {
-		std::set<shared_ptr<Tag> > tagSet;
-		bool changed = false;
-		for (TagList::const_iterator it = myTags.begin(); it != myTags.end(); ++it) {
-			if (*it == from) {
-				tagSet.insert(to);
-				changed = true;
-			} else {
-				shared_ptr<Tag> newtag = Tag::cloneSubTag(*it, from, to);
-				if (newtag.isNull()) {
-					tagSet.insert(*it);
-				} else {
-					tagSet.insert(newtag);
-					changed = true;
-				}
-			}
-		}
-		if (changed) {
-			myTags.clear();
-			myTags.insert(myTags.end(), tagSet.begin(), tagSet.end());
-			return true;
-		}
-	} else {
-		TagList::iterator it = std::find(myTags.begin(), myTags.end(), from);
-		if (it != myTags.end()) {
-			TagList::const_iterator jt = std::find(myTags.begin(), myTags.end(), to);
-			if (jt == myTags.end()) {
-				*it = to;
-			} else {
-				myTags.erase(it);
-			}
-			return true;
-		}
-	}
-	return false;
+    if (includeSubTags) {
+        std::set<shared_ptr<Tag> > tagSet;
+        bool changed = false;
+        for (TagList::const_iterator it = myTags.begin(); it != myTags.end(); ++it) {
+            if (*it == from) {
+                tagSet.insert(to);
+                changed = true;
+            } else {
+                shared_ptr<Tag> newtag = Tag::cloneSubTag(*it, from, to);
+                if (newtag.isNull()) {
+                    tagSet.insert(*it);
+                } else {
+                    tagSet.insert(newtag);
+                    changed = true;
+                }
+            }
+        }
+        if (changed) {
+            myTags.clear();
+            myTags.insert(myTags.end(), tagSet.begin(), tagSet.end());
+            return true;
+        }
+    } else {
+        TagList::iterator it = std::find(myTags.begin(), myTags.end(), from);
+        if (it != myTags.end()) {
+            TagList::const_iterator jt = std::find(myTags.begin(), myTags.end(), to);
+            if (jt == myTags.end()) {
+                *it = to;
+            } else {
+                myTags.erase(it);
+            }
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Book::cloneTag(shared_ptr<Tag> from, shared_ptr<Tag> to, bool includeSubTags) {
-	if (includeSubTags) {
-		std::set<shared_ptr<Tag> > tagSet;
-		for (TagList::const_iterator it = myTags.begin(); it != myTags.end(); ++it) {
-			if (*it == from) {
-				tagSet.insert(to);
-			} else {
-				shared_ptr<Tag> newtag = Tag::cloneSubTag(*it, from, to);
-				if (!newtag.isNull()) {
-					tagSet.insert(newtag);
-				}
-			}
-		}
-		if (!tagSet.empty()) {
-			tagSet.insert(myTags.begin(), myTags.end());
-			myTags.clear();
-			myTags.insert(myTags.end(), tagSet.begin(), tagSet.end());
-			return true;
-		}
-	} else {
-		TagList::const_iterator it = std::find(myTags.begin(), myTags.end(), from);
-		if (it != myTags.end()) {
-			TagList::const_iterator jt = std::find(myTags.begin(), myTags.end(), to);
-			if (jt == myTags.end()) {
-				myTags.push_back(to);
-				return true;
-			}
-		}
-	}
-	return false;
+    if (includeSubTags) {
+        std::set<shared_ptr<Tag> > tagSet;
+        for (TagList::const_iterator it = myTags.begin(); it != myTags.end(); ++it) {
+            if (*it == from) {
+                tagSet.insert(to);
+            } else {
+                shared_ptr<Tag> newtag = Tag::cloneSubTag(*it, from, to);
+                if (!newtag.isNull()) {
+                    tagSet.insert(newtag);
+                }
+            }
+        }
+        if (!tagSet.empty()) {
+            tagSet.insert(myTags.begin(), myTags.end());
+            myTags.clear();
+            myTags.insert(myTags.end(), tagSet.begin(), tagSet.end());
+            return true;
+        }
+    } else {
+        TagList::const_iterator it = std::find(myTags.begin(), myTags.end(), from);
+        if (it != myTags.end()) {
+            TagList::const_iterator jt = std::find(myTags.begin(), myTags.end(), to);
+            if (jt == myTags.end()) {
+                myTags.push_back(to);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /*shared_ptr<Book> Book::loadFromBookInfo(const ZLFile &file) {
@@ -237,80 +238,80 @@ bool Book::cloneTag(shared_ptr<Tag> from, shared_ptr<Tag> to, bool includeSubTag
 }*/
 
 bool Book::replaceAuthor(shared_ptr<Author> from, shared_ptr<Author> to) {
-	AuthorList::iterator it = std::find(myAuthors.begin(), myAuthors.end(), from);
-	if (it == myAuthors.end()) {
-		return false;
-	}
-	if (to.isNull()) {
-		myAuthors.erase(it);
-	} else {
-		*it = to;
-	}
-	return true;
+    AuthorList::iterator it = std::find(myAuthors.begin(), myAuthors.end(), from);
+    if (it == myAuthors.end()) {
+        return false;
+    }
+    if (to.isNull()) {
+        myAuthors.erase(it);
+    } else {
+        *it = to;
+    }
+    return true;
 }
 
 void Book::setTitle(const std::string &title) {
-	myTitle = title;
+    myTitle = title;
 }
 
 void Book::setLanguage(const std::string &language) {
-	if (!myLanguage.empty()) {
-		const std::vector<std::string> &codes = ZLLanguageList::languageCodes();
-		std::vector<std::string>::const_iterator it =
-			std::find(codes.begin(), codes.end(), myLanguage);
-		std::vector<std::string>::const_iterator jt =
-			std::find(codes.begin(), codes.end(), language);
-		if (it != codes.end() && jt == codes.end()) {
-			return;
-		}
-	}
-	myLanguage = language;
+    if (!myLanguage.empty()) {
+        const std::vector<std::string> &codes = ZLLanguageList::languageCodes();
+        std::vector<std::string>::const_iterator it =
+                std::find(codes.begin(), codes.end(), myLanguage);
+        std::vector<std::string>::const_iterator jt =
+                std::find(codes.begin(), codes.end(), language);
+        if (it != codes.end() && jt == codes.end()) {
+            return;
+        }
+    }
+    myLanguage = language;
 }
 
 void Book::setEncoding(const std::string &encoding) {
-	myEncoding = encoding;
+    myEncoding = encoding;
 }
 
 void Book::setSeries(const std::string &title, const std::string &index) {
-	mySeriesTitle = title;
-	myIndexInSeries = index;
+    mySeriesTitle = title;
+    myIndexInSeries = index;
 }
 
 void Book::removeAllTags() {
-	myTags.clear();
+    myTags.clear();
 }
 
 void Book::addAuthor(const std::string &displayName, const std::string &sortKey) {
-	addAuthor(Author::getAuthor(displayName, sortKey));
+    addAuthor(Author::getAuthor(displayName, sortKey));
 }
 
 void Book::addAuthor(shared_ptr<Author> author) {
-	if (!author.isNull()) {
-		myAuthors.push_back(author);
-	}
+    if (!author.isNull()) {
+        myAuthors.push_back(author);
+    }
 }
 
 void Book::removeAllAuthors() {
-	myAuthors.clear();
+    myAuthors.clear();
 }
 
 void Book::addUid(shared_ptr<UID> uid) {
-	if (uid.isNull()) {
-		return;
-	}
-	UIDList::const_iterator it = std::find(myUIDs.begin(), myUIDs.end(), uid);
-	if (it == myUIDs.end()) {
-		myUIDs.push_back(uid);
-	}
+    if (uid.isNull()) {
+        return;
+    }
+    UIDList::const_iterator it = std::find(myUIDs.begin(), myUIDs.end(), uid);
+    if (it == myUIDs.end()) {
+        myUIDs.push_back(uid);
+    }
 }
 
 void Book::addUid(const std::string &type, const std::string &id) {
-	if (type == "" || id == "") {
-		return;
-	}
-	addUid(new UID(type, id));
+    if (type == "" || id == "") {
+        return;
+    }
+    addUid(new UID(type, id));
 }
 
 void Book::removeAllUids() {
-	myUIDs.clear();
+    myUIDs.clear();
 }

@@ -25,16 +25,23 @@
 class DocPlugin : public FormatPlugin {
 
 public:
-	DocPlugin();
-	~DocPlugin();
-	bool providesMetainfo() const;
+    DocPlugin();
 
-	const std::string supportedFileType() const;
-	bool acceptsFile(const ZLFile &file) const;
-	bool readMetainfo(Book &book) const;
-	bool readUids(Book &book) const;
-	bool readLanguageAndEncoding(Book &book) const;
-	bool readModel(BookModel &model) const;
+    ~DocPlugin();
+
+    bool providesMetainfo() const;
+
+    const std::string supportedFileType() const;
+
+    bool acceptsFile(const ZLFile &file) const;
+
+    bool readMetainfo(Book &book) const;
+
+    bool readUids(Book &book) const;
+
+    bool readLanguageAndEncoding(Book &book) const;
+
+    bool readModel(BookModel &model) const;
 };
 
 #endif /* __DOCPLUGIN_H__ */

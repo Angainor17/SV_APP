@@ -15,14 +15,13 @@ import group.pals.android.lib.ui.filechooser.io.IFileFilter;
 /**
  * Interface for {@link IFile} providers.<br>
  * <br>
- * 
+ *
  * @author Hai Bison
  * @since v2.1 alpha
  */
 public interface IFileProvider {
 
     /**
-     *
      * @return {@code true} if hidden files are displayed
      */
     boolean isDisplayHiddenFiles();
@@ -35,7 +34,6 @@ public interface IFileProvider {
     void setDisplayHiddenFiles(boolean display);
 
     /**
-     *
      * @return the regular expression for file name filter
      */
     String getRegexFilenameFilter();
@@ -48,7 +46,6 @@ public interface IFileProvider {
     void setRegexFilenameFilter(String regex);
 
     /**
-     *
      * @return the {@link FilterMode}
      */
     FilterMode getFilterMode();
@@ -56,13 +53,11 @@ public interface IFileProvider {
     /**
      * Sets filter mode.
      *
-     * @param fm
-     *            {@link FilterMode}
+     * @param fm {@link FilterMode}
      */
     void setFilterMode(FilterMode fm);
 
     /**
-     *
      * @return the {@link SortType}
      */
     SortType getSortType();
@@ -70,13 +65,11 @@ public interface IFileProvider {
     /**
      * Sets sort type.
      *
-     * @param st
-     *            {@link SortType}
+     * @param st {@link SortType}
      */
     void setSortType(SortType st);
 
     /**
-     *
      * @return {@link SortOrder}
      */
     SortOrder getSortOrder();
@@ -84,13 +77,11 @@ public interface IFileProvider {
     /**
      * Sets sort order.
      *
-     * @param so
-     *            {@link SortOrder}
+     * @param so {@link SortOrder}
      */
     void setSortOrder(SortOrder so);
 
     /**
-     *
      * @return the max file count allowed to be listed
      */
     int getMaxFileCount();
@@ -112,8 +103,7 @@ public interface IFileProvider {
     /**
      * Gets path from pathname.
      *
-     * @param pathname
-     *            a {@link String}
+     * @param pathname a {@link String}
      * @return the path from {@code pathname}
      */
     IFile fromPath(String pathname);
@@ -122,19 +112,15 @@ public interface IFileProvider {
      * Lists files inside {@code dir}, the result should be sorted with
      * {@link SortType} and {@link SortOrder}
      *
-     * @deprecated
-     *
-     * @param dir
-     *            the root directory which needs to list files
-     * @param hasMoreFiles
-     *            since Java does not allow variable parameters, so we use this
-     *            trick. To use this parameter, set its size to {@code 1}. If
-     *            the {@code dir} has more files than max file count allowed,
-     *            the element returns {@code true}, otherwise it is
-     *            {@code false}
+     * @param dir          the root directory which needs to list files
+     * @param hasMoreFiles since Java does not allow variable parameters, so we use this
+     *                     trick. To use this parameter, set its size to {@code 1}. If
+     *                     the {@code dir} has more files than max file count allowed,
+     *                     the element returns {@code true}, otherwise it is
+     *                     {@code false}
      * @return an array of files, or {@code null} if an exception occurs.
-     * @throws a
-     *             {@link Exception}
+     * @throws a {@link Exception}
+     * @deprecated
      */
     IFile[] listFiles(IFile dir, boolean[] hasMoreFiles) throws Exception;
 
@@ -142,17 +128,14 @@ public interface IFileProvider {
      * Lists files inside {@code dir}, the result should be sorted with
      * {@link SortType} and {@link SortOrder}
      *
-     * @param dir
-     *            the root directory which needs to list files
-     * @param hasMoreFiles
-     *            since Java does not allow variable parameters, so we use this
-     *            trick. To use this parameter, set its size to {@code 1}. If
-     *            the {@code dir} has more files than max file count allowed,
-     *            the element returns {@code true}, otherwise it is
-     *            {@code false}
+     * @param dir          the root directory which needs to list files
+     * @param hasMoreFiles since Java does not allow variable parameters, so we use this
+     *                     trick. To use this parameter, set its size to {@code 1}. If
+     *                     the {@code dir} has more files than max file count allowed,
+     *                     the element returns {@code true}, otherwise it is
+     *                     {@code false}
      * @return an array of files, or {@code null} if an exception occurs.
-     * @throws a
-     *             {@link Exception}
+     * @throws a {@link Exception}
      * @since v4.0 beta
      */
     List<IFile> listAllFiles(IFile dir, boolean[] hasMoreFiles) throws Exception;
@@ -160,11 +143,9 @@ public interface IFileProvider {
     /**
      * Lists all files inside {@code dir}, <b><i>no</b></i> filter.
      *
-     * @param dir
-     *            the root directory which needs to list files
+     * @param dir the root directory which needs to list files
      * @return a list of files, or {@code null} if an exception occurs.
-     * @throws a
-     *             {@link Exception}
+     * @throws a {@link Exception}
      * @since v4.0 beta
      */
     List<IFile> listAllFiles(IFile dir) throws Exception;
@@ -176,10 +157,8 @@ public interface IFileProvider {
      * {@code dir} is not a directory. If {@code filter} is {@code null} then
      * all files match.
      *
-     * @param dir
-     *            an {@link IFile}
-     * @param filter
-     *            the filter to match names against, may be {@code null}.
+     * @param dir    an {@link IFile}
+     * @param filter the filter to match names against, may be {@code null}.
      * @return a list of files or {@code null}.
      * @since v4.3 beta
      */
@@ -188,10 +167,9 @@ public interface IFileProvider {
     /**
      * Filters {@code pathname} based on this file provider configurations.
      *
-     * @param pathname
-     *            {@link IFile}
+     * @param pathname {@link IFile}
      * @return {@code true} if {@code pathname} passed all filter
-     *         configurations, {@code false} otherwise
+     * configurations, {@code false} otherwise
      * @since v4.3 beta
      */
     boolean accept(IFile pathname);

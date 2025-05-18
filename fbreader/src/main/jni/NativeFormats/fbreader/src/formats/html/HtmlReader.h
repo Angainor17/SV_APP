@@ -31,63 +31,85 @@ class ZLInputStream;
 class HtmlReader : public EncodedTextReader {
 
 public:
-	struct HtmlAttribute {
-		std::string Name;
-		std::string Value;
-		bool HasValue;
+    struct HtmlAttribute {
+        std::string Name;
+        std::string Value;
+        bool HasValue;
 
-		HtmlAttribute(const std::string &name);
-		~HtmlAttribute();
-		void setValue(const std::string &value);
-	};
+        HtmlAttribute(const std::string &name);
 
-	struct HtmlTag {
-		std::string Name;
-		std::size_t Offset;
-		bool Start;
-		std::vector<HtmlAttribute> Attributes;
+        ~HtmlAttribute();
 
-		HtmlTag();
-		~HtmlTag();
-		void addAttribute(const std::string &name);
-		void setLastAttributeValue(const std::string &value);
-		const std::string *find(const std::string &name) const;
+        void setValue(const std::string &value);
+    };
 
-	private:
-		HtmlTag(const HtmlTag&);
-		const HtmlTag &operator = (const HtmlTag&);
-	};
+    struct HtmlTag {
+        std::string Name;
+        std::size_t Offset;
+        bool Start;
+        std::vector<HtmlAttribute> Attributes;
+
+        HtmlTag();
+
+        ~HtmlTag();
+
+        void addAttribute(const std::string &name);
+
+        void setLastAttributeValue(const std::string &value);
+
+        const std::string *find(const std::string &name) const;
+
+    private:
+        HtmlTag(const HtmlTag &);
+
+        const HtmlTag &operator=(const HtmlTag &);
+    };
 
 private:
-	static void setTag(HtmlTag &tag, const std::string &fullName);
+    static void setTag(HtmlTag &tag, const std::string &fullName);
 
 public:
-	virtual void readDocument(ZLInputStream &stream);
+    virtual void readDocument(ZLInputStream &stream);
 
 protected:
-	HtmlReader(const std::string &encoding);
-	virtual ~HtmlReader();
+    HtmlReader(const std::string &encoding);
+
+    virtual ~HtmlReader();
 
 protected:
-	virtual void startDocumentHandler() = 0;
-	virtual void endDocumentHandler() = 0;
+    virtual void startDocumentHandler() = 0;
 
-	// returns false iff processing must be stopped
-	virtual bool tagHandler(const HtmlTag &tag) = 0;
-	// returns false iff processing must be stopped
-	virtual bool characterDataHandler(const char *text, std::size_t len, bool convert) = 0;
+    virtual void endDocumentHandler() = 0;
+
+    // returns false iff processing must be stopped
+    virtual bool tagHandler(const HtmlTag &tag) = 0;
+
+    // returns false iff processing must be stopped
+    virtual bool characterDataHandler(const char *text, std::size_t len, bool convert) = 0;
 
 private:
-	void appendString(std::string &to, std::string &from);
+    void appendString(std::string &to, std::string &from);
 };
 
-inline HtmlReader::HtmlAttribute::HtmlAttribute(const std::string &name) : Name(name), HasValue(false) {}
+inline HtmlReader::HtmlAttribute::HtmlAttribute(const std::string &name) : Name(name),
+                                                                           HasValue(false) {}
+
 inline HtmlReader::HtmlAttribute::~HtmlAttribute() {}
-inline void HtmlReader::HtmlAttribute::setValue(const std::string &value) { Value = value; HasValue = true; }
+
+inline void HtmlReader::HtmlAttribute::setValue(const std::string &value) {
+    Value = value;
+    HasValue = true;
+}
 
 inline HtmlReader::HtmlTag::HtmlTag() : Start(true) {}
+
 inline HtmlReader::HtmlTag::~HtmlTag() {}
-inline void HtmlReader::HtmlTag::addAttribute(const std::string &name) { Attributes.push_back(HtmlAttribute(name)); }
-inline void HtmlReader::HtmlTag::setLastAttributeValue(const std::string &value) { if (!Attributes.empty()) Attributes.back().setValue(value); }
+
+inline void HtmlReader::HtmlTag::addAttribute(const std::string &name) {
+    Attributes.push_back(HtmlAttribute(name));
+}
+
+inline void HtmlReader::HtmlTag::setLastAttributeValue(
+        const std::string &value) { if (!Attributes.empty()) Attributes.back().setValue(value); }
 
 #endif /* __HTMLREADER_H__ */

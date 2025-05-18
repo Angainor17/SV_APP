@@ -25,13 +25,13 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 
 public abstract class ViewUtil {
-	public static void setColorLevel(Paint paint, Integer level) {
-		if (level != null) {
-			paint.setColorFilter(new PorterDuffColorFilter(
-				Color.rgb(level, level, level), PorterDuff.Mode.MULTIPLY
-			));
-		} else {
-			paint.setColorFilter(null);
-		}
-	}
+    public static void setColorLevel(Paint paint, Integer level) {
+        if (level != null) {
+            paint.setColorFilter(new PorterDuffColorFilter(
+                    Color.rgb(level, level, level), PorterDuff.Mode.MULTIPLY
+            ));
+        } else {
+            paint.setColorFilter(null);
+        }
+    }
 }

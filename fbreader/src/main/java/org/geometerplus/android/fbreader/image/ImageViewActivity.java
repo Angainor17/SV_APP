@@ -124,6 +124,7 @@ public class ImageViewActivity extends Activity {
         private int mySavedY;
         private float myStartPinchDistance2 = -1;
         private float myStartZoomFactor;
+
         ImageView() {
             super(ImageViewActivity.this);
         }

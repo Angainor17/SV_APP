@@ -26,8 +26,9 @@
 class Utf8EncodingConverterProvider : public ZLEncodingConverterProvider {
 
 public:
-	bool providesConverter(const std::string &encoding);
-	shared_ptr<ZLEncodingConverter> createConverter(const std::string &encoding);
+    bool providesConverter(const std::string &encoding);
+
+    shared_ptr<ZLEncodingConverter> createConverter(const std::string &encoding);
 };
 
 #endif /* __UTF8ENCODINGCONVERTER_H__ */

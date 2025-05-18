@@ -27,20 +27,26 @@
 class ZLUnixFileInputStream : public ZLInputStream {
 
 public:
-	ZLUnixFileInputStream(const std::string &name);
-	~ZLUnixFileInputStream();
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    ZLUnixFileInputStream(const std::string &name);
 
-	void seek(int offset, bool absoluteOffset);
-	std::size_t offset() const;
-	std::size_t sizeOfOpened();
+    ~ZLUnixFileInputStream();
+
+    bool open();
+
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
+
+    void seek(int offset, bool absoluteOffset);
+
+    std::size_t offset() const;
+
+    std::size_t sizeOfOpened();
 
 private:
-	std::string myName;
-	FILE *myFile;
-	bool myNeedRepositionToStart;
+    std::string myName;
+    FILE *myFile;
+    bool myNeedRepositionToStart;
 };
 
 #endif /* __ZLUNIXFILEINPUTSTREAM_H__ */

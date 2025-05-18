@@ -24,82 +24,83 @@
 #include "PdbStream.h"
 
 PdbStream::PdbStream(const ZLFile &file) : myBase(file.inputStream()) {
-	myBuffer = 0;
+    myBuffer = 0;
 }
 
 PdbStream::~PdbStream() {
 }
 
 bool PdbStream::open() {
-	close();
-	if (myBase.isNull() || !myBase->open() || !myHeader.read(myBase)) {
-		return false;
-	}
-	// myBase offset: startOffset + 78 + 8 * records number ( myHeader.Offsets.size() )
-	
-	myBase->seek(myHeader.Offsets[0], true);
-	// myBase offset: Offset[0] - zero record
-	
-	myBufferLength = 0;
-	myBufferOffset = 0;
+    close();
+    if (myBase.isNull() || !myBase->open() || !myHeader.read(myBase)) {
+        return false;
+    }
+    // myBase offset: startOffset + 78 + 8 * records number ( myHeader.Offsets.size() )
 
-	myOffset = 0;
+    myBase->seek(myHeader.Offsets[0], true);
+    // myBase offset: Offset[0] - zero record
 
-	return true;
+    myBufferLength = 0;
+    myBufferOffset = 0;
+
+    myOffset = 0;
+
+    return true;
 }
 
 size_t PdbStream::read(char *buffer, size_t maxSize) {
-	maxSize = std::min(maxSize, (size_t)std::max((int)sizeOfOpened() - (int)offset(), 0));
-	size_t realSize = 0;
-	while (realSize < maxSize) {
-		if (!fillBuffer()) {
-			break;
-		}
-		size_t size = std::min((size_t)(maxSize - realSize), (size_t)(myBufferLength - myBufferOffset));
-		
-		if (size > 0) {
-			if (buffer != 0) {
-				memcpy(buffer + realSize, myBuffer + myBufferOffset, size);
-			}
-			realSize += size;
-			myBufferOffset += size;
-		}
-	}
-			
-	myOffset += realSize;
-	return realSize;
+    maxSize = std::min(maxSize, (size_t) std::max((int) sizeOfOpened() - (int) offset(), 0));
+    size_t realSize = 0;
+    while (realSize < maxSize) {
+        if (!fillBuffer()) {
+            break;
+        }
+        size_t size = std::min((size_t) (maxSize - realSize),
+                               (size_t) (myBufferLength - myBufferOffset));
+
+        if (size > 0) {
+            if (buffer != 0) {
+                memcpy(buffer + realSize, myBuffer + myBufferOffset, size);
+            }
+            realSize += size;
+            myBufferOffset += size;
+        }
+    }
+
+    myOffset += realSize;
+    return realSize;
 }
 
 void PdbStream::close() {
-	if (!myBase.isNull()) {
-		myBase->close();
-	}
-	if (myBuffer != 0) {
-		delete[] myBuffer;
-		myBuffer = 0;
-	}
+    if (!myBase.isNull()) {
+        myBase->close();
+    }
+    if (myBuffer != 0) {
+        delete[] myBuffer;
+        myBuffer = 0;
+    }
 }
 
 void PdbStream::seek(int offset, bool absoluteOffset) {
-	if (absoluteOffset) {
-		offset -= this->offset();
-	}
-	if (offset > 0) {
-		read(0, offset);
-	} else if (offset < 0) {
-		offset += this->offset();
-		open();
-		if (offset >= 0) {
-			read(0, offset);
-		}
-	}
+    if (absoluteOffset) {
+        offset -= this->offset();
+    }
+    if (offset > 0) {
+        read(0, offset);
+    } else if (offset < 0) {
+        offset += this->offset();
+        open();
+        if (offset >= 0) {
+            read(0, offset);
+        }
+    }
 }
 
 size_t PdbStream::offset() const {
-	return myOffset;
+    return myOffset;
 }
 
 size_t PdbStream::recordOffset(size_t index) const {
-	return index < myHeader.Offsets.size() ? 
-		myHeader.Offsets[index] : myBase->sizeOfOpened();
+    return index < myHeader.Offsets.size() ?
+           myHeader.Offsets[index] : myBase->sizeOfOpened();
 }

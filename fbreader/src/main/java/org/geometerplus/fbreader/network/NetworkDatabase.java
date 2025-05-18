@@ -29,40 +29,43 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class NetworkDatabase {
-	private static NetworkDatabase ourInstance;
-	private final NetworkLibrary myLibrary;
+    private static NetworkDatabase ourInstance;
+    private final NetworkLibrary myLibrary;
 
-	protected NetworkDatabase(NetworkLibrary library) {
-		myLibrary = library;
-		ourInstance = this;
-	}
+    protected NetworkDatabase(NetworkLibrary library) {
+        myLibrary = library;
+        ourInstance = this;
+    }
 
-	public static NetworkDatabase Instance() {
-		return ourInstance;
-	}
+    public static NetworkDatabase Instance() {
+        return ourInstance;
+    }
 
-	protected abstract void executeAsTransaction(Runnable actions);
+    protected abstract void executeAsTransaction(Runnable actions);
 
-	protected INetworkLink createLink(int id, INetworkLink.Type type, String predefinedId, String title, String summary, String language, UrlInfoCollection<UrlInfoWithDate> infos) {
-		if (title == null || infos.getInfo(UrlInfo.Type.Catalog) == null) {
-			return null;
-		}
-		switch (type) {
-			default:
-				return new OPDSCustomNetworkLink(
-					myLibrary, id, type, title, summary, language, infos
-				);
-			case Predefined:
-				return new OPDSPredefinedNetworkLink(
-					myLibrary, id, predefinedId, title, summary, language, infos
-				);
-		}
-	}
+    protected INetworkLink createLink(int id, INetworkLink.Type type, String predefinedId, String title, String summary, String language, UrlInfoCollection<UrlInfoWithDate> infos) {
+        if (title == null || infos.getInfo(UrlInfo.Type.Catalog) == null) {
+            return null;
+        }
+        switch (type) {
+            default:
+                return new OPDSCustomNetworkLink(
+                        myLibrary, id, type, title, summary, language, infos
+                );
+            case Predefined:
+                return new OPDSPredefinedNetworkLink(
+                        myLibrary, id, predefinedId, title, summary, language, infos
+                );
+        }
+    }
 
-	protected abstract List<INetworkLink> listLinks();
-	protected abstract void saveLink(INetworkLink link);
-	protected abstract void deleteLink(INetworkLink link);
+    protected abstract List<INetworkLink> listLinks();
 
-	protected abstract Map<String,String> getLinkExtras(INetworkLink link);
-	protected abstract void setLinkExtras(INetworkLink link, Map<String,String> extras);
+    protected abstract void saveLink(INetworkLink link);
+
+    protected abstract void deleteLink(INetworkLink link);
+
+    protected abstract Map<String, String> getLinkExtras(INetworkLink link);
+
+    protected abstract void setLinkExtras(INetworkLink link, Map<String, String> extras);
 }

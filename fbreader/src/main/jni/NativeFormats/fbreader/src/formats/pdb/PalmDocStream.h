@@ -23,52 +23,57 @@
 #include "PalmDocLikeStream.h"
 
 class ZLFile;
+
 class HuffDecompressor;
 
 class PalmDocStream : public PalmDocLikeStream {
 
 protected:
-	PalmDocStream(const ZLFile &file);
+    PalmDocStream(const ZLFile &file);
 
 public:
-	~PalmDocStream();
-	
-	std::pair<int,int> imageLocation(const PdbHeader &header, int index) const;
-	bool hasExtraSections() const;
+    ~PalmDocStream();
+
+    std::pair<int, int> imageLocation(const PdbHeader &header, int index) const;
+
+    bool hasExtraSections() const;
 
 private:
-	bool processRecord();
-	bool processZeroRecord();
+    bool processRecord();
+
+    bool processZeroRecord();
 
 protected:
-	unsigned long  myTextLength;
+    unsigned long myTextLength;
 
 private:
-	unsigned short myCompressionVersion;
-	unsigned short myTextRecordNumber;
-	unsigned short myImageStartIndex;
+    unsigned short myCompressionVersion;
+    unsigned short myTextRecordNumber;
+    unsigned short myImageStartIndex;
 
-	shared_ptr<HuffDecompressor> myHuffDecompressorPtr;
+    shared_ptr<HuffDecompressor> myHuffDecompressorPtr;
 };
 
 class PalmDocContentStream : public PalmDocStream {
 
 public:
-	PalmDocContentStream(const ZLFile &file);
+    PalmDocContentStream(const ZLFile &file);
 
 private:
-	size_t sizeOfOpened();
+    size_t sizeOfOpened();
 };
 
 class PalmDocCssStream : public PalmDocStream {
 
 public:
-	PalmDocCssStream(const ZLFile &file);
+    PalmDocCssStream(const ZLFile &file);
 
 private:
-	bool open();
-	size_t sizeOfOpened();
-	size_t offset() const;
+    bool open();
+
+    size_t sizeOfOpened();
+
+    size_t offset() const;
 };
 
 #endif /* __PALMDOCSTREAM_H__ */

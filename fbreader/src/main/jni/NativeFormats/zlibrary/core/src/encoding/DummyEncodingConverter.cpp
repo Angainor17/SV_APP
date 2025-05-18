@@ -24,24 +24,29 @@
 class DummyEncodingConverter : public ZLEncodingConverter {
 
 private:
-	DummyEncodingConverter();
+    DummyEncodingConverter();
 
 public:
-	~DummyEncodingConverter();
-	std::string name() const;
-	void convert(std::string &dst, const char *srcStart, const char *srcEnd);
-	void reset();
-	bool fillTable(int *map);
+    ~DummyEncodingConverter();
 
-friend class DummyEncodingConverterProvider;
+    std::string name() const;
+
+    void convert(std::string &dst, const char *srcStart, const char *srcEnd);
+
+    void reset();
+
+    bool fillTable(int *map);
+
+    friend class DummyEncodingConverterProvider;
 };
 
 bool DummyEncodingConverterProvider::providesConverter(const std::string &encoding) {
-	return ZLUnicodeUtil::toLower(encoding) == ZLEncodingConverter::ASCII;
+    return ZLUnicodeUtil::toLower(encoding) == ZLEncodingConverter::ASCII;
 }
 
-shared_ptr<ZLEncodingConverter> DummyEncodingConverterProvider::createConverter(const std::string&) {
-	return new DummyEncodingConverter();
+shared_ptr<ZLEncodingConverter>
+DummyEncodingConverterProvider::createConverter(const std::string &) {
+    return new DummyEncodingConverter();
 }
 
 DummyEncodingConverter::DummyEncodingConverter() {
@@ -51,19 +56,19 @@ DummyEncodingConverter::~DummyEncodingConverter() {
 }
 
 std::string DummyEncodingConverter::name() const {
-	return ZLEncodingConverter::ASCII;
+    return ZLEncodingConverter::ASCII;
 }
 
 void DummyEncodingConverter::convert(std::string &dst, const char *srcStart, const char *srcEnd) {
-	dst.append(srcStart, srcEnd - srcStart);
+    dst.append(srcStart, srcEnd - srcStart);
 }
 
 void DummyEncodingConverter::reset() {
 }
 
 bool DummyEncodingConverter::fillTable(int *map) {
-	for (int i = 0; i < 255; ++i) {
-		map[i] = i;
-	}
-	return true;
+    for (int i = 0; i < 255; ++i) {
+        map[i] = i;
+    }
+    return true;
 }

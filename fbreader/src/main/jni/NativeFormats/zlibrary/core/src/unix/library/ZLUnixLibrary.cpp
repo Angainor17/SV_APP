@@ -58,7 +58,7 @@ const std::string ZLibrary::EndOfLine("\n");
 ZLibraryImplementation *ZLibraryImplementation::Instance = 0;
 
 ZLibraryImplementation::ZLibraryImplementation() {
-	Instance = this;
+    Instance = this;
 }
 
 ZLibraryImplementation::~ZLibraryImplementation() {
@@ -75,72 +75,72 @@ ZLibraryImplementation::~ZLibraryImplementation() {
 
 bool ZLibrary::init(int &argc, char **&argv) {
 #ifdef ZLSHARED
-	const std::string pluginPath = std::string(LIBDIR) + "/zlibrary/ui";
+    const std::string pluginPath = std::string(LIBDIR) + "/zlibrary/ui";
 
-	void *handle = 0;
+    void *handle = 0;
 
-	if ((argc > 2) && std::string("-zlui") == argv[1]) {
-		std::string pluginName = argv[2];
-		if (!ZLStringUtil::stringEndsWith(pluginName, ".so")) {
-			pluginName = pluginPath + "/zlui-" + pluginName + ".so";
-		}
-		handle = loadPlugin(pluginName);
-		argc -= 2;
-		argv += 2;
-	}
+    if ((argc > 2) && std::string("-zlui") == argv[1]) {
+        std::string pluginName = argv[2];
+        if (!ZLStringUtil::stringEndsWith(pluginName, ".so")) {
+            pluginName = pluginPath + "/zlui-" + pluginName + ".so";
+        }
+        handle = loadPlugin(pluginName);
+        argc -= 2;
+        argv += 2;
+    }
 
-	if (handle == 0) {
-		DIR *dir = opendir(pluginPath.c_str());
-		if (dir == 0) {
-			return false;
-		}
-		std::vector<std::string> names;
-		const dirent *file;
-		struct stat fileInfo;
-		while ((file = readdir(dir)) != 0) {
-			const std::string shortName = file->d_name;
-			if ((shortName.substr(0, 5) != "zlui-") ||
-					!ZLStringUtil::stringEndsWith(shortName, ".so")) {
-				continue;
-			}
-			const std::string fullName = pluginPath + "/" + shortName;
-			stat(fullName.c_str(), &fileInfo);
-			if (!S_ISREG(fileInfo.st_mode)) {
-				continue;
-			}
-			names.push_back(fullName);
-		}
-		closedir(dir);
+    if (handle == 0) {
+        DIR *dir = opendir(pluginPath.c_str());
+        if (dir == 0) {
+            return false;
+        }
+        std::vector<std::string> names;
+        const dirent *file;
+        struct stat fileInfo;
+        while ((file = readdir(dir)) != 0) {
+            const std::string shortName = file->d_name;
+            if ((shortName.substr(0, 5) != "zlui-") ||
+                    !ZLStringUtil::stringEndsWith(shortName, ".so")) {
+                continue;
+            }
+            const std::string fullName = pluginPath + "/" + shortName;
+            stat(fullName.c_str(), &fileInfo);
+            if (!S_ISREG(fileInfo.st_mode)) {
+                continue;
+            }
+            names.push_back(fullName);
+        }
+        closedir(dir);
 
-		std::sort(names.begin(), names.end());
-		for (std::vector<std::string>::const_iterator it = names.begin(); it != names.end(); ++it) {
-			handle = loadPlugin(*it);
-			if (handle != 0) {
-				break;
-			}
-		}
+        std::sort(names.begin(), names.end());
+        for (std::vector<std::string>::const_iterator it = names.begin(); it != names.end(); ++it) {
+            handle = loadPlugin(*it);
+            if (handle != 0) {
+                break;
+            }
+        }
 
-		if (handle == 0) {
-			return false;
-		}
-	}
+        if (handle == 0) {
+            return false;
+        }
+    }
 
-	void (*initLibrary)();
-	*(void**)&initLibrary = dlsym(handle, "initLibrary");
-	const char *error = dlerror();
-	if (error != 0) {
-		ZLLogger::Instance().println(ZLLogger::DEFAULT_CLASS, error);
-		return false;
-	}
+    void (*initLibrary)();
+    *(void**)&initLibrary = dlsym(handle, "initLibrary");
+    const char *error = dlerror();
+    if (error != 0) {
+        ZLLogger::Instance().println(ZLLogger::DEFAULT_CLASS, error);
+        return false;
+    }
 #endif /* ZLSHARED */
-	initLibrary();
+    initLibrary();
 
-	if (ZLibraryImplementation::Instance == 0) {
-		return false;
-	}
+    if (ZLibraryImplementation::Instance == 0) {
+        return false;
+    }
 
-	ZLibraryImplementation::Instance->init(argc, argv);
-	return true;
+    ZLibraryImplementation::Instance->init(argc, argv);
+    return true;
 }
 
 /*ZLPaintContext *ZLibrary::createContext() {

@@ -29,83 +29,83 @@ import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 public class SelectionPopup extends PopupPanel implements View.OnClickListener {
-	public final static String ID = "SelectionPopup";
+    public final static String ID = "SelectionPopup";
 
-	public SelectionPopup(FBReaderApp fbReader) {
-		super(fbReader);
-	}
+    public SelectionPopup(FBReaderApp fbReader) {
+        super(fbReader);
+    }
 
-	@Override
-	public String getId() {
-		return ID;
-	}
+    @Override
+    public String getId() {
+        return ID;
+    }
 
-	@Override
-	public void createControlPanel(Activity activity, RelativeLayout root) {
-		if (myWindow != null && activity == myWindow.getContext()) {
-			return;
-		}
+    @Override
+    public void createControlPanel(Activity activity, RelativeLayout root) {
+        if (myWindow != null && activity == myWindow.getContext()) {
+            return;
+        }
 
-		activity.getLayoutInflater().inflate(R.layout.selection_panel, root);
-		myWindow = (SimplePopupWindow)root.findViewById(R.id.selection_panel);
+        activity.getLayoutInflater().inflate(R.layout.selection_panel, root);
+        myWindow = (SimplePopupWindow) root.findViewById(R.id.selection_panel);
 
-		final ZLResource resource = ZLResource.resource("selectionPopup");
-		setupButton(R.id.selection_panel_copy, resource.getResource("copyToClipboard").getValue());
-		setupButton(R.id.selection_panel_share, resource.getResource("share").getValue());
-		setupButton(R.id.selection_panel_translate, resource.getResource("translate").getValue());
-		setupButton(R.id.selection_panel_bookmark, resource.getResource("bookmark").getValue());
-		setupButton(R.id.selection_panel_close, resource.getResource("close").getValue());
-	}
+        final ZLResource resource = ZLResource.resource("selectionPopup");
+        setupButton(R.id.selection_panel_copy, resource.getResource("copyToClipboard").getValue());
+        setupButton(R.id.selection_panel_share, resource.getResource("share").getValue());
+        setupButton(R.id.selection_panel_translate, resource.getResource("translate").getValue());
+        setupButton(R.id.selection_panel_bookmark, resource.getResource("bookmark").getValue());
+        setupButton(R.id.selection_panel_close, resource.getResource("close").getValue());
+    }
 
-	private void setupButton(int buttonId, String description) {
-		final View button = myWindow.findViewById(buttonId);
-		button.setOnClickListener(this);
-		button.setContentDescription(description);
-	}
+    private void setupButton(int buttonId, String description) {
+        final View button = myWindow.findViewById(buttonId);
+        button.setOnClickListener(this);
+        button.setContentDescription(description);
+    }
 
-	public void move(int selectionStartY, int selectionEndY) {
-		if (myWindow == null) {
-			return;
-		}
+    public void move(int selectionStartY, int selectionEndY) {
+        if (myWindow == null) {
+            return;
+        }
 
-		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-			RelativeLayout.LayoutParams.WRAP_CONTENT,
-			RelativeLayout.LayoutParams.WRAP_CONTENT
-		);
-		layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
-		final int verticalPosition;
-		final int screenHeight = ((View)myWindow.getParent()).getHeight();
-		final int diffTop = screenHeight - selectionEndY;
-		final int diffBottom = selectionStartY;
-		if (diffTop > diffBottom) {
-			verticalPosition = diffTop > myWindow.getHeight() + 20
-				? RelativeLayout.ALIGN_PARENT_BOTTOM : RelativeLayout.CENTER_VERTICAL;
-		} else {
-			verticalPosition = diffBottom > myWindow.getHeight() + 20
-				? RelativeLayout.ALIGN_PARENT_TOP : RelativeLayout.CENTER_VERTICAL;
-		}
+        final int verticalPosition;
+        final int screenHeight = ((View) myWindow.getParent()).getHeight();
+        final int diffTop = screenHeight - selectionEndY;
+        final int diffBottom = selectionStartY;
+        if (diffTop > diffBottom) {
+            verticalPosition = diffTop > myWindow.getHeight() + 20
+                    ? RelativeLayout.ALIGN_PARENT_BOTTOM : RelativeLayout.CENTER_VERTICAL;
+        } else {
+            verticalPosition = diffBottom > myWindow.getHeight() + 20
+                    ? RelativeLayout.ALIGN_PARENT_TOP : RelativeLayout.CENTER_VERTICAL;
+        }
 
-		layoutParams.addRule(verticalPosition);
-		myWindow.setLayoutParams(layoutParams);
-	}
+        layoutParams.addRule(verticalPosition);
+        myWindow.setLayoutParams(layoutParams);
+    }
 
-	@Override
-	protected void update() {
-	}
+    @Override
+    protected void update() {
+    }
 
-	public void onClick(View view) {
-		int id = view.getId();
-		if (id == R.id.selection_panel_copy)
-			Application.runAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD);
-		if (id == R.id.selection_panel_share)
-			Application.runAction(ActionCode.SELECTION_SHARE);
-		if (id == R.id.selection_panel_translate)
+    public void onClick(View view) {
+        int id = view.getId();
+        if (id == R.id.selection_panel_copy)
+            Application.runAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD);
+        if (id == R.id.selection_panel_share)
+            Application.runAction(ActionCode.SELECTION_SHARE);
+        if (id == R.id.selection_panel_translate)
             Application.runAction(ActionCode.SELECTION_TRANSLATE);
-		if (id == R.id.selection_panel_bookmark)
+        if (id == R.id.selection_panel_bookmark)
             Application.runAction(ActionCode.SELECTION_BOOKMARK);
-		if (id == R.id.selection_panel_close)
+        if (id == R.id.selection_panel_close)
             Application.runAction(ActionCode.SELECTION_CLEAR);
-		Application.hideActivePopup();
-	}
+        Application.hideActivePopup();
+    }
 }

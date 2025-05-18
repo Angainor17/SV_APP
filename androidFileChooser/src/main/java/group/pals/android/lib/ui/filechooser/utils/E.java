@@ -15,17 +15,15 @@ import group.pals.android.lib.ui.filechooser.utils.ui.Dlg;
 
 /**
  * Something funny :-)
- * 
+ *
  * @author Hai Bison
- * 
  */
 public class E {
 
     /**
      * Shows it!
-     * 
-     * @param context
-     *            {@link Context}
+     *
+     * @param context {@link Context}
      */
     public static void show(Context context) {
         String msg = null;

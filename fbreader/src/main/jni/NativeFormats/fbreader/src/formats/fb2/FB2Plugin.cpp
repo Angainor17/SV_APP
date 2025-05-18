@@ -27,25 +27,25 @@
 #include "FB2CoverReader.h"
 
 const std::string FB2Plugin::supportedFileType() const {
-	return "fb2";
+    return "fb2";
 }
 
 bool FB2Plugin::readMetainfo(Book &book) const {
-	return FB2MetaInfoReader(book).readMetainfo();
+    return FB2MetaInfoReader(book).readMetainfo();
 }
 
 bool FB2Plugin::readUids(Book &book) const {
-	return FB2UidReader(book).readUids();
+    return FB2UidReader(book).readUids();
 }
 
 bool FB2Plugin::readModel(BookModel &model) const {
-	return FB2BookReader(model).readBook();
+    return FB2BookReader(model).readBook();
 }
 
 shared_ptr<const ZLImage> FB2Plugin::coverImage(const ZLFile &file) const {
-	return FB2CoverReader(file).readCover();
+    return FB2CoverReader(file).readCover();
 }
 
 bool FB2Plugin::readLanguageAndEncoding(Book &book) const {
-	return true;
+    return true;
 }

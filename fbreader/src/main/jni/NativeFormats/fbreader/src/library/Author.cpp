@@ -21,47 +21,47 @@
 
 #include "Author.h"
 
-std::set<shared_ptr<Author>,AuthorComparator> Author::ourAuthorSet;
+std::set<shared_ptr<Author>, AuthorComparator> Author::ourAuthorSet;
 
 shared_ptr<Author> Author::getAuthor(const std::string &name, const std::string &sortKey) {
-	std::string strippedName = name;
-	ZLUnicodeUtil::utf8Trim(strippedName);
-	if (strippedName.empty()) {
-		return 0;
-	}
-	std::string strippedKey = sortKey;
-	ZLUnicodeUtil::utf8Trim(strippedKey);
+    std::string strippedName = name;
+    ZLUnicodeUtil::utf8Trim(strippedName);
+    if (strippedName.empty()) {
+        return 0;
+    }
+    std::string strippedKey = sortKey;
+    ZLUnicodeUtil::utf8Trim(strippedKey);
 
-	if (strippedKey.empty()) {
-		const std::size_t index = strippedName.find(',');
-		if (index != std::string::npos) {
-			strippedKey = strippedName.substr(0, index);
-			ZLUnicodeUtil::utf8Trim(strippedKey);
-		}
-	}
+    if (strippedKey.empty()) {
+        const std::size_t index = strippedName.find(',');
+        if (index != std::string::npos) {
+            strippedKey = strippedName.substr(0, index);
+            ZLUnicodeUtil::utf8Trim(strippedKey);
+        }
+    }
 
-	if (strippedKey.empty()) {
-		std::size_t index = strippedName.rfind(' ');
-		if (index == std::string::npos) {
-			strippedKey = strippedName;
-		} else {
-			strippedKey = strippedName.substr(index + 1);
-			const std::size_t size = strippedName.size();
-			while (index < size && strippedName[index] == ' ') {
-				--index;
-			}
-			strippedName = strippedName.substr(0, index + 1) + ' ' + strippedKey;
-		}
-	}
+    if (strippedKey.empty()) {
+        std::size_t index = strippedName.rfind(' ');
+        if (index == std::string::npos) {
+            strippedKey = strippedName;
+        } else {
+            strippedKey = strippedName.substr(index + 1);
+            const std::size_t size = strippedName.size();
+            while (index < size && strippedName[index] == ' ') {
+                --index;
+            }
+            strippedName = strippedName.substr(0, index + 1) + ' ' + strippedKey;
+        }
+    }
 
-	shared_ptr<Author> author =
-		new Author(strippedName, ZLUnicodeUtil::toLower(strippedKey));
-	std::set<shared_ptr<Author>,AuthorComparator>::const_iterator it =
-		ourAuthorSet.find(author);
-	if (it != ourAuthorSet.end()) {
-		return *it;
-	} else {
-		ourAuthorSet.insert(author);
-		return author;
-	}
+    shared_ptr<Author> author =
+            new Author(strippedName, ZLUnicodeUtil::toLower(strippedKey));
+    std::set<shared_ptr<Author>, AuthorComparator>::const_iterator it =
+            ourAuthorSet.find(author);
+    if (it != ourAuthorSet.end()) {
+        return *it;
+    } else {
+        ourAuthorSet.insert(author);
+        return author;
+    }
 }

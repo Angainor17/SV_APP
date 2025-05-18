@@ -27,34 +27,36 @@ class Book;
 class HtmlMetainfoReader : public HtmlReader {
 
 public:
-	enum ReadType {
-		NONE = 0,
-		TITLE = 1,
-		AUTHOR = 2,
-		TITLE_AND_AUTHOR = TITLE | AUTHOR,
-		TAGS = 4,
-		ALL = TITLE | AUTHOR | TAGS
-	};
+    enum ReadType {
+        NONE = 0,
+        TITLE = 1,
+        AUTHOR = 2,
+        TITLE_AND_AUTHOR = TITLE | AUTHOR,
+        TAGS = 4,
+        ALL = TITLE | AUTHOR | TAGS
+    };
 
 public:
-	HtmlMetainfoReader(Book &book, ReadType readType);
+    HtmlMetainfoReader(Book &book, ReadType readType);
 
 private:
-	void startDocumentHandler();
-	void endDocumentHandler();
+    void startDocumentHandler();
 
-	bool tagHandler(const HtmlTag &tag);
-	bool characterDataHandler(const char *text, size_t len, bool convert);
+    void endDocumentHandler();
+
+    bool tagHandler(const HtmlTag &tag);
+
+    bool characterDataHandler(const char *text, size_t len, bool convert);
 
 private:
-	Book &myBook;
-	const ReadType myReadType;
+    Book &myBook;
+    const ReadType myReadType;
 
-	bool myReadTitle;
-	bool myReadAuthor;
-	bool myReadTags;
+    bool myReadTitle;
+    bool myReadAuthor;
+    bool myReadTags;
 
-	std::string myBuffer;
+    std::string myBuffer;
 };
 
 #endif /* __HTMLMETAINFOREADER_H__ */

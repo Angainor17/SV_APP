@@ -27,26 +27,30 @@
 class ZLLanguageMatcher {
 
 public:
-	ZLLanguageMatcher(shared_ptr<ZLLanguageDetector::LanguageInfo> info);
-	virtual ~ZLLanguageMatcher();
+    ZLLanguageMatcher(shared_ptr<ZLLanguageDetector::LanguageInfo> info);
 
-	shared_ptr<ZLLanguageDetector::LanguageInfo> info() const;
+    virtual ~ZLLanguageMatcher();
+
+    shared_ptr<ZLLanguageDetector::LanguageInfo> info() const;
 
 private:
-	shared_ptr<ZLLanguageDetector::LanguageInfo> myInfo;
+    shared_ptr<ZLLanguageDetector::LanguageInfo> myInfo;
 };
 
 class ZLStatisticsBasedMatcher : public ZLLanguageMatcher {
 
 public:
-	ZLStatisticsBasedMatcher(const std::string &fileName, shared_ptr<ZLLanguageDetector::LanguageInfo> info);
-	~ZLStatisticsBasedMatcher(); // надо ли его объявлять, если он ничего не делает??
+    ZLStatisticsBasedMatcher(const std::string &fileName,
+                             shared_ptr<ZLLanguageDetector::LanguageInfo> info);
 
-	int charSequenceLength() const;
-	int criterion(const ZLStatistics &otherStatistics) const;
+    ~ZLStatisticsBasedMatcher(); // надо ли его объявлять, если он ничего не делает??
+
+    int charSequenceLength() const;
+
+    int criterion(const ZLStatistics &otherStatistics) const;
 
 private:
-	shared_ptr<ZLArrayBasedStatistics> myStatisticsPtr;
+    shared_ptr<ZLArrayBasedStatistics> myStatisticsPtr;
 };
 
 #endif /* __ZLLANGUAGEMATCHER_H__ */

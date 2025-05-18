@@ -27,55 +27,76 @@
 #include <ZLFile.h>
 
 class ZLDir;
+
 class ZLFSDir;
+
 class ZLInputStream;
+
 class ZLOutputStream;
 
 class ZLFSManager {
 
 public:
-	static void deleteInstance();
-	static ZLFSManager &Instance();
+    static void deleteInstance();
+
+    static ZLFSManager &Instance();
 
 protected:
-	static ZLFSManager *ourInstance;
+    static ZLFSManager *ourInstance;
 
 protected:
-	ZLFSManager();
-	virtual ~ZLFSManager();
+    ZLFSManager();
+
+    virtual ~ZLFSManager();
 
 public:
-	void normalize(std::string &path) const;
-	virtual std::string resolveSymlink(const std::string &path) const = 0;
+    void normalize(std::string &path) const;
+
+    virtual std::string resolveSymlink(const std::string &path) const = 0;
 
 protected:
-	virtual void normalizeRealPath(std::string &path) const = 0;
-	virtual ZLInputStream *createPlainInputStream(const std::string &path) const = 0;
-	virtual ZLOutputStream *createOutputStream(const std::string &path) const = 0;
-	virtual ZLFSDir *createPlainDirectory(const std::string &path) const = 0;
-	virtual ZLFSDir *createNewDirectory(const std::string &path) const = 0;
-	virtual ZLFileInfo fileInfo(const std::string &path) const = 0;
-	virtual bool removeFile(const std::string &path) const = 0;
-	virtual std::string convertFilenameToUtf8(const std::string &name) const = 0;
-	virtual std::string mimeType(const std::string &path) const = 0;
+    virtual void normalizeRealPath(std::string &path) const = 0;
 
-	virtual int findArchiveFileNameDelimiter(const std::string &path) const = 0;
-	int findLastFileNameDelimiter(const std::string &path) const;
-	virtual shared_ptr<ZLDir> rootDirectory() const = 0;
-	virtual const std::string &rootDirectoryPath() const = 0;
-	virtual std::string parentPath(const std::string &path) const = 0;
+    virtual ZLInputStream *createPlainInputStream(const std::string &path) const = 0;
 
-	virtual bool canRemoveFile(const std::string &path) const = 0;
+    virtual ZLOutputStream *createOutputStream(const std::string &path) const = 0;
+
+    virtual ZLFSDir *createPlainDirectory(const std::string &path) const = 0;
+
+    virtual ZLFSDir *createNewDirectory(const std::string &path) const = 0;
+
+    virtual ZLFileInfo fileInfo(const std::string &path) const = 0;
+
+    virtual bool removeFile(const std::string &path) const = 0;
+
+    virtual std::string convertFilenameToUtf8(const std::string &name) const = 0;
+
+    virtual std::string mimeType(const std::string &path) const = 0;
+
+    virtual int findArchiveFileNameDelimiter(const std::string &path) const = 0;
+
+    int findLastFileNameDelimiter(const std::string &path) const;
+
+    virtual shared_ptr<ZLDir> rootDirectory() const = 0;
+
+    virtual const std::string &rootDirectoryPath() const = 0;
+
+    virtual std::string parentPath(const std::string &path) const = 0;
+
+    virtual bool canRemoveFile(const std::string &path) const = 0;
 
 private:
-	std::map<std::string,ZLFile::ArchiveType> myForcedFiles;
+    std::map<std::string, ZLFile::ArchiveType> myForcedFiles;
 
-friend class ZLFile;
-friend class ZLDir;
+    friend class ZLFile;
+
+    friend class ZLDir;
 };
 
 inline ZLFSManager &ZLFSManager::Instance() { return *ourInstance; }
+
 inline ZLFSManager::ZLFSManager() {}
+
 inline ZLFSManager::~ZLFSManager() {}
 
 #endif /* __ZLFSMANAGER_H__ */

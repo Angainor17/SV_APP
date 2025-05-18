@@ -29,25 +29,28 @@ class Book;
 class FB2UidReader : public FB2Reader {
 
 public:
-	FB2UidReader(Book &book);
-	bool readUids();
+    FB2UidReader(Book &book);
 
-	void startElementHandler(int tag, const char **attributes);
-	void endElementHandler(int tag);
-	void characterDataHandler(const char *text, std::size_t len);
+    bool readUids();
+
+    void startElementHandler(int tag, const char **attributes);
+
+    void endElementHandler(int tag);
+
+    void characterDataHandler(const char *text, std::size_t len);
 
 private:
-	Book &myBook;
+    Book &myBook;
 
-	bool myReturnCode;
+    bool myReturnCode;
 
-	enum {
-		READ_NOTHING,
-		READ_DOCUMENT_INFO,
-		READ_ID
-	} myReadState;
+    enum {
+        READ_NOTHING,
+        READ_DOCUMENT_INFO,
+        READ_ID
+    } myReadState;
 
-	std::string myBuffer;
+    std::string myBuffer;
 };
 
 #endif /* __FB2UIDREADER_H__ */

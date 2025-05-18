@@ -1,8 +1,9 @@
 <fbreader-plugins>
-	<plugin id="bookshelf" min-api="9" package="org.fbreader.plugin.library"/>
-	<plugin id="tts_plus" package="com.hyperionics.fbreader.plugin.tts_plus"/>
-	<plugin id="pdf" min-api="8" package="org.geometerplus.fbreader.plugin.pdf"/>
-	<plugin id="djvu" min-api="8" package="org.geometerplus.fbreader.plugin.djvu"/>
-	<plugin id="cbr" min-api="8" package="org.geometerplus.fbreader.plugin.comicbook"/>
-	<plugin id="calibre_server_integration" min-api="9" package="org.geometerplus.fbreader.plugin.local_opds_scanner"/>
+    <plugin id="bookshelf" min-api="9" package="org.fbreader.plugin.library" />
+    <plugin id="tts_plus" package="com.hyperionics.fbreader.plugin.tts_plus" />
+    <plugin id="pdf" min-api="8" package="org.geometerplus.fbreader.plugin.pdf" />
+    <plugin id="djvu" min-api="8" package="org.geometerplus.fbreader.plugin.djvu" />
+    <plugin id="cbr" min-api="8" package="org.geometerplus.fbreader.plugin.comicbook" />
+    <plugin id="calibre_server_integration" min-api="9"
+        package="org.geometerplus.fbreader.plugin.local_opds_scanner" />
 </fbreader-plugins>

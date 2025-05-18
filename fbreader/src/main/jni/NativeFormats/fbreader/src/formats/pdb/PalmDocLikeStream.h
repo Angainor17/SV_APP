@@ -27,35 +27,38 @@ class ZLFile;
 class PalmDocLikeStream : public PdbStream {
 
 public:
-	enum ErrorCode {
-		ERROR_NONE,
-		ERROR_UNKNOWN,
-		ERROR_COMPRESSION,
-		ERROR_ENCRYPTION,
-	};
+    enum ErrorCode {
+        ERROR_NONE,
+        ERROR_UNKNOWN,
+        ERROR_COMPRESSION,
+        ERROR_ENCRYPTION,
+    };
 
 public:
-	PalmDocLikeStream(const ZLFile &file);
-	~PalmDocLikeStream();
-	bool open();
-	
-	ErrorCode errorCode() const;
-	//std::pair<int,int> imageLocation(int index);
-	//bool hasExtraSections() const;
+    PalmDocLikeStream(const ZLFile &file);
+
+    ~PalmDocLikeStream();
+
+    bool open();
+
+    ErrorCode errorCode() const;
+    //std::pair<int,int> imageLocation(int index);
+    //bool hasExtraSections() const;
 
 protected:
-	bool fillBuffer();
+    bool fillBuffer();
 
 private:
-	virtual bool processRecord() = 0;
-	virtual bool processZeroRecord() = 0;
+    virtual bool processRecord() = 0;
 
-protected: 
-	unsigned short myMaxRecordSize;
-	size_t myRecordIndex;
-	size_t myMaxRecordIndex;
+    virtual bool processZeroRecord() = 0;
 
-	ErrorCode myErrorCode;
+protected:
+    unsigned short myMaxRecordSize;
+    size_t myRecordIndex;
+    size_t myMaxRecordIndex;
+
+    ErrorCode myErrorCode;
 };
 
 #endif /* __PALMDOCLIKESTREAM_H__ */

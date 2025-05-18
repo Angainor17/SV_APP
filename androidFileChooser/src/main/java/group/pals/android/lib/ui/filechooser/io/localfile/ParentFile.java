@@ -11,7 +11,7 @@ import java.io.File;
 
 /**
  * This is a wrapper for {@link File}.
- * 
+ *
  * @author Hai Bison
  * @since v3.2
  */

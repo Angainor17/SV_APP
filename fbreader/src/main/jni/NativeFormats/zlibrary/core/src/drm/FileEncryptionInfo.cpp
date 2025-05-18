@@ -26,14 +26,17 @@ const std::string EncryptionMethod::EMBEDDING = "embedding";
 const std::string EncryptionMethod::MARLIN = "marlin";
 const std::string EncryptionMethod::KINDLE = "kindle";
 
-FileEncryptionInfo::FileEncryptionInfo(const std::string &uri, const std::string &method, const std::string &algorithm, const std::string &contentId) : Uri(uri), Method(method), Algorithm(algorithm), ContentId(contentId) {
+FileEncryptionInfo::FileEncryptionInfo(const std::string &uri, const std::string &method,
+                                       const std::string &algorithm, const std::string &contentId)
+        : Uri(uri), Method(method), Algorithm(algorithm), ContentId(contentId) {
 }
 
 void EncryptionMap::addInfo(const ZLDir &dir, shared_ptr<FileEncryptionInfo> info) {
-	myPathToInfo[ZLFile(dir.itemPath(info->Uri)).path()] = info;
+    myPathToInfo[ZLFile(dir.itemPath(info->Uri)).path()] = info;
 }
 
 shared_ptr<FileEncryptionInfo> EncryptionMap::info(const std::string &path) const {
-	const std::map<std::string,shared_ptr<FileEncryptionInfo> >::const_iterator it = myPathToInfo.find(path);
-	return it != myPathToInfo.end() ? it->second : 0;
+    const std::map<std::string, shared_ptr<FileEncryptionInfo> >::const_iterator it = myPathToInfo.find(
+            path);
+    return it != myPathToInfo.end() ? it->second : 0;
 }

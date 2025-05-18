@@ -25,19 +25,28 @@
 class HtmlPlugin : public FormatPlugin {
 
 public:
-	HtmlPlugin();
-	~HtmlPlugin();
-	bool providesMetainfo() const;
-	const std::string supportedFileType() const;
-	bool readMetainfo(Book &book) const;
-	bool readUids(Book &book) const;
-	bool readLanguageAndEncoding(Book &book) const;
-	bool readModel(BookModel &model) const;
+    HtmlPlugin();
+
+    ~HtmlPlugin();
+
+    bool providesMetainfo() const;
+
+    const std::string supportedFileType() const;
+
+    bool readMetainfo(Book &book) const;
+
+    bool readUids(Book &book) const;
+
+    bool readLanguageAndEncoding(Book &book) const;
+
+    bool readModel(BookModel &model) const;
 //	FormatInfoPage *createInfoPage(ZLOptionsDialog &dialog, const ZLFile &file);
 };
 
 inline HtmlPlugin::HtmlPlugin() {}
+
 inline HtmlPlugin::~HtmlPlugin() {}
+
 inline bool HtmlPlugin::providesMetainfo() const { return false; }
 
 #endif /* __HTMLPLUGIN_H__ */

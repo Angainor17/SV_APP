@@ -30,38 +30,39 @@ import org.geometerplus.zlibrary.core.network.ZLNetworkRequest;
 import java.util.HashSet;
 
 public class RSSCatalogItem extends NetworkURLCatalogItem {
-	private State myLoadingState;
-	protected RSSCatalogItem(INetworkLink link, CharSequence title,
-			CharSequence summary, UrlInfoCollection<?> urls,
-			Accessibility accessibility, int flags) {
-		super(link, title, summary, urls, accessibility, flags);
-	}
+    private State myLoadingState;
 
-	@Override
-	public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
+    protected RSSCatalogItem(INetworkLink link, CharSequence title,
+                             CharSequence summary, UrlInfoCollection<?> urls,
+                             Accessibility accessibility, int flags) {
+        super(link, title, summary, urls, accessibility, flags);
+    }
 
-		final RSSNetworkLink rssLink = (RSSNetworkLink)Link;
-		myLoadingState = rssLink.createOperationData(loader);
+    @Override
+    public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
 
-		doLoadChildren(rssLink.createNetworkData(getCatalogUrl(), myLoadingState));
-	}
+        final RSSNetworkLink rssLink = (RSSNetworkLink) Link;
+        myLoadingState = rssLink.createOperationData(loader);
 
-	private void doLoadChildren(ZLNetworkRequest networkRequest) throws ZLNetworkException {
-		try {
-			super.doLoadChildren(myLoadingState, networkRequest);
-		} catch (ZLNetworkException e) {
-			myLoadingState = null;
-			throw e;
-		}
-	}
+        doLoadChildren(rssLink.createNetworkData(getCatalogUrl(), myLoadingState));
+    }
 
-	static class State extends NetworkOperationData {
-		public final HashSet<String> LoadedIds = new HashSet<String>();
-		public String LastLoadedId;
+    private void doLoadChildren(ZLNetworkRequest networkRequest) throws ZLNetworkException {
+        try {
+            super.doLoadChildren(myLoadingState, networkRequest);
+        } catch (ZLNetworkException e) {
+            myLoadingState = null;
+            throw e;
+        }
+    }
 
-		public State(RSSNetworkLink link, NetworkItemsLoader loader) {
-			super(link, loader);
-		}
-	}
+    static class State extends NetworkOperationData {
+        public final HashSet<String> LoadedIds = new HashSet<String>();
+        public String LastLoadedId;
+
+        public State(RSSNetworkLink link, NetworkItemsLoader loader) {
+            super(link, loader);
+        }
+    }
 
 }

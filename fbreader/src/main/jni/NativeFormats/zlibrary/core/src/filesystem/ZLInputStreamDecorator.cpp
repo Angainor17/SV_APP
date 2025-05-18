@@ -19,39 +19,40 @@
 
 #include "ZLInputStream.h"
 
-ZLInputStreamDecorator::ZLInputStreamDecorator(shared_ptr<ZLInputStream> decoratee) : myBaseStream(decoratee), myBaseOffset(0) {
+ZLInputStreamDecorator::ZLInputStreamDecorator(shared_ptr<ZLInputStream> decoratee) : myBaseStream(
+        decoratee), myBaseOffset(0) {
 }
 
 bool ZLInputStreamDecorator::open() {
-	bool result = myBaseStream->open();
-	myBaseOffset = myBaseStream->offset();
-	return result;
+    bool result = myBaseStream->open();
+    myBaseOffset = myBaseStream->offset();
+    return result;
 }
 
 std::size_t ZLInputStreamDecorator::read(char *buffer, std::size_t maxSize) {
-	myBaseStream->seek(myBaseOffset, true);
-	std::size_t result = myBaseStream->read(buffer, maxSize);
-	myBaseOffset = myBaseStream->offset();
-	return result;
+    myBaseStream->seek(myBaseOffset, true);
+    std::size_t result = myBaseStream->read(buffer, maxSize);
+    myBaseOffset = myBaseStream->offset();
+    return result;
 }
 
 void ZLInputStreamDecorator::close() {
-	myBaseStream->close();
+    myBaseStream->close();
 }
 
 void ZLInputStreamDecorator::seek(int offset, bool absoluteOffset) {
-	if (absoluteOffset) {
-		myBaseStream->seek(offset, true);
-	} else {
-		myBaseStream->seek(myBaseOffset + offset, true);
-	}
-	myBaseOffset = myBaseStream->offset();
+    if (absoluteOffset) {
+        myBaseStream->seek(offset, true);
+    } else {
+        myBaseStream->seek(myBaseOffset + offset, true);
+    }
+    myBaseOffset = myBaseStream->offset();
 }
 
 std::size_t ZLInputStreamDecorator::offset() const {
-	return myBaseOffset;
+    return myBaseOffset;
 }
 
 std::size_t ZLInputStreamDecorator::sizeOfOpened() {
-	return myBaseStream->sizeOfOpened();
+    return myBaseStream->sizeOfOpened();
 }

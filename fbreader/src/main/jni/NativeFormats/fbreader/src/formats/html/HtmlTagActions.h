@@ -27,130 +27,147 @@
 class HtmlTagAction {
 
 protected:
-	HtmlTagAction(HtmlBookReader &reader);
+    HtmlTagAction(HtmlBookReader &reader);
 
 public:
-	virtual ~HtmlTagAction();
-	virtual void run(const HtmlReader::HtmlTag &tag) = 0;
-	virtual void reset();
+    virtual ~HtmlTagAction();
+
+    virtual void run(const HtmlReader::HtmlTag &tag) = 0;
+
+    virtual void reset();
 
 protected:
-	BookReader &bookReader();
+    BookReader &bookReader();
 
 protected:
-	HtmlBookReader &myReader;
+    HtmlBookReader &myReader;
 };
 
 class DummyHtmlTagAction : public HtmlTagAction {
 
 public:
-	DummyHtmlTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    DummyHtmlTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 };
 
 class HtmlControlTagAction : public HtmlTagAction {
 
 public:
-	HtmlControlTagAction(HtmlBookReader &reader, FBTextKind kind);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlControlTagAction(HtmlBookReader &reader, FBTextKind kind);
+
+    void run(const HtmlReader::HtmlTag &tag);
 
 private:
-	FBTextKind myKind;
+    FBTextKind myKind;
 };
 
 class HtmlHeaderTagAction : public HtmlTagAction {
 
 public:
-	HtmlHeaderTagAction(HtmlBookReader &reader, FBTextKind kind);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlHeaderTagAction(HtmlBookReader &reader, FBTextKind kind);
+
+    void run(const HtmlReader::HtmlTag &tag);
 
 private:
-	FBTextKind myKind;
+    FBTextKind myKind;
 };
 
 class HtmlIgnoreTagAction : public HtmlTagAction {
 
 public:
-	HtmlIgnoreTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlIgnoreTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 
 private:
-	std::set<std::string> myTagNames;
+    std::set<std::string> myTagNames;
 };
 
 class HtmlHrefTagAction : public HtmlTagAction {
 
 public:
-	HtmlHrefTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
-	void reset();
+    HtmlHrefTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
+
+    void reset();
 
 protected:
-	FBTextKind hyperlinkType() const;
-	void setHyperlinkType(FBTextKind hyperlinkType);
+    FBTextKind hyperlinkType() const;
+
+    void setHyperlinkType(FBTextKind hyperlinkType);
 
 private:
-	FBTextKind myHyperlinkType;
+    FBTextKind myHyperlinkType;
 };
 
 class HtmlImageTagAction : public HtmlTagAction {
 
 public:
-	HtmlImageTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlImageTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 };
 
 class HtmlBreakTagAction : public HtmlTagAction {
 
 public:
-	enum BreakType {
-		BREAK_AT_START = 1,
-		BREAK_AT_END = 2,
-		BREAK_AT_START_AND_AT_END = BREAK_AT_START | BREAK_AT_END
-	};
-	HtmlBreakTagAction(HtmlBookReader &reader, BreakType breakType);
-	void run(const HtmlReader::HtmlTag &tag);
+    enum BreakType {
+        BREAK_AT_START = 1,
+        BREAK_AT_END = 2,
+        BREAK_AT_START_AND_AT_END = BREAK_AT_START | BREAK_AT_END
+    };
+
+    HtmlBreakTagAction(HtmlBookReader &reader, BreakType breakType);
+
+    void run(const HtmlReader::HtmlTag &tag);
 
 private:
-	BreakType myBreakType;
+    BreakType myBreakType;
 };
 
 class HtmlPreTagAction : public HtmlTagAction {
 
 public:
-	HtmlPreTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlPreTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 };
 
 class HtmlListTagAction : public HtmlTagAction {
 
 public:
-	HtmlListTagAction(HtmlBookReader &reader, int startIndex);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlListTagAction(HtmlBookReader &reader, int startIndex);
+
+    void run(const HtmlReader::HtmlTag &tag);
 
 private:
-	int myStartIndex;
+    int myStartIndex;
 };
 
 class HtmlListItemTagAction : public HtmlTagAction {
 
 public:
-	HtmlListItemTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlListItemTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 };
 
 class HtmlTableTagAction : public HtmlTagAction {
 
 public:
-	HtmlTableTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlTableTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 };
 
 class HtmlStyleTagAction : public HtmlTagAction {
 
 public:
-	HtmlStyleTagAction(HtmlBookReader &reader);
-	void run(const HtmlReader::HtmlTag &tag);
+    HtmlStyleTagAction(HtmlBookReader &reader);
+
+    void run(const HtmlReader::HtmlTag &tag);
 };
 
 inline BookReader &HtmlTagAction::bookReader() { return myReader.myBookReader; }

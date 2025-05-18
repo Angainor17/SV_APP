@@ -29,36 +29,36 @@ import org.geometerplus.fbreader.network.urlInfo.UrlInfo;
 import org.geometerplus.zlibrary.core.network.ZLNetworkContext;
 
 public class ReloadCatalogAction extends CatalogAction {
-	private final ZLNetworkContext myNetworkContext;
+    private final ZLNetworkContext myNetworkContext;
 
-	public ReloadCatalogAction(NetworkLibraryActivity activity, ZLNetworkContext nc) {
-		super(activity, ActionCode.RELOAD_CATALOG, "reload", R.drawable.ic_menu_refresh);
-		myNetworkContext = nc;
-	}
+    public ReloadCatalogAction(NetworkLibraryActivity activity, ZLNetworkContext nc) {
+        super(activity, ActionCode.RELOAD_CATALOG, "reload", R.drawable.ic_menu_refresh);
+        myNetworkContext = nc;
+    }
 
-	@Override
-	public boolean isVisible(NetworkTree tree) {
-		if (!super.isVisible(tree)) {
-			return false;
-		}
-		final NetworkCatalogItem item = ((NetworkCatalogTree)tree).Item;
-		if (!(item instanceof NetworkURLCatalogItem)) {
-			return false;
-		}
-		return ((NetworkURLCatalogItem)item).getUrl(UrlInfo.Type.Catalog) != null;
-	}
+    @Override
+    public boolean isVisible(NetworkTree tree) {
+        if (!super.isVisible(tree)) {
+            return false;
+        }
+        final NetworkCatalogItem item = ((NetworkCatalogTree) tree).Item;
+        if (!(item instanceof NetworkURLCatalogItem)) {
+            return false;
+        }
+        return ((NetworkURLCatalogItem) item).getUrl(UrlInfo.Type.Catalog) != null;
+    }
 
-	@Override
-	public boolean isEnabled(NetworkTree tree) {
-		return myLibrary.getStoredLoader(tree) == null;
-	}
+    @Override
+    public boolean isEnabled(NetworkTree tree) {
+        return myLibrary.getStoredLoader(tree) == null;
+    }
 
-	@Override
-	public void run(NetworkTree tree) {
-		if (myLibrary.getStoredLoader(tree) != null) {
-			return;
-		}
-		((NetworkCatalogTree)tree).clearCatalog();
-		((NetworkCatalogTree)tree).startItemsLoader(myNetworkContext, false, false);
-	}
+    @Override
+    public void run(NetworkTree tree) {
+        if (myLibrary.getStoredLoader(tree) != null) {
+            return;
+        }
+        ((NetworkCatalogTree) tree).clearCatalog();
+        ((NetworkCatalogTree) tree).startItemsLoader(myNetworkContext, false, false);
+    }
 }

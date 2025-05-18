@@ -28,22 +28,26 @@
 class FB2CoverReader : public FB2Reader {
 
 public:
-	FB2CoverReader(const ZLFile &file);
-	shared_ptr<const ZLImage> readCover();
+    FB2CoverReader(const ZLFile &file);
+
+    shared_ptr<const ZLImage> readCover();
 
 private:
-	bool processNamespaces() const;
-	void startElementHandler(int tag, const char **attributes);
-	void endElementHandler(int tag);
-	void characterDataHandler(const char *text, std::size_t len);
+    bool processNamespaces() const;
+
+    void startElementHandler(int tag, const char **attributes);
+
+    void endElementHandler(int tag);
+
+    void characterDataHandler(const char *text, std::size_t len);
 
 private:
-	const ZLFile myFile;
-	bool myReadCoverPage;
-	bool myLookForImage;
-	std::string myImageId;
-	int myImageStart;
-	shared_ptr<const ZLImage> myImage;
+    const ZLFile myFile;
+    bool myReadCoverPage;
+    bool myLookForImage;
+    std::string myImageId;
+    int myImageStart;
+    shared_ptr<const ZLImage> myImage;
 };
 
 #endif /* __FB2COVERREADER_H__ */

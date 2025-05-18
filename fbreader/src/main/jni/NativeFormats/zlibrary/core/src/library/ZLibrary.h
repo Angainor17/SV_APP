@@ -28,31 +28,34 @@
 class ZLibrary {
 
 public:
-	static const std::string FileNameDelimiter;
-	static const std::string PathDelimiter;
-	static const std::string EndOfLine;
-	static std::string Language();
+    static const std::string FileNameDelimiter;
+    static const std::string PathDelimiter;
+    static const std::string EndOfLine;
+
+    static std::string Language();
 //	static std::string Country();
 
-	static std::string Version();
+    static std::string Version();
 
 //	static const std::string BaseDirectory;
-	static const std::string &ZLibraryDirectory();
+    static const std::string &ZLibraryDirectory();
 
 //	static const std::string &ImageDirectory();
 //	static const std::string &ApplicationName();
 //	static const std::string &ApplicationImageDirectory();
-	static const std::string &ApplicationDirectory();
+    static const std::string &ApplicationDirectory();
 //	static const std::string &DefaultFilesPathPrefix();
 
 //	static const std::string &ApplicationWritableDirectory();
 
 public:
-	static bool init(int &argc, char **&argv);
-	static void parseArguments(int &argc, char **&argv);
+    static bool init(int &argc, char **&argv);
+
+    static void parseArguments(int &argc, char **&argv);
+
 //	static ZLPaintContext *createContext();
 //	static void run(ZLApplication *application);
-	static void shutdown();
+    static void shutdown();
 
 private:
 //	static void initLocale();
@@ -61,12 +64,12 @@ private:
 //	static bool ourLocaleIsInitialized;
 //	static std::string ourLanguage;
 //	static std::string ourCountry;
-	static std::string ourZLibraryDirectory;
+    static std::string ourZLibraryDirectory;
 
 //	static std::string ourImageDirectory;
 //	static std::string ourApplicationImageDirectory;
-	static std::string ourApplicationName;
-	static std::string ourApplicationDirectory;
+    static std::string ourApplicationName;
+    static std::string ourApplicationDirectory;
 //	static std::string ourApplicationWritableDirectory;
 //	static std::string ourDefaultFilesPathPrefix;
 
@@ -74,15 +77,16 @@ private:
 //	static std::string replaceRegExps(const std::string &pattern);
 
 public:
-	static void initApplication(const std::string &name);
+    static void initApplication(const std::string &name);
 
 private:
-	ZLibrary();
+    ZLibrary();
 
-friend class ZLApplicationBase;
+    friend class ZLApplicationBase;
 };
 
 inline const std::string &ZLibrary::ZLibraryDirectory() { return ourZLibraryDirectory; }
+
 //inline const std::string &ZLibrary::ApplicationName() { return ourApplicationName; }
 //inline const std::string &ZLibrary::ImageDirectory() { return ourImageDirectory; }
 //inline const std::string &ZLibrary::ApplicationImageDirectory() { return ourApplicationImageDirectory; }

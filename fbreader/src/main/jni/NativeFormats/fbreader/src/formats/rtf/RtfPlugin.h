@@ -25,12 +25,17 @@
 class RtfPlugin : public FormatPlugin {
 
 public:
-	bool providesMetainfo() const;
-	const std::string supportedFileType() const;
-	bool readMetainfo(Book &book) const;
-	bool readUids(Book &book) const;
-	bool readLanguageAndEncoding(Book &book) const;
-	bool readModel(BookModel &model) const;
+    bool providesMetainfo() const;
+
+    const std::string supportedFileType() const;
+
+    bool readMetainfo(Book &book) const;
+
+    bool readUids(Book &book) const;
+
+    bool readLanguageAndEncoding(Book &book) const;
+
+    bool readModel(BookModel &model) const;
 };
 
 #endif /* __RTFPLUGIN_H__ */

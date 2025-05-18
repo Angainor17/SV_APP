@@ -25,120 +25,123 @@ import org.geometerplus.zlibrary.text.view.ZLTextPosition;
 import java.util.List;
 
 public interface IBookCollection<B extends AbstractBook> extends AbstractSerializer.BookCreator<B> {
-	public void addListener(Listener<B> listener);
+    public void addListener(Listener<B> listener);
 
-	public void removeListener(Listener<B> listener);
+    public void removeListener(Listener<B> listener);
 
-	Status status();
+    Status status();
 
-	int size();
+    int size();
 
-	List<B> books(BookQuery query);
+    List<B> books(BookQuery query);
 
-	boolean hasBooks(Filter filter);
+    boolean hasBooks(Filter filter);
 
-	List<String> titles(BookQuery query);
+    List<String> titles(BookQuery query);
 
-	List<B> recentlyOpenedBooks(int count);
+    List<B> recentlyOpenedBooks(int count);
 
-	List<B> recentlyAddedBooks(int count);
+    List<B> recentlyAddedBooks(int count);
 
-	B getRecentBook(int index);
+    B getRecentBook(int index);
 
-	void addToRecentlyOpened(B book);
+    void addToRecentlyOpened(B book);
 
-	void removeFromRecentlyOpened(B book);
+    void removeFromRecentlyOpened(B book);
 
-	B getBookByFile(String path);
+    B getBookByFile(String path);
 
-	B getBookById(long id);
+    B getBookById(long id);
 
-	B getBookByUid(UID uid);
+    B getBookByUid(UID uid);
 
-	B getBookByHash(String hash);
+    B getBookByHash(String hash);
 
-	List<String> labels();
+    List<String> labels();
 
-	List<Author> authors();
+    List<Author> authors();
 
-	boolean hasSeries();
+    boolean hasSeries();
 
-	List<String> series();
+    List<String> series();
 
-	List<Tag> tags();
+    List<Tag> tags();
 
-	List<String> firstTitleLetters();
+    List<String> firstTitleLetters();
 
-	boolean saveBook(B book);
+    boolean saveBook(B book);
 
-	boolean canRemoveBook(B book, boolean deleteFromDisk);
+    boolean canRemoveBook(B book, boolean deleteFromDisk);
 
-	void removeBook(B book, boolean deleteFromDisk);
+    void removeBook(B book, boolean deleteFromDisk);
 
-	String getHash(B book, boolean force);
+    String getHash(B book, boolean force);
 
-	void setHash(B book, String hash);
+    void setHash(B book, String hash);
 
-	boolean sameBook(B book0, B book1);
+    boolean sameBook(B book0, B book1);
 
-	ZLTextFixedPosition.WithTimestamp getStoredPosition(long bookId);
+    ZLTextFixedPosition.WithTimestamp getStoredPosition(long bookId);
 
-	void storePosition(long bookId, ZLTextPosition position);
+    void storePosition(long bookId, ZLTextPosition position);
 
-	boolean isHyperlinkVisited(B book, String linkId);
+    boolean isHyperlinkVisited(B book, String linkId);
 
-	void markHyperlinkAsVisited(B book, String linkId);
+    void markHyperlinkAsVisited(B book, String linkId);
 
-	String getCoverUrl(B book);
+    String getCoverUrl(B book);
 
-	String getDescription(B book);
+    String getDescription(B book);
 
-	List<Bookmark> bookmarks(BookmarkQuery query);
+    List<Bookmark> bookmarks(BookmarkQuery query);
 
-	void saveBookmark(Bookmark bookmark);
+    void saveBookmark(Bookmark bookmark);
 
-	void deleteBookmark(Bookmark bookmark);
+    void deleteBookmark(Bookmark bookmark);
 
-	List<String> deletedBookmarkUids();
+    List<String> deletedBookmarkUids();
 
-	void purgeBookmarks(List<String> uids);
+    void purgeBookmarks(List<String> uids);
 
-	HighlightingStyle getHighlightingStyle(int styleId);
+    HighlightingStyle getHighlightingStyle(int styleId);
 
-	List<HighlightingStyle> highlightingStyles();
+    List<HighlightingStyle> highlightingStyles();
 
-	void saveHighlightingStyle(HighlightingStyle style);
+    void saveHighlightingStyle(HighlightingStyle style);
 
-	int getDefaultHighlightingStyleId();
+    int getDefaultHighlightingStyleId();
 
-	void setDefaultHighlightingStyleId(int styleId);
+    void setDefaultHighlightingStyleId(int styleId);
 
-	List<FormatDescriptor> formats();
+    List<FormatDescriptor> formats();
 
-	// returns true iff active format set is changed
-	boolean setActiveFormats(List<String> formatIds);
+    // returns true iff active format set is changed
+    boolean setActiveFormats(List<String> formatIds);
 
-	void rescan(String path);
-	public enum Status {
-		NotStarted(false),
-		Started(false),
-		Succeeded(true),
-		Failed(true);
+    void rescan(String path);
 
-		public final Boolean IsComplete;
+    public enum Status {
+        NotStarted(false),
+        Started(false),
+        Succeeded(true),
+        Failed(true);
 
-		Status(boolean complete) {
-			IsComplete = complete;
-		}
-	}
-	public interface Listener<B> {
-		void onBookEvent(BookEvent event, B book);
-		void onBuildEvent(Status status);
-	}
+        public final Boolean IsComplete;
 
-	class FormatDescriptor {
-		public String Id;
-		public String Name;
-		public boolean IsActive;
-	}
+        Status(boolean complete) {
+            IsComplete = complete;
+        }
+    }
+
+    public interface Listener<B> {
+        void onBookEvent(BookEvent event, B book);
+
+        void onBuildEvent(Status status);
+    }
+
+    class FormatDescriptor {
+        public String Id;
+        public String Name;
+        public boolean IsActive;
+    }
 }

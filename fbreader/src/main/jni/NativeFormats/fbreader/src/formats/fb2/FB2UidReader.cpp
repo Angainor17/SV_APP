@@ -22,53 +22,53 @@
 #include "../../library/Book.h"
 
 FB2UidReader::FB2UidReader(Book &book) : myBook(book) {
-	myBook.removeAllUids();
+    myBook.removeAllUids();
 }
 
 void FB2UidReader::characterDataHandler(const char *text, std::size_t len) {
-	if (myReadState == READ_ID) {
-		myBuffer.append(text, len);
-	}
+    if (myReadState == READ_ID) {
+        myBuffer.append(text, len);
+    }
 }
 
 void FB2UidReader::startElementHandler(int tag, const char **attributes) {
-	switch (tag) {
-		case _BODY:
-			myReturnCode = true;
-			interrupt();
-			break;
-		case _DOCUMENT_INFO:
-			myReadState = READ_DOCUMENT_INFO;
-			break;
-		case _ID:
-			if (myReadState == READ_DOCUMENT_INFO) {
-				myReadState = READ_ID;
-			}
-			break;
-		default:
-			break;
-	}
+    switch (tag) {
+        case _BODY:
+            myReturnCode = true;
+            interrupt();
+            break;
+        case _DOCUMENT_INFO:
+            myReadState = READ_DOCUMENT_INFO;
+            break;
+        case _ID:
+            if (myReadState == READ_DOCUMENT_INFO) {
+                myReadState = READ_ID;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void FB2UidReader::endElementHandler(int tag) {
-	switch (tag) {
-		case _DOCUMENT_INFO:
-			myReadState = READ_NOTHING;
-			break;
-		case _ID:
-			if (myReadState == READ_ID) {
-				myBook.addUid("FB2-DOC-ID", myBuffer);
-				myBuffer.erase();
-				myReadState = READ_DOCUMENT_INFO;
-			}
-			break;
-		default:
-			break;
-	}
+    switch (tag) {
+        case _DOCUMENT_INFO:
+            myReadState = READ_NOTHING;
+            break;
+        case _ID:
+            if (myReadState == READ_ID) {
+                myBook.addUid("FB2-DOC-ID", myBuffer);
+                myBuffer.erase();
+                myReadState = READ_DOCUMENT_INFO;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 bool FB2UidReader::readUids() {
-	myReadState = READ_NOTHING;
-	myBuffer.erase();
-	return readDocument(myBook.file());
+    myReadState = READ_NOTHING;
+    myBuffer.erase();
+    return readDocument(myBook.file());
 }

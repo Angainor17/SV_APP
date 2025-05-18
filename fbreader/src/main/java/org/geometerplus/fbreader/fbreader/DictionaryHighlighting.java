@@ -26,37 +26,37 @@ import org.geometerplus.zlibrary.text.view.ZLTextSimpleHighlighting;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 
 public final class DictionaryHighlighting extends ZLTextSimpleHighlighting {
-	private DictionaryHighlighting(ZLTextView view, ZLTextPosition start, ZLTextPosition end) {
-		super(view, start, end);
-	}
+    private DictionaryHighlighting(ZLTextView view, ZLTextPosition start, ZLTextPosition end) {
+        super(view, start, end);
+    }
 
-	public static DictionaryHighlighting get(ZLTextView view) {
-		final ZLTextHighlighting hilite = view.getSelectionHighlighting();
-		if (hilite == null) {
-			return null;
-		}
+    public static DictionaryHighlighting get(ZLTextView view) {
+        final ZLTextHighlighting hilite = view.getSelectionHighlighting();
+        if (hilite == null) {
+            return null;
+        }
 
-		final ZLTextPosition start = hilite.getStartPosition();
-		final ZLTextPosition end = hilite.getEndPosition();
-		if (start == null || end == null) {
-			return null;
-		}
+        final ZLTextPosition start = hilite.getStartPosition();
+        final ZLTextPosition end = hilite.getEndPosition();
+        if (start == null || end == null) {
+            return null;
+        }
 
-		return new DictionaryHighlighting(view, start, end);
-	}
+        return new DictionaryHighlighting(view, start, end);
+    }
 
-	@Override
-	public ZLColor getBackgroundColor() {
-		return View.getSelectionBackgroundColor();
-	}
+    @Override
+    public ZLColor getBackgroundColor() {
+        return View.getSelectionBackgroundColor();
+    }
 
-	@Override
-	public ZLColor getForegroundColor() {
-		return null;
-	}
+    @Override
+    public ZLColor getForegroundColor() {
+        return null;
+    }
 
-	@Override
-	public ZLColor getOutlineColor() {
-		return null;
-	}
+    @Override
+    public ZLColor getOutlineColor() {
+        return null;
+    }
 }

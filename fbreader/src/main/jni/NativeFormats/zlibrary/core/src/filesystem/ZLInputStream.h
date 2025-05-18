@@ -27,44 +27,55 @@
 class ZLInputStream {
 
 protected:
-	ZLInputStream();
+    ZLInputStream();
 
 public:
-	virtual ~ZLInputStream();
-	virtual bool open() = 0;
-	virtual std::size_t read(char *buffer, std::size_t maxSize) = 0;
-	virtual void close() = 0;
+    virtual ~ZLInputStream();
 
-	virtual void seek(int offset, bool absoluteOffset) = 0;
-	virtual std::size_t offset() const = 0;
-	virtual std::size_t sizeOfOpened() = 0;
+    virtual bool open() = 0;
+
+    virtual std::size_t read(char *buffer, std::size_t maxSize) = 0;
+
+    virtual void close() = 0;
+
+    virtual void seek(int offset, bool absoluteOffset) = 0;
+
+    virtual std::size_t offset() const = 0;
+
+    virtual std::size_t sizeOfOpened() = 0;
 
 private:
-	// disable copying
-	ZLInputStream(const ZLInputStream&);
-	const ZLInputStream &operator = (const ZLInputStream&);
+    // disable copying
+    ZLInputStream(const ZLInputStream &);
+
+    const ZLInputStream &operator=(const ZLInputStream &);
 };
 
 class ZLInputStreamDecorator : public ZLInputStream {
 
 public:
-	ZLInputStreamDecorator(shared_ptr<ZLInputStream> decoratee);
+    ZLInputStreamDecorator(shared_ptr<ZLInputStream> decoratee);
 
 private:
-	bool open();
-	std::size_t read(char *buffer, std::size_t maxSize);
-	void close();
+    bool open();
 
-	void seek(int offset, bool absoluteOffset);
-	std::size_t offset() const;
-	std::size_t sizeOfOpened();
+    std::size_t read(char *buffer, std::size_t maxSize);
+
+    void close();
+
+    void seek(int offset, bool absoluteOffset);
+
+    std::size_t offset() const;
+
+    std::size_t sizeOfOpened();
 
 private:
-	shared_ptr<ZLInputStream> myBaseStream;
-	std::size_t myBaseOffset;
+    shared_ptr<ZLInputStream> myBaseStream;
+    std::size_t myBaseOffset;
 };
 
 inline ZLInputStream::ZLInputStream() {}
+
 inline ZLInputStream::~ZLInputStream() {}
 
 #endif /* __ZLINPUTSTREAM_H__ */

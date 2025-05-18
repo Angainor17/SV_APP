@@ -23,13 +23,13 @@ import org.geometerplus.zlibrary.core.network.ZLNetworkException;
 import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter;
 
 class LitResAuthenticationXMLReader extends ZLXMLReaderAdapter {
-	private ZLNetworkException myException;
+    private ZLNetworkException myException;
 
-	public ZLNetworkException getException() {
-		return myException;
-	}
+    public ZLNetworkException getException() {
+        return myException;
+    }
 
-	protected void setException(ZLNetworkException e) {
-		myException = e;
-	}
+    protected void setException(ZLNetworkException e) {
+        myException = e;
+    }
 }

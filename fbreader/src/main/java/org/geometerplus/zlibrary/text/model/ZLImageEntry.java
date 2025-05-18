@@ -24,19 +24,19 @@ import org.geometerplus.zlibrary.core.image.ZLImage;
 import java.util.Map;
 
 public final class ZLImageEntry {
-	public final String Id;
-	public final short VOffset;
-	public final boolean IsCover;
-	private final Map<String,ZLImage> myImageMap;
+    public final String Id;
+    public final short VOffset;
+    public final boolean IsCover;
+    private final Map<String, ZLImage> myImageMap;
 
-	public ZLImageEntry(Map<String,ZLImage> imageMap, String id, short vOffset, boolean isCover) {
-		myImageMap = imageMap;
-		Id = id;
-		VOffset = vOffset;
-		IsCover = isCover;
-	}
+    public ZLImageEntry(Map<String, ZLImage> imageMap, String id, short vOffset, boolean isCover) {
+        myImageMap = imageMap;
+        Id = id;
+        VOffset = vOffset;
+        IsCover = isCover;
+    }
 
-	public ZLImage getImage() {
-		return myImageMap.get(Id);
-	}
+    public ZLImage getImage() {
+        return myImageMap.get(Id);
+    }
 }

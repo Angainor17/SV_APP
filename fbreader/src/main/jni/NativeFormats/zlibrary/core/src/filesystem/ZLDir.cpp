@@ -21,37 +21,37 @@
 #include "ZLDir.h"
 
 shared_ptr<ZLDir> ZLDir::root() {
-	return ZLFSManager::Instance().rootDirectory();
+    return ZLFSManager::Instance().rootDirectory();
 }
 
 ZLDir::ZLDir(const std::string &path) : myPath(path) {
-	ZLFSManager::Instance().normalize(myPath);
+    ZLFSManager::Instance().normalize(myPath);
 }
 
 ZLDir::~ZLDir() {
 }
 
 const std::string &ZLDir::path() const {
-	return myPath;
+    return myPath;
 }
 
 std::string ZLDir::parentPath() const {
-	return ZLFSManager::Instance().parentPath(myPath);
+    return ZLFSManager::Instance().parentPath(myPath);
 }
 
 bool ZLDir::isRoot() const {
-	return myPath == ZLFSManager::Instance().rootDirectoryPath();
+    return myPath == ZLFSManager::Instance().rootDirectoryPath();
 }
 
 std::string ZLDir::name() const {
-	int index = ZLFSManager::Instance().findLastFileNameDelimiter(myPath);
-	return myPath.substr(index + 1);
+    int index = ZLFSManager::Instance().findLastFileNameDelimiter(myPath);
+    return myPath.substr(index + 1);
 }
 
 std::string ZLDir::itemPath(const std::string &itemName) const {
-	if (itemName == "..") {
-		return parentPath();
-	} else {
-		return isRoot() ? myPath + itemName : myPath + delimiter() + itemName;
-	}
+    if (itemName == "..") {
+        return parentPath();
+    } else {
+        return isRoot() ? myPath + itemName : myPath + delimiter() + itemName;
+    }
 }

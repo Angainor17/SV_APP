@@ -25,19 +25,21 @@ import org.geometerplus.zlibrary.core.util.MimeType;
 import java.util.List;
 
 public abstract class FileType {
-	public final String Id;
+    public final String Id;
 
-	protected FileType(String id) {
-		Id = id;
-	}
+    protected FileType(String id) {
+        Id = id;
+    }
 
-	public abstract boolean acceptsFile(ZLFile file);
+    public abstract boolean acceptsFile(ZLFile file);
 
-	public abstract List<MimeType> mimeTypes();
-	public abstract MimeType mimeType(ZLFile file);
-	public MimeType rawMimeType(ZLFile file) {
-		return mimeType(file);
-	}
+    public abstract List<MimeType> mimeTypes();
 
-	public abstract String defaultExtension(MimeType mime);
+    public abstract MimeType mimeType(ZLFile file);
+
+    public MimeType rawMimeType(ZLFile file) {
+        return mimeType(file);
+    }
+
+    public abstract String defaultExtension(MimeType mime);
 }

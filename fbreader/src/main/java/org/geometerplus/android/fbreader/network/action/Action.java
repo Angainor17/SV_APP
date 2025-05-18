@@ -26,36 +26,36 @@ import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.fbreader.network.NetworkTree;
 
 public abstract class Action {
-	public final int Code;
-	public final int IconId;
+    public final int Code;
+    public final int IconId;
 
-	protected final Activity myActivity;
-	protected final NetworkLibrary myLibrary;
-	private final String myResourceKey;
+    protected final Activity myActivity;
+    protected final NetworkLibrary myLibrary;
+    private final String myResourceKey;
 
-	protected Action(Activity activity, int code, String resourceKey, int iconId) {
-		myActivity = activity;
-		myLibrary = Util.networkLibrary(activity);
-		Code = code;
-		myResourceKey = resourceKey;
-		IconId = iconId;
-	}
+    protected Action(Activity activity, int code, String resourceKey, int iconId) {
+        myActivity = activity;
+        myLibrary = Util.networkLibrary(activity);
+        Code = code;
+        myResourceKey = resourceKey;
+        IconId = iconId;
+    }
 
-	public abstract boolean isVisible(NetworkTree tree);
+    public abstract boolean isVisible(NetworkTree tree);
 
-	public boolean isEnabled(NetworkTree tree) {
-		return true;
-	}
+    public boolean isEnabled(NetworkTree tree) {
+        return true;
+    }
 
-	public abstract void run(NetworkTree tree);
+    public abstract void run(NetworkTree tree);
 
-	public String getContextLabel(NetworkTree tree) {
-		return
-			NetworkLibrary.resource().getResource(myResourceKey).getValue();
-	}
+    public String getContextLabel(NetworkTree tree) {
+        return
+                NetworkLibrary.resource().getResource(myResourceKey).getValue();
+    }
 
-	public String getOptionsLabel(NetworkTree tree) {
-		return
-			NetworkLibrary.resource().getResource("menu").getResource(myResourceKey).getValue();
-	}
+    public String getOptionsLabel(NetworkTree tree) {
+        return
+                NetworkLibrary.resource().getResource("menu").getResource(myResourceKey).getValue();
+    }
 }

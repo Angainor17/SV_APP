@@ -23,20 +23,20 @@ import org.geometerplus.zlibrary.core.xml.ZLStringMap;
 import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter;
 
 class ContainerFileReader extends ZLXMLReaderAdapter {
-	private String myRootPath;
+    private String myRootPath;
 
-	public String getRootPath() {
-		return myRootPath;
-	}
+    public String getRootPath() {
+        return myRootPath;
+    }
 
-	@Override
-	public boolean startElementHandler(String tag, ZLStringMap xmlattributes) {
-		if ("rootfile".equalsIgnoreCase(tag)) {
-			myRootPath = xmlattributes.getValue("full-path");
-			if (myRootPath != null) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean startElementHandler(String tag, ZLStringMap xmlattributes) {
+        if ("rootfile".equalsIgnoreCase(tag)) {
+            myRootPath = xmlattributes.getValue("full-path");
+            if (myRootPath != null) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

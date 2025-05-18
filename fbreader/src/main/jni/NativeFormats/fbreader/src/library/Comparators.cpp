@@ -21,84 +21,84 @@
 #include "Author.h"
 #include "Tag.h"
 
-bool BookComparator::operator() (
-	const shared_ptr<Book> book0,
-	const shared_ptr<Book> book1
+bool BookComparator::operator()(
+        const shared_ptr<Book> book0,
+        const shared_ptr<Book> book1
 ) const {
-	const std::string &seriesTitle0 = book0->seriesTitle();
-	const std::string &seriesTitle1 = book1->seriesTitle();
-	int comp = seriesTitle0.compare(seriesTitle1);
-	if (comp == 0) {
-		if (!seriesTitle0.empty()) {
-			comp = book0->indexInSeries().compare(book1->indexInSeries());
-			if (comp != 0) {
-				return comp < 0;
-			}
-		}
-		return book0->title() < book1->title();
-	}
-	if (seriesTitle0.empty()) {
-		return book0->title() < seriesTitle1;
-	}
-	if (seriesTitle1.empty()) {
-		return seriesTitle0 <= book1->title();
-	}
-	return comp < 0;
+    const std::string &seriesTitle0 = book0->seriesTitle();
+    const std::string &seriesTitle1 = book1->seriesTitle();
+    int comp = seriesTitle0.compare(seriesTitle1);
+    if (comp == 0) {
+        if (!seriesTitle0.empty()) {
+            comp = book0->indexInSeries().compare(book1->indexInSeries());
+            if (comp != 0) {
+                return comp < 0;
+            }
+        }
+        return book0->title() < book1->title();
+    }
+    if (seriesTitle0.empty()) {
+        return book0->title() < seriesTitle1;
+    }
+    if (seriesTitle1.empty()) {
+        return seriesTitle0 <= book1->title();
+    }
+    return comp < 0;
 }
 
-bool BookByFileNameComparator::operator() (
-	const shared_ptr<Book> book0,
-	const shared_ptr<Book> book1
+bool BookByFileNameComparator::operator()(
+        const shared_ptr<Book> book0,
+        const shared_ptr<Book> book1
 ) const {
-	return book0->file() < book1->file();
+    return book0->file() < book1->file();
 }
 
-bool AuthorComparator::operator() (
-	const shared_ptr<Author> author0,
-	const shared_ptr<Author> author1
+bool AuthorComparator::operator()(
+        const shared_ptr<Author> author0,
+        const shared_ptr<Author> author1
 ) const {
-	if (author0.isNull()) {
-		return !author1.isNull();
-	}
-	if (author1.isNull()) {
-		return false;
-	}
+    if (author0.isNull()) {
+        return !author1.isNull();
+    }
+    if (author1.isNull()) {
+        return false;
+    }
 
-	const int comp = author0->sortKey().compare(author1->sortKey());
-	return comp != 0 ? comp < 0 : author0->name() < author1->name();
+    const int comp = author0->sortKey().compare(author1->sortKey());
+    return comp != 0 ? comp < 0 : author0->name() < author1->name();
 }
 
-bool TagComparator::operator() (
-	shared_ptr<Tag> tag0,
-	shared_ptr<Tag> tag1
+bool TagComparator::operator()(
+        shared_ptr<Tag> tag0,
+        shared_ptr<Tag> tag1
 ) const {
-	if (tag0.isNull()) {
-		return !tag1.isNull();
-	}
-	if (tag1.isNull()) {
-		return false;
-	}
+    if (tag0.isNull()) {
+        return !tag1.isNull();
+    }
+    if (tag1.isNull()) {
+        return false;
+    }
 
-	std::size_t level0 = tag0->level();
-	std::size_t level1 = tag1->level();
-	if (level0 > level1) {
-		for (; level0 > level1; --level0) {
-			tag0 = tag0->parent();
-		}
-		if (tag0 == tag1) {
-			return false;
-		}
-	} else if (level0 < level1) {
-		for (; level0 < level1; --level1) {
-			tag1 = tag1->parent();
-		}
-		if (tag0 == tag1) {
-			return true;
-		}
-	}
-	while (tag0->parent() != tag1->parent()) {
-		tag0 = tag0->parent();
-		tag1 = tag1->parent();
-	}
-	return tag0->name() < tag1->name();
+    std::size_t level0 = tag0->level();
+    std::size_t level1 = tag1->level();
+    if (level0 > level1) {
+        for (; level0 > level1; --level0) {
+            tag0 = tag0->parent();
+        }
+        if (tag0 == tag1) {
+            return false;
+        }
+    } else if (level0 < level1) {
+        for (; level0 < level1; --level1) {
+            tag1 = tag1->parent();
+        }
+        if (tag0 == tag1) {
+            return true;
+        }
+    }
+    while (tag0->parent() != tag1->parent()) {
+        tag0 = tag0->parent();
+        tag1 = tag1->parent();
+    }
+    return tag0->name() < tag1->name();
 }

@@ -28,30 +28,24 @@ import group.pals.android.lib.ui.filechooser.utils.history.History;
 
 /**
  * Utilities for editor context menu.
- * 
+ *
  * @author Hai Bison
  * @since v4.3 beta
- * 
  */
 public class ViewFilesContextMenuUtils {
 
     /**
      * Shows history contents to the user. He can clear all items.
-     * 
-     * @param context
-     *            {@link Context}
-     * @param fileProvider
-     *            {@link IFileProvider}
-     * @param history
-     *            {@link History} of {@link IFile}.
-     * @param currentLocation
-     *            current location, will not be shown.
-     * @param listener
-     *            will be notified after the user closed the dialog, or when the
-     *            user selects an item.
+     *
+     * @param context         {@link Context}
+     * @param fileProvider    {@link IFileProvider}
+     * @param history         {@link History} of {@link IFile}.
+     * @param currentLocation current location, will not be shown.
+     * @param listener        will be notified after the user closed the dialog, or when the
+     *                        user selects an item.
      */
     public static void doShowHistoryContents(final Context context, final IFileProvider fileProvider,
-            final History<IFile> history, IFile currentLocation, final TaskListener listener) {
+                                             final History<IFile> history, IFile currentLocation, final TaskListener listener) {
         if (history.isEmpty())
             return;
 

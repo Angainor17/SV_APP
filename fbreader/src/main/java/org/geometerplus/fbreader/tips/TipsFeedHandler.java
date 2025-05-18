@@ -26,11 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 class TipsFeedHandler extends AbstractATOMFeedHandler {
-	final List<Tip> Tips = new LinkedList<Tip>();
+    final List<Tip> Tips = new LinkedList<Tip>();
 
-	@Override
-	public boolean processFeedEntry(ATOMEntry entry) {
-		Tips.add(new Tip(entry.Title, entry.Content));
-		return false;
-	}
+    @Override
+    public boolean processFeedEntry(ATOMEntry entry) {
+        Tips.add(new Tip(entry.Title, entry.Content));
+        return false;
+    }
 }

@@ -25,10 +25,10 @@
 class ZLUnixFSDir : public ZLFSDir {
 
 public:
-	ZLUnixFSDir(const std::string &name) : ZLFSDir(name) {}
+    ZLUnixFSDir(const std::string &name) : ZLFSDir(name) {}
 
-	//void collectSubDirs(std::vector<std::string> &names, bool includeSymlinks);
-	void collectFiles(std::vector<std::string> &names, bool includeSymlinks);
+    //void collectSubDirs(std::vector<std::string> &names, bool includeSymlinks);
+    void collectFiles(std::vector<std::string> &names, bool includeSymlinks);
 };
 
 #endif /* __ZLUNIXFSDIR_H__ */

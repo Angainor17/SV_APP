@@ -25,19 +25,29 @@
 class FB2Plugin : public FormatPlugin {
 
 public:
-	FB2Plugin();
-	~FB2Plugin();
-	bool providesMetainfo() const;
-	const std::string supportedFileType() const;
-	bool readMetainfo(Book &book) const;
-	bool readUids(Book &book) const;
-	bool readLanguageAndEncoding(Book &book) const;
-	bool readModel(BookModel &model) const;
-	shared_ptr<const ZLImage> coverImage(const ZLFile &file) const;
+    FB2Plugin();
+
+    ~FB2Plugin();
+
+    bool providesMetainfo() const;
+
+    const std::string supportedFileType() const;
+
+    bool readMetainfo(Book &book) const;
+
+    bool readUids(Book &book) const;
+
+    bool readLanguageAndEncoding(Book &book) const;
+
+    bool readModel(BookModel &model) const;
+
+    shared_ptr<const ZLImage> coverImage(const ZLFile &file) const;
 };
 
 inline FB2Plugin::FB2Plugin() {}
+
 inline FB2Plugin::~FB2Plugin() {}
+
 inline bool FB2Plugin::providesMetainfo() const { return true; }
 
 #endif /* __FB2PLUGIN_H__ */

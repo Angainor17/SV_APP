@@ -30,28 +30,28 @@ import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationMan
 import org.geometerplus.fbreader.network.tree.NetworkCatalogRootTree;
 
 public class SignUpAction extends Action {
-	public SignUpAction(Activity activity) {
-		super(activity, ActionCode.SIGNUP, "signUp", -1);
-	}
+    public SignUpAction(Activity activity) {
+        super(activity, ActionCode.SIGNUP, "signUp", -1);
+    }
 
-	@Override
-	public boolean isVisible(NetworkTree tree) {
-		if (!(tree instanceof NetworkCatalogRootTree)) {
-			return false;
-		}
+    @Override
+    public boolean isVisible(NetworkTree tree) {
+        if (!(tree instanceof NetworkCatalogRootTree)) {
+            return false;
+        }
 
-		final NetworkAuthenticationManager mgr = tree.getLink().authenticationManager();
-		return mgr != null && !mgr.mayBeAuthorised(false);
-	}
+        final NetworkAuthenticationManager mgr = tree.getLink().authenticationManager();
+        return mgr != null && !mgr.mayBeAuthorised(false);
+    }
 
-	@Override
-	public void run(NetworkTree tree) {
-		final INetworkLink link = tree.getLink();
-		try {
-			myActivity.startActivity(Util.authorisationIntent(
-				link, myActivity, UserRegistrationActivity.class
-			));
-		} catch (ActivityNotFoundException e) {
-		}
-	}
+    @Override
+    public void run(NetworkTree tree) {
+        final INetworkLink link = tree.getLink();
+        try {
+            myActivity.startActivity(Util.authorisationIntent(
+                    link, myActivity, UserRegistrationActivity.class
+            ));
+        } catch (ActivityNotFoundException e) {
+        }
+    }
 }

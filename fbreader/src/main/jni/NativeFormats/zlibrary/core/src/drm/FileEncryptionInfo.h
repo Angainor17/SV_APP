@@ -29,32 +29,34 @@
 class EncryptionMethod {
 
 public:
-	static const std::string UNSUPPORTED;
-	static const std::string EMBEDDING;
-	static const std::string MARLIN;
-	static const std::string KINDLE;
+    static const std::string UNSUPPORTED;
+    static const std::string EMBEDDING;
+    static const std::string MARLIN;
+    static const std::string KINDLE;
 };
 
 class FileEncryptionInfo {
 
 public:
-	FileEncryptionInfo(const std::string &uri, const std::string &method, const std::string &algorithm, const std::string &contentId);
+    FileEncryptionInfo(const std::string &uri, const std::string &method,
+                       const std::string &algorithm, const std::string &contentId);
 
 public:
-	const std::string Uri;
-	const std::string Method;
-	const std::string Algorithm;
-	const std::string ContentId;
+    const std::string Uri;
+    const std::string Method;
+    const std::string Algorithm;
+    const std::string ContentId;
 };
 
 class EncryptionMap {
 
 public:
-	void addInfo(const ZLDir &dir, shared_ptr<FileEncryptionInfo> info);
-	shared_ptr<FileEncryptionInfo> info(const std::string &path) const;
+    void addInfo(const ZLDir &dir, shared_ptr<FileEncryptionInfo> info);
+
+    shared_ptr<FileEncryptionInfo> info(const std::string &path) const;
 
 private:
-	std::map<std::string,shared_ptr<FileEncryptionInfo> > myPathToInfo;
+    std::map<std::string, shared_ptr<FileEncryptionInfo> > myPathToInfo;
 };
 
 #endif /* __FILEENCRYPTIONINFO_H__ */

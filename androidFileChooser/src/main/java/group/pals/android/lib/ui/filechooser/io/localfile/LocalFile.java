@@ -18,7 +18,7 @@ import group.pals.android.lib.ui.filechooser.utils.history.History;
 
 /**
  * This is a wrapper for {@link File}.
- * 
+ *
  * @author Hai Bison
  * @since v3.2
  */
@@ -42,7 +42,7 @@ public class LocalFile extends File implements IFile {
     public LocalFile(String pathname) {
         super(pathname);
     }// LocalFile()
-   
+
     public LocalFile(File file) {
         this(file.getAbsolutePath());
     }// LocalFile()
@@ -50,7 +50,7 @@ public class LocalFile extends File implements IFile {
     private LocalFile(Parcel in) {
         this(in.readString());
     }
-    
+
     @Override
     public IFile parentFile() {
         return getParent() == null ? null : new ParentFile(getParent());

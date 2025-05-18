@@ -27,13 +27,15 @@
 class UID {
 
 public:
-	UID(const std::string &type, const std::string &id);
-	bool operator == (const UID &uid) const;
-	bool operator != (const UID &uid) const;
+    UID(const std::string &type, const std::string &id);
+
+    bool operator==(const UID &uid) const;
+
+    bool operator!=(const UID &uid) const;
 
 public:
-	const std::string Type;
-	const std::string Id;
+    const std::string Type;
+    const std::string Id;
 };
 
 #endif /* __UID_H__ */

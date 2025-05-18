@@ -26,34 +26,34 @@ import org.geometerplus.zlibrary.core.network.ZLNetworkException;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 public class RecentCatalogListItem extends NetworkCatalogItem {
-	RecentCatalogListItem(ZLResource resource) {
-		super(
-			null,
-			resource.getValue(),
-			resource.getResource("summary").getValue(),
-			new UrlInfoCollection<UrlInfo>(),
-			Accessibility.ALWAYS,
-			FLAGS_DEFAULT
-		);
-	}
+    RecentCatalogListItem(ZLResource resource) {
+        super(
+                null,
+                resource.getValue(),
+                resource.getResource("summary").getValue(),
+                new UrlInfoCollection<UrlInfo>(),
+                Accessibility.ALWAYS,
+                FLAGS_DEFAULT
+        );
+    }
 
-	@Override
-	public String getStringId() {
-		return "@RecentCatalogs";
-	}
+    @Override
+    public String getStringId() {
+        return "@RecentCatalogs";
+    }
 
-	@Override
-	public boolean canBeOpened() {
-		// TODO: implement
-		return true;
-	}
+    @Override
+    public boolean canBeOpened() {
+        // TODO: implement
+        return true;
+    }
 
-	@Override
-	public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
-		// TODO: implement
-		for (int i = 0; i < 5; ++i) {
-			loader.onNewItem(new RecentCatalogItem("Catalog " + i, "Visited ..."));
-		}
-		loader.Tree.confirmAllItems();
-	}
+    @Override
+    public void loadChildren(NetworkItemsLoader loader) throws ZLNetworkException {
+        // TODO: implement
+        for (int i = 0; i < 5; ++i) {
+            loader.onNewItem(new RecentCatalogItem("Catalog " + i, "Visited ..."));
+        }
+        loader.Tree.confirmAllItems();
+    }
 }

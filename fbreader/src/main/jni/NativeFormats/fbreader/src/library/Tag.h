@@ -32,69 +32,76 @@
 class Tag {
 
 private:
-	static TagList ourRootTags;
-	static std::map<int,shared_ptr<Tag> > ourTagsById;
+    static TagList ourRootTags;
+    static std::map<int, shared_ptr<Tag> > ourTagsById;
 
 public:
-	static shared_ptr<Tag> getTag(const std::string &name, shared_ptr<Tag> parent = 0, int tagId = 0);
-	static shared_ptr<Tag> getTagByFullName(const std::string &fullName);
-	static shared_ptr<Tag> getTagById(int tagId);
+    static shared_ptr<Tag>
+    getTag(const std::string &name, shared_ptr<Tag> parent = 0, int tagId = 0);
 
-	static void setTagId(shared_ptr<Tag>, int tagId);
+    static shared_ptr<Tag> getTagByFullName(const std::string &fullName);
 
-	static shared_ptr<Tag> cloneSubTag(shared_ptr<Tag> tag, shared_ptr<Tag> oldparent, shared_ptr<Tag> newparent);
+    static shared_ptr<Tag> getTagById(int tagId);
 
-	static void collectAncestors(shared_ptr<Tag> tag, TagList &parents);
+    static void setTagId(shared_ptr<Tag>, int tagId);
 
-	static void collectTagNames(std::vector<std::string> &tags);
+    static shared_ptr<Tag>
+    cloneSubTag(shared_ptr<Tag> tag, shared_ptr<Tag> oldparent, shared_ptr<Tag> newparent);
+
+    static void collectAncestors(shared_ptr<Tag> tag, TagList &parents);
+
+    static void collectTagNames(std::vector<std::string> &tags);
 
 private:
-	static const std::string DELIMITER;
+    static const std::string DELIMITER;
 
 private:
-	Tag(const std::string &name, shared_ptr<Tag> parent, int tagId);
+    Tag(const std::string &name, shared_ptr<Tag> parent, int tagId);
 
 public:
-	~Tag();
+    ~Tag();
 
 public:
-	const std::string &fullName() const;
-	const std::string &name() const;
+    const std::string &fullName() const;
 
-	shared_ptr<Tag> parent() const;
+    const std::string &name() const;
 
-	jobject javaTag(JNIEnv *env) const;
+    shared_ptr<Tag> parent() const;
+
+    jobject javaTag(JNIEnv *env) const;
 
 public:
-	bool isAncestorOf(shared_ptr<Tag> tag) const;
+    bool isAncestorOf(shared_ptr<Tag> tag) const;
 
-	int tagId() const;
-	std::size_t level() const;
+    int tagId() const;
+
+    std::size_t level() const;
 
 private:
-	const std::string myName;
-	mutable std::string myFullName;
+    const std::string myName;
+    mutable std::string myFullName;
 
-	shared_ptr<Tag> myParent;
-	TagList myChildren;
-	const std::size_t myLevel;
+    shared_ptr<Tag> myParent;
+    TagList myChildren;
+    const std::size_t myLevel;
 
-	int myTagId;
+    int myTagId;
 
-	mutable jobject myJavaTag;
+    mutable jobject myJavaTag;
 
 private: // disable copying
-	Tag(const Tag &);
-	const Tag &operator = (const Tag &);
+    Tag(const Tag &);
+
+    const Tag &operator=(const Tag &);
 };
 
 class TagComparator {
 
 public:
-	bool operator () (
-		shared_ptr<Tag> tag0,
-		shared_ptr<Tag> tag1
-	) const;
+    bool operator()(
+            shared_ptr<Tag> tag0,
+            shared_ptr<Tag> tag1
+    ) const;
 };
 
 inline const std::string &Tag::name() const { return myName; }
@@ -102,6 +109,7 @@ inline const std::string &Tag::name() const { return myName; }
 inline shared_ptr<Tag> Tag::parent() const { return myParent; }
 
 inline int Tag::tagId() const { return myTagId; }
+
 inline std::size_t Tag::level() const { return myLevel; }
 
 #endif /* __TAG_H__ */

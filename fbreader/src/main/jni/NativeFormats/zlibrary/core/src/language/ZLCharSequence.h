@@ -25,47 +25,53 @@
 class ZLCharSequence {
 
 public:
-	ZLCharSequence();
-	ZLCharSequence(const char *ptr, std::size_t size);
-	ZLCharSequence(const std::string &hexSequence);
-	ZLCharSequence(const ZLCharSequence &other);
-	~ZLCharSequence();
+    ZLCharSequence();
 
-	std::size_t getSize() const;
-	const char &operator [] (std::size_t index) const;
-	ZLCharSequence &operator = (const ZLCharSequence& other);
+    ZLCharSequence(const char *ptr, std::size_t size);
 
-	std::string toHexSequence() const;
+    ZLCharSequence(const std::string &hexSequence);
 
-	// returns
-	//   an integer < 0 if the sequence is less than other
-	//   an integer > 0 if the sequence is greater than other
-	//   0 if the sequence is equal to other
-	int compareTo(const ZLCharSequence &other) const;
+    ZLCharSequence(const ZLCharSequence &other);
+
+    ~ZLCharSequence();
+
+    std::size_t getSize() const;
+
+    const char &operator[](std::size_t index) const;
+
+    ZLCharSequence &operator=(const ZLCharSequence &other);
+
+    std::string toHexSequence() const;
+
+    // returns
+    //   an integer < 0 if the sequence is less than other
+    //   an integer > 0 if the sequence is greater than other
+    //   0 if the sequence is equal to other
+    int compareTo(const ZLCharSequence &other) const;
 
 private:
-	std::size_t mySize;
-	char *myHead;
+    std::size_t mySize;
+    char *myHead;
 };
 
 inline ZLCharSequence::ZLCharSequence() : mySize(0), myHead(0) {}
 
-inline const char& ZLCharSequence::operator [] (std::size_t index) const {
-	return myHead[index];
+inline const char &ZLCharSequence::operator[](std::size_t index) const {
+    return myHead[index];
 }
 
-inline bool operator < (const ZLCharSequence &a, const ZLCharSequence &b) {
-	return a.compareTo(b) < 0;
+inline bool operator<(const ZLCharSequence &a, const ZLCharSequence &b) {
+    return a.compareTo(b) < 0;
 }
 
 inline ZLCharSequence::~ZLCharSequence() {
-	if (myHead != 0) {
-		delete[] myHead;
-	}
+    if (myHead != 0) {
+        delete[] myHead;
+    }
 }
 
 inline std::size_t ZLCharSequence::getSize() const {
-	return mySize;
+    return mySize;
 }
 
 #endif /*__ZLCHARSEQUENCE_H__*/

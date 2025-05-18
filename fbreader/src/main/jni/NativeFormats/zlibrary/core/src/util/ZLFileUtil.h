@@ -25,10 +25,10 @@
 class ZLFileUtil {
 
 public:
-	static std::string normalizeUnixPath(const std::string &path);
+    static std::string normalizeUnixPath(const std::string &path);
 
 private:
-	ZLFileUtil();
+    ZLFileUtil();
 };
 
 #endif /* __ZLFILEUTIL_H__ */

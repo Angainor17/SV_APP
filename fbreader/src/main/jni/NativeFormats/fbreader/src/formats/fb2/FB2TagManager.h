@@ -27,19 +27,19 @@
 class FB2TagManager {
 
 private:
-	static FB2TagManager *ourInstance;
+    static FB2TagManager *ourInstance;
 
 public:
-	static const FB2TagManager &Instance();
+    static const FB2TagManager &Instance();
 
 private:
-	FB2TagManager();
+    FB2TagManager();
 
 public:
-	const std::vector<std::string> &humanReadableTags(const std::string &id) const;
+    const std::vector<std::string> &humanReadableTags(const std::string &id) const;
 
 private:
-	std::map<std::string,std::vector<std::string> > myTagMap;
+    std::map<std::string, std::vector<std::string> > myTagMap;
 };
 
 #endif /* __FB2TAGMANAGER_H__ */

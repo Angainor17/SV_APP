@@ -18,10 +18,9 @@ import group.pals.android.R;
 
 /**
  * Adapter for context menu.
- * 
+ *
  * @author Hai Bison
  * @since v4.3 beta
- * 
  */
 public class MenuItemAdapter extends BaseAdapter {
 
@@ -32,11 +31,9 @@ public class MenuItemAdapter extends BaseAdapter {
 
     /**
      * Creates new instance.<br>
-     * 
-     * @param context
-     *            {@link Context}
-     * @param itemIds
-     *            array of resource IDs of titles to be used.
+     *
+     * @param context {@link Context}
+     * @param itemIds array of resource IDs of titles to be used.
      */
     public MenuItemAdapter(Context context, Integer[] itemIds) {
         mContext = context;

@@ -28,87 +28,91 @@ import org.geometerplus.zlibrary.core.network.ZLNetworkRequest;
 import java.util.Set;
 
 public interface INetworkLink extends Comparable<INetworkLink> {
-		public static final int INVALID_ID = -1;;
+    public static final int INVALID_ID = -1;
+    ;
 
-		int getId();;
+    int getId();
 
-	void setId(int id);
+    ;
 
-	String getStringId();
+    void setId(int id);
 
-	String getShortName();
+    String getStringId();
 
-	String getHostName();
+    String getShortName();
 
-	String getTitle();
+    String getHostName();
 
-	String getSummary();
+    String getTitle();
 
-	String getUrl(UrlInfo.Type type);
+    String getSummary();
 
-	UrlInfoWithDate getUrlInfo(UrlInfo.Type type);
+    String getUrl(UrlInfo.Type type);
 
-	Set<UrlInfo.Type> getUrlKeys();
+    UrlInfoWithDate getUrlInfo(UrlInfo.Type type);
 
-	/**
-	 * @param force if local status is not checked then
-     *    if force is set to false, NotChecked will be returned
-     *    if force is set to true, network check will be performed;
-	 *       that will take some time and can return NotChecked (if network is not available)
+    Set<UrlInfo.Type> getUrlKeys();
+
+    /**
+     * @param force if local status is not checked then
+     *              if force is set to false, NotChecked will be returned
+     *              if force is set to true, network check will be performed;
+     *              that will take some time and can return NotChecked (if network is not available)
      */
-	//AccountStatus getAccountStatus(boolean force);
+    //AccountStatus getAccountStatus(boolean force);
 
-	Type getType();
+    Type getType();
 
-	/**
-	 * @return 2-letters language code or special token "multi"
-	 */
-	String getLanguage();
+    /**
+     * @return 2-letters language code or special token "multi"
+     */
+    String getLanguage();
 
-	/**
-	 * @param listener Network operation listener
-	 * @return instance, which represents the state of the network operation.
-	 */
-	NetworkOperationData createOperationData(NetworkItemsLoader loader);
+    /**
+     * @param listener Network operation listener
+     * @return instance, which represents the state of the network operation.
+     */
+    NetworkOperationData createOperationData(NetworkItemsLoader loader);
 
-	BasketItem getBasketItem();
+    BasketItem getBasketItem();
 
-	ZLNetworkRequest simpleSearchRequest(String pattern, NetworkOperationData data);
+    ZLNetworkRequest simpleSearchRequest(String pattern, NetworkOperationData data);
 
-	ZLNetworkRequest resume(NetworkOperationData data);
+    ZLNetworkRequest resume(NetworkOperationData data);
 
-	NetworkCatalogItem libraryItem();
+    NetworkCatalogItem libraryItem();
 
-	NetworkAuthenticationManager authenticationManager();
+    NetworkAuthenticationManager authenticationManager();
 
-	String rewriteUrl(String url, boolean isUrlExternal);
-public enum Type {
-		Predefined(0),
-		Custom(1),
-		Local(2),
-		Sync(3);
+    String rewriteUrl(String url, boolean isUrlExternal);
 
-		public final int Index;
+    public enum Type {
+        Predefined(0),
+        Custom(1),
+        Local(2),
+        Sync(3);
 
-		Type(int index) {
-			Index = index;
-		}
+        public final int Index;
 
-		public static Type byIndex(int index) {
-			for (Type t : Type.values()) {
-				if (t.Index == index) {
-					return t;
-				}
-			}
-			return Custom;
-		}
-	}
+        Type(int index) {
+            Index = index;
+        }
 
-public enum AccountStatus {
-		NotSupported,
-		NoUserName,
-		SignedIn,
-		SignedOut,
-		NotChecked
-	}
+        public static Type byIndex(int index) {
+            for (Type t : Type.values()) {
+                if (t.Index == index) {
+                    return t;
+                }
+            }
+            return Custom;
+        }
+    }
+
+    public enum AccountStatus {
+        NotSupported,
+        NoUserName,
+        SignedIn,
+        SignedOut,
+        NotChecked
+    }
 }

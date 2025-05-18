@@ -24,19 +24,19 @@ import org.geometerplus.zlibrary.text.model.ZLTextModel;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 
 class ShowNavigationAction extends FBAndroidAction {
-	ShowNavigationAction(FBReader baseActivity, FBReaderApp fbreader) {
-		super(baseActivity, fbreader);
-	}
+    ShowNavigationAction(FBReader baseActivity, FBReaderApp fbreader) {
+        super(baseActivity, fbreader);
+    }
 
-	@Override
-	public boolean isVisible() {
-		final ZLTextView view = (ZLTextView)Reader.getCurrentView();
-		final ZLTextModel textModel = view.getModel();
-		return textModel != null && textModel.getParagraphsNumber() != 0;
-	}
+    @Override
+    public boolean isVisible() {
+        final ZLTextView view = (ZLTextView) Reader.getCurrentView();
+        final ZLTextModel textModel = view.getModel();
+        return textModel != null && textModel.getParagraphsNumber() != 0;
+    }
 
-	@Override
-	protected void run(Object ... params) {
-		BaseActivity.navigate();
-	}
+    @Override
+    protected void run(Object... params) {
+        BaseActivity.navigate();
+    }
 }
