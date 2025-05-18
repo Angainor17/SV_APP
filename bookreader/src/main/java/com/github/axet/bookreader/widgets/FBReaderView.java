@@ -228,7 +228,7 @@ public class FBReaderView extends RelativeLayout {
                 @Override
                 public void createControlPanel(Activity activity, RelativeLayout root) {
                     super.createControlPanel(activity, root);
-                    View t = myWindow.findViewById(org.geometerplus.zlibrary.ui.android.R.id.selection_panel_translate);
+                    View t = myWindow.findViewById(org.geometerplus.R.id.selection_panel_translate);
                     PackageManager packageManager = getContext().getPackageManager();
                     List<ResolveInfo> rr = packageManager.queryIntentActivities(translateIntent(null), 0);
                     if (rr.isEmpty())

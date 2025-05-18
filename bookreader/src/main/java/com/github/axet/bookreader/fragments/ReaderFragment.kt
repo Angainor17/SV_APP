@@ -62,6 +62,7 @@ import com.github.axet.bookreader.widgets.ToolbarButtonView
 import org.geometerplus.fbreader.bookmodel.TOCTree
 import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.core.view.ZLViewEnums.PageIndex
+import timber.log.Timber
 
 class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListener,
     FullscreenListener, OnBackPressed {
@@ -287,15 +288,15 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         handler.removeCallbacks(time)
         ScreenlockPreference.onUserInteractionRemove()
         if (fb != null)  // onDestory without onCreate
-            fb!!.closeBook()
+            fb?.closeBook()
         if (fontsPopup != null) {
             fontsPopup!!.dismiss()
             fontsPopup = null
         }
-        if (fbook != null) {
-            fbook!!.close()
-            fbook = null
-        }
+
+        fbook?.close()
+        fbook = null
+
         book = null
     }
 
@@ -315,16 +316,20 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         }
         if (id == R.id.action_bm) {
             val dialog: BookmarksDialog = object : BookmarksDialog(context) {
+
                 override fun onSelected(b: Storage.Bookmark) {
+                    Timber.tag("voronin").d("BookmarksDialog onSelected")
                     fb!!.gotoPosition(ZLTextIndexPosition(b.start, b.end))
                 }
 
                 override fun onSave(bm: Storage.Bookmark?) {
+                    Timber.tag("voronin").d("BookmarksDialog onSave")
                     fb!!.bookmarksUpdate()
                     savePosition()
                 }
 
                 override fun onDelete(bm: Storage.Bookmark?) {
+                    Timber.tag("voronin").d("BookmarksDialog onDelete")
                     var i = book!!.info.bookmarks.indexOf(bm)
                     book!!.info.bookmarks.removeAt(i)
                     i = fb!!.book.info.bookmarks.indexOf(bm)
