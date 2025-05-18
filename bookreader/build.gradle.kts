@@ -21,15 +21,18 @@ android {
 
 dependencies {
 
+    // Модули-фичи
+    // "com.github.axet.fbreader:library:0.1.18"
+    implementation(project(":fbreader")) {
+        exclude("org.apache.httpcomponents", "httpmime")
+    }
+
     // Compose
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
 
-    implementation("com.github.axet.fbreader:library:0.1.18") {
-        exclude("org.apache.httpcomponents", "httpmime")
-    }
     implementation("com.github.axet:android-library:1.35.21") {
         exclude("org.apache.httpcomponents", "httpmime")
     }

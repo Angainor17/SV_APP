@@ -14,3 +14,8 @@
 .cxx
 local.properties
 /.idea/
+/androidFileChooser/build/
+/dragSortListview/build/
+/util/build/
+/superToasts/build/
+/ambilWarna/build/
