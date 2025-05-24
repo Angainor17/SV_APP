@@ -118,7 +118,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import su.sv.managers.OnBookPageListener;
+import su.sv.managers.OnBookPagerManager;
 
 public class FBReaderView extends RelativeLayout {
     public static final String ACTION_MENU = FBReaderView.class.getCanonicalName() + ".ACTION_MENU";
@@ -439,7 +439,7 @@ public class FBReaderView extends RelativeLayout {
         this.w = w;
     }
 
-    public void setActivity(final Activity a, OnBookPageListener onBookPageListener) {
+    public void setActivity(final Activity a, OnBookPagerManager onBookPagerManager) {
         PopupPanel.removeAllWindows(app, a);
 
         app.addAction(ActionCode.SEARCH, new FBAction(app) {
@@ -904,50 +904,53 @@ public class FBReaderView extends RelativeLayout {
         app.addAction(ActionCode.ASK_QUESTION, new FBAction(app) {
             @Override
             protected void run(Object... params) {
-                final String text;
-                if (selection != null) {
-                    text = selection.selection.getText();
-                } else {
-                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
-                    if (snippet == null)
-                        return;
-                    text = snippet.getText();
-                }
-
-                app.BookTextView.clearSelection();
-                selectionClose();
-                onBookPageListener.askQuestion(
-                        text,
-                        ""
-                );
+                selectionSVAction(onBookPagerManager::askQuestion);
             }
         });
         app.addAction(ActionCode.TEL_ABOUT_MISSPELL, new FBAction(app) {
             @Override
             protected void run(Object... params) {
-
-                final String text;
-                if (selection != null) {
-                    text = selection.selection.getText();
-                } else {
-                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
-                    if (snippet == null)
-                        return;
-                    text = snippet.getText();
-                }
-
-                app.BookTextView.clearSelection();
-                selectionClose();
-                onBookPageListener.tellAboutMisspell(
-                        text,
-                        book.book.getPath()
-                );
+                selectionSVAction(onBookPagerManager::tellAboutMisspell);
             }
         });
 
         ((PopupPanel) app.getPopupById(TextSearchPopup.ID)).setPanelInfo(a, this);
         ((NavigationPopup) app.getPopupById(NavigationPopup.ID)).setPanelInfo(a, this);
         ((PopupPanel) app.getPopupById(SelectionPopup.ID)).setPanelInfo(a, this);
+    }
+
+    private void selectionSVAction(CustomAction action) {
+        TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+
+        final String text;
+        final int pageIndex;
+        if (selection != null) {
+            text = selection.selection.getText();
+            pageIndex = selection.selection.getStart().getParagraphIndex();
+        } else {
+            if (snippet == null)
+                return;
+            text = snippet.getText();
+            pageIndex = snippet.getStart().getParagraphIndex();
+        }
+
+        app.BookTextView.clearSelection();
+        selectionClose();
+        action.action(
+                text,
+                book.info.title,
+                book.info.authors,
+                pageIndex
+        );
+    }
+
+    private interface CustomAction {
+        void action(
+                String selectionText,
+                String title,
+                String author,
+                int page
+        );
     }
 
     public void scrollNextPage() {

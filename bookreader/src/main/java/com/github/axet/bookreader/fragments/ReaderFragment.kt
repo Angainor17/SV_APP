@@ -63,7 +63,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.geometerplus.fbreader.bookmodel.TOCTree
 import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.core.view.ZLViewEnums.PageIndex
-import su.sv.managers.OnBookPageListener
+import su.sv.managers.OnBookPagerManager
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,7 +72,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
     FullscreenListener, OnBackPressed {
 
     @Inject
-    lateinit var onBookPageListener: OnBookPageListener
+    lateinit var onBookPagerManager: OnBookPagerManager
 
     private val handler: Handler = Handler()
     private val storage: Storage by lazy { Storage(context) }
@@ -151,7 +151,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         fb!!.setWidget(if (mode == Widgets.CONTINUOUS.toString()) Widgets.CONTINUOUS else Widgets.PAGING)
 
         fb!!.setWindow(requireActivity().window)
-        fb!!.setActivity(activity, onBookPageListener)
+        fb!!.setActivity(activity, onBookPagerManager)
 
         val uri = requireArguments().getParcelable<Uri?>("uri")
         val pos = requireArguments().getParcelable<ZLTextIndexPosition?>("pos")
