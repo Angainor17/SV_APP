@@ -1,68 +1,61 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-    Copyright (c) 2012 Hai Bison
-
-    See the file LICENSE at the root directory of this project for copying
-    permission.
--->
-
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="afc_lib_name">android-filechooser</string>
-    <string name="afc_cmd_advanced_selection_all">All</string>
-    <string name="afc_cmd_advanced_selection_invert">Invert selection</string>
-    <string name="afc_cmd_advanced_selection_none">None</string>
-    <string name="afc_cmd_clear">Clear</string>
-    <string name="afc_cmd_grid_view">Grid view</string>
-    <string name="afc_cmd_home">Home</string>
-    <string name="afc_cmd_list_view">List view</string>
-    <string name="afc_cmd_new_folder">New folder…</string>
-    <string name="afc_cmd_reload">Reload</string>
-    <string name="afc_cmd_remove_from_list">Remove from list</string>
-    <string name="afc_cmd_select_all_files">Select all files</string>
-    <string name="afc_cmd_select_all_folders">Select all folders</string>
-    <string name="afc_cmd_sort">Sort…</string>
+    <string name="afc_cmd_advanced_selection_all">Все</string>
+    <string name="afc_cmd_advanced_selection_invert">Инвертировать выделение</string>
+    <string name="afc_cmd_advanced_selection_none">Ни один</string>
+    <string name="afc_cmd_clear">Очистить</string>
+    <string name="afc_cmd_grid_view">Таблицей</string>
+    <string name="afc_cmd_home">Домой</string>
+    <string name="afc_cmd_list_view">Списком</string>
+    <string name="afc_cmd_new_folder">Создать папку…</string>
+    <string name="afc_cmd_reload">Обновить</string>
+    <string name="afc_cmd_remove_from_list">Удалить из списка</string>
+    <string name="afc_cmd_select_all_files">Выбрать все файлы</string>
+    <string name="afc_cmd_select_all_folders">Выбрать все папки</string>
+    <string name="afc_cmd_sort">Сортировать…</string>
     <string name="afc_ellipsize">…</string>
-    <string name="afc_file">file</string>
-    <string name="afc_folder">folder</string>
-    <string name="afc_hint_double_tap_to_select_file">Double tap to select file/ folder</string>
-    <string name="afc_hint_folder_name">folder name</string>
-    <string name="afc_hint_save_as_filename">filename</string>
-    <string name="afc_msg_app_doesnot_have_permission_to_create_files">This application does not have permission to create files/ folders</string>
-    <string name="afc_msg_app_doesnot_have_permission_to_delete_files">This application does not have permission to delete files/ folders</string>
-    <string name="afc_msg_cancelled">Cancelled</string>
-    <string name="afc_msg_cannot_connect_to_file_provider_service">Can not connect to file provider service</string>
-    <string name="afc_msg_done">Done</string>
-    <string name="afc_msg_empty">…empty</string>
-    <string name="afc_msg_filename_is_empty">Filename is empty</string>
-    <string name="afc_msg_loading">Loading…</string>
-    <string name="afc_pmsg_cannot_access_dir">Can not access \"%1$s\"</string>
-    <string name="afc_pmsg_cannot_create_folder">Can not create folder \"%1$s\"</string>
-    <string name="afc_pmsg_cannot_delete_file">Can not delete %1$s \"%2$s\"</string>
-    <string name="afc_pmsg_confirm_delete_file">Are you sure you want to delete this %1$s \"%2$s\"?</string>
-    <string name="afc_pmsg_confirm_replace_file">This file \"%1$s\" already exists.\n\nDo you want to replace it?</string>
-    <string name="afc_pmsg_deleting_file">Deleting %1$s \"%2$s\"…</string>
-    <string name="afc_pmsg_file_has_been_deleted">…%1$s \"%2$s\" has been deleted</string>
-    <string name="afc_pmsg_filename_is_directory">\"%1$s\" is a folder</string>
-    <string name="afc_pmsg_filename_is_invalid">File name \"%1$s\" is invalid</string>
-    <string name="afc_pmsg_max_file_count_allowed">…has more files, max allowed: %1$,d</string>
-    <string name="afc_pmsg_unknown_error">Unknown error: %1$s</string>
-    <string name="afc_pmsg_xxx_items">%1$,d items</string>
-    <string name="afc_root">Root</string>
-    <string name="afc_title_advanced_selection">Select…</string>
-    <string name="afc_title_alert">Alert</string>
-    <string name="afc_title_choose_directories">Choose folders…</string>
-    <string name="afc_title_choose_files">Choose files…</string>
-    <string name="afc_title_choose_files_and_directories">Choose files/ folders…</string>
-    <string name="afc_title_confirmation">Confirmation</string>
-    <string name="afc_title_date">Date</string>
-    <string name="afc_title_error">Error</string>
-    <string name="afc_title_history">History</string>
-    <string name="afc_title_info">Info</string>
-    <string name="afc_title_name">Name</string>
-    <string name="afc_title_save_as">Save as…</string>
-    <string name="afc_title_size">Size</string>
-    <string name="afc_title_sort_by">Sort by…</string>
-    <string name="afc_yesterday">Yesterday</string>
+    <string name="afc_file">файл</string>
+    <string name="afc_folder">папка</string>
+    <string name="afc_hint_double_tap_to_select_file">Нажмите дважды, чтобы выбрать файл/ папку</string>
+    <string name="afc_hint_folder_name">имя папки</string>
+    <string name="afc_hint_save_as_filename">имя файла</string>
+    <string name="afc_msg_app_doesnot_have_permission_to_create_files">Недостаточно прав для создания файлов/ папок</string>
+    <string name="afc_msg_app_doesnot_have_permission_to_delete_files">Недостаточно прав для удаления файлов/ папок</string>
+    <string name="afc_msg_cancelled">Отмена</string>
+    <string name="afc_msg_cannot_connect_to_file_provider_service">Невозможно соединиться с сервисом</string>
+    <string name="afc_msg_done">Готово</string>
+    <string name="afc_msg_empty">…пусто</string>
+    <string name="afc_msg_filename_is_empty">Имя файла не может быть пустым</string>
+    <string name="afc_msg_loading">Загружается…</string>
+    <string name="afc_pmsg_cannot_access_dir">Нет доступа к \"%1$s\"</string>
+    <string name="afc_pmsg_cannot_create_folder">Невозможно создать папку \"%1$s\"</string>
+    <string name="afc_pmsg_cannot_delete_file">Невозможно удалить %1$s \"%2$s\"</string>
+    <string name="afc_pmsg_confirm_delete_file">Удалить файл %1$s \"%2$s\"?</string>
+    <string name="afc_pmsg_confirm_replace_file">Файл \"%1$s\" уже существует.\n\nПерезаписать?</string>
+    <string name="afc_pmsg_deleting_file">Удаление %1$s \"%2$s\"…</string>
+    <string name="afc_pmsg_file_has_been_deleted">Файл %1$s \"%2$s\" удалён</string>
+    <string name="afc_pmsg_filename_is_directory">\"%1$s\" имя папки</string>
+    <string name="afc_pmsg_filename_is_invalid">Невозможно назвать файл \"%1$s\"</string>
+    <string name="afc_pmsg_max_file_count_allowed">…содержит другие файлы, возможный максимум: %1$,d</string>
+    <string name="afc_pmsg_unknown_error">Неизвестная ошибка: %1$s</string>
+    <string name="afc_pmsg_xxx_items">%1$,d файлов</string>
+    <string name="afc_root">Корень</string>
+    <string name="afc_title_advanced_selection">Выберите…</string>
+    <string name="afc_title_alert">Внимание!</string>
+    <string name="afc_title_choose_directories">Выберите папки…</string>
+    <string name="afc_title_choose_files">Выберите файл…</string>
+    <string name="afc_title_choose_files_and_directories">Выберите файл/ папку…</string>
+    <string name="afc_title_confirmation">Внимание!</string>
+    <string name="afc_title_date">Дата</string>
+    <string name="afc_title_error">Ошибка</string>
+    <string name="afc_title_history">История</string>
+    <string name="afc_title_info">Информация</string>
+    <string name="afc_title_name">Имя</string>
+    <string name="afc_title_save_as">Сохранить как…</string>
+    <string name="afc_title_size">Размер</string>
+    <string name="afc_title_sort_by">Сортировать по…</string>
+    <string name="afc_yesterday">Вчера</string>
     <string name="afc_msg_app_cant_create_folder">Can\'t create folder in this directory</string>
     <string name="afc_msg_app_cant_choose_folder">Can\'t choose this folder</string>
 

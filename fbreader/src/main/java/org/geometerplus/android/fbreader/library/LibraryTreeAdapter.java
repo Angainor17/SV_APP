@@ -88,7 +88,7 @@ class LibraryTreeAdapter extends TreeAdapter {
         }
 
         if (myCoverManager == null) {
-            view.measure(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             final int coverHeight = view.getMeasuredHeight();
             final TreeActivity activity = getActivity();
             myCoverManager = new CoverManager(activity, activity.ImageSynchronizer, coverHeight * 15 / 32, coverHeight);

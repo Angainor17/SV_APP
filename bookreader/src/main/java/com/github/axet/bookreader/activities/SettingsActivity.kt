@@ -17,8 +17,10 @@ import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
 import com.github.axet.bookreader.app.BookApplication.Companion.PREFERENCE_STORAGE
 import com.github.axet.bookreader.app.Storage
+import dagger.hilt.android.AndroidEntryPoint
 import android.R as androidR
 
+@AndroidEntryPoint
 class SettingsActivity : AppCompatSettingsThemeActivity() {
 
     private val storage: Storage by lazy { Storage(this) }

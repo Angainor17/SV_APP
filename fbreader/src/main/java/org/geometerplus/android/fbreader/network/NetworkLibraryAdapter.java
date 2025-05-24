@@ -53,7 +53,7 @@ class NetworkLibraryAdapter extends TreeAdapter {
         if (view == null) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.library_tree_item, parent, false);
             if (myCoverManager == null) {
-                view.measure(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 final int coverHeight = view.getMeasuredHeight();
                 final TreeActivity activity = getActivity();
                 myCoverManager = new CoverManager(activity, activity.ImageSynchronizer, coverHeight * 15 / 32, coverHeight);

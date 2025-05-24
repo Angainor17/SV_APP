@@ -118,6 +118,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import su.sv.managers.OnBookPageListener;
+
 public class FBReaderView extends RelativeLayout {
     public static final String ACTION_MENU = FBReaderView.class.getCanonicalName() + ".ACTION_MENU";
 
@@ -437,7 +439,7 @@ public class FBReaderView extends RelativeLayout {
         this.w = w;
     }
 
-    public void setActivity(final Activity a) {
+    public void setActivity(final Activity a, OnBookPageListener onBookPageListener) {
         PopupPanel.removeAllWindows(app, a);
 
         app.addAction(ActionCode.SEARCH, new FBAction(app) {
@@ -897,6 +899,49 @@ public class FBReaderView extends RelativeLayout {
             @Override
             protected void run(Object... params) {
                 scrollPrevPage();
+            }
+        });
+        app.addAction(ActionCode.ASK_QUESTION, new FBAction(app) {
+            @Override
+            protected void run(Object... params) {
+                final String text;
+                if (selection != null) {
+                    text = selection.selection.getText();
+                } else {
+                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+                    if (snippet == null)
+                        return;
+                    text = snippet.getText();
+                }
+
+                app.BookTextView.clearSelection();
+                selectionClose();
+                onBookPageListener.askQuestion(
+                        text,
+                        ""
+                );
+            }
+        });
+        app.addAction(ActionCode.TEL_ABOUT_MISSPELL, new FBAction(app) {
+            @Override
+            protected void run(Object... params) {
+
+                final String text;
+                if (selection != null) {
+                    text = selection.selection.getText();
+                } else {
+                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+                    if (snippet == null)
+                        return;
+                    text = snippet.getText();
+                }
+
+                app.BookTextView.clearSelection();
+                selectionClose();
+                onBookPageListener.tellAboutMisspell(
+                        text,
+                        book.book.getPath()
+                );
             }
         });
 

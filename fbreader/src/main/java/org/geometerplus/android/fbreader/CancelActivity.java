@@ -107,12 +107,12 @@ public class CancelActivity extends ListActivity {
                 summaryView.setVisibility(View.VISIBLE);
                 summaryView.setText(summary);
                 titleView.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
                 ));
             } else {
                 summaryView.setVisibility(View.GONE);
                 titleView.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT
                 ));
             }
             return view;

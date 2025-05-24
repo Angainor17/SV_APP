@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingLeft="10dp"
@@ -12,12 +12,12 @@
 
         <RelativeLayout
             android:id="@+id/add_custom_catalog_title_group"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/add_custom_catalog_title_label"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:singleLine="true" />
@@ -34,7 +34,7 @@
 
             <EditText
                 android:id="@+id/add_custom_catalog_title"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_custom_catalog_title_label"
                 android:layout_alignParentLeft="true"
@@ -43,7 +43,7 @@
 
             <TextView
                 android:id="@+id/add_custom_catalog_title_example"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_custom_catalog_title"
                 android:layout_alignParentBottom="true"
@@ -53,13 +53,13 @@
 
         <RelativeLayout
             android:id="@+id/add_custom_catalog_url_group"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp">
 
             <TextView
                 android:id="@+id/add_custom_catalog_url_label"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:singleLine="true" />
@@ -76,7 +76,7 @@
 
             <EditText
                 android:id="@+id/add_custom_catalog_url"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_custom_catalog_url_label"
                 android:layout_alignParentLeft="true"
@@ -86,7 +86,7 @@
 
             <TextView
                 android:id="@+id/add_custom_catalog_url_example"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_custom_catalog_url"
                 android:layout_alignParentBottom="true"
@@ -96,27 +96,27 @@
 
         <RelativeLayout
             android:id="@+id/add_custom_catalog_summary_group"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp">
 
             <TextView
                 android:id="@+id/add_custom_catalog_summary_label"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:singleLine="true" />
 
             <EditText
                 android:id="@+id/add_custom_catalog_summary"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_custom_catalog_summary_label"
                 android:singleLine="true" />
 
             <TextView
                 android:id="@+id/add_custom_catalog_summary_example"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/add_custom_catalog_summary"
                 android:layout_alignParentBottom="true"
@@ -126,7 +126,7 @@
 
         <TextView
             android:id="@+id/add_custom_catalog_error"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"

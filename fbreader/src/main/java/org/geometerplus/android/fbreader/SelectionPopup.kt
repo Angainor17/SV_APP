@@ -16,96 +16,90 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+package org.geometerplus.android.fbreader
 
-package org.geometerplus.android.fbreader;
+import android.app.Activity
+import android.view.View
+import android.widget.RelativeLayout
+import org.geometerplus.R
+import org.geometerplus.fbreader.fbreader.ActionCode
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-import android.app.Activity;
-import android.view.View;
-import android.widget.RelativeLayout;
+open class SelectionPopup(fbReader: FBReaderApp?) : PopupPanel(fbReader), View.OnClickListener {
 
-import org.geometerplus.R;
-import org.geometerplus.fbreader.fbreader.ActionCode;
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
-import org.geometerplus.zlibrary.core.resources.ZLResource;
-
-public class SelectionPopup extends PopupPanel implements View.OnClickListener {
-    public final static String ID = "SelectionPopup";
-
-    public SelectionPopup(FBReaderApp fbReader) {
-        super(fbReader);
+    override fun getId(): String {
+        return ID
     }
 
-    @Override
-    public String getId() {
-        return ID;
-    }
-
-    @Override
-    public void createControlPanel(Activity activity, RelativeLayout root) {
-        if (myWindow != null && activity == myWindow.getContext()) {
-            return;
+    override fun createControlPanel(activity: Activity, root: RelativeLayout) {
+        if (myWindow != null && activity === myWindow.context) {
+            return
         }
 
-        activity.getLayoutInflater().inflate(R.layout.selection_panel, root);
-        myWindow = (SimplePopupWindow) root.findViewById(R.id.selection_panel);
+        activity.layoutInflater.inflate(R.layout.selection_panel, root)
+        myWindow = root.findViewById<View?>(R.id.selection_panel) as SimplePopupWindow?
 
-        final ZLResource resource = ZLResource.resource("selectionPopup");
-        setupButton(R.id.selection_panel_copy, resource.getResource("copyToClipboard").getValue());
-        setupButton(R.id.selection_panel_share, resource.getResource("share").getValue());
-        setupButton(R.id.selection_panel_translate, resource.getResource("translate").getValue());
-        setupButton(R.id.selection_panel_bookmark, resource.getResource("bookmark").getValue());
-        setupButton(R.id.selection_panel_close, resource.getResource("close").getValue());
+        setupButton(R.id.selection_panel_copy)
+        setupButton(R.id.selection_panel_share)
+        setupButton(R.id.selection_panel_translate)
+        setupButton(R.id.selection_panel_bookmark)
+        setupButton(R.id.selection_panel_question)
+        setupButton(R.id.selection_panel_alert)
+        setupButton(R.id.selection_panel_close)
     }
 
-    private void setupButton(int buttonId, String description) {
-        final View button = myWindow.findViewById(buttonId);
-        button.setOnClickListener(this);
-        button.setContentDescription(description);
+    private fun setupButton(buttonId: Int) {
+        val button = myWindow.findViewById<View>(buttonId)
+        button.setOnClickListener(this)
     }
 
-    public void move(int selectionStartY, int selectionEndY) {
+    fun move(selectionStartY: Int, selectionEndY: Int) {
         if (myWindow == null) {
-            return;
+            return
         }
 
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        val layoutParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
 
-        final int verticalPosition;
-        final int screenHeight = ((View) myWindow.getParent()).getHeight();
-        final int diffTop = screenHeight - selectionEndY;
-        final int diffBottom = selectionStartY;
-        if (diffTop > diffBottom) {
-            verticalPosition = diffTop > myWindow.getHeight() + 20
-                    ? RelativeLayout.ALIGN_PARENT_BOTTOM : RelativeLayout.CENTER_VERTICAL;
+        val verticalPosition = getVerticalPosition(selectionStartY, selectionEndY)
+
+        layoutParams.addRule(verticalPosition)
+        myWindow.setLayoutParams(layoutParams)
+    }
+
+    private fun getVerticalPosition(selectionStartY: Int, selectionEndY: Int): Int {
+        val verticalPosition: Int
+        val screenHeight = (myWindow.parent as View).height
+        val diffTop = screenHeight - selectionEndY
+        val diffBottom = selectionStartY
+        verticalPosition = if (diffTop > diffBottom) {
+            if (diffTop > myWindow.height + 20) RelativeLayout.ALIGN_PARENT_BOTTOM else RelativeLayout.CENTER_VERTICAL
         } else {
-            verticalPosition = diffBottom > myWindow.getHeight() + 20
-                    ? RelativeLayout.ALIGN_PARENT_TOP : RelativeLayout.CENTER_VERTICAL;
+            if (diffBottom > myWindow.height + 20) RelativeLayout.ALIGN_PARENT_TOP else RelativeLayout.CENTER_VERTICAL
         }
-
-        layoutParams.addRule(verticalPosition);
-        myWindow.setLayoutParams(layoutParams);
+        return verticalPosition
     }
 
-    @Override
-    protected void update() {
+    protected override fun update() {
     }
 
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == R.id.selection_panel_copy)
-            Application.runAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD);
-        if (id == R.id.selection_panel_share)
-            Application.runAction(ActionCode.SELECTION_SHARE);
-        if (id == R.id.selection_panel_translate)
-            Application.runAction(ActionCode.SELECTION_TRANSLATE);
-        if (id == R.id.selection_panel_bookmark)
-            Application.runAction(ActionCode.SELECTION_BOOKMARK);
-        if (id == R.id.selection_panel_close)
-            Application.runAction(ActionCode.SELECTION_CLEAR);
-        Application.hideActivePopup();
+    override fun onClick(view: View) {
+        when (view.id) {
+            R.id.selection_panel_copy -> Application.runAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD)
+            R.id.selection_panel_share -> Application.runAction(ActionCode.SELECTION_SHARE)
+            R.id.selection_panel_translate -> Application.runAction(ActionCode.SELECTION_TRANSLATE)
+            R.id.selection_panel_bookmark -> Application.runAction(ActionCode.SELECTION_BOOKMARK)
+            R.id.selection_panel_alert -> Application.runAction(ActionCode.ASK_QUESTION)
+            R.id.selection_panel_question -> Application.runAction(ActionCode.TEL_ABOUT_MISSPELL)
+            R.id.selection_panel_close -> Application.runAction(ActionCode.SELECTION_CLEAR)
+        }
+        Application.hideActivePopup()
+    }
+
+    companion object {
+        const val ID: String = "SelectionPopup"
     }
 }
