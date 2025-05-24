@@ -49,12 +49,14 @@ import com.github.axet.bookreader.fragments.ReaderFragment
 import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.FBReaderView.ZLTextIndexPosition
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import org.geometerplus.fbreader.fbreader.options.ImageOptions
 import org.geometerplus.fbreader.fbreader.options.MiscOptions
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import java.util.Collections
 import com.github.axet.androidlibrary.R as AxetR
 
+@AndroidEntryPoint
 class BookReaderMainActivity : FullscreenActivity(), NavigationView.OnNavigationItemSelectedListener,
     OnSharedPreferenceChangeListener {
     @JvmField

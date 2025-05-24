@@ -9,7 +9,7 @@
     android:visibility="gone">
 
     <FrameLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="25dp"
@@ -18,7 +18,7 @@
         android:paddingRight="15dp">
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="12dp"
@@ -66,20 +66,18 @@
 
             <ImageView
                 android:id="@+id/selection_panel_question"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:background="?selectableItemBackground"
-                android:contentDescription="@string/panel_quiestion"
-                android:tooltipText="@string/panel_quiestion"
-                android:scaleType="centerCrop"
+                android:contentDescription="@string/panel_question"
+                android:tooltipText="@string/panel_question"
                 android:src="@drawable/baseline_question_mark_24" />
 
             <ImageView
                 android:id="@+id/selection_panel_alert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:background="?selectableItemBackground"

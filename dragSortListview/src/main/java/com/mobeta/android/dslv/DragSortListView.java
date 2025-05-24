@@ -1694,7 +1694,7 @@ public class DragSortListView extends ListView {
     private void measureItem(View item) {
         ViewGroup.LayoutParams lp = item.getLayoutParams();
         if (lp == null) {
-            lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             item.setLayoutParams(lp);
         }
         int wspec = ViewGroup.getChildMeasureSpec(mWidthMeasureSpec, getListPaddingLeft()
@@ -2216,7 +2216,7 @@ public class DragSortListView extends ListView {
          * DragSortListView will measure and layout this View for you,
          * so feel free to just inflate it. You can help DSLV by
          * setting some {@link ViewGroup.LayoutParams} on this View;
-         * otherwise it will set some for you (with a width of FILL_PARENT
+         * otherwise it will set some for you (with a width of match_parent
          * and a height of WRAP_CONTENT).
          *
          * @param position Position of item to drag (NOTE:
@@ -2403,7 +2403,7 @@ public class DragSortListView extends ListView {
                     v = new DragSortItemView(getContext());
                 }
                 v.setLayoutParams(new AbsListView.LayoutParams(
-                        ViewGroup.LayoutParams.FILL_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
                 v.addView(child);
             }

@@ -199,7 +199,7 @@ public class CatalogManagerActivity extends ListActivity {
                 final CatalogItem catalogItem = (CatalogItem) item;
 
                 if (myCoverManager == null) {
-                    view.measure(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     final int coverHeight = view.getMeasuredHeight();
                     myCoverManager = new CoverManager(CatalogManagerActivity.this, myImageSynchronizer, coverHeight * 15 / 22, coverHeight);
                     view.requestLayout();

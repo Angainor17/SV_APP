@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 apply(
@@ -22,10 +24,14 @@ android {
 dependencies {
 
     // Модули-фичи
-    // "com.github.axet.fbreader:library:0.1.18"
+    implementation(project(":managers"))
     implementation(project(":fbreader")) {
         exclude("org.apache.httpcomponents", "httpmime")
     }
+
+    // DI
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
     // Compose
     implementation(libs.bundles.coil)
