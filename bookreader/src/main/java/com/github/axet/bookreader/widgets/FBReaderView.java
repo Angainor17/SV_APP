@@ -34,6 +34,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.ColorUtils;
@@ -226,7 +227,7 @@ public class FBReaderView extends RelativeLayout {
         if (app.getPopupById(SelectionPopup.ID) == null) {
             new SelectionPopup(app) {
                 @Override
-                public void createControlPanel(Activity activity, RelativeLayout root) {
+                public void createControlPanel(@NonNull Activity activity, @NonNull RelativeLayout root) {
                     super.createControlPanel(activity, root);
                     View t = myWindow.findViewById(org.geometerplus.R.id.selection_panel_translate);
                     PackageManager packageManager = getContext().getPackageManager();
@@ -250,7 +251,9 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void configColorProfile(SharedPreferences shared) {
-        if (shared.getString(BookApplication.PREFERENCE_THEME, "").equals(getContext().getString(com.github.axet.androidlibrary.R.string.Theme_Dark))) {
+        if (shared.getString(BookApplication.PREFERENCE_THEME, "").equals(getContext().getString(
+                com.github.axet.androidlibrary.R.string.Theme_Dark))
+        ) {
             config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.NIGHT);
         } else {
             config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.DAY);
