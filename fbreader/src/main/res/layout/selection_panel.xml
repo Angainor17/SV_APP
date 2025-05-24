@@ -30,6 +30,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:contentDescription="@string/panel_bookmark"
+                android:tooltipText="@string/panel_bookmark"
                 android:src="@drawable/popup_bookmark" />
 
             <ImageView
@@ -38,6 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:contentDescription="@string/panel_transplate"
+                android:tooltipText="@string/panel_transplate"
                 android:src="@drawable/popup_translate" />
 
             <ImageView
@@ -46,6 +50,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:contentDescription="@string/panel_share"
+                android:tooltipText="@string/panel_share"
                 android:src="@drawable/popup_share" />
 
             <ImageView
@@ -54,7 +60,33 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:contentDescription="@string/panel_copy"
+                android:tooltipText="@string/panel_copy"
                 android:src="@drawable/popup_copy" />
+
+            <ImageView
+                android:id="@+id/selection_panel_question"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="?selectableItemBackground"
+                android:contentDescription="@string/panel_quiestion"
+                android:tooltipText="@string/panel_quiestion"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_question_mark_24" />
+
+            <ImageView
+                android:id="@+id/selection_panel_alert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="?selectableItemBackground"
+                android:contentDescription="@string/panel_misspell"
+                android:tooltipText="@string/panel_misspell"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_missplell" />
 
             <ImageView
                 android:id="@+id/selection_panel_close"
@@ -62,7 +94,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:contentDescription="@string/panel_close"
+                android:tooltipText="@string/panel_close"
                 android:src="@drawable/popup_close" />
+
         </LinearLayout>
     </FrameLayout>
 </org.geometerplus.android.fbreader.SimplePopupWindow>
