@@ -1,4 +1,4 @@
-package su.sv.news.di
+package su.sv.api.di
 
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -7,9 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import su.sv.news.data.api.VkApi
-
+import su.sv.api.data.api.VkApi
 import javax.inject.Singleton
+
+private const val VK_BASE_URL = "https://api.vk.com"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -17,7 +18,7 @@ internal class NewsApiModule {
 
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://api.vk.com") // FIXME hide
+            .baseUrl(VK_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create())) // FIXME refactoring
             .build();
     }

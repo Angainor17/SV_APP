@@ -21,8 +21,12 @@ android {
 
 dependencies {
 
+    // Модули-фичи
+    implementation(project(":api"))
+
     implementation(libs.androidx.core.ktx)
 
+    // Logging
     implementation(libs.timber)
 
     // Compose
