@@ -1,10 +1,10 @@
-package su.sv.news.data
+package su.sv.api.data
 
+import su.sv.api.R
+import su.sv.api.data.api.VkApi
+import su.sv.api.data.model.ApiNewsItem
 import su.sv.commonarchitecture.data.runCatchingHttpRequest
 import su.sv.commonui.managers.ResourcesRepository
-import su.sv.news.R
-import su.sv.news.data.api.VkApi
-import su.sv.news.data.model.ApiNewsItem
 import javax.inject.Inject
 
 class NewsRepo @Inject constructor(

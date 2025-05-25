@@ -1,7 +1,7 @@
-package su.sv.news.data.model
+package su.sv.api.data.model
 
 import com.google.gson.annotations.SerializedName
-import su.sv.news.data.response.VkResponseNewsAttachment
+import su.sv.api.data.response.VkResponseNewsAttachment
 
 /**
  * Модель новости в списке полученная от ВК

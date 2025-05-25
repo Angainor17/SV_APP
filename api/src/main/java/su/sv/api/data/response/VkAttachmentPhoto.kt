@@ -1,4 +1,4 @@
-package su.sv.news.data.response
+package su.sv.api.data.response
 
 import com.google.gson.annotations.SerializedName
 

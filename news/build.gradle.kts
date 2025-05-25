@@ -18,6 +18,9 @@ android {
 
 dependencies {
 
+    // Модули-фичи
+    implementation(project(":api"))
+
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
@@ -34,9 +37,6 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
-
-    // Network
-    implementation(libs.bundles.retrofit)
 
     // DI
     implementation(libs.hilt.android)

@@ -1,10 +1,10 @@
-package su.sv.news.data.api
+package su.sv.api.data.api
 
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
-import su.sv.news.data.response.VkNewsResponse
-import su.sv.news.data.response.VkResponse
+import su.sv.api.data.response.VkNewsResponse
+import su.sv.api.data.response.VkResponse
 
 interface VkApi {
 

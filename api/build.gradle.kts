@@ -4,40 +4,36 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    id("kotlin-parcelize")
 }
-
 apply(
     from = "${project.rootDir}/android_feature_commons.kts"
 )
 
 android {
-    namespace = "su.sv.managers"
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-    }
+    namespace = "su.sv.api"
 }
 
 dependencies {
 
-    // Модули-фичи
-    implementation(project(":api"))
+    // Модули-utils
+    implementation(project(":commonarchitecture"))
+    implementation(project(":commonui"))
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.appcompat)
+    implementation(libs.material)
+
+    // Compose
+    implementation(libs.bundles.compose)
+    implementation(platform(libs.androidx.compose.bom))
 
     // Logging
     implementation(libs.timber)
-
-    // Compose
-    implementation(libs.bundles.coil)
-    implementation(libs.bundles.compose)
-    implementation(platform(libs.androidx.compose.bom))
 
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
-    // code desugaring (for java.time)
-    coreLibraryDesugaring(libs.code.desugaring)
+    // Network
+    implementation(libs.bundles.retrofit)
 }

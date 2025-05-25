@@ -56,6 +56,7 @@ dependencies {
         exclude("org.apache.httpcomponents", "httpmime")
     } //{ exclude group: 'org.json', module: 'json' }
 
+    // Logging
     implementation(libs.timber)
 
     implementation(libs.appcompat)

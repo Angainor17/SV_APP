@@ -1,9 +1,9 @@
 package su.sv.news.domain
 
 import android.annotation.SuppressLint
+import su.sv.api.data.NewsRepo
+import su.sv.api.data.model.ApiNewsItem
 import su.sv.commonui.ext.toLocalDateTime
-import su.sv.news.data.NewsRepo
-import su.sv.news.data.model.ApiNewsItem
 import su.sv.news.domain.model.NewsItem
 import javax.inject.Inject
 
