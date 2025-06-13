@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="question_copy_to_clipboard">Вопрос в буфере обмена</string>
+    <string name="misspell_copy_to_clipboard">Опечатка в буфере обмена</string>
+
+    <string name="misspell_clip_title">Опечатка</string>
+    <string name="question_clip_title">Вопрос</string>
+
+    <string name="question_text_template">Текст: %s\nКнига: %s\nСтраница: %s\nАвтор: %s</string>
+    <string name="misspell_text_template">Вопрос: %s\nКнига: %s\nСтраница: %s\nАвтор: %s</string>
+
+</resources>
