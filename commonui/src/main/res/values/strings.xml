@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- ОБЩИЕ ТЕКСТЫ -->
+    <string name="common_loading_dialog_text">Подождите, пожалуйста…</string>
+
     <string name="common_error_title">Ошибка</string>
     <string name="common_retry">Повторить</string>
 

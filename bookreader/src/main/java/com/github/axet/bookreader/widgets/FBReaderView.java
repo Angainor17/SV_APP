@@ -937,6 +937,7 @@ public class FBReaderView extends RelativeLayout {
         app.BookTextView.clearSelection();
         selectionClose();
         action.action(
+                this.getContext(),
                 text,
                 book.info.title,
                 book.info.authors,
@@ -946,6 +947,7 @@ public class FBReaderView extends RelativeLayout {
 
     private interface CustomAction {
         void action(
+                Context context,
                 String selectionText,
                 String title,
                 String author,

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="misspell_action_success">Данные отправлены</string>
+    <string name="misspell_action_error">Ошибка запроса</string>
+
+</resources>

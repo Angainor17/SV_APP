@@ -24,6 +24,10 @@ dependencies {
     // Модули-фичи
     implementation(project(":api"))
 
+    // Модули-common
+    implementation(project(":commonui"))
+    implementation(project(":commonarchitecture"))
+
     implementation(libs.androidx.core.ktx)
 
     // Logging
