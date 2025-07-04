@@ -114,8 +114,7 @@ fun BookDetailInfoUiPreview() {
         image = "https://picsum.photos/300/300",
         downloadUrl = "link",
         fileNameWithExt = "1.pdf",
-        pagesCountFormatted = "323 стр.",
-        dateFormatted = "25 февр. 2025",
+        category = "СВремя",
 
         downloadState = UIBookState.DOWNLOADED,
         fileUri = null,

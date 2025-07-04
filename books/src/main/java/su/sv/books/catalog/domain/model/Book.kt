@@ -1,7 +1,6 @@
 package su.sv.books.catalog.domain.model
 
 import android.net.Uri
-import java.time.LocalDate
 
 /**
  * Книга, которую отображаем для скачивания
@@ -14,8 +13,9 @@ data class Book(
     val image: String,
     val link: String,
     val fileNameWithExt: String,
-    val pagesCount: Int,
-    val publicationDate: LocalDate,
+
+    /** Категория */
+    val category: String,
 
     val fileUri: Uri?,
 )
