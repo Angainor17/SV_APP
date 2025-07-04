@@ -3,7 +3,6 @@ package su.sv.books.catalog.domain
 import su.sv.books.catalog.data.repo.BookDownloadRepository
 import su.sv.books.catalog.data.repo.RemoteBooksRepo
 import su.sv.books.catalog.domain.model.Book
-import java.time.LocalDate
 import javax.inject.Inject
 
 class GetBooksListUseCase @Inject constructor(
@@ -24,9 +23,8 @@ class GetBooksListUseCase @Inject constructor(
                     author = it.author.orEmpty(),
                     image = it.image.orEmpty(),
                     link = it.link.orEmpty(),
+                    category = it.category.orEmpty(),
                     fileNameWithExt = fileNameWithExt,
-                    publicationDate = it.publicationDate ?: LocalDate.now(),
-                    pagesCount = it.pagesCount ?: 0,
 
                     fileUri = downloadRepo.getDownloadsUri(fileNameWithExt),
                 )

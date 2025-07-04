@@ -5,6 +5,6 @@ import su.sv.books.catalog.data.models.ApiBook
 
 interface BooksApi {
 
-    @GET("/")
+    @GET("appws/appws.php")
     suspend fun getBooks(): List<ApiBook>
 }

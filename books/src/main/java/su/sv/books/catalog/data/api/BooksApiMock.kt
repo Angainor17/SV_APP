@@ -2,7 +2,6 @@ package su.sv.books.catalog.data.api
 
 import kotlinx.coroutines.delay
 import su.sv.books.catalog.data.models.ApiBook
-import java.time.LocalDate
 import javax.inject.Inject
 
 class BooksApiMock @Inject constructor() : BooksApi {
@@ -52,10 +51,9 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         "научных знаний.",
                 author = "В. И. Ленин",
                 image = "https://svg-shop2.ru/userfls/shop/large/138_ovl-tom-12--uroki-pervoy-ru.png",
-                pagesCount = 746,
-                publicationDate = LocalDate.now().minusYears(1),
                 link = "https://www.rulit.me/download-books-177130.html?t=epub",
                 fileNameWithExt = "asdasdasd.pdf",
+                category = "Свободное время",
             ),
             ApiBook(
                 id = "1",
@@ -67,7 +65,6 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         "теории научного социализма.",
                 author = "Попов М. В., Удовиченко М. С.",
                 image = "https://bibl.fra-mos.ru/wp-content/uploads/2024/03/cover.png",
-                pagesCount = 746,
                 link = "\n" +
                         "https://s398vlx.storage.yandex.net/rdisk/0bb82aebf1b388de390ee" +
                         "eaf6a043cecf78a1c2e97f025e2c318658dbf9bb2e8/6814c9a0/IWjBU-wNM4" +
@@ -85,7 +82,7 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         "kqAsEZ5bd0LMm0SJGTSnlRuk-Rzeik2jBhz5CJkWQnvDDsxkTLaZ0EqDkRLY7kZ" +
                         "nLVs-60YC3lRal0AVo",
                 fileNameWithExt = "socializm.pdf",
-                publicationDate = LocalDate.now().minusYears(1).minusMonths(3),
+                category = "Свободное время",
             ),
             ApiBook(
                 id = "2",
@@ -117,10 +114,9 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         "как изучать и делать далее, строя общечеловеческое будущее.",
                 author = "Попов М. В., Удовиченко М. С.",
                 image = "https://svg-shop2.ru/userfls/shop/large/92_nauka-pobezhdat-uchebnoe-po.png",
-                pagesCount = 258,
                 link = "https://www.dropbox.com/scl/fi/kao9e4hlqxt7kmnhu69eq/.pdf?rlkey=a7c3hgwhf0palshvh49wyrrfb&st=imrs9xmy&dl=0",
-                publicationDate = LocalDate.now().minusYears(2).minusMonths(1),
                 fileNameWithExt = "2.pdf",
+                category = "Свободное время",
             ),
             ApiBook(
                 id = "3",
@@ -145,10 +141,9 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         "диалектически, является истинной Логикой.",
                 author = "Г. В. Ф. Гегель",
                 image = "https://bibl.fra-mos.ru/wp-content/uploads/2016/12/Hegel_SL_Cover.jpg",
-                pagesCount = 544,
                 link = "https://bibl.fra-mos.ru/wp-content/uploads/2020/04/Hegel_T1.pdf",
-                publicationDate = LocalDate.now().minusDays(22).minusMonths(1),
                 fileNameWithExt = "Hegel_T1.pdf",
+                category = "Свободное время",
             ),
             ApiBook(
                 id = "4",
@@ -171,11 +166,10 @@ class BooksApiMock @Inject constructor() : BooksApi {
                         " быстро развивался. В середине ХХ века возникла крупная мировая система социализма.",
                 author = "Казеннов А. С., Попов М. В.",
                 image = "https://frafond.ru/wp-content/uploads/2022/04/calibre2-750x375.jpg",
-                pagesCount = 544,
                 link = "https://frafond.ru/wp-content/uploads/2022/04/" +
                         "REVOLYUTSIYA-I-KONTRREVOLYUTSIYA-V-S-Aleksandr-Sergeevich-Kazennov-_2983.pdf",
-                publicationDate = LocalDate.now().minusDays(22).minusMonths(1),
                 fileNameWithExt = "REVOLYUTSIYA-I-KONTRREVOLYUTSIYA-V-S-Aleksandr-Sergeevich-Kazennov-_2983.pdf",
+                category = "Свободное время",
             ),
         )
     }

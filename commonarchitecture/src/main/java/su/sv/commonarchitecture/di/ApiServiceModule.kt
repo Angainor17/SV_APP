@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 private const val CONNECTION_TIMEOUTS_MS = 20_000L
-private const val BASE_URL = "https://svremya.su/"
+private const val BASE_URL = "https://svremya.org/"
 
 @InstallIn(SingletonComponent::class)
 @Module

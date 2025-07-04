@@ -139,6 +139,7 @@ private fun InfoFooter(item: UiBook) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.tertiaryContainer)
+
             .padding(all = 4.dp)
     ) {
         Spacer(Modifier.height(4.dp))
@@ -146,6 +147,7 @@ private fun InfoFooter(item: UiBook) {
             text = item.title,
             fontSize = 17.sp,
             maxLines = 2,
+            minLines = 2,
             overflow = TextOverflow.Ellipsis,
             color = MaterialTheme.colorScheme.onTertiary,
             fontWeight = FontWeight.Bold,
@@ -163,11 +165,8 @@ private fun InfoFooter(item: UiBook) {
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
-                text = item.dateFormatted,
-                color = MaterialTheme.colorScheme.onTertiary,
-            )
-            Text(
-                text = item.pagesCountFormatted,
+                text = item.category,
+                maxLines = 1,
                 color = MaterialTheme.colorScheme.onTertiary,
             )
         }
@@ -188,9 +187,7 @@ fun InfoFooterPreview() {
         image = "https://picsum.photos/300/300",
         downloadUrl = "link",
         fileNameWithExt = "1.pdf",
-        pagesCountFormatted = "323 стр.",
-        dateFormatted = "25 февр. 2025",
-
+        category = "Свободное время",
         downloadState = UIBookState.DOWNLOADED,
         fileUri = null,
     )
@@ -214,8 +211,7 @@ fun BookItemPreview() {
         image = "https://picsum.photos/300/300",
         downloadUrl = "link",
         fileNameWithExt = "1.pdf",
-        pagesCountFormatted = "323 стр.",
-        dateFormatted = "25 февр. 2025",
+        category = "Свободное время",
 
         downloadState = UIBookState.DOWNLOADING,
         fileUri = null,
