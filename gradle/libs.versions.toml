@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.0"
+agp = "8.11.1"
 
 linkifyText = "1.0"
 modoCompose = "0.10.1"
