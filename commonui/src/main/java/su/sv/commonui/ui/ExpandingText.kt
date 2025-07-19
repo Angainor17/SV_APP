@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +48,7 @@ fun ExpandingText(
             content = LinkifyContent(text),
             style = TextStyle.Default.copy(
                 fontSize = fontSize,
+                color = MaterialTheme.colorScheme.onPrimary,
             ),
             maxLines = if (isExpanded) Int.MAX_VALUE else minimizedMaxLines,
             onTextLayout = { textLayoutResultState.value = it },
@@ -62,7 +64,7 @@ fun ExpandingText(
             Text(
                 text = labelText,
                 fontSize = fontSize,
-                color = Color.Blue,
+                color = MaterialTheme.colorScheme.surfaceBright,
                 modifier = modifier.clickable {
                     isExpanded = !isExpanded
                 },
