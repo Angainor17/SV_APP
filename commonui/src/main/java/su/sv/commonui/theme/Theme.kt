@@ -11,9 +11,12 @@ private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = Grey80,
     tertiary = Pink80,
-//
-//    surface = PurpleGrey80,
-//    onSurface = Color.White,
+
+    // текст карточек - заголовок
+    onPrimary = Color.LightGray,
+
+    // синий текст для кнопки ещё
+    surfaceBright = Color(0xFF6161FF),
 
     tertiaryContainer = PurpleGrey40,
     onSurface = Color.White,
@@ -24,19 +27,14 @@ private val LightColorScheme = lightColorScheme(
     secondary = Grey40,
     tertiary = Pink40,
 
+    // текст карточек - заголовок
+    onPrimary = Color.DarkGray,
+
+    // синий текст для кнопки ещё
+    surfaceBright = Color.Blue,
+
     tertiaryContainer = PurpleGrey80,
     onTertiary = White,
-
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
@@ -52,6 +50,6 @@ fun SVAPPTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

@@ -52,7 +52,7 @@ fun NewsItem(item: UiNewsItem) {
             Text(
                 text = item.dateFormatted,
                 textAlign = TextAlign.End,
-                color = Color.DarkGray,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = MaterialTheme.typography.bodySmall.fontSize,
                 modifier = Modifier
                     .fillMaxWidth()
