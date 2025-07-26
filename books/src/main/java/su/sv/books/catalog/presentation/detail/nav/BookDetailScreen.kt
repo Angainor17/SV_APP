@@ -8,6 +8,7 @@ import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import kotlinx.parcelize.Parcelize
 import su.sv.books.catalog.presentation.detail.ui.BookDetailUi
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.models.ui.book.UiBook
 
 @Parcelize
@@ -19,9 +20,11 @@ class BookDetailScreen(
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content(modifier: Modifier) {
-        BookDetailUi(
-            uiBook = uiBook,
-            modifier = modifier,
-        )
+        SVAPPTheme {
+            BookDetailUi(
+                uiBook = uiBook,
+                modifier = modifier,
+            )
+        }
     }
 }

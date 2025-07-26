@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,7 +34,7 @@ fun InfoItem(item: UiLinkItem) {
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .clickable { openLink(context, item.url) }
-            .background(Color.LightGray)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .height(80.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
