@@ -18,8 +18,11 @@ private val DarkColorScheme = darkColorScheme(
     // синий текст для кнопки ещё
     surfaceBright = Color(0xFF6161FF),
 
-    tertiaryContainer = PurpleGrey40,
+    surfaceContainer = Color.DarkGray,
     onSurface = Color.White,
+
+    tertiaryContainer = PurpleGrey40,
+    onTertiary = White,
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -32,6 +35,8 @@ private val LightColorScheme = lightColorScheme(
 
     // синий текст для кнопки ещё
     surfaceBright = Color.Blue,
+
+    surfaceContainer = Color.LightGray,
 
     tertiaryContainer = PurpleGrey80,
     onTertiary = White,

@@ -134,6 +134,7 @@ private fun PrimaryContent(
     ) {
         Text(
             text = text,
+            color = MaterialTheme.colorScheme.surfaceContainer,
             modifier = Modifier
                 // so that bouncing button's width doesn't cut first and last letters
                 .padding(horizontal = 4.dp),
