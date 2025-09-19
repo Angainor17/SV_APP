@@ -18,8 +18,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -28,11 +26,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
 import su.sv.info.rootinfo.ui.RootInfo
-import su.sv.main.R
 import su.sv.main.Screens
 import su.sv.main.res.BooksVector
 import su.sv.news.presentation.root.ui.RootNews
-import su.sv.wiki.root.RootWiki
 
 @Composable
 internal fun BottomNavigationBar() {
@@ -96,9 +92,9 @@ private fun BottomNavHost(
         composable(Screens.Books.route) {
             RootBooksCatalog()
         }
-        composable(Screens.Wiki.route) {
-            RootWiki()
-        }
+//        composable(Screens.Wiki.route) {
+//            RootWiki()
+//        }
         composable(Screens.Info.route) {
             RootInfo()
         }
@@ -118,11 +114,11 @@ fun bottomNavigationItems(): List<BottomNavigationItem> {
             icon = Icons.Filled.BooksVector,
             route = Screens.Books.route
         ),
-        BottomNavigationItem(
-            label = "Wiki",
-            icon = ImageVector.vectorResource(R.drawable.ic_wikipedia),
-            route = Screens.Wiki.route
-        ),
+//        BottomNavigationItem(
+//            label = "Wiki",
+//            icon = ImageVector.vectorResource(R.drawable.ic_wikipedia),
+//            route = Screens.Wiki.route
+//        ),
         BottomNavigationItem(
             label = "Info",
             icon = Icons.Filled.Info,

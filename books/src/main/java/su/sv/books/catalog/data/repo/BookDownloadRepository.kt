@@ -44,7 +44,7 @@ class BookDownloadRepository @Inject constructor(
     }
 
     /**
-     * Получаем адрес скачановго файла
+     * Получаем адрес скачанного файла
      * Может отсутствовать
      */
     fun getDownloadsUri(fileNameWithExt: String): Uri? {
