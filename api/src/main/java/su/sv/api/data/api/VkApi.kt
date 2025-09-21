@@ -20,6 +20,16 @@ interface VkApi {
         @Field("v") version: String = VK_API_VERSION,
     ): VkResponse<VkNewsResponse>
 
+    @FormUrlEncoded
+    @POST("/method/video.get")
+    suspend fun getVideo(
+        @Field("access_token") accessToken: String,
+        @Field("videos") videos: String,
+        @Field("offset") offset: Int,
+        @Field("count") count: Int = 1,
+        @Field("v") version: String = VK_API_VERSION,
+    ): VkResponse<VkNewsResponse>
+
     companion object {
         const val VK_API_VERSION = "5.199"
     }
