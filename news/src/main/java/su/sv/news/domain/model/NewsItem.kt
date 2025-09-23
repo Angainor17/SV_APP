@@ -16,6 +16,9 @@ data class NewsItem(
     /** Описание/содержание */
     val description: String?,
 
-    /** Центральная картинка */
+    /** Центральная картинка (список) */
     val images: List<String>,
+
+    /** Список видео */
+    val videos: List<NewsVideoItem>,
 )

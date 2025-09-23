@@ -9,5 +9,5 @@ class VkResponseNewsAttachment(
 
     @SerializedName("photo") val photo: VkAttachmentPhoto?,
 
-//    @SerializedName("video") val video: VkAttachmentVideo?,
+    @SerializedName("video") val video: VkAttachmentVideo?,
 )

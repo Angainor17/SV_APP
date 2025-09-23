@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import su.sv.api.data.NewsRepo
 import su.sv.api.data.model.ApiNewsItem
 import su.sv.commonui.ext.toLocalDateTime
+import su.sv.news.domain.mapper.fromApiToDomain
 import su.sv.news.domain.model.NewsItem
 import javax.inject.Inject
 
@@ -33,6 +34,10 @@ class GetNewsListUseCase @Inject constructor(
             images = attachments.orEmpty()
                 .filter { it.type == "photo" }
                 .mapNotNull { it.photo?.origPhoto?.url }, // FIXME: select size
+            videos = attachments.orEmpty()
+                .filter { it.type == "video" }
+                .mapNotNull { it.video }
+                .map { fromApiToDomain(it) },
         )
     }
 
