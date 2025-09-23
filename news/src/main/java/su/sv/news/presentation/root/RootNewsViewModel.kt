@@ -71,9 +71,9 @@ class RootNewsViewModel @Inject constructor(
             }
 
             is RootNewsActions.OnNewsVideoClick -> {
-                // TODO open video
-//                bridge
-                // https://vk.com/video_ext.php?oid=-209314107&id=456239198&hash=559843b6bda0cb08
+                _oneTimeEffect.trySend(
+                    NewsListOneTimeEffect.OpenNewsVideo(action.item)
+                )
             }
         }
     }
