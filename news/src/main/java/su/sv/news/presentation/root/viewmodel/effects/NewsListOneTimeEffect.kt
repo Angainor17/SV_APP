@@ -1,5 +1,6 @@
 package su.sv.news.presentation.root.viewmodel.effects
 
+import su.sv.news.presentation.root.model.UiItemVideo
 import su.sv.news.presentation.root.model.UiNewsItem
 
 /**
@@ -15,5 +16,10 @@ sealed class NewsListOneTimeEffect {
     /** Отображение информации о новости */
     data class OpenNewsItem(
         val newItem: UiNewsItem,
+    ) : NewsListOneTimeEffect()
+
+    /** Открыть видео из новости */
+    data class OpenNewsVideo(
+        val item: UiItemVideo,
     ) : NewsListOneTimeEffect()
 }
