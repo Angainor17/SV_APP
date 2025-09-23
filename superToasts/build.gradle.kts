@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.github.johnpersano"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24

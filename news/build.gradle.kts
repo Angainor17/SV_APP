@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.browser)
     debugImplementation(libs.androidx.ui.tooling)
 
     // Navigation
@@ -42,7 +43,4 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-
-    implementation(libs.android.sdk.core)
-    implementation(libs.android.sdk.api)
 }

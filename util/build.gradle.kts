@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "org.fbreader"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
