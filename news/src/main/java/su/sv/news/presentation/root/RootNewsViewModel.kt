@@ -30,7 +30,7 @@ class RootNewsViewModel @Inject constructor(
 ) : BaseViewModel(), RootNewsActionsHandler {
 
     /** Контент экрана (вне списка) */
-    private val _state = MutableStateFlow<UiRootNewsState>(UiRootNewsState())
+    private val _state = MutableStateFlow(UiRootNewsState())
     val state: StateFlow<UiRootNewsState> get() = _state
 
     /** Одноразовые события */
@@ -68,6 +68,12 @@ class RootNewsViewModel @Inject constructor(
                 _oneTimeEffect.trySend(
                     NewsListOneTimeEffect.OpenNewsItem(action.item)
                 )
+            }
+
+            is RootNewsActions.OnNewsVideoClick -> {
+                // TODO open video
+//                bridge
+                // https://vk.com/video_ext.php?oid=-209314107&id=456239198&hash=559843b6bda0cb08
             }
         }
     }

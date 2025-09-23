@@ -52,7 +52,12 @@ fun NewsList(
             ) { index ->
                 val item = lazyPagingItems[index]
                 if (item != null) {
-                    NewsItem(item)
+                    NewsItem(
+                        item = item,
+                        onVideoClick = {
+                            actions.onAction(RootNewsActions.OnNewsVideoClick(it))
+                        }
+                    )
                 } else {
                     MessagePlaceholder()
                 }

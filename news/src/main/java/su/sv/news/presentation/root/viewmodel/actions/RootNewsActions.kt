@@ -1,5 +1,6 @@
 package su.sv.news.presentation.root.viewmodel.actions
 
+import su.sv.news.presentation.root.model.UiItemVideo
 import su.sv.news.presentation.root.model.UiNewsItem
 
 sealed class RootNewsActions {
@@ -12,4 +13,7 @@ sealed class RootNewsActions {
 
     /** Нажатие на сам элемент списка */
     data class OnNewsClick(val item: UiNewsItem) : RootNewsActions()
+
+    /** Нажатие на видео в списке новости */
+    data class OnNewsVideoClick(val item: UiItemVideo) : RootNewsActions()
 }
