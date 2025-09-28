@@ -13,10 +13,6 @@ apply(
 
 android {
     namespace = "su.sv.managers"
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -41,7 +37,4 @@ dependencies {
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-
-    // code desugaring (for java.time)
-    coreLibraryDesugaring(libs.code.desugaring)
 }

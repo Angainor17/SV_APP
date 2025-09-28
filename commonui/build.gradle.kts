@@ -29,7 +29,6 @@ android {
         }
     }
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -59,6 +58,5 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     ksp(libs.hilt.android.compiler)
 
-    // code desugaring (for java.time)
-    coreLibraryDesugaring(libs.code.desugaring)
+    implementation(libs.threetenabp)
 }

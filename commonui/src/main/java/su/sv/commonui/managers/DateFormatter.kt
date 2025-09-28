@@ -1,8 +1,7 @@
 package su.sv.commonui.managers
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
@@ -23,7 +22,9 @@ class DateFormatter @Inject constructor() {
      *
      * Пример: 20 окт
      */
-    fun formatShortDateOnly(date: LocalDateTime): String {
+    fun formatShortDateOnly(date: LocalDateTime?): String {
+        if (date == null) return ""
+
         return shortDateFormat.format(date).replace(".", "")
     }
 
@@ -33,7 +34,9 @@ class DateFormatter @Inject constructor() {
      *
      * Пример: 17:40
      */
-    fun formatShortTimeOnly(date: LocalDateTime): String {
+    fun formatShortTimeOnly(date: LocalDateTime?): String {
+        if (date == null) return ""
+
         return shortTimeFormat.format(date)
     }
 

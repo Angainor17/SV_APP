@@ -1,21 +1,19 @@
 package su.sv.news.presentation.root.mapper
 
-import android.annotation.SuppressLint
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import su.sv.commonui.managers.DateFormatter
 import su.sv.news.domain.model.NewsItem
 import su.sv.news.presentation.root.model.UiNewsItem
-import java.time.LocalDateTime
 import javax.inject.Inject
-
 
 class UiNewsMapper @Inject constructor(
     private val mediaMapper: UiNewsMediaMapper,
     private val dateFormatter: DateFormatter,
 ) {
 
-    @SuppressLint("NewApi")
     fun fromDomainToUi(domain: NewsItem): UiNewsItem {
-        val date = domain.date ?: LocalDateTime.now()
+        val date = domain.date
 
         return UiNewsItem(
             id = domain.id.orEmpty(),
@@ -37,8 +35,8 @@ class UiNewsMapper @Inject constructor(
         )
     }
 
-    @SuppressLint("NewApi")
-    private fun LocalDateTime.isToday(): Boolean {
-        return LocalDateTime.now().toLocalDate() == toLocalDate()
+    private fun LocalDateTime?.isToday(): Boolean {
+        if (this == null) return false
+        return this.toLocalDate() == LocalDate.now()
     }
 }

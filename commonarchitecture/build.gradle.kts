@@ -28,7 +28,6 @@ android {
         }
     }
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -49,7 +48,4 @@ dependencies {
 
     // Network
     implementation(libs.bundles.retrofit)
-
-    // code desugaring (for java.time)
-    coreLibraryDesugaring(libs.code.desugaring)
 }

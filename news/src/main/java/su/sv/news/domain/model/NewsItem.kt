@@ -1,6 +1,6 @@
 package su.sv.news.domain.model
 
-import java.time.LocalDateTime
+import org.threeten.bp.LocalDateTime
 
 /**
  * Отображение информации о новости в списке

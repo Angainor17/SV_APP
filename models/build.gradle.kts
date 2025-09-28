@@ -11,10 +11,6 @@ apply(
 
 android {
     namespace = "su.sv.models"
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -23,7 +19,4 @@ dependencies {
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
-
-    // code desugaring (for java.time)
-    coreLibraryDesugaring(libs.code.desugaring)
 }
