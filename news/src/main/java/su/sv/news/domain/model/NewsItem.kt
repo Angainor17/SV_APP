@@ -17,8 +17,11 @@ data class NewsItem(
     val description: String?,
 
     /** Центральная картинка (список) */
-    val images: List<String>,
+    val images: List<NewsMediaItem.ImageItem>,
 
     /** Список видео */
-    val videos: List<NewsVideoItem>,
+    val videos: List<NewsMediaItem.VideoItem>,
+
+    /** Список медиа */
+    val mediaItems: List<NewsMediaItem>,
 )

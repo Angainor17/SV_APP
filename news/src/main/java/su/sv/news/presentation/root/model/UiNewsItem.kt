@@ -12,15 +12,18 @@ data class UiNewsItem(
     /** Идентификатор для хранения */
     val id: String,
 
-    /** Дата поста*/
+    /** Дата поста */
     val dateFormatted: String,
 
     /** Описание/содержание. Например: "8 статей" */
     val description: String,
 
     /** Список видео. Может быть пустым */
-    val videos: List<UiItemVideo>,
+    val videos: List<UiNewsMedia.ItemVideo>,
 
     /** Список картинок. Может быть пустым */
-    val images: List<String>,
+    val images: List<UiNewsMedia.ItemImage>,
+
+    /** Список картинок и видео Может быть пустым */
+    val allMedia: List<UiNewsMedia>,
 ) : Parcelable
