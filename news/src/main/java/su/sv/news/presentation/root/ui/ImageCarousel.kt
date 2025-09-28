@@ -68,11 +68,7 @@ fun ImageCarousel(
                     contentDescription = "",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .apply {
-                            if (isVideo) clickable {
-                                onItemClick.invoke(item)
-                            }
-                        }
+                        .clickable { onItemClick.invoke(item) }
                         .graphicsLayer {
                             val pageOffset =
                                 (pagerState.currentPage - page + pagerState.currentPageOffsetFraction).absoluteValue

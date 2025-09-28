@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="nav_bar_news">Новости</string>
+    <string name="nav_bar_books">Книги</string>
+    <string name="nav_bar_info">Инфо</string>
+
+</resources>
