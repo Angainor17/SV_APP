@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -66,6 +68,7 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
     Box {
         AsyncImage(
             modifier = Modifier
+                .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
                 .fillMaxWidth()
                 .height(250.dp),
             model = ImageRequest.Builder(LocalContext.current)
@@ -138,8 +141,8 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
 private fun InfoFooter(item: UiBook) {
     Column(
         modifier = Modifier
+            .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
             .background(MaterialTheme.colorScheme.tertiaryContainer)
-
             .padding(all = 4.dp)
     ) {
         Spacer(Modifier.height(4.dp))

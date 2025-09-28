@@ -1,54 +1,40 @@
 package su.sv.commonui.managers
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
-/** Пример: 2019-12-21 */
-private const val DATE_ONLY_TEMPLATE = "yyyy-MM-dd"
-
-/** Пример: "20 окт. 2024" */
-private const val FULL_DATE_TEMPLATE = "d MMM YYYY"
-
 /** Пример: "20 окт." */
 private const val SHORT_DATE_TEMPLATE = "d MMM"
 
+/** Пример: "17:40" */
+private const val SHORT_TIME_TEMPLATE = "HH:mm"
+
 class DateFormatter @Inject constructor() {
 
-    private val dateOnlyFormat = createFormat(DATE_ONLY_TEMPLATE)
-    private val fullDateFormat = createFormat(FULL_DATE_TEMPLATE)
     private val shortDateFormat = createFormat(SHORT_DATE_TEMPLATE)
-
+    private val shortTimeFormat = createFormat(SHORT_TIME_TEMPLATE)
 
     /**
      * Форматирует дату
-     * @see DATE_ONLY_TEMPLATE
+     * @see SHORT_DATE_TEMPLATE
      *
      * Пример: 20 окт
      */
-    fun formatShortDateOnly(date: LocalDate): String {
+    fun formatShortDateOnly(date: LocalDateTime): String {
         return shortDateFormat.format(date).replace(".", "")
     }
 
     /**
-     * Форматирует дату
-     * @see DATE_ONLY_TEMPLATE
+     * Форматирует время
+     * @see SHORT_TIME_TEMPLATE
      *
-     * Пример: 2019-12-21
+     * Пример: 17:40
      */
-    fun formatDateOnly(date: LocalDate): String {
-        return dateOnlyFormat.format(date)
-    }
-
-    /**
-     * Форматирует дату
-     * @see DATE_ONLY_TEMPLATE
-     *
-     * Пример: 2019-12-21
-     */
-    fun formatDateFull(date: LocalDate): String {
-        return fullDateFormat.format(date)
+    fun formatShortTimeOnly(date: LocalDateTime): String {
+        return shortTimeFormat.format(date)
     }
 
     private fun createFormat(template: String) =
