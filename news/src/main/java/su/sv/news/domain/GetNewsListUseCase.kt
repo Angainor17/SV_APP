@@ -27,19 +27,27 @@ class GetNewsListUseCase @Inject constructor(
             return copyHistory.orEmpty().first().toDomain()
         }
 
+        val attachments = attachments.orEmpty()
+
         return NewsItem(
             id = (id ?: 0).toString(),
             date = ((dateSeconds ?: 0) * 1_000).toLocalDateTime(),
             description = text.orEmpty(),
-            images = attachments.orEmpty()
+            images = attachments
                 .filter { it.type == "photo" }
-                .mapNotNull { it.photo?.origPhoto?.url }, // FIXME: select size
-            videos = attachments.orEmpty()
+                .mapNotNull {
+                    it.photo?.let { api -> fromApiToDomain(api) }
+                },
+            videos = attachments
                 .filter { it.type == "video" }
-                .mapNotNull { it.video }
-                .map { fromApiToDomain(it) },
+                .mapNotNull {
+                    it.video?.let { api -> fromApiToDomain(api) }
+                },
+            mediaItems = attachments
+                .mapNotNull { fromApiToDomain(it) }
         )
     }
+
 
     companion object {
         const val NEWS_PAGE_SIZE = 20

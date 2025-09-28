@@ -4,5 +4,6 @@
     <string name="news_empty_list_title">Нет новостей</string>
 
     <string name="news_item_image_content_description">Картинка новости</string>
+    <string name="news_item_play_content_description">Иконка Play у видео</string>
 
 </resources>

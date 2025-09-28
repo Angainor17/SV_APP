@@ -54,8 +54,8 @@ fun NewsList(
                 if (item != null) {
                     NewsItem(
                         item = item,
-                        onVideoClick = {
-                            actions.onAction(RootNewsActions.OnNewsVideoClick(it))
+                        onItemClick = {
+                            actions.onAction(RootNewsActions.OnNewsMediaClick(it))
                         }
                     )
                 } else {

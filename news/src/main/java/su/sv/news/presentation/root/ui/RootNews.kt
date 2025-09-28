@@ -30,7 +30,7 @@ import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.news.R
 import su.sv.news.presentation.root.RootNewsViewModel
-import su.sv.news.presentation.root.model.UiItemVideo
+import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
 
@@ -113,18 +113,11 @@ private fun HandleEffects(
     }
 }
 
-private fun Context.openVideo(item: UiItemVideo) {
+private fun Context.openVideo(item: UiNewsMedia.ItemVideo) {
     val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
-//    builder.
-//    val url = item.link
-    val url = "https://vk.com/video_ext.php?oid=-206226873&id=456239875&hash=e31639c922357e44"
-
-    // Optional: Customize the appearance and behavior of the Custom Tab
-    // builder.setToolbarColor(ContextCompat.getColor(this, R.color.my_toolbar_color));
-    // builder.setShowTitle(true);
-    // builder.addMenuItem("Share", pendingIntent); // Add a custom menu item
     val customTabsIntent: CustomTabsIntent = builder.build()
-    customTabsIntent.launchUrl(this, url.toUri())
+
+    customTabsIntent.launchUrl(this, item.link.toUri())
 }
 
 @Composable

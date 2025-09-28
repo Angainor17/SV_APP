@@ -16,6 +16,7 @@ import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import su.sv.news.domain.GetNewsListUseCase
 import su.sv.news.presentation.root.mapper.UiNewsMapper
 import su.sv.news.presentation.root.model.UiNewsItem
+import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.model.UiRootNewsState
 import su.sv.news.presentation.root.viewmodel.NewsPagingSource
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
@@ -70,10 +71,17 @@ class RootNewsViewModel @Inject constructor(
                 )
             }
 
-            is RootNewsActions.OnNewsVideoClick -> {
-                _oneTimeEffect.trySend(
-                    NewsListOneTimeEffect.OpenNewsVideo(action.item)
-                )
+            is RootNewsActions.OnNewsMediaClick -> {
+                val item = action.item
+                when (item) {
+                    is UiNewsMedia.ItemVideo -> {
+                        _oneTimeEffect.trySend(
+                            NewsListOneTimeEffect.OpenNewsVideo(item)
+                        )
+                    }
+
+                    else -> Unit
+                }
             }
         }
     }

@@ -7,7 +7,7 @@ import su.sv.news.presentation.root.model.UiNewsItem
 import javax.inject.Inject
 
 class UiNewsMapper @Inject constructor(
-    private val videoMapper: UiNewsVideoMapper,
+    private val mediaMapper: UiNewsMediaMapper,
     private val dateFormatter: DateFormatter,
 ) {
 
@@ -19,9 +19,14 @@ class UiNewsMapper @Inject constructor(
                 dateFormatter.formatShortDateOnly(it)
             }.orEmpty(),
             description = domain.description.orEmpty(),
-            images = domain.images.filter { it.isNotEmpty() },
+            images = domain.images.map {
+                mediaMapper.fromDomainToUi(it)
+            },
             videos = domain.videos.map {
-                videoMapper.fromDomainToUi(it)
+                mediaMapper.fromDomainToUi(it)
+            },
+            allMedia = domain.mediaItems.map {
+                mediaMapper.fromDomainToUi(it)
             },
         )
     }
