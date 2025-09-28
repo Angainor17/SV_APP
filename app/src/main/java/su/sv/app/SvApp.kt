@@ -6,6 +6,7 @@ import coil3.SingletonImageLoader
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import com.github.axet.bookreader.app.BookApplication
+import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.hilt.android.HiltAndroidApp
 import okio.Path.Companion.toOkioPath
 import timber.log.Timber
@@ -15,7 +16,7 @@ class SvApp : BookApplication(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
-
+        AndroidThreeTen.init(this);
         Timber.plant(Timber.DebugTree())
     }
 
