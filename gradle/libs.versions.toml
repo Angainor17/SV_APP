@@ -3,15 +3,15 @@ agp = "8.13.0"
 
 linkifyText = "1.0"
 modoCompose = "0.10.1"
-kotlin = "2.2.0"
-coreKtx = "1.16.0"
+kotlin = "2.2.20"
+coreKtx = "1.17.0"
 lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
 composeBom = "2025.06.01"
 hiltAndroid = "2.56.2"
 ktlint = "12.2.0"
 hiltNavigationCompose = "1.2.0"
-ksp = "2.2.0-2.0.2"
+ksp = "2.2.20-2.0.2"
 pagingCompose = "3.3.6"
 retrofit = "3.0.0"
 gson = "2.13.1"
@@ -21,7 +21,7 @@ timber = "5.0.1"
 navigationRuntimeKtx = "2.9.1"
 navigationCompose = "2.9.1"
 coilCompose = "3.2.0"
-code-desugaring = "2.1.5"
+tracerVersion = "1.1.4"
 uiTooling = "1.8.3"
 
 appcompat = "1.7.1"
@@ -29,7 +29,6 @@ material = "1.12.0"
 
 djvulibre = "0.1.4"
 k2pdfopt = "0.1.6"
-fbreader = "0.1.18"
 pdfium = "2.0.16"
 wget = "1.7.0"
 junit = "4.13.2"
@@ -69,6 +68,13 @@ retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref 
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 retrofit2-kotlin-coroutines-adapter = { module = "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter", version.ref = "retrofit2KotlinCoroutinesAdapter" }
 
+#Tracer
+tracer-gradle = { module = 'ru.ok.tracer:ru.ok.tracer.gradle.plugin', version.ref = 'tracerVersion' }
+tracer-crash-report-native = { module = "ru.ok.tracer:tracer-crash-report-native" }
+tracer-crash-report = { module = "ru.ok.tracer:tracer-crash-report" }
+tracer-disk-usage = { module = "ru.ok.tracer:tracer-disk-usage" }
+tracer-heap-dumps = { module = "ru.ok.tracer:tracer-heap-dumps" }
+tracer-platform = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracerVersion" }
 
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
@@ -98,6 +104,7 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+tracer = { id = "ru.ok.tracer", version.ref = "tracerVersion" }
 
 [bundles]
 compose = [
