@@ -89,11 +89,7 @@ dependencies {
     implementation(libs.timber)
 
     // Tracer
-    implementation(libs.tracer.platform){
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, "java-runtime"))
-        }
-    }
+    implementation(platform(libs.tracer.platform))
     // Сбор и анализ крешей и ANR
     implementation(libs.tracer.crash.report)
     // Сбор и анализ нативных крешей

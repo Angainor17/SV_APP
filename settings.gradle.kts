@@ -5,6 +5,7 @@ pluginManagement {
                 includeGroupByRegex("com\\.android.*")
                 includeGroupByRegex("com\\.google.*")
                 includeGroupByRegex("androidx.*")
+                excludeGroup("ru.ok.tracer")
             }
         }
         mavenCentral()
@@ -14,7 +15,11 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google()
+        google {
+            content {
+                excludeGroup("ru.ok.tracer")
+            }
+        }
         mavenCentral()
     }
 }
