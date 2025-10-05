@@ -5,7 +5,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 /**
- * Форматирвует число в строку с разделением пробелами по три знака
+ * Форматирует число в строку с разделением пробелами по три знака
  * Пример: "12 000"
  */
 fun Int.formatDecimal(): String {
