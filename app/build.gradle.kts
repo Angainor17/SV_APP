@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.tracer)
 }
 
 android {
@@ -46,6 +47,29 @@ kotlin {
     }
 }
 
+tracer {
+    create("defaultConfig") {
+        pluginToken = "BCXLwm9rvlBMAZtYNZpqdM2CF5DKvuylMBxxTHfsg780"
+        appToken = "c3ChjlLDndDpMt068bSjI0NBsHfHLYxU7IkePlEkhi1"
+
+        uploadMapping = true
+        uploadNativeSymbols = true
+//        additionalLibrariesPath = "$projectDir/aVeryNonstandardLibsDirectory"
+    }
+    create("debug") {
+        pluginToken = "BCXLwm9rvlBMAZtYNZpqdM2CF5DKvuylMBxxTHfsg780"
+        appToken = "c3ChjlLDndDpMt068bSjI0NBsHfHLYxU7IkePlEkhi1"
+
+        uploadMapping = true
+    }
+    create("release") {
+        pluginToken = "BCXLwm9rvlBMAZtYNZpqdM2CF5DKvuylMBxxTHfsg780"
+        appToken = "c3ChjlLDndDpMt068bSjI0NBsHfHLYxU7IkePlEkhi1"
+
+        uploadMapping = true
+    }
+}
+
 dependencies {
 
     // Модули-фичи
@@ -64,6 +88,21 @@ dependencies {
     // Logging
     implementation(libs.timber)
 
+    // Tracer
+    implementation(libs.tracer.platform){
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, "java-runtime"))
+        }
+    }
+    // Сбор и анализ крешей и ANR
+    implementation(libs.tracer.crash.report)
+    // Сбор и анализ нативных крешей
+    implementation(libs.tracer.crash.report.native)
+    // Сбор и анализ хипдапмов при OOM
+    implementation(libs.tracer.heap.dumps)
+    // Анализ потребления дискового места на устройстве
+    implementation(libs.tracer.disk.usage)
+
     // Compose
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
@@ -77,18 +116,4 @@ dependencies {
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.threetenabp)
-}
-
-subprojects {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint") // Version should be inherited from parent
-
-    repositories {
-        // Required to download KtLint
-        mavenCentral()
-    }
-
-    // Optionally configure plugin
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        debug.set(true)
-    }
 }
