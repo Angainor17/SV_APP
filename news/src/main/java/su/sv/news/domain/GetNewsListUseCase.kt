@@ -1,5 +1,6 @@
 package su.sv.news.domain
 
+import org.threeten.bp.LocalDateTime
 import su.sv.api.data.NewsRepo
 import su.sv.api.data.model.ApiNewsItem
 import su.sv.commonui.ext.toLocalDateTime
@@ -22,13 +23,15 @@ class GetNewsListUseCase @Inject constructor(
 
     private fun ApiNewsItem.toDomain(): NewsItem {
         if (copyHistory.orEmpty().isNotEmpty()) {
-            return copyHistory.orEmpty().first().toDomain()
+            return copyHistory.orEmpty().first().toDomain().copy(
+                date = getDate(),
+            )
         }
 
         val attachments = attachments.orEmpty()
         return NewsItem(
             id = (id ?: 0).toString(),
-            date = ((dateSeconds ?: 0) * 1_000).toLocalDateTime(),
+            date = getDate(),
             description = text.orEmpty(),
             images = attachments
                 .filter { it.type == "photo" }
@@ -45,6 +48,9 @@ class GetNewsListUseCase @Inject constructor(
         )
     }
 
+    private fun ApiNewsItem.getDate(): LocalDateTime {
+        return ((dateSeconds ?: 0) * 1_000).toLocalDateTime()
+    }
 
     companion object {
         const val NEWS_PAGE_SIZE = 20
