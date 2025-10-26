@@ -1,12 +1,13 @@
 package su.sv.news.presentation.root.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -29,7 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
+import su.sv.commonui.theme.NewItemBorderStroke
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.ExpandingText
 import su.sv.commonui.ui.shimmerBrush
@@ -42,25 +45,32 @@ fun NewsItem(
     item: UiNewsItem,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
-    Card(modifier = Modifier.padding(horizontal = 8.dp)) {
+    Card(
+        modifier = Modifier.padding(horizontal = 8.dp),
+        border = BorderStroke(1.dp, NewItemBorderStroke),
+    ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
+            val hasText = item.description.isNotBlank()
             Logo(
                 item = item,
                 onItemClick = onItemClick,
             )
-            SelectionContainer {
-                ExpandingText(
-                    text = item.description,
-                    minimizedMaxLines = 4,
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        end = 8.dp,
-                        top = 8.dp,
-                    ),
-                )
+            if (hasText) {
+                SelectionContainer {
+                    ExpandingText(
+                        text = item.description,
+                        minimizedMaxLines = 4,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        modifier = Modifier.padding(
+                            start = 8.dp,
+                            end = 8.dp,
+                            top = 8.dp,
+                        ),
+                    )
+                }
             }
 
             Text(
@@ -74,7 +84,7 @@ fun NewsItem(
                         start = 8.dp,
                         bottom = 8.dp,
                         end = 8.dp,
-                        top = 4.dp,
+                        top = if (hasText) 4.dp else 0.dp,
                     ),
             )
         }
@@ -113,12 +123,17 @@ private fun SingleImage(item: UiNewsItem) {
         modifier = Modifier
             .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
             .fillMaxWidth()
-            .heightIn(min = 220.dp),
+            .defaultMinSize(minHeight = 200.dp),
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
             .build(),
         contentDescription = stringResource(R.string.news_item_image_content_description),
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.FillWidth,
+        onState = { state ->
+            if (state is State.Success) {
+                showShimmer.value = false
+            }
+        },
     )
 }
 
@@ -128,6 +143,7 @@ private fun SingleVideo(
     onVideoClick: (UiNewsMedia) -> Unit,
 ) {
     val showShimmer = remember { mutableStateOf(true) }
+    val isPlayIconVisible = remember { mutableStateOf(false) }
 
     val video = item.videos.firstOrNull()
     val url = video?.image.orEmpty()
@@ -138,24 +154,33 @@ private fun SingleVideo(
         AsyncImage(
             modifier = Modifier
                 .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
+                .defaultMinSize(minHeight = 200.dp)
                 .fillMaxWidth()
+                .align(Alignment.TopCenter)
                 .clickable {
                     video?.let { onVideoClick(it) }
-                }
-                .heightIn(min = 220.dp),
+                },
             model = ImageRequest.Builder(LocalContext.current)
                 .data(url)
                 .build(),
             contentDescription = stringResource(R.string.news_item_image_content_description),
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillWidth,
+            onState = { state ->
+                if (state is State.Success) {
+                    showShimmer.value = false
+                    isPlayIconVisible.value = true
+                }
+            },
         )
-        Image(
-            modifier = Modifier
-                .size(50.dp)
-                .background(Color.LightGray.copy(alpha = 0.6f), shape = CircleShape),
-            imageVector = ImageVector.vectorResource(R.drawable.ic_play_button),
-            contentDescription = stringResource(R.string.news_item_play_content_description),
-        )
+        if (isPlayIconVisible.value) {
+            Image(
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(Color.LightGray.copy(alpha = 0.6f), shape = CircleShape),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_play_button),
+                contentDescription = stringResource(R.string.news_item_play_content_description),
+            )
+        }
     }
 }
 
@@ -175,17 +200,48 @@ private fun MultiImage(
     showBackground = true,
     backgroundColor = 0xFFFFFFFF,
 )
-fun BookItemPreview() {
+fun SingleVideoPreview() {
     val item = UiNewsItem(
         id = "id",
         dateFormatted = "2 февраля",
         description = "В. И. Ленин",
         images = listOf(
-            UiNewsMedia.ItemImage(
-                "https://picsum.photos/300/300"
+
+        ),
+        videos = listOf(
+            UiNewsMedia.ItemVideo(
+                id = "1",
+                image = "https://picsum.photos/300/300",
+                link = "link"
             )
         ),
-        videos = listOf(),
+        allMedia = listOf()
+    )
+    SVAPPTheme {
+        NewsItem(item) {
+
+        }
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun BookItemPreview() {
+    val item = UiNewsItem(
+        id = "id",
+        dateFormatted = "2 февраля",
+        description = "В. И. Ленин",
+        images = listOf(),
+        videos = listOf(
+            UiNewsMedia.ItemVideo(
+                id = "1",
+                image = "https://picsum.photos/300/300",
+                link = "link"
+            )
+        ),
         allMedia = listOf()
     )
     SVAPPTheme {

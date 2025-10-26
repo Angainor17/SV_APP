@@ -14,6 +14,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,8 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
 import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiNewsMedia
@@ -46,14 +50,14 @@ fun ImageCarousel(
 
     Column(
         modifier
-            .defaultMinSize(minHeight = 220.dp)
+            .defaultMinSize(minHeight = 190.dp)
             .fillMaxWidth()
     ) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
             pageSpacing = 10.dp,
-            contentPadding = PaddingValues(horizontal = 30.dp),
+            contentPadding = PaddingValues(horizontal = 20.dp),
         ) { page ->
             val item = allMedia[page]
             val isVideo = item is UiNewsMedia.ItemVideo
@@ -61,13 +65,23 @@ fun ImageCarousel(
             Box(
                 contentAlignment = Alignment.Center
             ) {
+                val showShimmer = remember { mutableStateOf(true) }
+                val isPlayIconVisible = remember { mutableStateOf(false) }
+
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(item.image)
                         .build(),
                     contentDescription = "",
                     modifier = Modifier
+                        .background(
+                            shimmerBrush(
+                                targetValue = 1300f,
+                                showShimmer = showShimmer.value
+                            )
+                        )
                         .fillMaxWidth()
+                        .defaultMinSize(minHeight = 180.dp)
                         .clickable { onItemClick.invoke(item) }
                         .graphicsLayer {
                             val pageOffset =
@@ -81,10 +95,16 @@ fun ImageCarousel(
                                 scaleY = scale / 100.dp
                             }
                         },
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.FillWidth,
+                    onState = { state ->
+                        if (state is State.Success) {
+                            showShimmer.value = false
+                            if (isVideo) isPlayIconVisible.value = true
+                        }
+                    },
                 )
 
-                if (isVideo) {
+                if (isVideo && isPlayIconVisible.value) {
                     Image(
                         modifier = Modifier
                             .size(50.dp)
