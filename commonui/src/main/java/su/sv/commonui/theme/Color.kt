@@ -17,3 +17,7 @@ val Grey40 = Color(0xFFCAC7DC)
 val PurpleGrey80 = Color(0xFF285191) // tertiaryContainer
 
 val White = Color(0xFFFFFFFF) // onTertiary
+
+val NewItemBorderStroke = Color(0x40FFFFFF) // обводка карточки новостей
+
+val LinkInTextColor = Color(0xFF3C92DE)
