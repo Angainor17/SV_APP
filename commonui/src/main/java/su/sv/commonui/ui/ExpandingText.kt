@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -22,8 +21,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.core.net.toUri
 import su.sv.commonui.R
-import uz.kjuraev.linkify.LinkifyContent
-import uz.kjuraev.linkify.LinkifyText
+import su.sv.commonui.ui.linkify.LinkifyContent
+import su.sv.commonui.ui.linkify.LinkifyText
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
