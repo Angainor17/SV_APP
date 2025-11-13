@@ -46,6 +46,9 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     ksp(libs.hilt.android.compiler)
 
+    // Logging
+    implementation(libs.timber)
+
     // Network
     implementation(libs.bundles.retrofit)
 }
