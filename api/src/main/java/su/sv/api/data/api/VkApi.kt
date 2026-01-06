@@ -9,6 +9,7 @@ import su.sv.api.data.response.VkResponse
 interface VkApi {
 
     // https://api.vk.com/method/wall.get
+    // https://dev.vk.com/ru/method/wall.get
 
     @FormUrlEncoded
     @POST("/method/wall.get")

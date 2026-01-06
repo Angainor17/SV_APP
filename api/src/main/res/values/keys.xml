@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="vk_service_key_mini_app_for_api_request">vk1.a.agH5x5XiphWC1XUYcmcgwb9VR4JSCUfq9X2CC_eCgWS9g5pd2spL6i4va9so06VB9UbBeOfyrOhhh2dreKkDwJaW1UvfDgfxPFqCNPo8DBJ--xSB6-OjDruX0oc1R-dFYHWPJnzwzaUyqWt4WDwhX8xqUVfmgBYmTD7_DtZm4sxycWGDjSDbGTpE01ZBGXfMElx1Hk5W4I7tcz2dE1S4EA</string>
+    <string name="vk_service_key_mini_app_for_api_request">vk1.a.sTTW2hLNnZ5MfJ0H7OsKhrPwFEb4gwFKHr3-eDw8mCZ2TqrIZ2fq4X0pMX04OW_QIpqbwWM7qxNaCk6gA1ZcuDpYKIBgT3ao1y12v9QXlvKIoLj9gvgVTsK7FWKuUjKDxhKosWDPPtxa4mWRmB-6wFawgUMKSE02Wn6JRsKX5zQIBtSXtXKS4h8revj2J-6ldlClZmC5SptJehwj4f1lWA</string>
     <string name="vk_public_name">svremyanews</string>
+<!--    https://vkhost.github.io/-->
+<!--    https://oauth.vk.com/blank.html#access_token=vk1.a.sTTW2hLNnZ5MfJ0H7OsKhrPwFEb4gwFKHr3-eDw8mCZ2TqrIZ2fq4X0pMX04OW_QIpqbwWM7qxNaCk6gA1ZcuDpYKIBgT3ao1y12v9QXlvKIoLj9gvgVTsK7FWKuUjKDxhKosWDPPtxa4mWRmB-6wFawgUMKSE02Wn6JRsKX5zQIBtSXtXKS4h8revj2J-6ldlClZmC5SptJehwj4f1lWA&expires_in=0&user_id=41072338&email=angainor17@gmail.com-->
 
 </resources>
