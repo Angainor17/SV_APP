@@ -19,8 +19,8 @@ android {
         minSdk = 24
         targetSdk = 36
         // Для нового релиза поднять versionCode и versionName
-        versionCode = 5
-        versionName = "0.1.4"
+        versionCode = 8
+        versionName = "0.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

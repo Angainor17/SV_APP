@@ -17,20 +17,21 @@ class GetNewsListUseCase @Inject constructor(
             count = NEWS_PAGE_SIZE,
             offset = offset,
         ).map { list ->
-            list.map { it.toDomain() }
+            list.map { it.toDomain(null) }
+                .distinct()
         }
     }
 
-    private fun ApiNewsItem.toDomain(): NewsItem {
+    private fun ApiNewsItem.toDomain(prevId: Int?): NewsItem {
         if (copyHistory.orEmpty().isNotEmpty()) {
-            return copyHistory.orEmpty().first().toDomain().copy(
+            return copyHistory.orEmpty().first().toDomain(id).copy(
                 date = getDate(),
             )
         }
 
         val attachments = attachments.orEmpty()
         return NewsItem(
-            id = (id ?: 0).toString(),
+            id = prevId?.toString() + id?.toString(),
             date = getDate(),
             description = text.orEmpty(),
             images = attachments
