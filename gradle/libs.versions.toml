@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.1"
+agp = "9.2.0"
 
 modoCompose = "0.10.1"
 kotlin = "2.2.20"
@@ -10,7 +10,7 @@ composeBom = "2025.06.01"
 hiltAndroid = "2.56.2"
 ktlint = "12.2.0"
 hiltNavigationCompose = "1.2.0"
-ksp = "2.2.20-2.0.2"
+ksp = "2.3.2"
 pagingCompose = "3.3.6"
 retrofit = "3.0.0"
 gson = "2.13.1"
