@@ -12,12 +12,12 @@ plugins {
 
 android {
     namespace = "su.sv.app"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "su.sv.app"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         // Для нового релиза поднять versionCode и versionName
         versionCode = 8
         versionName = "0.1.6"
