@@ -1,74 +1,63 @@
-package com.mobeta.android.dslv;
+package com.mobeta.android.dslv
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Point
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ListView
 
 /**
  * Simple implementation of the FloatViewManager class. Uses list
  * items as they appear in the ListView to create the floating View.
  */
-public class SimpleFloatViewManager implements DragSortListView.FloatViewManager {
+open class SimpleFloatViewManager(private val mListView: ListView) : DragSortListView.FloatViewManager {
 
-    private Bitmap mFloatBitmap;
+    private var mFloatBitmap: Bitmap? = null
+    private var mImageView: ImageView? = null
+    private var mFloatBGColor = Color.BLACK
 
-    private ImageView mImageView;
-
-    private int mFloatBGColor = Color.BLACK;
-
-    private ListView mListView;
-
-    public SimpleFloatViewManager(ListView lv) {
-        mListView = lv;
-    }
-
-    public void setBackgroundColor(int color) {
-        mFloatBGColor = color;
+    open fun setBackgroundColor(color: Int) {
+        mFloatBGColor = color
     }
 
     /**
      * This simple implementation creates a Bitmap copy of the
-     * list item currently shown at ListView <code>position</code>.
+     * list item currently shown at ListView `position`.
      */
-    @Override
-    public View onCreateFloatView(int position) {
+    override fun onCreateFloatView(position: Int): View? {
         // Guaranteed that this will not be null? I think so. Nope, got
         // a NullPointerException once...
-        View v = mListView.getChildAt(position + mListView.getHeaderViewsCount() - mListView.getFirstVisiblePosition());
+        val v = mListView.getChildAt(position + mListView.headerViewsCount - mListView.firstVisiblePosition)
 
         if (v == null) {
-            return null;
+            return null
         }
 
-        v.setPressed(false);
+        v.isPressed = false
 
         // Create a copy of the drawing cache so that it does not get
         // recycled by the framework when the list tries to clean up memory
-        //v.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        v.setDrawingCacheEnabled(true);
-        mFloatBitmap = Bitmap.createBitmap(v.getDrawingCache());
-        v.setDrawingCacheEnabled(false);
+        v.isDrawingCacheEnabled = true
+        mFloatBitmap = Bitmap.createBitmap(v.drawingCache)
+        v.isDrawingCacheEnabled = false
 
         if (mImageView == null) {
-            mImageView = new ImageView(mListView.getContext());
+            mImageView = ImageView(mListView.context)
         }
-        mImageView.setBackgroundColor(mFloatBGColor);
-        mImageView.setPadding(0, 0, 0, 0);
-        mImageView.setImageBitmap(mFloatBitmap);
-        mImageView.setLayoutParams(new ViewGroup.LayoutParams(v.getWidth(), v.getHeight()));
+        mImageView!!.setBackgroundColor(mFloatBGColor)
+        mImageView!!.setPadding(0, 0, 0, 0)
+        mImageView!!.setImageBitmap(mFloatBitmap)
+        mImageView!!.layoutParams = ViewGroup.LayoutParams(v.width, v.height)
 
-        return mImageView;
+        return mImageView
     }
 
     /**
      * This does nothing
      */
-    @Override
-    public void onDragFloatView(View floatView, Point position, Point touch) {
+    override fun onDragFloatView(floatView: View, position: Point, touch: Point) {
         // do nothing
     }
 
@@ -76,13 +65,10 @@ public class SimpleFloatViewManager implements DragSortListView.FloatViewManager
      * Removes the Bitmap from the ImageView created in
      * onCreateFloatView() and tells the system to recycle it.
      */
-    @Override
-    public void onDestroyFloatView(View floatView) {
-        ((ImageView) floatView).setImageDrawable(null);
+    override fun onDestroyFloatView(floatView: View) {
+        (floatView as ImageView).setImageDrawable(null)
 
-        mFloatBitmap.recycle();
-        mFloatBitmap = null;
+        mFloatBitmap?.recycle()
+        mFloatBitmap = null
     }
-
 }
-

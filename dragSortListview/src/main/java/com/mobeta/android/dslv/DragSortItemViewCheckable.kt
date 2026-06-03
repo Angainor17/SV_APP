@@ -1,8 +1,7 @@
-package com.mobeta.android.dslv;
+package com.mobeta.android.dslv
 
-import android.content.Context;
-import android.view.View;
-import android.widget.Checkable;
+import android.content.Context
+import android.widget.Checkable
 
 /**
  * Lightweight ViewGroup that wraps list items obtained from user's
@@ -14,37 +13,33 @@ import android.widget.Checkable;
  * to the child, and the ItemView measured width is set to the
  * child's measured width). The height of ItemView can be anything;
  * the
- * <p>
- * <p>
+ *
+ *
  * The purpose of this class is to optimize slide
  * shuffle animations.
  */
-public class DragSortItemViewCheckable extends DragSortItemView implements Checkable {
+class DragSortItemViewCheckable(context: Context) : DragSortItemView(context), Checkable {
 
-    public DragSortItemViewCheckable(Context context) {
-        super(context);
+    override fun isChecked(): Boolean {
+        val child = getChildAt(0)
+        return if (child is Checkable) {
+            child.isChecked
+        } else {
+            false
+        }
     }
 
-    @Override
-    public boolean isChecked() {
-        View child = getChildAt(0);
-        if (child instanceof Checkable)
-            return ((Checkable) child).isChecked();
-        else
-            return false;
+    override fun setChecked(checked: Boolean) {
+        val child = getChildAt(0)
+        if (child is Checkable) {
+            child.isChecked = checked
+        }
     }
 
-    @Override
-    public void setChecked(boolean checked) {
-        View child = getChildAt(0);
-        if (child instanceof Checkable)
-            ((Checkable) child).setChecked(checked);
-    }
-
-    @Override
-    public void toggle() {
-        View child = getChildAt(0);
-        if (child instanceof Checkable)
-            ((Checkable) child).toggle();
+    override fun toggle() {
+        val child = getChildAt(0)
+        if (child is Checkable) {
+            child.toggle()
+        }
     }
 }

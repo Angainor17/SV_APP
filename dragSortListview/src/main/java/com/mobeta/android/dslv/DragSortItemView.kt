@@ -1,10 +1,9 @@
-package com.mobeta.android.dslv;
+package com.mobeta.android.dslv
 
-import android.content.Context;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.content.Context
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.AbsListView
 
 /**
  * Lightweight ViewGroup that wraps list items obtained from user's
@@ -16,83 +15,78 @@ import android.widget.AbsListView;
  * to the child, and the ItemView measured width is set to the
  * child's measured width). The height of ItemView can be anything;
  * the
- * <p>
- * <p>
+ *
+ *
  * The purpose of this class is to optimize slide
  * shuffle animations.
  */
-public class DragSortItemView extends ViewGroup {
+open class DragSortItemView @JvmOverloads constructor(
+    context: Context,
+    gravity: Int = Gravity.TOP
+) : ViewGroup(context) {
 
-    private int mGravity = Gravity.TOP;
+    protected var mGravity = gravity
 
-    public DragSortItemView(Context context) {
-        super(context);
-
+    init {
         // always init with standard ListView layout params
-        setLayoutParams(new AbsListView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        //setClipChildren(true);
+        layoutParams = AbsListView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
-    public int getGravity() {
-        return mGravity;
+    open fun getGravity(): Int {
+        return mGravity
     }
 
-    public void setGravity(int gravity) {
-        mGravity = gravity;
+    open fun setGravity(gravity: Int) {
+        mGravity = gravity
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        final View child = getChildAt(0);
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        val child = getChildAt(0)
 
         if (child == null) {
-            return;
+            return
         }
 
         if (mGravity == Gravity.TOP) {
-            child.layout(0, 0, getMeasuredWidth(), child.getMeasuredHeight());
+            child.layout(0, 0, measuredWidth, child.measuredHeight)
         } else {
-            child.layout(0, getMeasuredHeight() - child.getMeasuredHeight(), getMeasuredWidth(), getMeasuredHeight());
+            child.layout(0, measuredHeight - child.measuredHeight, measuredWidth, measuredHeight)
         }
     }
 
-    /**
-     *
-     */
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        var height = MeasureSpec.getSize(heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
 
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-
-        final View child = getChildAt(0);
+        val child = getChildAt(0)
         if (child == null) {
-            setMeasuredDimension(0, width);
-            return;
+            setMeasuredDimension(0, width)
+            return
         }
 
-        if (child.isLayoutRequested()) {
+        if (child.isLayoutRequested) {
             // Always let child be as tall as it wants.
-            measureChild(child, widthMeasureSpec,
-                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            measureChild(
+                child, widthMeasureSpec,
+                MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+            )
         }
 
         if (heightMode == MeasureSpec.UNSPECIFIED) {
-            ViewGroup.LayoutParams lp = getLayoutParams();
+            val lp = layoutParams
 
             if (lp.height > 0) {
-                height = lp.height;
+                height = lp.height
             } else {
-                height = child.getMeasuredHeight();
+                height = child.measuredHeight
             }
         }
 
-        setMeasuredDimension(width, height);
+        setMeasuredDimension(width, height)
     }
-
 }

@@ -1,193 +1,176 @@
-package com.mobeta.android.dslv;
+package com.mobeta.android.dslv
 
-import android.content.Context;
-import android.database.Cursor;
-import android.util.SparseIntArray;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.cursoradapter.widget.CursorAdapter;
-
-import java.util.ArrayList;
-
+import android.content.Context
+import android.database.Cursor
+import android.util.SparseIntArray
+import android.view.View
+import android.view.ViewGroup
+import androidx.cursoradapter.widget.CursorAdapter
+import com.mobeta.android.dslv.DragSortCursorAdapter.Companion.REMOVED
 
 /**
- * A subclass of {@link android.widget.CursorAdapter} that provides
+ * A subclass of [android.widget.CursorAdapter] that provides
  * reordering of the elements in the Cursor based on completed
  * drag-sort operations. The reordering is a simple mapping of
  * list positions into Cursor positions (the Cursor is unchanged).
  * To persist changes made by drag-sorts, one can retrieve the
- * mapping with the {@link #getCursorPositions()} method, which
+ * mapping with the [getCursorPositions] method, which
  * returns the reordered list of Cursor positions.
- * <p>
+ *
+ *
  * An instance of this class is passed
- * to {@link DragSortListView#setAdapter(ListAdapter)} and, since
- * this class implements the {@link DragSortListView.DragSortListener}
+ * to [DragSortListView.setAdapter] and, since
+ * this class implements the [DragSortListView.DragSortListener]
  * interface, it is automatically set as the DragSortListener for
  * the DragSortListView instance.
  */
-public abstract class DragSortCursorAdapter extends CursorAdapter implements DragSortListView.DragSortListener {
+abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortListener {
 
-    public static final int REMOVED = -1;
+    companion object {
+        const val REMOVED = -1
+    }
 
     /**
      * Key is ListView position, value is Cursor position
      */
-    private SparseIntArray mListMapping = new SparseIntArray();
+    private var mListMapping: SparseIntArray = SparseIntArray()
 
-    private ArrayList<Integer> mRemovedCursorPositions = new ArrayList<Integer>();
+    private var mRemovedCursorPositions: ArrayList<Int> = ArrayList()
 
-    public DragSortCursorAdapter(Context context, Cursor c) {
-        super(context, c);
-    }
+    constructor(context: Context, c: Cursor?) : super(context, c)
 
-    public DragSortCursorAdapter(Context context, Cursor c, boolean autoRequery) {
-        super(context, c, autoRequery);
-    }
+    constructor(context: Context, c: Cursor?, autoRequery: Boolean) : super(context, c, autoRequery)
 
-    public DragSortCursorAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
-    }
+    constructor(context: Context, c: Cursor?, flags: Int) : super(context, c, flags)
 
     /**
      * Swaps Cursor and clears list-Cursor mapping.
      *
-     * @see android.widget.CursorAdapter#swapCursor(android.database.Cursor)
+     * @see android.widget.CursorAdapter.swapCursor
      */
-    @Override
-    public Cursor swapCursor(Cursor newCursor) {
-        Cursor old = super.swapCursor(newCursor);
-        resetMappings();
-        return old;
+    override fun swapCursor(newCursor: Cursor?): Cursor? {
+        val old = super.swapCursor(newCursor)
+        resetMappings()
+        return old
     }
 
     /**
      * Changes Cursor and clears list-Cursor mapping.
      *
-     * @see android.widget.CursorAdapter#changeCursor(android.database.Cursor)
+     * @see android.widget.CursorAdapter.changeCursor
      */
-    @Override
-    public void changeCursor(Cursor cursor) {
-        super.changeCursor(cursor);
-        resetMappings();
+    override fun changeCursor(cursor: Cursor?) {
+        super.changeCursor(cursor)
+        resetMappings()
     }
 
     /**
      * Resets list-cursor mapping.
      */
-    public void reset() {
-        resetMappings();
-        notifyDataSetChanged();
+    fun reset() {
+        resetMappings()
+        notifyDataSetChanged()
     }
 
-    private void resetMappings() {
-        mListMapping.clear();
-        mRemovedCursorPositions.clear();
+    private fun resetMappings() {
+        mListMapping.clear()
+        mRemovedCursorPositions.clear()
     }
 
-    @Override
-    public Object getItem(int position) {
-        return super.getItem(mListMapping.get(position, position));
+    override fun getItem(position: Int): Any {
+        return super.getItem(mListMapping.get(position, position))
     }
 
-    @Override
-    public long getItemId(int position) {
-        return super.getItemId(mListMapping.get(position, position));
+    override fun getItemId(position: Int): Long {
+        return super.getItemId(mListMapping.get(position, position))
     }
 
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return super.getDropDownView(mListMapping.get(position, position), convertView, parent);
+    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+        return super.getDropDownView(mListMapping.get(position, position), convertView, parent)
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return super.getView(mListMapping.get(position, position), convertView, parent);
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        return super.getView(mListMapping.get(position, position), convertView, parent)
     }
 
     /**
      * On drop, this updates the mapping between Cursor positions
      * and ListView positions. The Cursor is unchanged. Retrieve
-     * the current mapping with {@link getCursorPositions()}.
+     * the current mapping with [getCursorPositions].
      *
-     * @see DragSortListView.DropListener#drop(int, int)
+     * @see DragSortListView.DropListener.drop
      */
-    @Override
-    public void drop(int from, int to) {
+    override fun drop(from: Int, to: Int) {
         if (from != to) {
-            int cursorFrom = mListMapping.get(from, from);
+            val cursorFrom = mListMapping.get(from, from)
 
             if (from > to) {
-                for (int i = from; i > to; --i) {
-                    mListMapping.put(i, mListMapping.get(i - 1, i - 1));
+                for (i in from downTo to + 1) {
+                    mListMapping.put(i, mListMapping.get(i - 1, i - 1))
                 }
             } else {
-                for (int i = from; i < to; ++i) {
-                    mListMapping.put(i, mListMapping.get(i + 1, i + 1));
+                for (i in from until to) {
+                    mListMapping.put(i, mListMapping.get(i + 1, i + 1))
                 }
             }
-            mListMapping.put(to, cursorFrom);
+            mListMapping.put(to, cursorFrom)
 
-            cleanMapping();
-            notifyDataSetChanged();
+            cleanMapping()
+            notifyDataSetChanged()
         }
     }
 
     /**
      * On remove, this updates the mapping between Cursor positions
      * and ListView positions. The Cursor is unchanged. Retrieve
-     * the current mapping with {@link getCursorPositions()}.
+     * the current mapping with [getCursorPositions].
      *
-     * @see DragSortListView.RemoveListener#remove(int)
+     * @see DragSortListView.RemoveListener.remove
      */
-    @Override
-    public void remove(int which) {
-        int cursorPos = mListMapping.get(which, which);
+    override fun remove(which: Int) {
+        val cursorPos = mListMapping.get(which, which)
         if (!mRemovedCursorPositions.contains(cursorPos)) {
-            mRemovedCursorPositions.add(cursorPos);
+            mRemovedCursorPositions.add(cursorPos)
         }
 
-        int newCount = getCount();
-        for (int i = which; i < newCount; ++i) {
-            mListMapping.put(i, mListMapping.get(i + 1, i + 1));
+        val newCount = count
+        for (i in which until newCount) {
+            mListMapping.put(i, mListMapping.get(i + 1, i + 1))
         }
 
-        mListMapping.delete(newCount);
+        mListMapping.delete(newCount)
 
-        cleanMapping();
-        notifyDataSetChanged();
+        cleanMapping()
+        notifyDataSetChanged()
     }
 
     /**
      * Does nothing. Just completes DragSortListener interface.
      */
-    @Override
-    public void drag(int from, int to) {
+    override fun drag(from: Int, to: Int) {
         // do nothing
     }
 
     /**
      * Remove unnecessary mappings from sparse array.
      */
-    private void cleanMapping() {
-        ArrayList<Integer> toRemove = new ArrayList<Integer>();
+    private fun cleanMapping() {
+        val toRemove = ArrayList<Int>()
 
-        int size = mListMapping.size();
-        for (int i = 0; i < size; ++i) {
+        val size = mListMapping.size()
+        for (i in 0 until size) {
             if (mListMapping.keyAt(i) == mListMapping.valueAt(i)) {
-                toRemove.add(mListMapping.keyAt(i));
+                toRemove.add(mListMapping.keyAt(i))
             }
         }
 
-        size = toRemove.size();
-        for (int i = 0; i < size; ++i) {
-            mListMapping.delete(toRemove.get(i));
+        for (key in toRemove) {
+            mListMapping.delete(key)
         }
     }
 
-    @Override
-    public int getCount() {
-        return super.getCount() - mRemovedCursorPositions.size();
+    override fun getCount(): Int {
+        return super.getCount() - mRemovedCursorPositions.size
     }
 
     /**
@@ -198,44 +181,42 @@ public abstract class DragSortCursorAdapter extends CursorAdapter implements Dra
      * @param position List position
      * @return The mapped-to Cursor position
      */
-    public int getCursorPosition(int position) {
-        return mListMapping.get(position, position);
+    fun getCursorPosition(position: Int): Int {
+        return mListMapping.get(position, position)
     }
 
     /**
      * Get the current order of Cursor positions presented by the
      * list.
      */
-    public ArrayList<Integer> getCursorPositions() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
+    fun getCursorPositions(): ArrayList<Int> {
+        val result = ArrayList<Int>()
 
-        for (int i = 0; i < getCount(); ++i) {
-            result.add(mListMapping.get(i, i));
+        for (i in 0 until count) {
+            result.add(mListMapping.get(i, i))
         }
 
-        return result;
+        return result
     }
 
     /**
      * Get the list position mapped to by the provided Cursor position.
      * If the provided Cursor position has been removed by a drag-sort,
-     * this returns {@link #REMOVED}.
+     * this returns [REMOVED].
      *
      * @param cursorPosition A Cursor position
      * @return The mapped-to list position or REMOVED
      */
-    public int getListPosition(int cursorPosition) {
+    fun getListPosition(cursorPosition: Int): Int {
         if (mRemovedCursorPositions.contains(cursorPosition)) {
-            return REMOVED;
+            return REMOVED
         }
 
-        int index = mListMapping.indexOfValue(cursorPosition);
-        if (index < 0) {
-            return cursorPosition;
+        val index = mListMapping.indexOfValue(cursorPosition)
+        return if (index < 0) {
+            cursorPosition
         } else {
-            return mListMapping.keyAt(index);
+            mListMapping.keyAt(index)
         }
     }
-
-
 }
