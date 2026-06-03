@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
@@ -41,6 +42,7 @@ import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.androidlibrary.widgets.WebViewCustom
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.PermissionHelper
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.app.Storage.RecentInfo
 import com.github.axet.bookreader.fragments.LibraryFragment
@@ -68,6 +70,8 @@ class BookReaderMainActivity : FullscreenActivity(), NavigationView.OnNavigation
     var choicer: OpenChoicer? = null
     var lastSearch: String? = null
 
+    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+
     val libraryFragment: LibraryFragment = newInstance()
     val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -77,6 +81,12 @@ class BookReaderMainActivity : FullscreenActivity(), NavigationView.OnNavigation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize permission launcher for Android 13+ support
+        permissionLauncher = PermissionHelper.createPermissionLauncher(this) { granted, _ ->
+            // Permission result is handled by the choicer via onRequestPermissionsResult
+            // This launcher can be used for future permission requests
+        }
 
         changeStatusBarColor()
 
@@ -440,9 +450,9 @@ class BookReaderMainActivity : FullscreenActivity(), NavigationView.OnNavigation
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // Delegate to choicer for backward compatibility with android-library
         when (requestCode) {
-            RESULT_FILE, RESULT_ADD_CATALOG -> if (choicer != null)  // called twice or activity reacated
-                choicer!!.onRequestPermissionsResult(permissions, grantResults)
+            RESULT_FILE, RESULT_ADD_CATALOG -> choicer?.onRequestPermissionsResult(permissions, grantResults)
         }
     }
 

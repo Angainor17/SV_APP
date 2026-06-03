@@ -7,7 +7,6 @@
 
 package group.pals.android.lib.ui.filechooser;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -1238,7 +1237,7 @@ public class FileChooserActivity extends Activity {
      */
     private void doCreateNewDir() {
         if (mFileProvider instanceof LocalFileProvider
-                && !Utils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                && !Utils.hasStoragePermissions(this)) {
             Dlg.toast(this, R.string.afc_msg_app_doesnot_have_permission_to_create_files, Dlg._LengthShort);
             return;
         }
@@ -1340,7 +1339,7 @@ public class FileChooserActivity extends Activity {
      */
     private void doDeleteFile(final IFileDataModel data) {
         if (mFileProvider instanceof LocalFileProvider
-                && !Utils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                && !Utils.hasStoragePermissions(this)) {
             notifyDataModelNotDeleted(data);
             Dlg.toast(this, R.string.afc_msg_app_doesnot_have_permission_to_delete_files, Dlg._LengthShort);
             return;

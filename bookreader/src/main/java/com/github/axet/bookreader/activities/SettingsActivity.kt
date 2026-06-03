@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.updatePadding
 import androidx.preference.PreferenceFragmentCompat
 import com.github.axet.androidlibrary.activities.AppCompatSettingsThemeActivity
@@ -16,6 +18,7 @@ import com.github.axet.androidlibrary.preferences.StoragePathPreferenceCompat
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
 import com.github.axet.bookreader.app.BookApplication.Companion.PREFERENCE_STORAGE
+import com.github.axet.bookreader.app.PermissionHelper
 import com.github.axet.bookreader.app.Storage
 import dagger.hilt.android.AndroidEntryPoint
 import android.R as androidR
@@ -51,10 +54,20 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
     }
 
     class GeneralPreferenceFragment : PreferenceFragmentCompat() {
+        private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             addPreferencesFromResource(R.xml.pref_general)
             setHasOptionsMenu(true)
+
+            // Initialize permission launcher for Android 13+ support
+            permissionLauncher = registerForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { permissions ->
+                // Permission result is handled by StoragePathPreferenceCompat via onRequestPermissionsResult
+                // This launcher can be used for future permission requests
+            }
 
             bindPreferenceSummaryToValue(findPreference(BookApplication.PREFERENCE_SCREENLOCK))
             bindPreferenceSummaryToValue(findPreference(BookApplication.PREFERENCE_THEME))
@@ -62,7 +75,7 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
 
             val s = findPreference(PREFERENCE_STORAGE) as StoragePathPreferenceCompat
             s.setStorage(Storage(context))
-            s.setPermissionsDialog(this, Storage.PERMISSIONS_RW, RESULT_STORAGE)
+            s.setPermissionsDialog(this, PermissionHelper.STORAGE_PERMISSIONS_RW, RESULT_STORAGE)
             s.setStorageAccessFramework(this, RESULT_STORAGE)
         }
 
@@ -105,8 +118,8 @@ class SettingsActivity : AppCompatSettingsThemeActivity() {
             grantResults: IntArray
         ) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            val s =
-                findPreference(PREFERENCE_STORAGE) as StoragePathPreferenceCompat
+            // Delegate to StoragePathPreferenceCompat for backward compatibility
+            val s = findPreference(PREFERENCE_STORAGE) as StoragePathPreferenceCompat
             when (requestCode) {
                 RESULT_STORAGE -> s.onRequestPermissionsResult(permissions, grantResults)
             }
