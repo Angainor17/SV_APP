@@ -85,8 +85,32 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
     public static final String ZIP_EXT = "zip";
     public static String TAG = Storage.class.getCanonicalName();
 
+    /**
+     * Storage permissions for read-write access.
+     * Updated for Android 13+ (API 33+) granular media permissions.
+     */
+    public static String[] PERMISSIONS_RW = PermissionHelper.INSTANCE.getSTORAGE_PERMISSIONS_RW();
+
+    /**
+     * Storage permissions for read-only access.
+     * Updated for Android 13+ (API 33+) granular media permissions.
+     */
+    public static String[] PERMISSIONS_RO = PermissionHelper.INSTANCE.getSTORAGE_PERMISSIONS_RO();
+
     public Storage(Context context) {
         super(context);
+    }
+
+    /**
+     * Check if storage permissions are granted.
+     * Updated for Android 13+ (API 33+) granular media permissions.
+     *
+     * @param context Context for permission check
+     * @param permissions Permission array to check (use PERMISSIONS_RO or PERMISSIONS_RW)
+     * @return true if all permissions are granted
+     */
+    public static boolean permitted(Context context, String[] permissions) {
+        return PermissionHelper.INSTANCE.hasStoragePermissions(context, false);
     }
 
     public static FileTypeDetector.Detector[] supported() {

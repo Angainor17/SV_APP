@@ -27,6 +27,7 @@ import com.github.axet.androidlibrary.widgets.OpenChoicer;
 import com.github.axet.androidlibrary.widgets.OpenFileDialog;
 import com.github.axet.bookreader.R;
 import com.github.axet.bookreader.app.BookApplication;
+import com.github.axet.bookreader.app.PermissionHelper;
 import com.github.axet.bookreader.app.Storage;
 import com.github.axet.bookreader.app.TTFManager;
 
@@ -99,7 +100,7 @@ public class FontsPopup extends PopupWindow {
             });
             updatePath();
         } else {
-            if (!Storage.permitted(context, Storage.PERMISSIONS_RO))
+            if (!PermissionHelper.INSTANCE.hasStoragePermissions(context, false))
                 fontsText.setText(context.getString(R.string.add_more_fonts_to, ttf.appFonts.toString()));
         }
         fontsList = fontsize_popup.findViewById(R.id.fonts_list);

@@ -1,13 +1,14 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-                excludeGroup("ru.ok.tracer")
-            }
-        }
+//        google {
+//            content {
+//                includeGroupByRegex("com\\.android.*")
+//                includeGroupByRegex("com\\.google.*")
+//                includeGroupByRegex("androidx.*")
+//                excludeGroup("ru.ok.tracer")
+//            }
+//        }
+        repositories.maven("https://nexus.vkteam.ru/repository/maven/")
         mavenCentral()
         gradlePluginPortal()
     }
@@ -15,12 +16,14 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google {
-            content {
-                excludeGroup("ru.ok.tracer")
-            }
-        }
-        mavenCentral()
+//        google {
+//            content {
+//                excludeGroup("ru.ok.tracer")
+//            }
+//        }
+        repositories.maven("https://nexus.vkteam.ru/repository/maven/")
+
+//        mavenCentral()
     }
 }
 
