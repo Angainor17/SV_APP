@@ -11,25 +11,23 @@
 ### AmbilWarnaDialog
 Диалоговое окно для выбора цвета.
 
-```java
-AmbilWarnaDialog dialog = new AmbilWarnaDialog(
+```kotlin
+val dialog = AmbilWarnaDialog(
     context,
-    currentColor,  // Текущий цвет (int)
-    new AmbilWarnaDialog.OnAmbilWarnaListener() {
-        @Override
-        public void onOk(AmbilWarnaDialog dialog, int color) {
+    currentColor,  // Текущий цвет (Int)
+    object : AmbilWarnaDialog.OnAmbilWarnaListener {
+        override fun onOk(dialog: AmbilWarnaDialog, color: Int) {
             // Пользователь выбрал цвет
         }
 
-        @Override
-        public void onCancel(AmbilWarnaDialog dialog) {
+        override fun onCancel(dialog: AmbilWarnaDialog) {
             // Пользователь отменил выбор
         }
     },
     "OK",      // Текст кнопки подтверждения
     "Отмена"   // Текст кнопки отмены
-);
-dialog.show();
+)
+dialog.show()
 ```
 
 ### AmbilWarnaKotak
@@ -53,10 +51,10 @@ dialog.show();
 
 ```
 ambilWarna/src/main/java/yuku/ambilwarna/
-├── AmbilWarnaDialog.java      # Основной диалог
-├── AmbilWarnaKotak.java       # Кастомная View для выбора S/V
+├── AmbilWarnaDialog.kt      # Основной диалог
+├── AmbilWarnaKotak.kt       # Кастомная View для выбора S/V
 └── widget/
-    └── AmbilWarnaPrefWidgetView.java  # Виджет для настроек
+    └── AmbilWarnaPrefWidgetView.kt  # Виджет для настроек
 ```
 
 ## Зависимости
