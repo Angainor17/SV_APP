@@ -93,6 +93,57 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - FBReader библиотеку (модуль `fbreader`)
 - DragSortListView для списка книг
 
+## Миграция на Kotlin
+
+### Статус миграции
+
+**Мигрированные файлы:**
+- activities/ (все файлы)
+- fragments/ (все файлы)
+- app/BookApplication.kt
+- app/PermissionHelper.kt
+- app/Plugin.kt
+- app/Reflow.kt
+- app/TTFManager.kt
+- app/TextFormatter.kt
+- app/ComicsPlugin.kt
+- app/PDFPlugin.kt
+- app/DjvuPlugin.kt
+- services/ImagesProvider.kt
+- widgets/ActiveAreasView.kt
+- widgets/BookmarkPopup.kt
+- widgets/BookmarksDialog.kt
+- widgets/FBFooterView.kt
+- widgets/FontsPopup.kt
+- widgets/FullWidthActionView.kt
+- widgets/SelectionView.kt
+- widgets/TimeAnimatorCompat.kt
+- widgets/WallpaperLayout.kt
+
+**Оставшиеся Java файлы:**
+- `app/Storage.java` - основное хранилище, зависимости: Plugin, Reflow, Bookmarks
+- `widgets/TTSPopup.java` - TTS функционал, зависит от FBReaderView, ScrollWidget
+- `widgets/ScrollWidget.java` - скролл виджет, зависит от FBReaderView, Plugin, Reflow
+- `widgets/FBReaderView.java` - главный виджет чтения, зависит от всех компонентов
+
+### Порядок миграции (от простого к сложному)
+
+1. DjvuPlugin.java → DjvuPlugin.kt (зависит от Plugin.View)
+2. PDFPlugin.java → PDFPlugin.kt (зависит от Plugin.View)
+3. Storage.java → Storage.kt (базовый класс)
+4. ScrollWidget.java → ScrollWidget.kt (зависит от FBReaderView)
+5. TTSPopup.java → TTSPopup.kt (зависит от FBReaderView, ScrollWidget)
+6. FBReaderView.java → FBReaderView.kt (самый сложный)
+
+### Особенности миграции
+
+- Использовать `lateinit` для свойств, инициализируемых в `create()`
+- Обратите внимание на nullable типы в интерфейсах FBReader
+- Внутренние классы должны быть `inner class` если обращаются к внешнему классу
+- Companion object для static методов и свойств
+- Использовать `@JvmStatic` для совместимости с Java кодом
+- Использовать `@JvmField` для static полей
+
 ## Примечания
 
 Модуль интегрирован с основным приложением через навигацию. При нажатии на скачанную книгу открывается этот модуль.
