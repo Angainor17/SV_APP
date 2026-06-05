@@ -239,17 +239,17 @@ class LibraryFragment : Fragment(), SearchListener {
             invalidateOptionsMenu?.run()
             return true
         } else if (id == R.id.action_bm) {
-            val dialog: BookmarksDialog = object : BookmarksDialog(context) {
+            val dialog: BookmarksDialog = object : BookmarksDialog(context!!) {
                 override fun onSelected(b: Storage.Book, bm: Storage.Bookmark) {
                     val main = (activity as BookReaderMainActivity?)
                     main?.openBook(b.url, ZLTextIndexPosition(bm.start, bm.end))
                 }
 
-                override fun onSave(book: Storage.Book, bm: Storage.Bookmark?) {
+                override fun onSave(book: Storage.Book, bm: Storage.Bookmark) {
                     storage.save(book)
                 }
 
-                override fun onDelete(book: Storage.Book, bm: Storage.Bookmark?) {
+                override fun onDelete(book: Storage.Book, bm: Storage.Bookmark) {
                     book.info.bookmarks.remove(bm)
                     storage.save(book)
                 }

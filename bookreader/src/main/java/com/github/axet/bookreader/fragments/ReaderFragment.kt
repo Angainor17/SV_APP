@@ -322,20 +322,20 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
             return true
         }
         if (id == R.id.action_bm) {
-            val dialog: BookmarksDialog = object : BookmarksDialog(context) {
+            val dialog: BookmarksDialog = object : BookmarksDialog(context!!) {
 
                 override fun onSelected(b: Storage.Bookmark) {
                     Timber.tag("voronin").d("BookmarksDialog onSelected")
                     fb!!.gotoPosition(ZLTextIndexPosition(b.start, b.end))
                 }
 
-                override fun onSave(bm: Storage.Bookmark?) {
+                override fun onSave(bm: Storage.Bookmark) {
                     Timber.tag("voronin").d("BookmarksDialog onSave")
                     fb!!.bookmarksUpdate()
                     savePosition()
                 }
 
-                override fun onDelete(bm: Storage.Bookmark?) {
+                override fun onDelete(bm: Storage.Bookmark) {
                     Timber.tag("voronin").d("BookmarksDialog onDelete")
                     var i = book!!.info.bookmarks.indexOf(bm)
                     book!!.info.bookmarks.removeAt(i)
@@ -365,8 +365,8 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         if (id == R.id.action_fontsize) {
             if (fb!!.pluginview == null) {
                 fontsPopup =
-                    object : FontsPopup(context, BookApplication.from(requireContext())?.ttf) {
-                        override fun setFont(f: String?) {
+                    object : FontsPopup(context!!, BookApplication.from(requireContext())!!.ttf!!) {
+                        override fun setFont(f: String) {
                             val shared = PreferenceManager.getDefaultSharedPreferences(context)
                             shared.edit {
                                 putString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, f)
@@ -394,7 +394,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
                         }
 
                         override fun updateFontsize(f: Int) {
-                            fontsizepopup_text.text = f.toString()
+                            fontsizepopupText.text = f.toString()
                         }
                     }
                 fontsPopup!!.fragment = this
@@ -404,12 +404,12 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
                     fb!!.app.ViewOptions.getTextStyleCollection()
                         .baseStyle.FontFamilyOption.value
                 )
-                fontsPopup!!.ignore_embedded_fonts.setChecked(fb!!.ignoreCssFonts)
+                fontsPopup!!.ignoreEmbeddedFonts.setChecked(fb!!.ignoreCssFonts)
                 fontsPopup!!.fontsList.scrollToPosition(fontsPopup!!.fonts.selected)
                 fontsPopup!!.updateFontsize(FONT_START, FONT_END, fb!!.getFontsizeFB())
             } else {
                 fontsPopup =
-                    object : FontsPopup(context, BookApplication.from(requireContext())?.ttf) {
+                    object : FontsPopup(context!!, BookApplication.from(requireContext())!!.ttf!!) {
                         override fun setFontsize(f: Int) {
                             val p = f / 10f
                             val shared = PreferenceManager.getDefaultSharedPreferences(context)
@@ -421,7 +421,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
                         }
 
                         override fun updateFontsize(f: Int) {
-                            fontsizepopup_text.text = String.format("%.1f", f / 10f)
+                            fontsizepopupText.text = String.format("%.1f", f / 10f)
                         }
                     }
                 fontsPopup!!.fontsFrame.visibility = View.GONE
@@ -638,10 +638,10 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (fontsPopup != null && fontsPopup!!.choicer != null) fontsPopup!!.choicer.onActivityResult(
-            resultCode,
-            data
-        )
+        val popup = fontsPopup?.choicer
+        if (popup != null) {
+            popup.onActivityResult(resultCode, data)
+        }
     }
 
     class TOCHolder(itemView: View) : TreeRecyclerView.TreeHolder(itemView) {
