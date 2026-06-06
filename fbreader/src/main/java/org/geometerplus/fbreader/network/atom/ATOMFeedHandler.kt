@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,22 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.ui.android.image;
+package org.geometerplus.fbreader.network.atom
 
-import android.graphics.Bitmap;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-import org.geometerplus.zlibrary.core.image.ZLImage;
+interface ATOMFeedHandler<MetadataType : ATOMFeedMetadata, EntryType : ATOMEntry> {
+    fun processFeedStart()
 
-public class ZLBitmapImage implements ZLImage {
-    private final Bitmap myBitmap;
+    // returns true iff reading process should be interrupted
+    fun processFeedMetadata(feed: MetadataType, beforeEntries: Boolean): Boolean
 
-    public ZLBitmapImage(Bitmap bitmap) {
-        myBitmap = bitmap;
-    }
+    // returns true iff reading process should be interrupted
+    fun processFeedEntry(entry: EntryType): Boolean
 
-    public Bitmap getBitmap() {
-        return myBitmap;
-    }
+    fun processFeedEnd()
 
-    @Override
-    public String getURI() {
-        return "bitmap image";
-    }
+    fun createFeed(attributes: ZLStringMap): MetadataType
+    fun createEntry(attributes: ZLStringMap): EntryType
+    fun createLink(attributes: ZLStringMap): ATOMLink
 }

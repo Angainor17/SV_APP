@@ -17,23 +17,24 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.network;
+package org.geometerplus.fbreader.network.authentication.litres
 
-import org.json.simple.JSONValue;
+import org.geometerplus.fbreader.network.INetworkLink
+import org.geometerplus.zlibrary.core.util.ZLNetworkUtil
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+internal object LitResUtil {
+    const val HOST_NAME = "litres.ru"
 
-public abstract class JsonRequest2 extends ZLNetworkRequest.PostWithBody {
-    public JsonRequest2(String url, Object data) {
-        super(url, JSONValue.toJSONString(data), false);
+    @JvmStatic
+    fun url(path: String): String {
+        val url = "://robot.litres.ru/$path"
+        return if (ZLNetworkUtil.hasParameter(url, "sid") || ZLNetworkUtil.hasParameter(url, "pwd")) {
+            "https$url"
+        } else {
+            "http$url"
+        }
     }
 
-    @Override
-    public void handleStream(InputStream stream, int length) throws IOException, ZLNetworkException {
-        processResponse(JSONValue.parse(new InputStreamReader(stream)));
-    }
-
-    protected abstract void processResponse(Object response);
+    @JvmStatic
+    fun url(link: INetworkLink, path: String): String = link.rewriteUrl(url(path), false)
 }

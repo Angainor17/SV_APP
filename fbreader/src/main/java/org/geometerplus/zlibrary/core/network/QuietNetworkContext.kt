@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,22 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.zlibrary.core.network
 
-import org.geometerplus.fbreader.book.Book;
-import org.geometerplus.fbreader.book.BookUtil;
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import java.io.File
+import java.net.URI
 
-public class ShareBookAction extends FBAndroidAction {
-    ShareBookAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
+class QuietNetworkContext : ZLNetworkContext() {
+    override fun authenticate(uri: URI, realm: String, params: Map<String, String>): Map<String, String> {
+        return mapOf("error" to "Required authorization")
     }
 
-    @Override
-    public boolean isVisible() {
-        final Book book = Reader.getCurrentBook();
-        return book != null && BookUtil.fileByBook(book).getPhysicalFile() != null;
-    }
-
-    @Override
-    protected void run(Object... params) {
-        FBUtil.shareBook(BaseActivity, Reader.getCurrentBook());
+    fun downloadToFileQuietly(url: String, outFile: File): Boolean {
+        return try {
+            downloadToFile(url, outFile)
+            true
+        } catch (e: ZLNetworkException) {
+            false
+        }
     }
 }

@@ -17,25 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network.action;
+package org.geometerplus.android.fbreader.network.action
 
-import org.geometerplus.R;
-import org.geometerplus.android.fbreader.network.NetworkLibraryActivity;
-import org.geometerplus.fbreader.network.NetworkTree;
+import android.app.Activity
+import org.geometerplus.fbreader.network.NetworkBookItem
+import org.geometerplus.fbreader.network.NetworkTree
+import org.geometerplus.fbreader.network.tree.NetworkBookTree
 
-public class RefreshRootCatalogAction extends RootAction {
-    public RefreshRootCatalogAction(NetworkLibraryActivity activity) {
-        super(activity, ActionCode.REFRESH, "refreshCatalogsList", R.drawable.ic_menu_refresh);
-    }
+internal abstract class BookAction(activity: Activity, code: Int, resourceKey: String) : Action(activity, code, resourceKey, -1) {
+    override fun isVisible(tree: NetworkTree): Boolean = tree is NetworkBookTree
 
-    @Override
-    public boolean isEnabled(NetworkTree tree) {
-        return !myLibrary.isUpdateInProgress();
-    }
-
-    @Override
-    public void run(NetworkTree tree) {
-        myLibrary.runBackgroundUpdate(true);
-        ((NetworkLibraryActivity) myActivity).requestCatalogPlugins();
-    }
+    protected fun getBook(tree: NetworkTree): NetworkBookItem = (tree as NetworkBookTree).Book
 }

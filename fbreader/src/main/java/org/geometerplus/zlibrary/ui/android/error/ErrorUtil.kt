@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.authentication.litres;
+package org.geometerplus.zlibrary.ui.android.error
 
-import org.geometerplus.fbreader.network.INetworkLink;
-import org.geometerplus.zlibrary.core.util.ZLNetworkUtil;
+import android.content.Context
 
-class LitResUtil {
-    public static final String HOST_NAME = "litres.ru";
-
-    public static String url(String path) {
-        final String url = "://robot.litres.ru/" + path;
-        if (ZLNetworkUtil.hasParameter(url, "sid") || ZLNetworkUtil.hasParameter(url, "pwd")) {
-            return "https" + url;
-        } else {
-            return "http" + url;
+class ErrorUtil(private val myContext: Context) {
+    fun getVersionName(): String {
+        return try {
+            val info = myContext.packageManager.getPackageInfo(myContext.packageName, 0)
+            "${info.versionName} (${info.versionCode})"
+        } catch (e: Exception) {
+            ""
         }
-    }
-
-    public static String url(INetworkLink link, String path) {
-        return link.rewriteUrl(url(path), false);
     }
 }

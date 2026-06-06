@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,24 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.ui.android.error;
+package org.geometerplus.zlibrary.core.network
 
-import android.content.Context;
-import android.content.pm.PackageInfo;
+import org.apache.http.HttpEntity
+import org.json.simple.JSONValue
+import java.io.InputStreamReader
 
-public class ErrorUtil {
-    private final Context myContext;
+internal class BearerAuthenticationException(
+    @JvmField val Realm: String,
+    entity: HttpEntity
+) : RuntimeException("Authentication failed") {
+    @JvmField
+    val Params: MutableMap<String, String> = HashMap()
 
-    public ErrorUtil(Context context) {
-        myContext = context;
-    }
-
-    public String getVersionName() {
+    init {
         try {
-            final PackageInfo info = myContext.getPackageManager().getPackageInfo(myContext.getPackageName(), 0);
-            return info.versionName + " (" + info.versionCode + ")";
-        } catch (Exception e) {
-            return "";
+            @Suppress("UNCHECKED_CAST")
+            Params.putAll(JSONValue.parse(InputStreamReader(entity.content)) as Map<String, String>)
+        } catch (e: Exception) {
         }
     }
 }

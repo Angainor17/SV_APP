@@ -17,24 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.zlibrary.core.network
 
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.json.simple.JSONValue
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 
-public interface ATOMFeedHandler<MetadataType extends ATOMFeedMetadata, EntryType extends ATOMEntry> {
-    void processFeedStart();
+abstract class JsonRequest2(url: String, data: Any?) : ZLNetworkRequest.PostWithBody(url, JSONValue.toJSONString(data), false) {
+    @Throws(IOException::class, ZLNetworkException::class)
+    override fun handleStream(stream: InputStream, length: Int) {
+        processResponse(JSONValue.parse(InputStreamReader(stream)))
+    }
 
-    // returns true iff reading process should be interrupted
-    boolean processFeedMetadata(MetadataType feed, boolean beforeEntries);
-
-    // returns true iff reading process should be interrupted
-    boolean processFeedEntry(EntryType entry);
-
-    void processFeedEnd();
-
-    MetadataType createFeed(ZLStringMap attributes);
-
-    EntryType createEntry(ZLStringMap attributes);
-
-    ATOMLink createLink(ZLStringMap attributes);
+    protected abstract fun processResponse(response: Any?)
 }
