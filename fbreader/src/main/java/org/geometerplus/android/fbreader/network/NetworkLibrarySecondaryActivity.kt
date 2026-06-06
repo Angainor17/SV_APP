@@ -17,7 +17,6 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network;
+package org.geometerplus.android.fbreader.network
 
-public class NetworkLibrarySecondaryActivity extends NetworkLibraryActivity {
-}
+class NetworkLibrarySecondaryActivity : NetworkLibraryActivity()

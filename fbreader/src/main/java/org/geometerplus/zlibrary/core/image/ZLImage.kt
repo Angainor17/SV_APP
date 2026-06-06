@@ -17,9 +17,8 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.zlibrary.core.image
 
-import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
-
-public class FBReaderApplication extends ZLAndroidApplication {
+interface ZLImage {
+    fun getURI(): String?
 }
