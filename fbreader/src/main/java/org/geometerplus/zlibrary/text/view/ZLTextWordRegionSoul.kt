@@ -17,13 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.zlibrary.text.view
 
-public class ZLTextImageRegionSoul extends ZLTextRegion.Soul {
-    public final ZLTextImageElement ImageElement;
-
-    ZLTextImageRegionSoul(ZLTextPosition position, ZLTextImageElement imageElement) {
-        super(position.getParagraphIndex(), position.getElementIndex(), position.getElementIndex());
-        ImageElement = imageElement;
-    }
-}
+class ZLTextWordRegionSoul(
+    position: ZLTextPosition,
+    @JvmField val Word: ZLTextWord
+) : ZLTextRegion.Soul(
+    position.paragraphIndex,
+    position.elementIndex,
+    position.elementIndex
+)

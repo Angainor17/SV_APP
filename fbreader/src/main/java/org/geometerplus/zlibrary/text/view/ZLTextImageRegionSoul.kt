@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.formatPlugin;
+package org.geometerplus.zlibrary.text.view
 
-import android.content.Intent;
-
-import org.geometerplus.fbreader.formats.ExternalFormatPlugin;
-
-public abstract class PluginUtil {
-    public static Intent createIntent(ExternalFormatPlugin plugin, String action) {
-        return new Intent(action).setPackage(plugin.packageName());
-    }
-}
+class ZLTextImageRegionSoul(
+    position: ZLTextPosition,
+    @JvmField val ImageElement: ZLTextImageElement
+) : ZLTextRegion.Soul(
+    position.paragraphIndex,
+    position.elementIndex,
+    position.elementIndex
+)

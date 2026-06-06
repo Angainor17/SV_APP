@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.android.fbreader.formatPlugin
 
-public enum DurationEnum {
-    duration1(1000), duration3(3000), duration5(5000), duration10(10000), duration20(20000), duration40(40000), duration60(60000), duration300(300000);
+import android.content.Intent
+import org.geometerplus.fbreader.formats.ExternalFormatPlugin
 
-    public final int Value;
-
-    DurationEnum(int value) {
-        Value = value;
+object PluginUtil {
+    fun createIntent(plugin: ExternalFormatPlugin, action: String): Intent {
+        return Intent(action).setPackage(plugin.packageName())
     }
 }
