@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.preferences;
+package org.geometerplus.zlibrary.core.util
 
-import android.content.Context;
-
-import org.geometerplus.zlibrary.core.options.ZLBooleanOption;
-import org.geometerplus.zlibrary.core.resources.ZLResource;
-
-class ZLBooleanPreference extends ZLCheckBoxPreference {
-    private final ZLBooleanOption myOption;
-
-    ZLBooleanPreference(Context context, ZLBooleanOption option, ZLResource resource) {
-        super(context, resource);
-        myOption = option;
-        setChecked(option.getValue());
+class ZLTTFInfo(
+    @JvmField val FamilyName: String?,
+    subfamily: String?
+) {
+    @JvmField
+    val SubfamilyName: String? = if ("Literata" == FamilyName && "Bold Literata" == subfamily) {
+        "Bold Italic"
+    } else {
+        subfamily
     }
 
-    @Override
-    protected void onClick() {
-        super.onClick();
-        myOption.setValue(isChecked());
-    }
+    override fun toString(): String = "FontInfo [$FamilyName ($SubfamilyName)]"
 }

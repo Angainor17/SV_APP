@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2012-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,19 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.android.fbreader
 
+import org.geometerplus.fbreader.book.Book
+import org.geometerplus.fbreader.book.BookUtil
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-import androidx.collection.LruCache;
-
-import org.geometerplus.zlibrary.text.model.ZLTextModel;
-
-final class CursorManager extends LruCache<Integer, ZLTextParagraphCursor> {
-    final ExtensionElementManager ExtensionManager;
-    private final ZLTextModel myModel;
-
-    CursorManager(ZLTextModel model, ExtensionElementManager extManager) {
-        super(200); // max 200 cursors in the cache
-        myModel = model;
-        ExtensionManager = extManager;
+internal class ShareBookAction(baseActivity: FBReader, fbreader: FBReaderApp) : FBAndroidAction(baseActivity, fbreader) {
+    override fun isVisible(): Boolean {
+        val book: Book? = Reader.getCurrentBook()
+        return book != null && BookUtil.fileByBook(book).physicalFile != null
     }
 
-    @Override
-    protected ZLTextParagraphCursor create(Integer index) {
-        return new ZLTextParagraphCursor(this, myModel, index);
+    override fun run(vararg params: Any?) {
+        FBUtil.shareBook(BaseActivity, Reader.getCurrentBook())
     }
 }

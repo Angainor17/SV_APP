@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.book;
+package org.geometerplus.android.fbreader.network.action
 
-public final class BookQuery {
-    public final Filter Filter;
-    public final int Limit;
-    public final int Page;
+import org.geometerplus.R
+import org.geometerplus.android.fbreader.network.NetworkLibraryActivity
+import org.geometerplus.fbreader.network.NetworkTree
 
-    public BookQuery(Filter filter, int limit) {
-        this(filter, limit, 0);
-    }
+class RefreshRootCatalogAction(activity: NetworkLibraryActivity) : RootAction(activity, ActionCode.REFRESH, "refreshCatalogsList", R.drawable.ic_menu_refresh) {
+    override fun isEnabled(tree: NetworkTree): Boolean = !myLibrary.isUpdateInProgress
 
-    BookQuery(Filter filter, int limit, int page) {
-        Filter = filter;
-        Limit = limit;
-        Page = page;
-    }
-
-    public BookQuery next() {
-        return new BookQuery(Filter, Limit, Page + 1);
+    override fun run(tree: NetworkTree) {
+        myLibrary.runBackgroundUpdate(true)
+        (myActivity as NetworkLibraryActivity).requestCatalogPlugins()
     }
 }

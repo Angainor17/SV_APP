@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network.action;
+package org.geometerplus.zlibrary.ui.android.image
 
-import android.app.Activity;
+import android.graphics.Bitmap
+import org.geometerplus.zlibrary.core.image.ZLImage
 
-import org.geometerplus.fbreader.network.NetworkBookItem;
-import org.geometerplus.fbreader.network.NetworkTree;
-import org.geometerplus.fbreader.network.tree.NetworkBookTree;
+class ZLBitmapImage(private val myBitmap: Bitmap) : ZLImage {
+    fun getBitmap(): Bitmap = myBitmap
 
-abstract class BookAction extends Action {
-    protected BookAction(Activity activity, int code, String resourceKey) {
-        super(activity, code, resourceKey, -1);
-    }
-
-    @Override
-    public boolean isVisible(NetworkTree tree) {
-        return tree instanceof NetworkBookTree;
-    }
-
-    protected NetworkBookItem getBook(NetworkTree tree) {
-        return ((NetworkBookTree) tree).Book;
-    }
+    override fun getURI(): String = "bitmap image"
 }

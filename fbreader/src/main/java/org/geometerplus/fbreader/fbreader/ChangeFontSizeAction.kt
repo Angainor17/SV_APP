@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network.action;
+package org.geometerplus.fbreader.fbreader
 
-import android.app.Activity;
+import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption
 
-import org.geometerplus.fbreader.network.NetworkTree;
-import org.geometerplus.fbreader.network.tree.NetworkCatalogTree;
-
-abstract class CatalogAction extends Action {
-    protected CatalogAction(Activity activity, int code, String resourceKey, int iconId) {
-        super(activity, code, resourceKey, iconId);
-    }
-
-    protected CatalogAction(Activity activity, int code, String resourceKey) {
-        super(activity, code, resourceKey, -1);
-    }
-
-    @Override
-    public boolean isVisible(NetworkTree tree) {
-        return tree instanceof NetworkCatalogTree;
+internal class ChangeFontSizeAction(fbreader: FBReaderApp, private val myDelta: Int) : FBAction(fbreader) {
+    override fun run(vararg params: Any?) {
+        val option: ZLIntegerRangeOption = Reader.ViewOptions.getTextStyleCollection().baseStyle.FontSizeOption
+        option.value = option.value + myDelta
+        Reader.clearTextCaches()
+        Reader.getViewWidget().repaint()
     }
 }

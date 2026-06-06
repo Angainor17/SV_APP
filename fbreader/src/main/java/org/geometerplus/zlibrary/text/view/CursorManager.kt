@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.util;
+package org.geometerplus.zlibrary.text.view
 
-public final class ZLTTFInfo {
-    public final String FamilyName;
-    public final String SubfamilyName;
+import androidx.collection.LruCache
+import org.geometerplus.zlibrary.text.model.ZLTextModel
 
-    public ZLTTFInfo(String family, String subfamily) {
-        FamilyName = family;
-        if ("Literata".equals(family) && "Bold Literata".equals(subfamily)) {
-            SubfamilyName = "Bold Italic";
-        } else {
-            SubfamilyName = subfamily;
-        }
-    }
+internal class CursorManager(
+    private val myModel: ZLTextModel,
+    @JvmField val ExtensionManager: ExtensionElementManager
+) : LruCache<Int, ZLTextParagraphCursor>(200) {
 
-    @Override
-    public String toString() {
-        return "FontInfo [" + FamilyName + " (" + SubfamilyName + ")]";
+    override fun create(index: Int): ZLTextParagraphCursor {
+        return ZLTextParagraphCursor(this, myModel, index)
     }
 }
