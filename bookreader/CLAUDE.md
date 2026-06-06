@@ -122,17 +122,21 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - widgets/TTSPopup.kt
 - widgets/PagerWidget.kt
 - widgets/StoragePathPreferenceCompat.kt
+- widgets/ZLTextIndexPosition.kt (выделен из FBReaderView.java)
+- widgets/ZLBookmark.kt (выделен из FBReaderView.java)
+- widgets/BrightnessGesture.kt (выделен из FBReaderView.java)
 
-**Оставшиеся Java файлы (3 файла) - рекомендуется оставить на Java:**
-- `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки `com.github.axet.androidlibrary.app.Storage`, содержит package-private типы из FBReader
-- `widgets/ScrollWidget.java` (1717 строк) - сложный скролл виджет, много внутренних классов
-- `widgets/FBReaderView.java` (2294 строки) - главный виджет чтения, зависит от всех компонентов
+**Оставшиеся Java файлы (3 файла) - в процессе декомпозиции:**
+- `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки
+- `widgets/ScrollWidget.java` (1717 строк) - много внутренних классов
+- `widgets/FBReaderView.java` (2158 строк, было 2294) - декомпозируется
 
-### Почему Storage.java сложно мигрировать
+### Декомпозиция Java файлов
 
-1. **Наследование от внешней библиотеки**: Статические методы родительского класса вызываются напрямую без указания класса
-2. **Package-private типы**: `ZLTextViewBase.ImageFitting` - package-private класс, недоступен из Kotlin
-3. **Много статических методов**: Требуют `@JvmStatic` обёрток для совместимости с Kotlin кодом
+Выделенные классы из FBReaderView.java:
+- `ZLTextIndexPosition` → `ZLTextIndexPosition.kt`
+- `ZLBookmark`, `ZLTTSMark` → `ZLBookmark.kt`
+- `BrightnessGesture` → `BrightnessGesture.kt`
 
 ### Порядок миграции
 

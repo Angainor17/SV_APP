@@ -28,7 +28,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -85,7 +84,6 @@ import org.geometerplus.zlibrary.core.options.Config;
 import org.geometerplus.zlibrary.core.options.StringPair;
 import org.geometerplus.zlibrary.core.options.ZLOption;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
-import org.geometerplus.zlibrary.core.util.ZLColor;
 import org.geometerplus.zlibrary.core.view.ZLPaintContext;
 import org.geometerplus.zlibrary.core.view.ZLViewEnums;
 import org.geometerplus.zlibrary.core.view.ZLViewWidget;
@@ -103,7 +101,6 @@ import org.geometerplus.zlibrary.text.view.ZLTextImageRegionSoul;
 import org.geometerplus.zlibrary.text.view.ZLTextParagraphCursor;
 import org.geometerplus.zlibrary.text.view.ZLTextPosition;
 import org.geometerplus.zlibrary.text.view.ZLTextRegion;
-import org.geometerplus.zlibrary.text.view.ZLTextSimpleHighlighting;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 import org.geometerplus.zlibrary.text.view.ZLTextWordRegionSoul;
@@ -1437,8 +1434,8 @@ public class FBReaderView extends RelativeLayout {
         void ttsStatus(boolean speaking);
     }
 
-    public static class ZLTextIndexPosition extends ZLTextFixedPosition implements Parcelable {
-        public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+    public static class ZLTextIndexPosition extends com.github.axet.bookreader.widgets.ZLTextIndexPosition {
+        public static final Parcelable.Creator<ZLTextIndexPosition> CREATOR = new Parcelable.Creator<ZLTextIndexPosition>() {
             public ZLTextIndexPosition createFromParcel(Parcel in) {
                 return new ZLTextIndexPosition(in);
             }
@@ -1448,70 +1445,22 @@ public class FBReaderView extends RelativeLayout {
             }
         };
 
-        public ZLTextPosition end;
-
         public ZLTextIndexPosition(ZLTextPosition p, ZLTextPosition e) {
-            super(p);
-            end = new ZLTextFixedPosition(e);
+            super(p, e);
         }
 
         public ZLTextIndexPosition(Parcel in) {
-            super(read(in));
-            end = read(in);
-        }
-
-        static ZLTextPosition read(Parcel in) {
-            int p = in.readInt();
-            int e = in.readInt();
-            int c = in.readInt();
-            return new ZLTextFixedPosition(p, e, c);
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(getParagraphIndex());
-            dest.writeInt(getElementIndex());
-            dest.writeInt(getCharIndex());
-            dest.writeInt(end.getParagraphIndex());
-            dest.writeInt(end.getElementIndex());
-            dest.writeInt(end.getCharIndex());
+            super(in);
         }
     }
 
-    public static class ZLBookmark extends ZLTextSimpleHighlighting {
-        public FBView view;
-        public Storage.Bookmark b;
-
+    public static class ZLBookmark extends com.github.axet.bookreader.widgets.ZLBookmark {
         public ZLBookmark(FBView view, Storage.Bookmark b) {
-            super(view, b.start, b.end);
-            this.view = view;
-            this.b = b;
-        }
-
-        @Override
-        public ZLColor getForegroundColor() {
-            return null;
-        }
-
-        @Override
-        public ZLColor getBackgroundColor() {
-            if (b.color != 0)
-                return new ZLColor(b.color);
-            return view.getHighlightingBackgroundColor();
-        }
-
-        @Override
-        public ZLColor getOutlineColor() {
-            return null;
+            super(view, b);
         }
     }
 
-    public static class ZLTTSMark extends ZLBookmark {
+    public static class ZLTTSMark extends com.github.axet.bookreader.widgets.ZLTTSMark {
         public ZLTTSMark(FBView view, Storage.Bookmark m) {
             super(view, m);
         }
@@ -1629,87 +1578,9 @@ public class FBReaderView extends RelativeLayout {
         }
     }
 
-    public static class BrightnessGesture {
-        FBReaderView fb;
-        int myStartY;
-        boolean myIsBrightnessAdjustmentInProgress;
-        int myStartBrightness;
-        int areaWidth;
-        Integer myColorLevel;
-
+    public static class BrightnessGesture extends com.github.axet.bookreader.widgets.BrightnessGesture {
         public BrightnessGesture(FBReaderView view) {
-            fb = view;
-            areaWidth = ThemeUtils.dp2px(fb.getContext(), 36); // 24dp - icon; 48dp - button
-        }
-
-        public boolean onTouchEvent(MotionEvent e) {
-            int x = (int) e.getX();
-            int y = (int) e.getY();
-            switch (e.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (fb.app.MiscOptions.AllowScreenBrightnessAdjustment.getValue() && x < areaWidth) {
-                        myIsBrightnessAdjustmentInProgress = true;
-                        myStartY = y;
-                        myStartBrightness = fb.widget.getScreenBrightness();
-                        return true;
-                    }
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (myIsBrightnessAdjustmentInProgress) {
-                        if (x >= areaWidth * 2) {
-                            myIsBrightnessAdjustmentInProgress = false;
-                            return false;
-                        } else {
-                            final int delta = (myStartBrightness + 30) * (myStartY - y) / fb.getHeight();
-                            fb.widget.setScreenBrightness(myStartBrightness + delta);
-                            return true;
-                        }
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    if (myIsBrightnessAdjustmentInProgress) {
-                        myIsBrightnessAdjustmentInProgress = false;
-                        return true;
-                    }
-                    break;
-            }
-            return false;
-        }
-
-        public Integer setScreenBrightness(int percent) {
-            if (percent < 1)
-                percent = 1;
-            else if (percent > 100)
-                percent = 100;
-
-            final float level;
-            final Integer oldColorLevel = myColorLevel;
-            if (percent >= 25) {
-                // 100 => 1f; 25 => .01f
-                level = .01f + (percent - 25) * .99f / 75;
-                myColorLevel = null;
-            } else {
-                level = .01f;
-                myColorLevel = 0x60 + (0xFF - 0x60) * Math.max(percent, 0) / 25;
-            }
-
-            final WindowManager.LayoutParams attrs = fb.w.getAttributes();
-            attrs.screenBrightness = level;
-            fb.w.setAttributes(attrs);
-
-            return myColorLevel;
-        }
-
-        public int getScreenBrightness() {
-            if (myColorLevel != null)
-                return (myColorLevel - 0x60) * 25 / (0xFF - 0x60);
-
-            float level = fb.w.getAttributes().screenBrightness;
-            level = level >= 0 ? level : .5f;
-
-            // level = .01f + (percent - 25) * .99f / 75;
-            return 25 + (int) ((level - .01f) * 75 / .99f);
+            super(view);
         }
     }
 
@@ -2127,7 +1998,7 @@ public class FBReaderView extends RelativeLayout {
         public void onFingerSingleTap(int x, int y) {
             final ZLTextHighlighting highlighting = findHighlighting(x, y, maxSelectionDistance());
             if (highlighting instanceof ZLBookmark) {
-                app.runAction(ActionCode.SELECTION_BOOKMARK, ((ZLBookmark) highlighting).b);
+                app.runAction(ActionCode.SELECTION_BOOKMARK, ((ZLBookmark) highlighting).getB());
                 return;
             }
             super.onFingerSingleTap(x, y);
