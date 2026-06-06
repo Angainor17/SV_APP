@@ -42,59 +42,59 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
         const val MISS = -1
     }
 
-    private var mDragInitMode = ON_DOWN
-    private var mSortEnabled = true
+    private var dragInitMode = ON_DOWN
+    private var sortEnabled = true
     /**
      * The current remove mode.
      */
-    private var mRemoveMode = 0
-    private var mRemoveEnabled = false
-    private var mIsRemoving = false
-    private var mDetector: GestureDetector
-    private var mFlingRemoveDetector: GestureDetector
-    private var mTouchSlop: Int
-    private var mHitPos = MISS
-    private var mFlingHitPos = MISS
+    private var removeMode = 0
+    private var removeEnabled = false
+    private var isRemoving = false
+    private var detector: GestureDetector
+    private var flingRemoveDetector: GestureDetector
+    private var touchSlop: Int
+    private var hitPos = MISS
+    private var flingHitPos = MISS
 
-    private var mClickRemoveHitPos = MISS
+    private var clickRemoveHitPos = MISS
 
-    private var mTempLoc = IntArray(2)
+    private var tempLoc = IntArray(2)
 
-    private var mItemX = 0
-    private var mItemY = 0
+    private var itemX = 0
+    private var itemY = 0
 
-    private var mCurrX = 0
-    private var mCurrY = 0
+    private var currX = 0
+    private var currY = 0
 
-    private var mDragging = false
+    private var dragging = false
 
-    private var mFlingSpeed = 500f
+    private var flingSpeed = 500f
 
-    private var mDragHandleId: Int
-    private var mClickRemoveId: Int
-    private var mFlingHandleId: Int
-    private var mCanDrag = false
+    private var dragHandleId: Int
+    private var clickRemoveId: Int
+    private var flingHandleId: Int
+    private var canDrag = false
 
-    private var mDslv: DragSortListView
-    private var mPositionX = 0
+    private var dslv: DragSortListView
+    private var positionX = 0
 
-    private val mFlingRemoveListener: GestureDetector.OnGestureListener =
+    private val flingRemoveListener: GestureDetector.OnGestureListener =
         object : GestureDetector.SimpleOnGestureListener() {
             override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 // Log.d("mobeta", "on fling remove called");
-                if (mRemoveEnabled && mIsRemoving) {
-                    val w = mDslv.width
+                if (removeEnabled && isRemoving) {
+                    val w = dslv.width
                     val minPos = w / 5
-                    if (velocityX > mFlingSpeed) {
-                        if (mPositionX > -minPos) {
-                            mDslv.stopDragWithVelocity(true, velocityX)
+                    if (velocityX > flingSpeed) {
+                        if (positionX > -minPos) {
+                            dslv.stopDragWithVelocity(true, velocityX)
                         }
-                    } else if (velocityX < -mFlingSpeed) {
-                        if (mPositionX < minPos) {
-                            mDslv.stopDragWithVelocity(true, velocityX)
+                    } else if (velocityX < -flingSpeed) {
+                        if (positionX < minPos) {
+                            dslv.stopDragWithVelocity(true, velocityX)
                         }
                     }
-                    mIsRemoving = false
+                    isRemoving = false
                 }
                 return false
             }
@@ -122,20 +122,20 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * the drag handle in a list item.
      */
     constructor(dslv: DragSortListView, dragHandleId: Int, dragInitMode: Int, removeMode: Int, clickRemoveId: Int, flingHandleId: Int) : super(dslv) {
-        mDslv = dslv
-        mDetector = GestureDetector(dslv.context, this)
-        mFlingRemoveDetector = GestureDetector(dslv.context, mFlingRemoveListener)
-        mFlingRemoveDetector.setIsLongpressEnabled(false)
-        mTouchSlop = ViewConfiguration.get(dslv.context).scaledTouchSlop
-        mDragHandleId = dragHandleId
-        mClickRemoveId = clickRemoveId
-        mFlingHandleId = flingHandleId
+        this.dslv = dslv
+        detector = GestureDetector(dslv.context, this)
+        flingRemoveDetector = GestureDetector(dslv.context, flingRemoveListener)
+        flingRemoveDetector.setIsLongpressEnabled(false)
+        touchSlop = ViewConfiguration.get(dslv.context).scaledTouchSlop
+        this.dragHandleId = dragHandleId
+        this.clickRemoveId = clickRemoveId
+        this.flingHandleId = flingHandleId
         setRemoveMode(removeMode)
         setDragInitMode(dragInitMode)
     }
 
     open fun getDragInitMode(): Int {
-        return mDragInitMode
+        return dragInitMode
     }
 
     /**
@@ -145,11 +145,11 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * @param mode The drag init mode.
      */
     open fun setDragInitMode(mode: Int) {
-        mDragInitMode = mode
+        dragInitMode = mode
     }
 
     open fun isSortEnabled(): Boolean {
-        return mSortEnabled
+        return sortEnabled
     }
 
     /**
@@ -160,29 +160,29 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * item sorting.
      */
     open fun setSortEnabled(enabled: Boolean) {
-        mSortEnabled = enabled
+        sortEnabled = enabled
     }
 
     open fun getRemoveMode(): Int {
-        return mRemoveMode
+        return removeMode
     }
 
     /**
      * One of [CLICK_REMOVE], [FLING_REMOVE].
      */
     open fun setRemoveMode(mode: Int) {
-        mRemoveMode = mode
+        removeMode = mode
     }
 
     open fun isRemoveEnabled(): Boolean {
-        return mRemoveEnabled
+        return removeEnabled
     }
 
     /**
      * Enable/Disable item removal without affecting remove mode.
      */
     open fun setRemoveEnabled(enabled: Boolean) {
-        mRemoveEnabled = enabled
+        removeEnabled = enabled
     }
 
     /**
@@ -192,7 +192,7 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * @param id An android resource id.
      */
     open fun setDragHandleId(id: Int) {
-        mDragHandleId = id
+        dragHandleId = id
     }
 
     /**
@@ -202,7 +202,7 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * @param id An android resource id.
      */
     open fun setFlingHandleId(id: Int) {
-        mFlingHandleId = id
+        flingHandleId = id
     }
 
     /**
@@ -212,7 +212,7 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * @param id An android resource id.
      */
     open fun setClickRemoveId(id: Int) {
-        mClickRemoveId = id
+        clickRemoveId = id
     }
 
     /**
@@ -227,46 +227,46 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      */
     open fun startDrag(position: Int, deltaX: Int, deltaY: Int): Boolean {
         var dragFlags = 0
-        if (mSortEnabled && !mIsRemoving) {
+        if (sortEnabled && !isRemoving) {
             dragFlags = dragFlags or DragSortListView.DRAG_POS_Y or DragSortListView.DRAG_NEG_Y
         }
-        if (mRemoveEnabled && mIsRemoving) {
+        if (removeEnabled && isRemoving) {
             dragFlags = dragFlags or DragSortListView.DRAG_POS_X
             dragFlags = dragFlags or DragSortListView.DRAG_NEG_X
         }
 
-        mDragging = mDslv.startDrag(position - mDslv.headerViewsCount, dragFlags, deltaX, deltaY)
-        return mDragging
+        dragging = dslv.startDrag(position - dslv.headerViewsCount, dragFlags, deltaX, deltaY)
+        return dragging
     }
 
     override fun onTouch(v: View, ev: MotionEvent): Boolean {
-        if (!mDslv.isDragEnabled || mDslv.listViewIntercepted()) {
+        if (!dslv.isDragEnabled || dslv.listViewIntercepted()) {
             return false
         }
 
-        mDetector.onTouchEvent(ev)
-        if (mRemoveEnabled && mDragging && mRemoveMode == FLING_REMOVE) {
-            mFlingRemoveDetector.onTouchEvent(ev)
+        detector.onTouchEvent(ev)
+        if (removeEnabled && dragging && removeMode == FLING_REMOVE) {
+            flingRemoveDetector.onTouchEvent(ev)
         }
 
         val action = ev.action and MotionEvent.ACTION_MASK
         when (action) {
             MotionEvent.ACTION_DOWN -> {
-                mCurrX = ev.x.toInt()
-                mCurrY = ev.y.toInt()
+                currX = ev.x.toInt()
+                currY = ev.y.toInt()
             }
             MotionEvent.ACTION_UP -> {
-                if (mRemoveEnabled && mIsRemoving) {
-                    val x = if (mPositionX >= 0) mPositionX else -mPositionX
-                    val removePoint = mDslv.width / 2
+                if (removeEnabled && isRemoving) {
+                    val x = if (positionX >= 0) positionX else -positionX
+                    val removePoint = dslv.width / 2
                     if (x > removePoint) {
-                        mDslv.stopDragWithVelocity(true, 0f)
+                        dslv.stopDragWithVelocity(true, 0f)
                     }
                 }
             }
             MotionEvent.ACTION_CANCEL -> {
-                mIsRemoving = false
-                mDragging = false
+                isRemoving = false
+                dragging = false
             }
         }
 
@@ -277,8 +277,8 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * Overrides to provide fading when slide removal is enabled.
      */
     override fun onDragFloatView(floatView: View, position: Point, touch: Point) {
-        if (mRemoveEnabled && mIsRemoving) {
-            mPositionX = position.x
+        if (removeEnabled && isRemoving) {
+            positionX = position.x
         }
     }
 
@@ -299,7 +299,7 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
     }
 
     open fun startFlingPosition(ev: MotionEvent): Int {
-        return if (mRemoveMode == FLING_REMOVE) flingHandleHitPosition(ev) else MISS
+        return if (removeMode == FLING_REMOVE) flingHandleHitPosition(ev) else MISS
     }
 
     /**
@@ -312,41 +312,41 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
      * touched; MISS if unsuccessful.
      */
     open fun dragHandleHitPosition(ev: MotionEvent): Int {
-        return viewIdHitPosition(ev, mDragHandleId)
+        return viewIdHitPosition(ev, dragHandleId)
     }
 
     open fun flingHandleHitPosition(ev: MotionEvent): Int {
-        return viewIdHitPosition(ev, mFlingHandleId)
+        return viewIdHitPosition(ev, flingHandleId)
     }
 
     open fun viewIdHitPosition(ev: MotionEvent, id: Int): Int {
         val x = ev.x.toInt()
         val y = ev.y.toInt()
 
-        val touchPos = mDslv.pointToPosition(x, y) // includes headers/footers
+        val touchPos = dslv.pointToPosition(x, y) // includes headers/footers
 
-        val numHeaders = mDslv.headerViewsCount
-        val numFooters = mDslv.footerViewsCount
-        val count = mDslv.count
+        val numHeaders = dslv.headerViewsCount
+        val numFooters = dslv.footerViewsCount
+        val count = dslv.count
 
         // Log.d("mobeta", "touch down on position " + itemnum);
         // We're only interested if the touch was on an
         // item that's not a header or footer.
         if (touchPos != AdapterView.INVALID_POSITION && touchPos >= numHeaders && touchPos < count - numFooters) {
-            val item = mDslv.getChildAt(touchPos - mDslv.firstVisiblePosition)
+            val item = dslv.getChildAt(touchPos - dslv.firstVisiblePosition)
             val rawX = ev.rawX.toInt()
             val rawY = ev.rawY.toInt()
 
             val dragBox: View? = if (id == 0) item else item.findViewById(id)
             if (dragBox != null) {
-                dragBox.getLocationOnScreen(mTempLoc)
+                dragBox.getLocationOnScreen(tempLoc)
 
-                if (rawX > mTempLoc[0] && rawY > mTempLoc[1] &&
-                    rawX < mTempLoc[0] + dragBox.width &&
-                    rawY < mTempLoc[1] + dragBox.height
+                if (rawX > tempLoc[0] && rawY > tempLoc[1] &&
+                    rawX < tempLoc[0] + dragBox.width &&
+                    rawY < tempLoc[1] + dragBox.height
                 ) {
-                    mItemX = item.left
-                    mItemY = item.top
+                    itemX = item.left
+                    itemY = item.top
 
                     return touchPos
                 }
@@ -357,19 +357,19 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
     }
 
     override fun onDown(ev: MotionEvent): Boolean {
-        if (mRemoveEnabled && mRemoveMode == CLICK_REMOVE) {
-            mClickRemoveHitPos = viewIdHitPosition(ev, mClickRemoveId)
+        if (removeEnabled && removeMode == CLICK_REMOVE) {
+            clickRemoveHitPos = viewIdHitPosition(ev, clickRemoveId)
         }
 
-        mHitPos = startDragPosition(ev)
-        if (mHitPos != MISS && mDragInitMode == ON_DOWN) {
-            startDrag(mHitPos, ev.x.toInt() - mItemX, ev.y.toInt() - mItemY)
+        hitPos = startDragPosition(ev)
+        if (hitPos != MISS && dragInitMode == ON_DOWN) {
+            startDrag(hitPos, ev.x.toInt() - itemX, ev.y.toInt() - itemY)
         }
 
-        mIsRemoving = false
-        mCanDrag = true
-        mPositionX = 0
-        mFlingHitPos = startFlingPosition(ev)
+        isRemoving = false
+        canDrag = true
+        positionX = 0
+        flingHitPos = startFlingPosition(ev)
 
         return true
     }
@@ -380,23 +380,23 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
         val y1 = e1.y.toInt()
         val x2 = e2.x.toInt()
         val y2 = e2.y.toInt()
-        val deltaX = x2 - mItemX
-        val deltaY = y2 - mItemY
+        val deltaX = x2 - itemX
+        val deltaY = y2 - itemY
 
-        if (mCanDrag && !mDragging && (mHitPos != MISS || mFlingHitPos != MISS)) {
-            if (mHitPos != MISS) {
-                if (mDragInitMode == ON_DRAG && Math.abs(y2 - y1) > mTouchSlop && mSortEnabled) {
-                    startDrag(mHitPos, deltaX, deltaY)
-                } else if (mDragInitMode != ON_DOWN && Math.abs(x2 - x1) > mTouchSlop && mRemoveEnabled) {
-                    mIsRemoving = true
-                    startDrag(mFlingHitPos, deltaX, deltaY)
+        if (canDrag && !dragging && (hitPos != MISS || flingHitPos != MISS)) {
+            if (hitPos != MISS) {
+                if (dragInitMode == ON_DRAG && Math.abs(y2 - y1) > touchSlop && sortEnabled) {
+                    startDrag(hitPos, deltaX, deltaY)
+                } else if (dragInitMode != ON_DOWN && Math.abs(x2 - x1) > touchSlop && removeEnabled) {
+                    isRemoving = true
+                    startDrag(flingHitPos, deltaX, deltaY)
                 }
-            } else if (mFlingHitPos != MISS) {
-                if (Math.abs(x2 - x1) > mTouchSlop && mRemoveEnabled) {
-                    mIsRemoving = true
-                    startDrag(mFlingHitPos, deltaX, deltaY)
-                } else if (Math.abs(y2 - y1) > mTouchSlop) {
-                    mCanDrag = false // if started to scroll the list then
+            } else if (flingHitPos != MISS) {
+                if (Math.abs(x2 - x1) > touchSlop && removeEnabled) {
+                    isRemoving = true
+                    startDrag(flingHitPos, deltaX, deltaY)
+                } else if (Math.abs(y2 - y1) > touchSlop) {
+                    canDrag = false // if started to scroll the list then
                     // don't allow sorting nor fling-removing
                 }
             }
@@ -407,9 +407,9 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
 
     override fun onLongPress(e: MotionEvent) {
         // Log.d("mobeta", "lift listener long pressed");
-        if (mHitPos != MISS && mDragInitMode == ON_LONG_PRESS) {
-            mDslv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-            startDrag(mHitPos, mCurrX - mItemX, mCurrY - mItemY)
+        if (hitPos != MISS && dragInitMode == ON_LONG_PRESS) {
+            dslv.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            startDrag(hitPos, currX - itemX, currY - itemY)
         }
     }
 
@@ -420,9 +420,9 @@ open class DragSortController : SimpleFloatViewManager, View.OnTouchListener, Ge
 
     // complete the OnGestureListener interface
     override fun onSingleTapUp(ev: MotionEvent): Boolean {
-        if (mRemoveEnabled && mRemoveMode == CLICK_REMOVE) {
-            if (mClickRemoveHitPos != MISS) {
-                mDslv.removeItem(mClickRemoveHitPos - mDslv.headerViewsCount)
+        if (removeEnabled && removeMode == CLICK_REMOVE) {
+            if (clickRemoveHitPos != MISS) {
+                dslv.removeItem(clickRemoveHitPos - dslv.headerViewsCount)
             }
         }
         return true

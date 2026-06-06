@@ -12,14 +12,14 @@ import android.widget.ListView
  * Simple implementation of the FloatViewManager class. Uses list
  * items as they appear in the ListView to create the floating View.
  */
-open class SimpleFloatViewManager(private val mListView: ListView) : DragSortListView.FloatViewManager {
+open class SimpleFloatViewManager(private val listView: ListView) : DragSortListView.FloatViewManager {
 
-    private var mFloatBitmap: Bitmap? = null
-    private var mImageView: ImageView? = null
-    private var mFloatBGColor = Color.BLACK
+    private var floatBitmap: Bitmap? = null
+    private var imageView: ImageView? = null
+    private var floatBGColor = Color.BLACK
 
     open fun setBackgroundColor(color: Int) {
-        mFloatBGColor = color
+        floatBGColor = color
     }
 
     /**
@@ -29,7 +29,7 @@ open class SimpleFloatViewManager(private val mListView: ListView) : DragSortLis
     override fun onCreateFloatView(position: Int): View? {
         // Guaranteed that this will not be null? I think so. Nope, got
         // a NullPointerException once...
-        val v = mListView.getChildAt(position + mListView.headerViewsCount - mListView.firstVisiblePosition)
+        val v = listView.getChildAt(position + listView.headerViewsCount - listView.firstVisiblePosition)
 
         if (v == null) {
             return null
@@ -40,18 +40,18 @@ open class SimpleFloatViewManager(private val mListView: ListView) : DragSortLis
         // Create a copy of the drawing cache so that it does not get
         // recycled by the framework when the list tries to clean up memory
         v.isDrawingCacheEnabled = true
-        mFloatBitmap = Bitmap.createBitmap(v.drawingCache)
+        floatBitmap = Bitmap.createBitmap(v.drawingCache)
         v.isDrawingCacheEnabled = false
 
-        if (mImageView == null) {
-            mImageView = ImageView(mListView.context)
+        if (imageView == null) {
+            imageView = ImageView(listView.context)
         }
-        mImageView!!.setBackgroundColor(mFloatBGColor)
-        mImageView!!.setPadding(0, 0, 0, 0)
-        mImageView!!.setImageBitmap(mFloatBitmap)
-        mImageView!!.layoutParams = ViewGroup.LayoutParams(v.width, v.height)
+        imageView!!.setBackgroundColor(floatBGColor)
+        imageView!!.setPadding(0, 0, 0, 0)
+        imageView!!.setImageBitmap(floatBitmap)
+        imageView!!.layoutParams = ViewGroup.LayoutParams(v.width, v.height)
 
-        return mImageView
+        return imageView
     }
 
     /**
@@ -68,7 +68,7 @@ open class SimpleFloatViewManager(private val mListView: ListView) : DragSortLis
     override fun onDestroyFloatView(floatView: View) {
         (floatView as ImageView).setImageDrawable(null)
 
-        mFloatBitmap?.recycle()
-        mFloatBitmap = null
+        floatBitmap?.recycle()
+        floatBitmap = null
     }
 }

@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
-import androidx.annotation.NonNull
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import org.geometerplus.zlibrary.core.util.ZLTTFInfoDetector
 import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil
@@ -133,15 +132,13 @@ class TTFManager(val context: Context) {
             fl = File(fl, "Fonts")
             fonts.add(fl)
         }
-        if (Build.VERSION.SDK_INT >= 19) {
-            val fl2 = context.getExternalFilesDirs("Fonts")
-            if (fl2 != null) {
-                for (f in fl2) {
-                    if (f != null)
-                        fonts.add(f)
-                }
-                appFonts = fl2[0]
+        val fl2 = context.getExternalFilesDirs("Fonts")
+        if (fl2 != null) {
+            for (f in fl2) {
+                if (f != null)
+                    fonts.add(f)
             }
+            appFonts = fl2[0]
         }
         if (appFonts == null)
             appFonts = fl
@@ -267,7 +264,7 @@ class TTFManager(val context: Context) {
         var uri: Uri
         var index: Int
 
-        constructor(@NonNull pathname: String) : super(pathname) {
+        constructor(pathname: String) : super(pathname) {
             uri = Uri.EMPTY
             index = -1
         }
@@ -294,7 +291,7 @@ class TTFManager(val context: Context) {
      * http://www.ulduzsoft.com/2012/01/enumerating-the-fonts-on-android-platform/
      */
     class TTFAnalyzer {
-        private var mFile: CacheImagesAdapter.SeekInputStream? = null // Файл шрифта; должен поддерживать seek
+        private var ttfFile: CacheImagesAdapter.SeekInputStream? = null // Файл шрифта; должен поддерживать seek
 
         /**
          * Парсит TTF-файл и возвращает имя шрифта.
@@ -323,7 +320,7 @@ class TTFManager(val context: Context) {
                         // Читаем секцию имени полностью
                         val table = ByteArray(length)
 
-                        mFile!!.seek(offset.toLong())
+                        ttfFile!!.seek(offset.toLong())
                         read(table)
 
                         // Это тоже таблица. См. http://developer.apple.com/fonts/ttrefman/rm06/Chap6name.html
@@ -368,7 +365,7 @@ class TTFManager(val context: Context) {
         fun getTtfFontName(file: File): String? {
             var tag = 0
             try {
-                mFile = CacheImagesAdapter.SeekInputStream(FileInputStream(file))
+                ttfFile = CacheImagesAdapter.SeekInputStream(FileInputStream(file))
                 tag = readDword()
             } catch (e: IOException) {
                 return null
@@ -389,7 +386,7 @@ class TTFManager(val context: Context) {
                     nn[i] = readDword()
                 val ss = arrayOfNulls<String>(num)
                 for (i in 0 until num) {
-                    mFile!!.seek(nn[i].toLong())
+                    ttfFile!!.seek(nn[i].toLong())
                     val tag = readDword()
                     when (tag) {
                         0x74727565, 0x00010000, 0x4F54544F -> ss[i] = getTtfFontName()
@@ -411,7 +408,7 @@ class TTFManager(val context: Context) {
 
         fun getNames(`is`: InputStream): Array<String>? {
             try {
-                mFile = CacheImagesAdapter.SeekInputStream(`is`)
+                ttfFile = CacheImagesAdapter.SeekInputStream(`is`)
                 val tag = readDword()
                 when (tag) {
                     0x74746366 -> return getTTCFontNames() // 'ttcf'
@@ -426,7 +423,7 @@ class TTFManager(val context: Context) {
         // Вспомогательные функции I/O
         @Throws(IOException::class)
         private fun readByte(): Int {
-            return mFile!!.read() and 0xFF
+            return ttfFile!!.read() and 0xFF
         }
 
         @Throws(IOException::class)
@@ -447,7 +444,7 @@ class TTFManager(val context: Context) {
 
         @Throws(IOException::class)
         private fun read(array: ByteArray) {
-            if (mFile!!.read(array) != array.size)
+            if (ttfFile!!.read(array) != array.size)
                 throw IOException()
         }
 

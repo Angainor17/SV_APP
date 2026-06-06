@@ -25,7 +25,7 @@ open class DragSortItemView @JvmOverloads constructor(
     gravity: Int = Gravity.TOP
 ) : ViewGroup(context) {
 
-    protected var mGravity = gravity
+    protected var viewGravity = gravity
 
     init {
         // always init with standard ListView layout params
@@ -36,11 +36,11 @@ open class DragSortItemView @JvmOverloads constructor(
     }
 
     open fun getGravity(): Int {
-        return mGravity
+        return viewGravity
     }
 
     open fun setGravity(gravity: Int) {
-        mGravity = gravity
+        viewGravity = gravity
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -50,7 +50,7 @@ open class DragSortItemView @JvmOverloads constructor(
             return
         }
 
-        if (mGravity == Gravity.TOP) {
+        if (viewGravity == Gravity.TOP) {
             child.layout(0, 0, measuredWidth, child.measuredHeight)
         } else {
             child.layout(0, measuredHeight - child.measuredHeight, measuredWidth, measuredHeight)

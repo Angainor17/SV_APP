@@ -33,9 +33,9 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
     /**
      * Key is ListView position, value is Cursor position
      */
-    private var mListMapping: SparseIntArray = SparseIntArray()
+    private var listMapping: SparseIntArray = SparseIntArray()
 
-    private var mRemovedCursorPositions: ArrayList<Int> = ArrayList()
+    private var removedCursorPositions: ArrayList<Int> = ArrayList()
 
     constructor(context: Context, c: Cursor?) : super(context, c)
 
@@ -73,24 +73,24 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
     }
 
     private fun resetMappings() {
-        mListMapping.clear()
-        mRemovedCursorPositions.clear()
+        listMapping.clear()
+        removedCursorPositions.clear()
     }
 
     override fun getItem(position: Int): Any {
-        return super.getItem(mListMapping.get(position, position))
+        return super.getItem(listMapping.get(position, position))
     }
 
     override fun getItemId(position: Int): Long {
-        return super.getItemId(mListMapping.get(position, position))
+        return super.getItemId(listMapping.get(position, position))
     }
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-        return super.getDropDownView(mListMapping.get(position, position), convertView, parent)
+        return super.getDropDownView(listMapping.get(position, position), convertView, parent)
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        return super.getView(mListMapping.get(position, position), convertView, parent)
+        return super.getView(listMapping.get(position, position), convertView, parent)
     }
 
     /**
@@ -102,18 +102,18 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
      */
     override fun drop(from: Int, to: Int) {
         if (from != to) {
-            val cursorFrom = mListMapping.get(from, from)
+            val cursorFrom = listMapping.get(from, from)
 
             if (from > to) {
                 for (i in from downTo to + 1) {
-                    mListMapping.put(i, mListMapping.get(i - 1, i - 1))
+                    listMapping.put(i, listMapping.get(i - 1, i - 1))
                 }
             } else {
                 for (i in from until to) {
-                    mListMapping.put(i, mListMapping.get(i + 1, i + 1))
+                    listMapping.put(i, listMapping.get(i + 1, i + 1))
                 }
             }
-            mListMapping.put(to, cursorFrom)
+            listMapping.put(to, cursorFrom)
 
             cleanMapping()
             notifyDataSetChanged()
@@ -128,17 +128,17 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
      * @see DragSortListView.RemoveListener.remove
      */
     override fun remove(which: Int) {
-        val cursorPos = mListMapping.get(which, which)
-        if (!mRemovedCursorPositions.contains(cursorPos)) {
-            mRemovedCursorPositions.add(cursorPos)
+        val cursorPos = listMapping.get(which, which)
+        if (!removedCursorPositions.contains(cursorPos)) {
+            removedCursorPositions.add(cursorPos)
         }
 
         val newCount = count
         for (i in which until newCount) {
-            mListMapping.put(i, mListMapping.get(i + 1, i + 1))
+            listMapping.put(i, listMapping.get(i + 1, i + 1))
         }
 
-        mListMapping.delete(newCount)
+        listMapping.delete(newCount)
 
         cleanMapping()
         notifyDataSetChanged()
@@ -157,20 +157,20 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
     private fun cleanMapping() {
         val toRemove = ArrayList<Int>()
 
-        val size = mListMapping.size()
+        val size = listMapping.size()
         for (i in 0 until size) {
-            if (mListMapping.keyAt(i) == mListMapping.valueAt(i)) {
-                toRemove.add(mListMapping.keyAt(i))
+            if (listMapping.keyAt(i) == listMapping.valueAt(i)) {
+                toRemove.add(listMapping.keyAt(i))
             }
         }
 
         for (key in toRemove) {
-            mListMapping.delete(key)
+            listMapping.delete(key)
         }
     }
 
     override fun getCount(): Int {
-        return super.getCount() - mRemovedCursorPositions.size
+        return super.getCount() - removedCursorPositions.size
     }
 
     /**
@@ -182,7 +182,7 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
      * @return The mapped-to Cursor position
      */
     fun getCursorPosition(position: Int): Int {
-        return mListMapping.get(position, position)
+        return listMapping.get(position, position)
     }
 
     /**
@@ -193,7 +193,7 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
         val result = ArrayList<Int>()
 
         for (i in 0 until count) {
-            result.add(mListMapping.get(i, i))
+            result.add(listMapping.get(i, i))
         }
 
         return result
@@ -208,15 +208,15 @@ abstract class DragSortCursorAdapter : CursorAdapter, DragSortListView.DragSortL
      * @return The mapped-to list position or REMOVED
      */
     fun getListPosition(cursorPosition: Int): Int {
-        if (mRemovedCursorPositions.contains(cursorPosition)) {
+        if (removedCursorPositions.contains(cursorPosition)) {
             return REMOVED
         }
 
-        val index = mListMapping.indexOfValue(cursorPosition)
+        val index = listMapping.indexOfValue(cursorPosition)
         return if (index < 0) {
             cursorPosition
         } else {
-            mListMapping.keyAt(index)
+            listMapping.keyAt(index)
         }
     }
 }
