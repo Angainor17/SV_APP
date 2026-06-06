@@ -17,17 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.android.fbreader
 
-class ZLTextSpecialParagraphImpl extends ZLTextParagraphImpl {
-    private final byte myKind;
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-    ZLTextSpecialParagraphImpl(byte kind, ZLTextPlainModel model, int offset) {
-        super(model, offset);
-        myKind = kind;
-    }
-
-    public byte getKind() {
-        return myKind;
+internal class ShowMenuAction(
+    baseActivity: FBReader,
+    fbreader: FBReaderApp
+) : FBAndroidAction(baseActivity, fbreader) {
+    override fun run(vararg params: Any?) {
+        BaseActivity.openOptionsMenu()
     }
 }

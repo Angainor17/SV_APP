@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.fbreader.network.opds
 
-class ExitAction extends FBAction {
-    ExitAction(FBReaderApp fbreader) {
-        super(fbreader);
-    }
+import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-    @Override
-    protected void run(Object... params) {
-        if (Reader.getCurrentView() != Reader.BookTextView) {
-            Reader.showBookTextView();
-        } else {
-            Reader.closeWindow();
-        }
-    }
+internal class OPDSFeedMetadata(attributes: ZLStringMap) : ATOMFeedMetadata(attributes) {
+    @JvmField var OpensearchTotalResults: Int = -1
+    @JvmField var OpensearchItemsPerPage: Int = 0
+    @JvmField var OpensearchStartIndex: Int = 1
+
+    @JvmField var ViewType: String? = null
 }

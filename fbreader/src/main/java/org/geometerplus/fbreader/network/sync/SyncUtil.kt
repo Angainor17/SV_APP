@@ -17,20 +17,20 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network.action;
+package org.geometerplus.fbreader.network.sync
 
-import android.app.Activity;
+import org.geometerplus.fbreader.fbreader.options.SyncOptions
+import org.geometerplus.zlibrary.core.network.ZLNetworkContext
 
-import org.geometerplus.fbreader.network.NetworkTree;
-import org.geometerplus.fbreader.network.tree.RootTree;
-
-public abstract class RootAction extends Action {
-    protected RootAction(Activity activity, int code, String resourceKey, int iconId) {
-        super(activity, code, resourceKey, iconId);
+object SyncUtil {
+    @JvmStatic
+    fun getAccountName(context: ZLNetworkContext): String? {
+        return context.getAccountName(SyncOptions.DOMAIN, SyncOptions.REALM)
     }
 
-    @Override
-    public boolean isVisible(NetworkTree tree) {
-        return tree instanceof RootTree;
+    @JvmStatic
+    fun logout(context: ZLNetworkContext) {
+        context.removeCookiesForDomain(SyncOptions.DOMAIN)
+        context.setAccountName(SyncOptions.DOMAIN, SyncOptions.REALM, null)
     }
 }

@@ -17,17 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.fbreader.fbreader
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
-
-class ShowMenuAction extends FBAndroidAction {
-    ShowMenuAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
-    }
-
-    @Override
-    protected void run(Object... params) {
-        BaseActivity.openOptionsMenu();
+internal class ExitAction(fbreader: FBReaderApp) : FBAction(fbreader) {
+    override fun run(vararg params: Any?) {
+        if (Reader.currentView !== Reader.BookTextView) {
+            Reader.showBookTextView()
+        } else {
+            Reader.closeWindow()
+        }
     }
 }

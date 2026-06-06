@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.fbreader.network.urlInfo
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.zlibrary.core.util.MimeType
 
-class StartScreenAction extends FBAndroidAction {
-    StartScreenAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
-    }
-
-    @Override
-    protected void run(Object... params) {
-        Reader.openHelpBook();
+class RelatedUrlInfo(
+    type: Type,
+    @JvmField val Title: String,
+    url: String,
+    mime: MimeType
+) : UrlInfo(type, url, mime) {
+    companion object {
+        private const val serialVersionUID: Long = -63738967788098L
     }
 }

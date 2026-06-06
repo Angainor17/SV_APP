@@ -17,18 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.sync;
+package org.geometerplus.fbreader.network.authentication.litres
 
-import org.geometerplus.fbreader.fbreader.options.SyncOptions;
-import org.geometerplus.zlibrary.core.network.ZLNetworkContext;
+import org.geometerplus.zlibrary.core.network.ZLNetworkException
+import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter
 
-public abstract class SyncUtil {
-    public static String getAccountName(ZLNetworkContext context) {
-        return context.getAccountName(SyncOptions.DOMAIN, SyncOptions.REALM);
-    }
+open class LitResAuthenticationXMLReader : ZLXMLReaderAdapter() {
+    private var myException: ZLNetworkException? = null
 
-    public static void logout(ZLNetworkContext context) {
-        context.removeCookiesForDomain(SyncOptions.DOMAIN);
-        context.setAccountName(SyncOptions.DOMAIN, SyncOptions.REALM, null);
+    fun getException(): ZLNetworkException? = myException
+
+    protected fun setException(e: ZLNetworkException) {
+        myException = e
     }
 }

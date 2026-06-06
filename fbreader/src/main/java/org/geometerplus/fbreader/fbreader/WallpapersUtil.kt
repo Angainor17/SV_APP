@@ -22,6 +22,7 @@ package org.geometerplus.fbreader.fbreader
 import org.geometerplus.zlibrary.core.filesystem.ZLFile
 
 object WallpapersUtil {
+    @JvmStatic
     fun predefinedWallpaperFiles(): List<ZLFile> {
         return ZLFile.createFileByPath("wallpapers").children()
     }

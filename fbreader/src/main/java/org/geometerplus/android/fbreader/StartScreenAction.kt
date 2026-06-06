@@ -17,17 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.android.fbreader
 
-import org.geometerplus.zlibrary.text.model.ExtensionEntry;
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-import java.util.List;
-import java.util.Map;
-
-public abstract class ExtensionElementManager {
-    final List<? extends ExtensionElement> getElements(ExtensionEntry entry) {
-        return getElements(entry.Type, entry.Data);
+internal class StartScreenAction(
+    baseActivity: FBReader,
+    fbreader: FBReaderApp
+) : FBAndroidAction(baseActivity, fbreader) {
+    override fun run(vararg params: Any?) {
+        Reader.openHelpBook()
     }
-
-    protected abstract List<? extends ExtensionElement> getElements(String type, Map<String, String> data);
 }

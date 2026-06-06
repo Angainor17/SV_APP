@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network.litres;
+package org.geometerplus.android.util.eink
 
-public interface UserRegistrationConstants {
-    String CATALOG_URL = "catalogUrl";
-    String SIGNIN_URL = "signinUrl";
-    String SIGNUP_URL = "signupUrl";
-    String RECOVER_PASSWORD_URL = "recoverPasswordUrl";
+import android.app.Activity
+import org.geometerplus.android.util.DeviceType
 
-    String USER_REGISTRATION_USERNAME = "userName";
-    String USER_REGISTRATION_PASSWORD = "password";
-    String USER_REGISTRATION_EMAIL = "eMail";
-    String USER_REGISTRATION_LITRES_SID = "litres:sid";
+object EInkUtil {
+    @JvmStatic
+    fun prepareSingleFullRefresh(a: Activity) {
+        val deviceType = DeviceType.Instance()
+        if (deviceType == DeviceType.NOOK || deviceType == DeviceType.NOOK12) {
+            Nook2Util.setGL16Mode(a)
+        }
+    }
 }

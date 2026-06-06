@@ -17,17 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.util.eink;
+package org.geometerplus.android.fbreader
 
-import android.app.Activity;
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-import org.geometerplus.android.util.DeviceType;
-
-public abstract class EInkUtil {
-    public static void prepareSingleFullRefresh(Activity a) {
-        final DeviceType deviceType = DeviceType.Instance();
-        if (deviceType == DeviceType.NOOK || deviceType == DeviceType.NOOK12) {
-            Nook2Util.setGL16Mode(a);
-        }
+internal class SelectionHidePanelAction(
+    baseActivity: FBReader,
+    fbreader: FBReaderApp
+) : FBAndroidAction(baseActivity, fbreader) {
+    override fun run(vararg params: Any?) {
+        BaseActivity.hideSelectionPanel()
     }
 }
