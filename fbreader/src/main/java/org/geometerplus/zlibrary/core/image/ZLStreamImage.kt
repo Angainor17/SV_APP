@@ -17,10 +17,10 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.zlibrary.core.image
 
-public final class ZLTextCSSStyleEntry extends ZLTextStyleEntry {
-    public ZLTextCSSStyleEntry(short depth) {
-        super(depth);
-    }
+import java.io.InputStream
+
+interface ZLStreamImage : ZLImage {
+    fun inputStream(): InputStream?
 }

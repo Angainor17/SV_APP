@@ -335,7 +335,7 @@ interface Plugin {
                 val app = FBReaderApp(null, BookCollectionShadow())
                 val wallpaper = app.BookTextView.getWallpaperFile()
                 if (wallpaper != null)
-                    this.wallpaper = BitmapFactory.decodeStream(wallpaper.inputStream)
+                    this.wallpaper = BitmapFactory.decodeStream(wallpaper.getInputStream())
                 else
                     this.wallpaper = null
                 wallpaperColor = (0xff shl 24) or app.BookTextView.getBackgroundColor().intValue()

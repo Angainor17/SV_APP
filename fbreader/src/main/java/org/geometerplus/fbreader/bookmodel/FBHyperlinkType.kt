@@ -17,11 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.util;
+package org.geometerplus.fbreader.bookmodel
 
-import java.io.IOException;
-import java.io.InputStream;
-
-public interface InputStreamHolder {
-    InputStream getInputStream() throws IOException;
+interface FBHyperlinkType {
+    companion object {
+        const val NONE: Byte = 0
+        const val INTERNAL: Byte = 1
+        const val FOOTNOTE: Byte = 2
+        const val EXTERNAL: Byte = 3
+    }
 }

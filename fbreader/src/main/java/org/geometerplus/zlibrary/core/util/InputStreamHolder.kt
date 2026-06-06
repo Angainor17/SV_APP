@@ -17,10 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.util;
+package org.geometerplus.zlibrary.core.util
 
-public interface SystemInfo {
-    String tempDirectory();
+import java.io.IOException
+import java.io.InputStream
 
-    String networkCacheDirectory();
+interface InputStreamHolder {
+    @Throws(IOException::class)
+    fun getInputStream(): InputStream?
 }

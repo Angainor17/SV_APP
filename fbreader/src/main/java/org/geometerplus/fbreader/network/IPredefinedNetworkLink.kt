@@ -17,8 +17,9 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.image;
+package org.geometerplus.fbreader.network
 
-public abstract class ZLImageSimpleProxy extends ZLImageProxy {
-    public abstract void synchronize();
+interface IPredefinedNetworkLink : INetworkLink {
+    fun getPredefinedId(): String?
+    fun servesHost(hostname: String?): Boolean
 }

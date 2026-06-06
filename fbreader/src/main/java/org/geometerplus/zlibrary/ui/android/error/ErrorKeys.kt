@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network;
+package org.geometerplus.zlibrary.ui.android.error
 
-import org.geometerplus.zlibrary.core.network.ZLNetworkContext;
-
-public interface ISyncNetworkLink extends INetworkLink {
-    boolean isLoggedIn(ZLNetworkContext context);
-
-    void logout(ZLNetworkContext context);
+interface ErrorKeys {
+    companion object {
+        const val STACKTRACE = "fbreader.stacktrace"
+        const val MESSAGE = "fbreader.message"
+        const val FILE_PATH = "fbreader.filePath"
+    }
 }
