@@ -57,19 +57,19 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * This field should be made private, so it is hidden from the SDK.
      * {@hide}
      */
-    protected var mFrom: IntArray? = null
+    protected var fromColumns: IntArray? = null
 
     /**
      * A list of View ids representing the views to which the data must be bound.
      * This field should be made private, so it is hidden from the SDK.
      * {@hide}
      */
-    protected var mTo: IntArray = intArrayOf()
+    protected var toViews: IntArray = intArrayOf()
 
-    private var mOriginalFrom: Array<String> = emptyArray()
-    private var mStringConversionColumn = -1
-    private var mCursorToStringConverter: CursorToStringConverter? = null
-    private var mViewBinder: ViewBinder? = null
+    private var originalFrom: Array<String> = emptyArray()
+    private var stringConversionColumn = -1
+    private var cursorToStringConverter: CursorToStringConverter? = null
+    private var viewBinder: ViewBinder? = null
 
     /**
      * Constructor the enables auto-requery.
@@ -81,8 +81,8 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      */
     @Deprecated("")
     constructor(context: Context, layout: Int, c: Cursor?, from: Array<String>, to: IntArray) : super(context, layout, c) {
-        mTo = to
-        mOriginalFrom = from
+        toViews = to
+        originalFrom = from
         findColumns(c, from)
     }
 
@@ -105,8 +105,8 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * as per [CursorAdapter.CursorAdapter].
      */
     constructor(context: Context, layout: Int, c: Cursor?, from: Array<String>, to: IntArray, flags: Int) : super(context, layout, c, flags) {
-        mTo = to
-        mOriginalFrom = from
+        toViews = to
+        originalFrom = from
         findColumns(c, from)
     }
 
@@ -134,10 +134,10 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see setViewText
      */
     override fun bindView(view: View, context: Context, cursor: Cursor) {
-        val binder = mViewBinder
-        val count = mTo.size
-        val from = mFrom ?: return
-        val to = mTo
+        val binder = viewBinder
+        val count = toViews.size
+        val from = fromColumns ?: return
+        val to = toViews
 
         for (i in 0 until count) {
             val v = view.findViewById<View>(to[i])
@@ -172,7 +172,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see setViewBinder
      */
     open fun getViewBinder(): ViewBinder? {
-        return mViewBinder
+        return viewBinder
     }
 
     /**
@@ -184,7 +184,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see getViewBinder
      */
     open fun setViewBinder(viewBinder: ViewBinder?) {
-        mViewBinder = viewBinder
+        this.viewBinder = viewBinder
     }
 
     /**
@@ -239,7 +239,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see getCursorToStringConverter
      */
     open fun getStringConversionColumn(): Int {
-        return mStringConversionColumn
+        return stringConversionColumn
     }
 
     /**
@@ -256,7 +256,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see getCursorToStringConverter
      */
     open fun setStringConversionColumn(stringConversionColumn: Int) {
-        mStringConversionColumn = stringConversionColumn
+        this.stringConversionColumn = stringConversionColumn
     }
 
     /**
@@ -271,7 +271,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see android.widget.CursorAdapter.convertToString
      */
     open fun getCursorToStringConverter(): CursorToStringConverter? {
-        return mCursorToStringConverter
+        return cursorToStringConverter
     }
 
     /**
@@ -286,7 +286,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @see android.widget.CursorAdapter.convertToString
      */
     open fun setCursorToStringConverter(cursorToStringConverter: CursorToStringConverter?) {
-        mCursorToStringConverter = cursorToStringConverter
+        this.cursorToStringConverter = cursorToStringConverter
     }
 
     /**
@@ -300,10 +300,10 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * @return a non-null CharSequence representing the cursor
      */
     override fun convertToString(cursor: Cursor?): CharSequence {
-        if (mCursorToStringConverter != null) {
-            return mCursorToStringConverter!!.convertToString(cursor)
-        } else if (mStringConversionColumn > -1 && cursor != null) {
-            return cursor.getString(mStringConversionColumn)
+        if (cursorToStringConverter != null) {
+            return cursorToStringConverter!!.convertToString(cursor)
+        } else if (stringConversionColumn > -1 && cursor != null) {
+            return cursor.getString(stringConversionColumn)
         }
 
         return super.convertToString(cursor)
@@ -319,14 +319,14 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
     private fun findColumns(c: Cursor?, from: Array<String>) {
         if (c != null) {
             val count = from.size
-            if (mFrom == null || mFrom!!.size != count) {
-                mFrom = IntArray(count)
+            if (fromColumns == null || fromColumns!!.size != count) {
+                fromColumns = IntArray(count)
             }
             for (i in 0 until count) {
-                mFrom!![i] = c.getColumnIndexOrThrow(from[i])
+                fromColumns!![i] = c.getColumnIndexOrThrow(from[i])
             }
         } else {
-            mFrom = null
+            fromColumns = null
         }
     }
 
@@ -334,7 +334,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
         // super.swapCursor() will notify observers before we have
         // a valid mapping, make sure we have a mapping before this
         // happens
-        findColumns(c, mOriginalFrom)
+        findColumns(c, originalFrom)
         return super.swapCursor(c)
     }
 
@@ -350,12 +350,12 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
      * parameter.  Can be null if the cursor is not available yet.
      */
     open fun changeCursorAndColumns(c: Cursor?, from: Array<String>, to: IntArray) {
-        mOriginalFrom = from
-        mTo = to
+        originalFrom = from
+        toViews = to
         // super.changeCursor() will notify observers before we have
         // a valid mapping, make sure we have a mapping before this
         // happens
-        findColumns(c, mOriginalFrom)
+        findColumns(c, originalFrom)
         super.changeCursor(c)
     }
 

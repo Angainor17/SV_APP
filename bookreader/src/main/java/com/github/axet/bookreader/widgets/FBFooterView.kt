@@ -34,7 +34,7 @@ class FBFooterView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     companion object {
-        private val sNextGeneratedId = AtomicInteger(1)
+        private val nextGeneratedId = AtomicInteger(1)
 
         /**
          * Генерирует уникальный ID для view.
@@ -43,10 +43,10 @@ class FBFooterView @JvmOverloads constructor(
             if (Build.VERSION.SDK_INT >= 17)
                 return View.generateViewId()
             while (true) {
-                val result = sNextGeneratedId.get()
+                val result = nextGeneratedId.get()
                 var newValue = result + 1
                 if (newValue > 0x00FFFFFF) newValue = 1 // Сброс на 1, не 0
-                if (sNextGeneratedId.compareAndSet(result, newValue))
+                if (nextGeneratedId.compareAndSet(result, newValue))
                     return result
             }
         }

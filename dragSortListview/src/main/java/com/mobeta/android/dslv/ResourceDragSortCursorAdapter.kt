@@ -31,9 +31,9 @@ import android.view.ViewGroup
  * documentation for a class overview.
  */
 abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
-    private var mLayout: Int
-    private var mDropDownLayout: Int
-    private var mInflater: LayoutInflater
+    private var layoutRes: Int
+    private var dropDownLayoutRes: Int
+    private var inflater: LayoutInflater
 
     /**
      * Constructor the enables auto-requery.
@@ -49,9 +49,9 @@ abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
      */
     @Deprecated("")
     constructor(context: Context, layout: Int, c: Cursor?) : super(context, c) {
-        mLayout = layout
-        mDropDownLayout = layout
-        mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        layoutRes = layout
+        dropDownLayoutRes = layout
+        inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     }
 
     /**
@@ -71,9 +71,9 @@ abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
      * data is always displayed.  Using true here is discouraged.
      */
     constructor(context: Context, layout: Int, c: Cursor?, autoRequery: Boolean) : super(context, c, autoRequery) {
-        mLayout = layout
-        mDropDownLayout = layout
-        mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        layoutRes = layout
+        dropDownLayoutRes = layout
+        inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     }
 
     /**
@@ -88,9 +88,9 @@ abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
      * as per [CursorAdapter.CursorAdapter].
      */
     constructor(context: Context, layout: Int, c: Cursor?, flags: Int) : super(context, c, flags) {
-        mLayout = layout
-        mDropDownLayout = layout
-        mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        layoutRes = layout
+        dropDownLayoutRes = layout
+        inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     }
 
     /**
@@ -99,11 +99,11 @@ abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
      * @see android.widget.CursorAdapter.newView
      */
     override fun newView(context: Context, cursor: Cursor?, parent: ViewGroup): View {
-        return mInflater.inflate(mLayout, parent, false)
+        return inflater.inflate(layoutRes, parent, false)
     }
 
     override fun newDropDownView(context: Context, cursor: Cursor?, parent: ViewGroup): View {
-        return mInflater.inflate(mDropDownLayout, parent, false)
+        return inflater.inflate(dropDownLayoutRes, parent, false)
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
      * @param layout the layout resources used to create item views
      */
     fun setViewResource(layout: Int) {
-        mLayout = layout
+        layoutRes = layout
     }
 
     /**
@@ -121,6 +121,6 @@ abstract class ResourceDragSortCursorAdapter : DragSortCursorAdapter {
      * @param dropDownLayout the layout resources used to create drop down views
      */
     fun setDropDownViewResource(dropDownLayout: Int) {
-        mDropDownLayout = dropDownLayout
+        dropDownLayoutRes = dropDownLayout
     }
 }
