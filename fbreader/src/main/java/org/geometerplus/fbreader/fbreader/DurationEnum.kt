@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.fbreader.fbreader
 
-public class ZLTextWordRegionSoul extends ZLTextRegion.Soul {
-    public final ZLTextWord Word;
-
-    ZLTextWordRegionSoul(ZLTextPosition position, ZLTextWord word) {
-        super(position.getParagraphIndex(), position.getElementIndex(), position.getElementIndex());
-        Word = word;
-    }
+enum class DurationEnum(@JvmField val Value: Int) {
+    duration1(1000),
+    duration3(3000),
+    duration5(5000),
+    duration10(10000),
+    duration20(20000),
+    duration40(40000),
+    duration60(60000),
+    duration300(300000)
 }

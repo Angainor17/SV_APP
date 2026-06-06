@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2011-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.fbreader.fbreader
 
-public class ZLTextVideoRegionSoul extends ZLTextRegion.Soul {
-    public final ZLTextVideoElement VideoElement;
+import org.geometerplus.zlibrary.core.filesystem.ZLFile
 
-    ZLTextVideoRegionSoul(ZLTextPosition position, ZLTextVideoElement videoElement) {
-        super(position.getParagraphIndex(), position.getElementIndex(), position.getElementIndex());
-        VideoElement = videoElement;
+object WallpapersUtil {
+    fun predefinedWallpaperFiles(): List<ZLFile> {
+        return ZLFile.createFileByPath("wallpapers").children()
     }
 }

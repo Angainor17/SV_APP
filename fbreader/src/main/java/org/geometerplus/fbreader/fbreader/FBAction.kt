@@ -17,13 +17,8 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.fbreader.fbreader
 
-public final class ZLTextHyperlinkControlElement extends ZLTextControlElement {
-    public final ZLTextHyperlink Hyperlink;
+import org.geometerplus.zlibrary.core.application.ZLApplication
 
-    ZLTextHyperlinkControlElement(byte kind, byte type, String id) {
-        super(kind, true);
-        Hyperlink = new ZLTextHyperlink(type, id);
-    }
-}
+abstract class FBAction(protected val Reader: FBReaderApp) : ZLApplication.ZLAction()

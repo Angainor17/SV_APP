@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.zlibrary.text.view
 
-import org.geometerplus.zlibrary.core.filesystem.ZLFile;
-
-import java.util.List;
-
-public abstract class WallpapersUtil {
-    public static List<ZLFile> predefinedWallpaperFiles() {
-        return ZLFile.createFileByPath("wallpapers").children();
-    }
+class ZLTextHyperlinkControlElement(
+    kind: Byte,
+    type: Byte,
+    id: String
+) : ZLTextControlElement(kind, true) {
+    @JvmField val Hyperlink = ZLTextHyperlink(type, id)
 }
