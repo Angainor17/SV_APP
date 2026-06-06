@@ -17,19 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.opds;
+package org.geometerplus.android.fbreader.network.litres
 
-import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata;
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+interface UserRegistrationConstants {
+    companion object {
+        const val CATALOG_URL = "catalogUrl"
+        const val SIGNIN_URL = "signinUrl"
+        const val SIGNUP_URL = "signupUrl"
+        const val RECOVER_PASSWORD_URL = "recoverPasswordUrl"
 
-class OPDSFeedMetadata extends ATOMFeedMetadata {
-    public int OpensearchTotalResults = -1;
-    public int OpensearchItemsPerPage;
-    public int OpensearchStartIndex = 1;
-
-    public String ViewType;
-
-    protected OPDSFeedMetadata(ZLStringMap attributes) {
-        super(attributes);
+        const val USER_REGISTRATION_USERNAME = "userName"
+        const val USER_REGISTRATION_PASSWORD = "password"
+        const val USER_REGISTRATION_EMAIL = "eMail"
+        const val USER_REGISTRATION_LITRES_SID = "litres:sid"
     }
 }

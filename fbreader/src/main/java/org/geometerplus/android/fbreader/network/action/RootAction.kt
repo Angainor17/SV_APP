@@ -17,17 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.android.fbreader.network.action
 
-public interface ATOMConstants {
-    String TYPE_TEXT = "text";
-    String TYPE_HTML = "html";
-    String TYPE_XHTML = "xhtml";
-    String TYPE_DEFAULT = TYPE_TEXT;
+import android.app.Activity
+import org.geometerplus.fbreader.network.NetworkTree
+import org.geometerplus.fbreader.network.tree.RootTree
 
-    String REL_ALTERNATE = "alternate";
-    String REL_RELATED = "related";
-    String REL_SELF = "self";
-    String REL_ENCLOSURE = "enclosure";
-    String REL_VIA = "via";
+abstract class RootAction(
+    activity: Activity,
+    code: Int,
+    resourceKey: String,
+    iconId: Int
+) : Action(activity, code, resourceKey, iconId) {
+    override fun isVisible(tree: NetworkTree): Boolean = tree is RootTree
 }

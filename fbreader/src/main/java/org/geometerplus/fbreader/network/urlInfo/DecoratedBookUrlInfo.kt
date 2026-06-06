@@ -17,17 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network;
+package org.geometerplus.fbreader.network.urlInfo
 
-import org.geometerplus.fbreader.network.urlInfo.UrlInfoCollection;
-
-public class TopUpItem extends NetworkItem {
-    public TopUpItem(INetworkLink link, UrlInfoCollection<?> urls) {
-        super(
-                link,
-                NetworkLibrary.resource().getResource("topupTitle").getValue(),
-                NetworkLibrary.resource().getResource("topupSummary").getValue(),
-                urls
-        );
+class DecoratedBookUrlInfo(
+    base: BookUrlInfo,
+    url: String
+) : BookUrlInfo(base.InfoType, url, base.Mime) {
+    companion object {
+        private const val serialVersionUID: Long = 5678945586904L
     }
+
+    private val myCleanUrl: String = base.cleanUrl()
+
+    override fun cleanUrl(): String = myCleanUrl
 }

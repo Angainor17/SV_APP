@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.authentication.litres;
+package org.geometerplus.zlibrary.text.model
 
-import org.geometerplus.zlibrary.core.network.ZLNetworkException;
-import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter;
-
-class LitResAuthenticationXMLReader extends ZLXMLReaderAdapter {
-    private ZLNetworkException myException;
-
-    public ZLNetworkException getException() {
-        return myException;
-    }
-
-    protected void setException(ZLNetworkException e) {
-        myException = e;
-    }
+internal class ZLTextSpecialParagraphImpl(
+    private val myKind: Byte,
+    model: ZLTextPlainModel,
+    offset: Int
+) : ZLTextParagraphImpl(model, offset) {
+    override fun getKind(): Byte = myKind
 }

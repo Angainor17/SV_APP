@@ -17,17 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.urlInfo;
+package org.geometerplus.fbreader.network.urlInfo
 
-import org.geometerplus.zlibrary.core.util.MimeType;
+import org.geometerplus.zlibrary.core.money.Money
+import org.geometerplus.zlibrary.core.util.MimeType
 
-public class RelatedUrlInfo extends UrlInfo {
-    private static final long serialVersionUID = -893514485257788098L;
-
-    public final String Title;
-
-    public RelatedUrlInfo(Type type, String title, String url, MimeType mime) {
-        super(type, url, mime);
-        Title = title;
+class BookBuyUrlInfo(
+    type: Type,
+    url: String,
+    mime: MimeType,
+    @JvmField val Price: Money
+) : BookUrlInfo(type, url, mime) {
+    companion object {
+        private const val serialVersionUID: Long = 7086586069650L
     }
 }

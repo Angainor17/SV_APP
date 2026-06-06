@@ -23,6 +23,6 @@ import org.geometerplus.fbreader.fbreader.FBAction
 import org.geometerplus.fbreader.fbreader.FBReaderApp
 
 internal abstract class FBAndroidAction(
-    protected val BaseActivity: FBReader,
+    @JvmField protected val BaseActivity: FBReader,
     fbreader: FBReaderApp
 ) : FBAction(fbreader)

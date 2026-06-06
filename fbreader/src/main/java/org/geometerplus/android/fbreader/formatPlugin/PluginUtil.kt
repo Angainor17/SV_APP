@@ -23,6 +23,7 @@ import android.content.Intent
 import org.geometerplus.fbreader.formats.ExternalFormatPlugin
 
 object PluginUtil {
+    @JvmStatic
     fun createIntent(plugin: ExternalFormatPlugin, action: String): Intent {
         return Intent(action).setPackage(plugin.packageName())
     }

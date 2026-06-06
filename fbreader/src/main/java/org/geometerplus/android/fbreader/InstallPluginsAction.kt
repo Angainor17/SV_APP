@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,16 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.urlInfo;
+package org.geometerplus.android.fbreader
 
-import org.geometerplus.zlibrary.core.money.Money;
-import org.geometerplus.zlibrary.core.util.MimeType;
+import android.content.Intent
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-public class BookBuyUrlInfo extends BookUrlInfo {
-    private static final long serialVersionUID = 7877935250896069650L;
-
-    public final Money Price;
-
-    public BookBuyUrlInfo(Type type, String url, MimeType mime, Money price) {
-        super(type, url, mime);
-        Price = price;
+internal class InstallPluginsAction(
+    baseActivity: FBReader,
+    fbreader: FBReaderApp
+) : FBAndroidAction(baseActivity, fbreader) {
+    override fun run(vararg params: Any?) {
+        BaseActivity.startActivity(Intent(BaseActivity, PluginListActivity::class.java))
     }
 }

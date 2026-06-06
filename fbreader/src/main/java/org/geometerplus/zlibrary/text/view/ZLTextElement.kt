@@ -17,17 +17,23 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.zlibrary.text.view
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
+abstract class ZLTextElement {
+    companion object {
+        @JvmField
+        val HSpace: ZLTextElement = object : ZLTextElement() {}
 
-class SelectionHidePanelAction extends FBAndroidAction {
-    SelectionHidePanelAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
-    }
+        @JvmField
+        val NBSpace: ZLTextElement = object : ZLTextElement() {}
 
-    @Override
-    protected void run(Object... params) {
-        BaseActivity.hideSelectionPanel();
+        @JvmField
+        val AfterParagraph: ZLTextElement = object : ZLTextElement() {}
+
+        @JvmField
+        val Indent: ZLTextElement = object : ZLTextElement() {}
+
+        @JvmField
+        val StyleClose: ZLTextElement = object : ZLTextElement() {}
     }
 }

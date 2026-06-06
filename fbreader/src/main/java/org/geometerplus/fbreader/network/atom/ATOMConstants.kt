@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.fbreader.network.atom
 
-import android.content.Intent;
+interface ATOMConstants {
+    companion object {
+        const val TYPE_TEXT = "text"
+        const val TYPE_HTML = "html"
+        const val TYPE_XHTML = "xhtml"
+        const val TYPE_DEFAULT = TYPE_TEXT
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
-
-class InstallPluginsAction extends FBAndroidAction {
-    InstallPluginsAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
-    }
-
-    @Override
-    protected void run(Object... params) {
-        BaseActivity.startActivity(new Intent(BaseActivity, PluginListActivity.class));
+        const val REL_ALTERNATE = "alternate"
+        const val REL_RELATED = "related"
+        const val REL_SELF = "self"
+        const val REL_ENCLOSURE = "enclosure"
+        const val REL_VIA = "via"
     }
 }
