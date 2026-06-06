@@ -17,12 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.money;
+package org.geometerplus.fbreader.network.authentication.litres
 
-public class MoneyException extends RuntimeException {
-    private static final long serialVersionUID = 3936494538949724968L;
+import java.util.LinkedList
 
-    public MoneyException(String message) {
-        super(message);
-    }
+internal class LitResGenre {
+    var Id: String? = null
+    var Title: String? = null
+    var Children: LinkedList<LitResGenre>? = null
 }
