@@ -17,15 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.formats;
+package org.geometerplus.fbreader.formats
 
-import org.geometerplus.fbreader.bookmodel.BookModel;
-import org.geometerplus.zlibrary.core.util.SystemInfo;
+import org.geometerplus.fbreader.bookmodel.BookModel
+import org.geometerplus.zlibrary.core.util.SystemInfo
 
-public abstract class BuiltinFormatPlugin extends FormatPlugin {
-    protected BuiltinFormatPlugin(SystemInfo systemInfo, String fileType) {
-        super(systemInfo, fileType);
-    }
-
-    public abstract void readModel(BookModel model) throws BookReadingException;
+abstract class BuiltinFormatPlugin(
+    systemInfo: SystemInfo,
+    fileType: String
+) : FormatPlugin(systemInfo, fileType) {
+    @Throws(BookReadingException::class)
+    abstract fun readModel(model: BookModel)
 }

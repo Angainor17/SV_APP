@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.preferences;
+package org.geometerplus.zlibrary.text.hyphenation
 
-import android.content.Context;
-import android.preference.Preference;
+class ZLTextHyphenationInfo(length: Int) {
+    internal val Mask: BooleanArray = BooleanArray(length - 1)
 
-class InfoPreference extends Preference {
-    InfoPreference(Context context, String title, String value) {
-        super(context);
-        setTitle(title);
-        setSummary(value);
-        setEnabled(false);
+    fun isHyphenationPossible(position: Int): Boolean {
+        return position < Mask.size && Mask[position]
     }
 }

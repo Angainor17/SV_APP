@@ -17,16 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.android.fbreader
 
-import org.geometerplus.fbreader.fbreader.FBAction;
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.fbreader.fbreader.FBAction
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-abstract class FBAndroidAction extends FBAction {
-    protected final FBReader BaseActivity;
-
-    FBAndroidAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(fbreader);
-        BaseActivity = baseActivity;
-    }
-}
+internal abstract class FBAndroidAction(
+    protected val BaseActivity: FBReader,
+    fbreader: FBReaderApp
+) : FBAction(fbreader)

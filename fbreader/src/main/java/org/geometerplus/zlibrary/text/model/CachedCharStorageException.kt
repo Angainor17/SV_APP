@@ -17,16 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.zlibrary.text.model
 
-public final class CachedCharStorageException extends RuntimeException {
-    private static final long serialVersionUID = -6373408730045821053L;
-
-    public CachedCharStorageException(String message) {
-        super(message);
+class CachedCharStorageException : RuntimeException {
+    companion object {
+        private const val serialVersionUID: Long = -6373408730045821053L
     }
 
-    public CachedCharStorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String) : super(message)
+    constructor(message: String, cause: Throwable) : super(message, cause)
 }

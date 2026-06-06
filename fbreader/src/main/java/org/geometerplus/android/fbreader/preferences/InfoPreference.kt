@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,19 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.rss;
+package org.geometerplus.android.fbreader.preferences
 
-import org.geometerplus.fbreader.network.atom.ATOMEntry;
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import android.content.Context
+import android.preference.Preference
 
-public class RSSItem extends ATOMEntry {
-    public String SeriesTitle;
-    public float SeriesIndex;
-
-    protected RSSItem(ZLStringMap attributes) {
-        super(attributes);
+internal class InfoPreference(
+    context: Context,
+    title: String,
+    value: String
+) : Preference(context) {
+    init {
+        setTitle(title)
+        setSummary(value)
+        isEnabled = false
     }
 }

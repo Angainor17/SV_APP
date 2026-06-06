@@ -17,16 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.hyphenation;
+package org.geometerplus.zlibrary.ui.android.view.animation
 
-public final class ZLTextHyphenationInfo {
-    final boolean[] Mask;
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import org.geometerplus.zlibrary.core.view.ZLViewEnums
 
-    public ZLTextHyphenationInfo(int length) {
-        Mask = new boolean[length - 1];
-    }
-
-    public boolean isHyphenationPossible(int position) {
-        return (position < Mask.length && Mask[position]);
-    }
+interface BitmapManager {
+    fun getBitmap(index: ZLViewEnums.PageIndex): Bitmap?
+    fun drawBitmap(canvas: Canvas, x: Int, y: Int, index: ZLViewEnums.PageIndex, paint: Paint)
 }

@@ -17,15 +17,10 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.drm;
+package org.geometerplus.fbreader.fbreader
 
-public abstract class EncryptionMethod {
-    public static final String UNSUPPORTED = "unsupported";
-    public static final String EMBEDDING = "embedding";
-    public static final String MARLIN = "marlin";
-    public static final String KINDLE = "kindle";
-
-    public static boolean isSupported(String method) {
-        return EMBEDDING.equals(method);
+internal class SelectionClearAction(fbreader: FBReaderApp) : FBAction(fbreader) {
+    override fun run(vararg params: Any?) {
+        Reader.getTextView().clearSelection()
     }
 }
