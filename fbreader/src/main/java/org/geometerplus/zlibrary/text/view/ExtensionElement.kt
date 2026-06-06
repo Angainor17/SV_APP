@@ -17,14 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.zlibrary.text.view
 
-import org.geometerplus.zlibrary.core.view.ZLPaintContext;
+import org.geometerplus.zlibrary.core.view.ZLPaintContext
 
-public abstract class ExtensionElement extends ZLTextElement {
-    protected abstract int getWidth();
-
-    protected abstract int getHeight();
-
-    protected abstract void draw(ZLPaintContext context, ZLTextElementArea area);
+abstract class ExtensionElement : ZLTextElement() {
+    protected abstract fun getWidth(): Int
+    protected abstract fun getHeight(): Int
+    protected abstract fun draw(context: ZLPaintContext, area: ZLTextElementArea)
 }

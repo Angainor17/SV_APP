@@ -17,14 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.formats;
+package org.geometerplus.fbreader.formats
 
-import org.geometerplus.zlibrary.core.filesystem.ZLFile;
+import org.geometerplus.zlibrary.core.filesystem.ZLFile
 
-public interface IFormatPluginCollection {
-    FormatPlugin getPlugin(ZLFile file);
+interface IFormatPluginCollection {
+    fun getPlugin(file: ZLFile): FormatPlugin?
 
-    public interface Holder {
-        IFormatPluginCollection getCollection();
+    interface Holder {
+        fun getCollection(): IFormatPluginCollection?
     }
 }
