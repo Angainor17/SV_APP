@@ -17,6 +17,7 @@ import android.widget.FrameLayout
 import android.widget.PopupWindow
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -97,10 +98,10 @@ open class FontsPopup(context: Context, private val ttf: TTFManager) : PopupWind
         val context = ttf.context
         val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         var uri = shared.getString(BookApplication.PREFERENCE_FONTS_FOLDER, "")
-        if (uri == "")
-            uri = ttf.appFonts.toString()
+        if (uri.isNullOrEmpty())
+            uri = ttf.appFonts?.toString() ?: ""
         else
-            uri = Storage.getDisplayName(context, Uri.parse(uri))
+            uri = Storage.getDisplayName(context, uri.toUri())
         fontsText.text = context.getString(R.string.add_more_fonts_to, uri)
     }
 

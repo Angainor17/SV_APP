@@ -17,10 +17,10 @@ package com.mobeta.android.dslv
 
 import android.content.Context
 import android.database.Cursor
-import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 
 // taken from sdk/sources/android-16/android/widget/SimpleCursorAdapter.java
 
@@ -208,7 +208,7 @@ open class SimpleDragSortCursorAdapter : ResourceDragSortCursorAdapter {
         try {
             v.setImageResource(value.toInt())
         } catch (e: NumberFormatException) {
-            v.setImageURI(Uri.parse(value))
+            v.setImageURI(value.toUri())
         }
     }
 
