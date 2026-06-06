@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network;
+package org.geometerplus.fbreader.fbreader.options
 
-import org.geometerplus.zlibrary.core.network.ZLNetworkException;
+import org.geometerplus.zlibrary.core.options.ZLBooleanOption
+import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption
 
-public class AlreadyPurchasedException extends ZLNetworkException {
-    public static final String ERROR_PURCHASE_ALREADY_PURCHASED = "purchaseAlreadyPurchased";
+class EInkOptions {
+    @JvmField
+    val EnableFastRefresh = ZLBooleanOption("EInk", "EnableFastRefresh", true)
 
-    public AlreadyPurchasedException() {
-        super(errorMessage(ERROR_PURCHASE_ALREADY_PURCHASED));
-    }
+    @JvmField
+    val UpdateInterval = ZLIntegerRangeOption("EInk", "UpdateInterval", 0, 20, 10)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader.options;
+package org.geometerplus.fbreader.util
 
-import org.geometerplus.zlibrary.core.options.ZLBooleanOption;
-import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption;
+import org.geometerplus.zlibrary.text.view.ZLTextPosition
 
-public class EInkOptions {
-    public final ZLBooleanOption EnableFastRefresh =
-            new ZLBooleanOption("EInk", "EnableFastRefresh", true);
-    public final ZLIntegerRangeOption UpdateInterval =
-            new ZLIntegerRangeOption("EInk", "UpdateInterval", 0, 20, 10);
+interface TextSnippet {
+    fun getStart(): ZLTextPosition
+    fun getEnd(): ZLTextPosition
+    fun getText(): String
 }

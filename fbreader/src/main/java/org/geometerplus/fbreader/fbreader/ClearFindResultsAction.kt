@@ -17,14 +17,10 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.encodings;
+package org.geometerplus.fbreader.fbreader
 
-import java.util.List;
-
-public abstract class EncodingCollection {
-    public abstract List<Encoding> encodings();
-
-    public abstract Encoding getEncoding(String alias);
-
-    public abstract Encoding getEncoding(int code);
+internal class ClearFindResultsAction(fbreader: FBReaderApp) : FBAction(fbreader) {
+    override fun run(vararg params: Any?) {
+        Reader.getTextView().clearFindResults()
+    }
 }

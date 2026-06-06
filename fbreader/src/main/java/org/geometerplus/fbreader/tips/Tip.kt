@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,9 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.fbreader.tips
 
-import java.util.Map;
-
-public final class ZLTextVideoElement extends ZLTextElement {
-    public final Map<String, String> Sources;
-
-    ZLTextVideoElement(Map<String, String> sources) {
-        Sources = sources;
-    }
-}
+class Tip(
+    @JvmField val Title: CharSequence,
+    @JvmField val Content: CharSequence
+)

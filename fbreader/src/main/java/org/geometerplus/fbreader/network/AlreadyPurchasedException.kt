@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.util;
+package org.geometerplus.fbreader.network
 
-import org.geometerplus.zlibrary.text.view.ZLTextPosition;
+import org.geometerplus.zlibrary.core.network.ZLNetworkException
 
-public interface TextSnippet {
-    ZLTextPosition getStart();
-
-    ZLTextPosition getEnd();
-
-    String getText();
+class AlreadyPurchasedException : ZLNetworkException(errorMessage(ERROR_PURCHASE_ALREADY_PURCHASED)) {
+    companion object {
+        const val ERROR_PURCHASE_ALREADY_PURCHASED = "purchaseAlreadyPurchased"
+    }
 }
