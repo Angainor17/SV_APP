@@ -17,10 +17,6 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.image;
+package org.geometerplus.zlibrary.text.model
 
-import java.io.InputStream;
-
-public interface ZLStreamImage extends ZLImage {
-    public abstract InputStream inputStream();
-}
+class ZLTextCSSStyleEntry(depth: Short) : ZLTextStyleEntry(depth)

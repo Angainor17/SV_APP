@@ -17,10 +17,9 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.zlibrary.core.util
 
-public final class ZLTextOtherStyleEntry extends ZLTextStyleEntry {
-    public ZLTextOtherStyleEntry() {
-        super((short) 0);
-    }
+interface SystemInfo {
+    fun tempDirectory(): String?
+    fun networkCacheDirectory(): String?
 }

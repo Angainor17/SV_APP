@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,8 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.ui.android.error;
+package org.geometerplus.zlibrary.core.image
 
-public interface ErrorKeys {
-    static final String STACKTRACE = "fbreader.stacktrace";
-    static final String MESSAGE = "fbreader.message";
-    static final String FILE_PATH = "fbreader.filePath";
+abstract class ZLImageSimpleProxy : ZLImageProxy() {
+    abstract fun synchronize()
 }

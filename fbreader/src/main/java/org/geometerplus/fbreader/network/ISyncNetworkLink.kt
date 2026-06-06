@@ -17,10 +17,11 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network;
+package org.geometerplus.fbreader.network
 
-public interface IPredefinedNetworkLink extends INetworkLink {
-    String getPredefinedId();
+import org.geometerplus.zlibrary.core.network.ZLNetworkContext
 
-    boolean servesHost(String hostname);
+interface ISyncNetworkLink : INetworkLink {
+    fun isLoggedIn(context: ZLNetworkContext?): Boolean
+    fun logout(context: ZLNetworkContext?)
 }
