@@ -17,13 +17,9 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.rss;
+package org.geometerplus.fbreader.network.rss
 
-import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata;
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.geometerplus.fbreader.network.atom.ATOMLink
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public class RSSChannelMetadata extends ATOMFeedMetadata {
-    protected RSSChannelMetadata(ZLStringMap attributes) {
-        super(attributes);
-    }
-}
+class RSSLink(attributes: ZLStringMap) : ATOMLink(attributes)

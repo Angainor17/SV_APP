@@ -17,12 +17,9 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.tree;
+package org.geometerplus.fbreader.network.rss
 
-import org.geometerplus.fbreader.network.RecentCatalogListItem;
+import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public class RecentCatalogListTree extends NetworkCatalogTree {
-    public RecentCatalogListTree(RootTree parent, RecentCatalogListItem item) {
-        super(parent, null, item, -1);
-    }
-}
+class RSSChannelMetadata(attributes: ZLStringMap) : ATOMFeedMetadata(attributes)

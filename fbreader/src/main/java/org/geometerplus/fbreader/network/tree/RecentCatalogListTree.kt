@@ -17,12 +17,8 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.authentication.litres;
+package org.geometerplus.fbreader.network.tree
 
-import java.util.LinkedList;
+import org.geometerplus.fbreader.network.RecentCatalogListItem
 
-class LitResGenre {
-    public String Id;
-    public String Title;
-    public LinkedList<LitResGenre> Children;
-}
+class RecentCatalogListTree(parent: RootTree, item: RecentCatalogListItem) : NetworkCatalogTree(parent, null, item, -1)
