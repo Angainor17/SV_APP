@@ -17,21 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.android.fbreader
 
-class FindNextAction extends FBAction {
-    FindNextAction(FBReaderApp fbreader) {
-        super(fbreader);
-    }
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-    @Override
-    public boolean isEnabled() {
-        FBView view = Reader.getTextView();
-        return (view != null) && view.canFindNext();
-    }
+internal class SearchAction(baseActivity: FBReader, fbreader: FBReaderApp) : FBAndroidAction(baseActivity, fbreader) {
+    override fun isVisible(): Boolean = Reader.Model != null
 
-    @Override
-    protected void run(Object... params) {
-        Reader.getTextView().findNext();
+    override fun run(vararg params: Any?) {
+        BaseActivity.onSearchRequested()
     }
 }

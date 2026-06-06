@@ -17,23 +17,23 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.encodings;
+package org.geometerplus.zlibrary.ui.android.view
 
-import java.util.Collections;
-import java.util.List;
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 
-public final class AutoEncodingCollection extends EncodingCollection {
-    private final Encoding myEncoding = new Encoding(null, "auto", "auto");
-
-    public List<Encoding> encodings() {
-        return Collections.singletonList(myEncoding);
-    }
-
-    public Encoding getEncoding(String alias) {
-        return myEncoding;
-    }
-
-    public Encoding getEncoding(int code) {
-        return myEncoding;
+object ViewUtil {
+    @JvmStatic
+    fun setColorLevel(paint: Paint, level: Int?) {
+        if (level != null) {
+            paint.colorFilter = PorterDuffColorFilter(
+                Color.rgb(level, level, level),
+                PorterDuff.Mode.MULTIPLY
+            )
+        } else {
+            paint.colorFilter = null
+        }
     }
 }

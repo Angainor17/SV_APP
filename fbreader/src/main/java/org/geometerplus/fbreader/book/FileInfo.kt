@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,24 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.fbreader.book
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import org.geometerplus.zlibrary.core.tree.ZLTree
 
-public class ZLVideoEntry {
-    private final Map<String, String> mySources = new HashMap<String, String>();
+class FileInfo : ZLTree<FileInfo> {
+    @JvmField
+    val Name: String
 
-    public void addSource(String mime, String path) {
-        mySources.put(mime, path);
-    }
+    @JvmField
+    var Id: Long
 
-    public Map<String, String> sources() {
-        return Collections.unmodifiableMap(mySources);
+    @JvmField
+    var FileSize: Long = -1
+
+    constructor(name: String, parent: FileInfo?) : this(name, parent, -1)
+
+    constructor(name: String, parent: FileInfo?, id: Long) : super(parent) {
+        Name = name
+        Id = id
     }
 }

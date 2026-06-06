@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.network;
+package org.geometerplus.android.fbreader
 
-import org.json.simple.JSONValue;
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+internal class SelectionShowPanelAction(baseActivity: FBReader, fbreader: FBReaderApp) : FBAndroidAction(baseActivity, fbreader) {
+    override fun isEnabled(): Boolean = !Reader.getTextView().isSelectionEmpty
 
-public abstract class JsonRequest extends ZLNetworkRequest.PostWithMap {
-    public JsonRequest(String url) {
-        super(url);
+    override fun run(vararg params: Any?) {
+        BaseActivity.showSelectionPanel()
     }
-
-    @Override
-    public void handleStream(InputStream stream, int length) throws IOException, ZLNetworkException {
-        processResponse(JSONValue.parse(new InputStreamReader(stream)));
-    }
-
-    protected abstract void processResponse(Object response);
 }

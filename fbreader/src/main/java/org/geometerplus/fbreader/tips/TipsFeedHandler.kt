@@ -17,22 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.book;
+package org.geometerplus.fbreader.tips
 
-import org.geometerplus.zlibrary.core.tree.ZLTree;
+import org.geometerplus.fbreader.network.atom.ATOMEntry
+import org.geometerplus.fbreader.network.atom.AbstractATOMFeedHandler
 
-public final class FileInfo extends ZLTree<FileInfo> {
-    public final String Name;
-    public long Id;
-    public long FileSize = -1;
+internal class TipsFeedHandler : AbstractATOMFeedHandler() {
+    @JvmField
+    val Tips: MutableList<Tip> = mutableListOf()
 
-    FileInfo(String name, FileInfo parent) {
-        this(name, parent, -1);
-    }
-
-    FileInfo(String name, FileInfo parent, long id) {
-        super(parent);
-        Name = name;
-        Id = id;
+    override fun processFeedEntry(entry: ATOMEntry): Boolean {
+        Tips.add(Tip(entry.Title, entry.Content))
+        return false
     }
 }

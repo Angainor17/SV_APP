@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.opds;
+package org.geometerplus.zlibrary.text.model
 
-import org.geometerplus.fbreader.network.atom.ATOMFeedHandler;
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+class ZLVideoEntry {
+    private val mySources: MutableMap<String, String> = HashMap()
 
-abstract class AbstractOPDSFeedHandler implements ATOMFeedHandler<OPDSFeedMetadata, OPDSEntry>, OPDSConstants {
-    public OPDSFeedMetadata createFeed(ZLStringMap attributes) {
-        return new OPDSFeedMetadata(attributes);
+    fun addSource(mime: String, path: String) {
+        mySources[mime] = path
     }
 
-    public OPDSEntry createEntry(ZLStringMap attributes) {
-        return new OPDSEntry(attributes);
-    }
-
-    public OPDSLink createLink(ZLStringMap attributes) {
-        return new OPDSLink(attributes);
-    }
+    fun sources(): Map<String, String> = mySources.toMap()
 }

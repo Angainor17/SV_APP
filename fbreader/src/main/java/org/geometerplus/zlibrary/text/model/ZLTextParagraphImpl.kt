@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.tips;
+package org.geometerplus.zlibrary.text.model
 
-import org.geometerplus.fbreader.network.atom.ATOMEntry;
-import org.geometerplus.fbreader.network.atom.AbstractATOMFeedHandler;
+internal open class ZLTextParagraphImpl(
+    private val myModel: ZLTextPlainModel,
+    private val myIndex: Int
+) : ZLTextParagraph {
+    override fun iterator(): ZLTextParagraph.EntryIterator = myModel.EntryIteratorImpl(myIndex)
 
-import java.util.LinkedList;
-import java.util.List;
-
-class TipsFeedHandler extends AbstractATOMFeedHandler {
-    final List<Tip> Tips = new LinkedList<Tip>();
-
-    @Override
-    public boolean processFeedEntry(ATOMEntry entry) {
-        Tips.add(new Tip(entry.Title, entry.Content));
-        return false;
-    }
+    override fun getKind(): Byte = ZLTextParagraph.Kind.TEXT_PARAGRAPH
 }

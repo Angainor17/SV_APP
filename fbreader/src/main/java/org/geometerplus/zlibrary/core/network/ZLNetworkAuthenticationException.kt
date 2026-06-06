@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.zlibrary.core.network
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
-
-class SelectionShowPanelAction extends FBAndroidAction {
-    SelectionShowPanelAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
+class ZLNetworkAuthenticationException : ZLNetworkException {
+    companion object {
+        const val ERROR_AUTHENTICATION_FAILED = "authenticationFailed"
     }
 
-    @Override
-    public boolean isEnabled() {
-        return !Reader.getTextView().isSelectionEmpty();
-    }
-
-    @Override
-    protected void run(Object... params) {
-        BaseActivity.showSelectionPanel();
-    }
+    constructor() : super(errorMessage(ERROR_AUTHENTICATION_FAILED))
+    constructor(message: String) : super(message)
+    constructor(message: String, cause: Throwable) : super(message, cause)
 }

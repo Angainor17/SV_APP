@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.view;
+package org.geometerplus.fbreader.network.rss
 
-public interface Hull {
-    void draw(ZLPaintContext context, int mode);
+import org.geometerplus.fbreader.network.atom.ATOMFeedHandler
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-    ;
-
-    int distanceTo(int x, int y);
-
-    boolean isBefore(int x, int y);
-
-    interface DrawMode {
-        int None = 0;
-        int Outline = 1;
-        int Fill = 2;
-    }
+abstract class AbstractRSSChannelHandler : ATOMFeedHandler<RSSChannelMetadata, RSSItem> {
+    override fun createFeed(attributes: ZLStringMap): RSSChannelMetadata = RSSChannelMetadata(attributes)
+    override fun createEntry(attributes: ZLStringMap): RSSItem = RSSItem(attributes)
+    override fun createLink(attributes: ZLStringMap): RSSLink = RSSLink(attributes)
 }
