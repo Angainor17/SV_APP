@@ -95,7 +95,7 @@ bookreader/src/main/java/com/github/axet/bookreader/
 
 ## Миграция на Kotlin
 
-### Статус миграции
+### Статус миграции (обновлено 2026-06-06)
 
 **Мигрированные файлы:**
 - activities/ (все файлы)
@@ -119,25 +119,46 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - widgets/SelectionView.kt
 - widgets/TimeAnimatorCompat.kt
 - widgets/WallpaperLayout.kt
+- widgets/TTSPopup.kt
+- widgets/PagerWidget.kt
+- widgets/StoragePathPreferenceCompat.kt
 
-**Оставшиеся Java файлы:**
-- `app/Storage.java` - основное хранилище, зависимости: Plugin, Reflow, Bookmarks
-- `widgets/TTSPopup.java` - TTS функционал, зависит от FBReaderView, ScrollWidget
-- `widgets/ScrollWidget.java` - скролл виджет, зависит от FBReaderView, Plugin, Reflow
-- `widgets/FBReaderView.java` - главный виджет чтения, зависит от всех компонентов
+**Оставшиеся Java файлы (3 файла) - рекомендуется оставить на Java:**
+- `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки `com.github.axet.androidlibrary.app.Storage`, содержит package-private типы из FBReader
+- `widgets/ScrollWidget.java` (1717 строк) - сложный скролл виджет, много внутренних классов
+- `widgets/FBReaderView.java` (2294 строки) - главный виджет чтения, зависит от всех компонентов
 
-### Порядок миграции (от простого к сложному)
+### Почему Storage.java сложно мигрировать
 
-1. DjvuPlugin.java → DjvuPlugin.kt (зависит от Plugin.View)
-2. PDFPlugin.java → PDFPlugin.kt (зависит от Plugin.View)
-3. Storage.java → Storage.kt (базовый класс)
-4. ScrollWidget.java → ScrollWidget.kt (зависит от FBReaderView)
-5. TTSPopup.java → TTSPopup.kt (зависит от FBReaderView, ScrollWidget)
-6. FBReaderView.java → FBReaderView.kt (самый сложный)
+1. **Наследование от внешней библиотеки**: Статические методы родительского класса вызываются напрямую без указания класса
+2. **Package-private типы**: `ZLTextViewBase.ImageFitting` - package-private класс, недоступен из Kotlin
+3. **Много статических методов**: Требуют `@JvmStatic` обёрток для совместимости с Kotlin кодом
 
-### Особенности миграции
+### Порядок миграции
 
-- Использовать `lateinit` для свойств, инициализируемых в `create()`
+1. ~~DjvuPlugin.java → DjvuPlugin.kt~~ ✅
+2. ~~PDFPlugin.java → PDFPlugin.kt~~ ✅
+3. **Storage.java → Storage.kt** (следующий) - наследуется от `com.github.axet.androidlibrary.app.Storage`
+4. ScrollWidget.java → ScrollWidget.kt
+5. FBReaderView.java → FBReaderView.kt (самый сложный)
+
+### Особенности миграции Storage.java
+
+**Сложности:**
+- Наследуется от внешней Java библиотеки `com.github.axet.androidlibrary.app.Storage`
+- Много статических методов, вызываемых из Kotlin кода
+- Внутренние классы: `Info`, `Progress`, `ProgresInputstream`, `FileCbz`, `FileCbr`, `FBook`, `Book`, `RecentInfo`, `Bookmark`, `Bookmarks`
+
+**Требуется:**
+- Добавить `@JvmStatic` для статических методов в `companion object`
+- Добавить `@JvmField` для статических полей
+- Создать обёртки для статических методов родительского класса (например, `getFile`, `exists`, `getNameNoExt` и т.д.)
+- Использовать `open class` для классов которые наследуются (например, `Bookmark`)
+- Использовать `lateinit` для `Book.info` и `FBook.book`
+
+### Общие правила миграции
+
+- Использовать `lateinit` для свойств, инициализируемых позже
 - Обратите внимание на nullable типы в интерфейсах FBReader
 - Внутренние классы должны быть `inner class` если обращаются к внешнему классу
 - Companion object для static методов и свойств
