@@ -17,22 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.zlibrary.core.encodings
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
+class AutoEncodingCollection : EncodingCollection() {
+    private val myEncoding = Encoding(null, "auto", "auto")
 
-class SearchAction extends FBAndroidAction {
-    SearchAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
-    }
+    override fun encodings(): List<Encoding> = listOf(myEncoding)
 
-    @Override
-    public boolean isVisible() {
-        return Reader.Model != null;
-    }
+    override fun getEncoding(alias: String): Encoding? = myEncoding
 
-    @Override
-    protected void run(Object... params) {
-        BaseActivity.onSearchRequested();
-    }
+    override fun getEncoding(code: Int): Encoding? = myEncoding
 }

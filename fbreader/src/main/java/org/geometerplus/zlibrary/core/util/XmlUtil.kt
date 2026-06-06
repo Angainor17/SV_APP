@@ -17,23 +17,20 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.zlibrary.core.util
 
-import org.geometerplus.zlibrary.text.view.ZLTextView;
+import android.util.Xml
+import org.geometerplus.zlibrary.core.filesystem.ZLFile
+import org.xml.sax.helpers.DefaultHandler
 
-class FindPreviousAction extends FBAction {
-    FindPreviousAction(FBReaderApp fbreader) {
-        super(fbreader);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        ZLTextView view = Reader.getTextView();
-        return (view != null) && view.canFindPrevious();
-    }
-
-    @Override
-    protected void run(Object... params) {
-        Reader.getTextView().findPrevious();
+object XmlUtil {
+    @JvmStatic
+    fun parseQuietly(file: ZLFile, handler: DefaultHandler): Boolean {
+        return try {
+            Xml.parse(file.getInputStream(), Xml.Encoding.UTF_8, handler)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 }

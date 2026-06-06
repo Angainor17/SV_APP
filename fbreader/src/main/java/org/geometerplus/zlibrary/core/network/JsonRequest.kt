@@ -17,20 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.network;
+package org.geometerplus.zlibrary.core.network
 
-public class ZLNetworkAuthenticationException extends ZLNetworkException {
-    public static final String ERROR_AUTHENTICATION_FAILED = "authenticationFailed";
+import org.json.simple.JSONValue
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 
-    public ZLNetworkAuthenticationException() {
-        super(errorMessage(ERROR_AUTHENTICATION_FAILED));
+abstract class JsonRequest(url: String) : ZLNetworkRequest.PostWithMap(url) {
+    @Throws(IOException::class, ZLNetworkException::class)
+    override fun handleStream(stream: InputStream, length: Int) {
+        processResponse(JSONValue.parse(InputStreamReader(stream)))
     }
 
-    public ZLNetworkAuthenticationException(String message) {
-        super(message);
-    }
-
-    public ZLNetworkAuthenticationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    protected abstract fun processResponse(response: Any?)
 }

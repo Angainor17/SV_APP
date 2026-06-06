@@ -17,21 +17,13 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.rss;
+package org.geometerplus.fbreader.network.opds
 
-import org.geometerplus.fbreader.network.atom.ATOMFeedHandler;
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.geometerplus.fbreader.network.atom.ATOMFeedHandler
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public abstract class AbstractRSSChannelHandler implements ATOMFeedHandler<RSSChannelMetadata, RSSItem> {
-    public RSSChannelMetadata createFeed(ZLStringMap attributes) {
-        return new RSSChannelMetadata(attributes);
-    }
-
-    public RSSItem createEntry(ZLStringMap attributes) {
-        return new RSSItem(attributes);
-    }
-
-    public RSSLink createLink(ZLStringMap attributes) {
-        return new RSSLink(attributes);
-    }
+internal abstract class AbstractOPDSFeedHandler : ATOMFeedHandler<OPDSFeedMetadata, OPDSEntry>, OPDSConstants {
+    override fun createFeed(attributes: ZLStringMap): OPDSFeedMetadata = OPDSFeedMetadata(attributes)
+    override fun createEntry(attributes: ZLStringMap): OPDSEntry = OPDSEntry(attributes)
+    override fun createLink(attributes: ZLStringMap): OPDSLink = OPDSLink(attributes)
 }

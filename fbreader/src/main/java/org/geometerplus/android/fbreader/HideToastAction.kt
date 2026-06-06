@@ -17,20 +17,14 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.view;
+package org.geometerplus.android.fbreader
 
-import org.geometerplus.zlibrary.core.image.ZLImageData;
+import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-public final class ZLTextImageElement extends ZLTextElement {
-    public final String Id;
-    public final ZLImageData ImageData;
-    public final String URL;
-    public final boolean IsCover;
+internal class HideToastAction(baseActivity: FBReader, fbreader: FBReaderApp) : FBAndroidAction(baseActivity, fbreader) {
+    override fun isEnabled(): Boolean = BaseActivity.isToastShown()
 
-    ZLTextImageElement(String id, ZLImageData imageData, String url, boolean isCover) {
-        Id = id;
-        ImageData = imageData;
-        URL = url;
-        IsCover = isCover;
+    override fun run(vararg params: Any?) {
+        BaseActivity.hideToast()
     }
 }

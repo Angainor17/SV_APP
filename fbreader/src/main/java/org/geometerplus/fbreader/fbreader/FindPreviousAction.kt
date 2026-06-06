@@ -17,21 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.ui.android.view;
+package org.geometerplus.fbreader.fbreader
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
+import org.geometerplus.zlibrary.text.view.ZLTextView
 
-public abstract class ViewUtil {
-    public static void setColorLevel(Paint paint, Integer level) {
-        if (level != null) {
-            paint.setColorFilter(new PorterDuffColorFilter(
-                    Color.rgb(level, level, level), PorterDuff.Mode.MULTIPLY
-            ));
-        } else {
-            paint.setColorFilter(null);
-        }
+internal class FindPreviousAction(fbreader: FBReaderApp) : FBAction(fbreader) {
+    override fun isEnabled(): Boolean {
+        val view: ZLTextView? = Reader.getTextView()
+        return view != null && view.canFindPrevious()
+    }
+
+    override fun run(vararg params: Any?) {
+        Reader.getTextView().findPrevious()
     }
 }

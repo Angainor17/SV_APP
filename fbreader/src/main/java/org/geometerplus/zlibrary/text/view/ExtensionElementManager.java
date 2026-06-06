@@ -17,22 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader;
+package org.geometerplus.zlibrary.text.view;
 
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.zlibrary.text.model.ExtensionEntry;
 
-public class HideToastAction extends FBAndroidAction {
-    HideToastAction(FBReader baseActivity, FBReaderApp fbreader) {
-        super(baseActivity, fbreader);
+import java.util.List;
+import java.util.Map;
+
+public abstract class ExtensionElementManager {
+    final List<? extends ExtensionElement> getElements(ExtensionEntry entry) {
+        return getElements(entry.Type, entry.Data);
     }
 
-    @Override
-    public boolean isEnabled() {
-        return BaseActivity.isToastShown();
-    }
-
-    @Override
-    protected void run(Object... params) {
-        BaseActivity.hideToast();
-    }
+    protected abstract List<? extends ExtensionElement> getElements(String type, Map<String, String> data);
 }
