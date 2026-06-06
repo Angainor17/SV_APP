@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.android.fbreader.network
 
-public class SelectionClearAction extends FBAction {
-    SelectionClearAction(FBReaderApp fbreader) {
-        super(fbreader);
-    }
+interface UserRegistrationConstants {
+    companion object {
+        const val CATALOG_URL = "catalogUrl"
+        const val SIGNIN_URL = "signinUrl"
+        const val SIGNUP_URL = "signupUrl"
+        const val RECOVER_PASSWORD_URL = "recoverPasswordUrl"
 
-    @Override
-    protected void run(Object... params) {
-        Reader.getTextView().clearSelection();
+        const val USER_REGISTRATION_USERNAME = "userName"
+        const val USER_REGISTRATION_PASSWORD = "password"
+        const val USER_REGISTRATION_EMAIL = "eMail"
+        const val USER_REGISTRATION_LITRES_SID = "litres:sid"
     }
 }

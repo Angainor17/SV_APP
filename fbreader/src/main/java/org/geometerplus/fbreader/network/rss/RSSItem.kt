@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.ui.android.view.animation;
+package org.geometerplus.fbreader.network.rss
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import org.geometerplus.fbreader.network.atom.ATOMEntry
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-import org.geometerplus.zlibrary.core.view.ZLViewEnums;
-
-public interface BitmapManager {
-    Bitmap getBitmap(ZLViewEnums.PageIndex index);
-
-    void drawBitmap(Canvas canvas, int x, int y, ZLViewEnums.PageIndex index, Paint paint);
+open class RSSItem(attributes: ZLStringMap) : ATOMEntry(attributes) {
+    @JvmField var SeriesTitle: String? = null
+    @JvmField var SeriesIndex: Float = 0f
 }

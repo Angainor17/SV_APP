@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.network;
+package org.geometerplus.zlibrary.core.drm
 
-public interface UserRegistrationConstants {
-    String CATALOG_URL = "catalogUrl";
-    String SIGNIN_URL = "signinUrl";
-    String SIGNUP_URL = "signupUrl";
-    String RECOVER_PASSWORD_URL = "recoverPasswordUrl";
+abstract class EncryptionMethod {
+    companion object {
+        const val UNSUPPORTED = "unsupported"
+        const val EMBEDDING = "embedding"
+        const val MARLIN = "marlin"
+        const val KINDLE = "kindle"
 
-    String USER_REGISTRATION_USERNAME = "userName";
-    String USER_REGISTRATION_PASSWORD = "password";
-    String USER_REGISTRATION_EMAIL = "eMail";
-    String USER_REGISTRATION_LITRES_SID = "litres:sid";
+        @JvmStatic
+        fun isSupported(method: String?): Boolean = EMBEDDING == method
+    }
 }
