@@ -351,9 +351,9 @@ class XMLSerializer extends AbstractSerializer {
         for (UID uid : book.uids()) {
             appendTag(
                     buffer, "dc:identifier", false,
-                    "scheme", uid.Type
+                    "scheme", uid.type
             );
-            buffer.append(escapeForXml(uid.Id));
+            buffer.append(escapeForXml(uid.id));
             closeTag(buffer, "dc:identifier");
         }
 

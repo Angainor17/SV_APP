@@ -157,7 +157,7 @@ public final class ZLTextParagraphCursor {
             }
             myFirstMark = i;
             myLastMark = myFirstMark;
-            for (; myLastMark != myMarks.size() && ((ZLTextMark) myMarks.get(myLastMark)).ParagraphIndex == paragraphIndex; myLastMark++)
+            for (; myLastMark != myMarks.size() && ((ZLTextMark) myMarks.get(myLastMark)).paragraphIndex == paragraphIndex; myLastMark++)
                 ;
             myOffset = 0;
         }
@@ -203,7 +203,7 @@ public final class ZLTextParagraphCursor {
                                 if (hyperlink != null) {
                                     hyperlink.addElementIndex(elements.size());
                                 }
-                                elements.add(new ZLTextImageElement(imageEntry.Id, data, image.getURI(), imageEntry.IsCover));
+                                elements.add(new ZLTextImageElement(imageEntry.id, data, image.getURI(), imageEntry.isCover));
                             }
                         }
                         break;
@@ -305,8 +305,8 @@ public final class ZLTextParagraphCursor {
             ZLTextWord word = new ZLTextWord(data, offset, len, paragraphOffset);
             for (int i = myFirstMark; i < myLastMark; ++i) {
                 final ZLTextMark mark = (ZLTextMark) myMarks.get(i);
-                if ((mark.Offset < paragraphOffset + len) && (mark.Offset + mark.Length > paragraphOffset)) {
-                    word.addMark(mark.Offset - paragraphOffset, mark.Length);
+                if ((mark.offset < paragraphOffset + len) && (mark.offset + mark.length > paragraphOffset)) {
+                    word.addMark(mark.offset - paragraphOffset, mark.length);
                 }
             }
             if (hyperlink != null) {

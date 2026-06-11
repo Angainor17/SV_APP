@@ -17,31 +17,21 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.book;
+package org.geometerplus.fbreader.book
 
-public class UID {
-    public final String Type;
-    public final String Id;
+class UID(
+    @JvmField val type: String,
+    id: String
+) {
 
-    public UID(String type, String id) {
-        Type = type;
-        Id = id.trim();
+    @JvmField
+    val id: String = id.trim()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UID) return false
+        return type == other.type && id == other.id
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UID)) {
-            return false;
-        }
-        final UID u = (UID) o;
-        return Type.equals(u.Type) && Id.equals(u.Id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Type.hashCode() + Id.hashCode();
-    }
+    override fun hashCode(): Int = type.hashCode() + id.hashCode()
 }

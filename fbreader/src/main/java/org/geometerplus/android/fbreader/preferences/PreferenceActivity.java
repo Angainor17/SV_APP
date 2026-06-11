@@ -616,7 +616,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 		 */
 
         final Screen scrollingScreen = createPreferenceScreen("scrolling");
-        scrollingScreen.addOption(pageTurningOptions.FingerScrolling, "fingerScrolling");
+        scrollingScreen.addOption(pageTurningOptions.fingerScrolling, "fingerScrolling");
         scrollingScreen.addOption(miscOptions.EnableDoubleTap, "enableDoubleTapDetection");
 
         final PreferenceSet volumeKeysPreferences = new PreferenceSet.Enabler() {
@@ -668,14 +668,14 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         }));
         volumeKeysPreferences.run();
 
-        scrollingScreen.addOption(pageTurningOptions.Animation, "animation");
+        scrollingScreen.addOption(pageTurningOptions.animation, "animation");
         scrollingScreen.addPreference(new AnimationSpeedPreference(
                 this,
                 scrollingScreen.Resource,
                 "animationSpeed",
-                pageTurningOptions.AnimationSpeed
+                pageTurningOptions.animationSpeed
         ));
-        scrollingScreen.addOption(pageTurningOptions.Horizontal, "horizontal");
+        scrollingScreen.addOption(pageTurningOptions.horizontal, "horizontal");
 
         final Screen dictionaryScreen = createPreferenceScreen("dictionary");
 

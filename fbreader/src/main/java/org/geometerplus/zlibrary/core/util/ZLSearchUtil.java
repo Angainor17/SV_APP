@@ -31,12 +31,12 @@ public abstract class ZLSearchUtil {
         if (pos < 0) {
             pos = 0;
         }
-        final char[] lower = pattern.LowerCasePattern;
+        final char[] lower = pattern.lowerCasePattern;
         final int patternLength = lower.length;
         final int end = offset + length;
         final int lastStart = end - patternLength;
-        if (pattern.IgnoreCase) {
-            final char[] upper = pattern.UpperCasePattern;
+        if (pattern.ignoreCase) {
+            final char[] upper = pattern.upperCasePattern;
             final char firstCharLower = lower[0];
             final char firstCharUpper = upper[0];
             for (int i = offset + pos; i <= lastStart; ++i) {

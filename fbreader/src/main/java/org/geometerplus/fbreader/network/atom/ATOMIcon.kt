@@ -17,12 +17,20 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.fbreader.network.atom
 
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public class ATOMAuthor extends ATOMPersonConstruct {
-    protected ATOMAuthor(ZLStringMap attributes) {
-        super(attributes);
+class ATOMIcon protected constructor(attributes: ZLStringMap) : ATOMCommonAttributes(attributes) {
+
+    @JvmField
+    var Uri: String? = null
+
+    override fun toString(): String {
+        val buf = StringBuilder("[")
+        buf.append(super.toString())
+        buf.append(",\nUri=").append(Uri)
+        buf.append("]")
+        return buf.toString()
     }
 }

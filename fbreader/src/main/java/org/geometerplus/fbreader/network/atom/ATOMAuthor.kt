@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,8 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.util;
+package org.geometerplus.fbreader.network.atom
 
-import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition;
-import org.geometerplus.zlibrary.text.view.ZLTextPosition;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public class EmptyTextSnippet implements TextSnippet {
-    private final ZLTextPosition myPosition;
-
-    public EmptyTextSnippet(ZLTextPosition position) {
-        myPosition = new ZLTextFixedPosition(position);
-    }
-
-    public ZLTextPosition getStart() {
-        return myPosition;
-    }
-
-    public ZLTextPosition getEnd() {
-        return myPosition;
-    }
-
-    public String getText() {
-        return "";
-    }
-}
+open class ATOMAuthor(attributes: ZLStringMap) : ATOMPersonConstruct(attributes)

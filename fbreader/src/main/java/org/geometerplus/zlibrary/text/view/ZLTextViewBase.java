@@ -175,11 +175,11 @@ abstract class ZLTextViewBase extends ZLView {
     }
 
     private void applyControl(ZLTextControlElement control) {
-        if (control.IsStart) {
+        if (control.isStart) {
             final ZLTextHyperlink hyperlink = control instanceof ZLTextHyperlinkControlElement
                     ? ((ZLTextHyperlinkControlElement) control).Hyperlink : null;
             final ZLTextNGStyleDescription description =
-                    getTextStyleCollection().getDescription(control.Kind);
+                    getTextStyleCollection().getDescription(control.kind);
             if (description != null) {
                 setTextStyle(new ZLTextNGStyle(myTextStyle, description, hyperlink));
             }
@@ -230,7 +230,7 @@ abstract class ZLTextViewBase extends ZLView {
         } else if (element == ZLTextElement.Indent) {
             return myTextStyle.getFirstLineIndent(metrics());
         } else if (element instanceof ZLTextFixedHSpaceElement) {
-            return getContext().getSpaceWidth() * ((ZLTextFixedHSpaceElement) element).Length;
+            return getContext().getSpaceWidth() * ((ZLTextFixedHSpaceElement) element).length;
         }
         return 0;
     }

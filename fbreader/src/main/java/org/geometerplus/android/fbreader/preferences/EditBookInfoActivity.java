@@ -116,16 +116,16 @@ class EncodingPreference extends ZLStringListPreference {
                 new ArrayList<Encoding>(plugin.supportedEncodings().encodings());
         Collections.sort(encodings, new Comparator<Encoding>() {
             public int compare(Encoding e1, Encoding e2) {
-                return e1.DisplayName.compareTo(e2.DisplayName);
+                return e1.displayName.compareTo(e2.displayName);
             }
         });
         final String[] codes = new String[encodings.size()];
         final String[] names = new String[encodings.size()];
         int index = 0;
         for (Encoding e : encodings) {
-            //addItem(e.Family, e.Name, e.DisplayName);
-            codes[index] = e.Name;
-            names[index] = e.DisplayName;
+            //addItem(e.Family, e.name, e.displayName);
+            codes[index] = e.name;
+            names[index] = e.displayName;
             ++index;
         }
         setLists(codes, names);

@@ -109,8 +109,8 @@ public final class AutoTextSnippet implements TextSnippet {
                 }
             } else if (element instanceof ZLTextControlElement) {
                 final ZLTextControlElement control = (ZLTextControlElement) element;
-                if (control.IsStart) {
-                    switch (control.Kind) {
+                if (control.isStart) {
+                    switch (control.kind) {
                         case FBTextKind.H1:
                         case FBTextKind.H2:
                             if (!buffer.isEmpty()) {

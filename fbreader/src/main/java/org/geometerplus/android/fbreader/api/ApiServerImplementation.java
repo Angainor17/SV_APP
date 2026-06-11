@@ -387,7 +387,7 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
             return null;
         }
         final UID uid = BookUtil.createUid(book, "SHA-256");
-        return uid != null ? uid.Id : null;
+        return uid != null ? uid.id : null;
     }
 
     public String getBookUniqueId() {
@@ -442,7 +442,7 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
 
     // manage view
     public void setPageStart(TextPosition position) {
-        getReader().getTextView().gotoPosition(position.ParagraphIndex, position.ElementIndex, position.CharIndex);
+        getReader().getTextView().gotoPosition(position.paragraphIndex, position.elementIndex, position.charIndex);
         getReader().getViewWidget().repaint();
         getReader().storePosition();
     }
@@ -471,9 +471,9 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
 
     private ZLTextFixedPosition getZLTextPosition(TextPosition position) {
         return new ZLTextFixedPosition(
-                position.ParagraphIndex,
-                position.ElementIndex,
-                position.CharIndex
+                position.paragraphIndex,
+                position.elementIndex,
+                position.charIndex
         );
     }
 
@@ -600,11 +600,11 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
     }
 
     public String getZoneMap() {
-        return getReader().PageTurningOptions.TapZoneMap.getValue();
+        return getReader().PageTurningOptions.tapZoneMap.getValue();
     }
 
     public void setZoneMap(String name) {
-        getReader().PageTurningOptions.TapZoneMap.setValue(name);
+        getReader().PageTurningOptions.tapZoneMap.setValue(name);
     }
 
     public int getZoneMapHeight(String name) {

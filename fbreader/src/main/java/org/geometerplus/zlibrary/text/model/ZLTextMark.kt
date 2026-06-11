@@ -17,26 +17,35 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.util;
+package org.geometerplus.zlibrary.text.model
 
-public class ZLSearchPattern {
-    final boolean IgnoreCase;
-    final char[] LowerCasePattern;
-    final char[] UpperCasePattern;
+class ZLTextMark : Comparable<ZLTextMark> {
 
-    public ZLSearchPattern(String pattern, boolean ignoreCase) {
-        pattern = pattern.replace("\u200b", "");
-        IgnoreCase = ignoreCase;
-        if (IgnoreCase) {
-            LowerCasePattern = pattern.toLowerCase().toCharArray();
-            UpperCasePattern = pattern.toUpperCase().toCharArray();
-        } else {
-            LowerCasePattern = pattern.toCharArray();
-            UpperCasePattern = null;
-        }
+    @JvmField
+    val paragraphIndex: Int
+
+    @JvmField
+    val offset: Int
+
+    @JvmField
+    val length: Int
+
+    constructor(paragraphIndex: Int, offset: Int, length: Int) {
+        this.paragraphIndex = paragraphIndex
+        this.offset = offset
+        this.length = length
     }
 
-    public int getLength() {
-        return LowerCasePattern.length;
+    constructor(mark: ZLTextMark) {
+        paragraphIndex = mark.paragraphIndex
+        offset = mark.offset
+        length = mark.length
     }
+
+    override fun compareTo(other: ZLTextMark): Int {
+        val diff = paragraphIndex - other.paragraphIndex
+        return if (diff != 0) diff else offset - other.offset
+    }
+
+    override fun toString(): String = "$paragraphIndex $offset $length"
 }

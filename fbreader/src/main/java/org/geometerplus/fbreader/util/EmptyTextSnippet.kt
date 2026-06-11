@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.fbreader.util
 
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
+import org.geometerplus.zlibrary.text.view.ZLTextPosition
 
-public class ATOMLogo extends ATOMCommonAttributes {
-    public String Uri;
+class EmptyTextSnippet(position: ZLTextPosition) : TextSnippet {
 
-    protected ATOMLogo(ZLStringMap attributes) {
-        super(attributes);
-    }
+    private val myPosition = ZLTextFixedPosition(position)
 
-    @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder("[");
-        buf.append(super.toString());
-        buf.append(",\nUri=").append(Uri);
-        buf.append("]");
-        return buf.toString();
-    }
+    override fun getStart(): ZLTextPosition = myPosition
+
+    override fun getEnd(): ZLTextPosition = myPosition
+
+    override fun getText(): String = ""
 }

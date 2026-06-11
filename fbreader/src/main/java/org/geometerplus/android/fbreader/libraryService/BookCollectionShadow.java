@@ -229,7 +229,7 @@ public class BookCollectionShadow extends AbstractBookCollection<Book> implement
             return null;
         }
         try {
-            return SerializerUtil.deserializeBook(myInterface.getBookByUid(uid.Type, uid.Id), this);
+            return SerializerUtil.deserializeBook(myInterface.getBookByUid(uid.type, uid.id), this);
         } catch (RemoteException e) {
             return null;
         }

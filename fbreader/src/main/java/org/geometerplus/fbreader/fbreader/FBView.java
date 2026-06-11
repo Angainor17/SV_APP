@@ -85,9 +85,9 @@ public class FBView extends ZLTextView {
 
     private TapZoneMap getZoneMap() {
         final PageTurningOptions prefs = myReader.PageTurningOptions;
-        String id = prefs.TapZoneMap.getValue();
+        String id = prefs.tapZoneMap.getValue();
         if ("".equals(id)) {
-            id = prefs.Horizontal.getValue() ? "right_to_left" : "up";
+            id = prefs.horizontal.getValue() ? "right_to_left" : "up";
         }
         if (myZoneMap == null || !id.equals(myZoneMap.Name)) {
             myZoneMap = TapZoneMap.zoneMap(id);
@@ -183,7 +183,7 @@ public class FBView extends ZLTextView {
 
     private boolean isFlickScrollingEnabled() {
         final PageTurningOptions.FingerScrollingType fingerScrolling =
-                myReader.PageTurningOptions.FingerScrolling.getValue();
+                myReader.PageTurningOptions.fingerScrolling.getValue();
         return
                 fingerScrolling == PageTurningOptions.FingerScrollingType.byFlick ||
                         fingerScrolling == PageTurningOptions.FingerScrollingType.byTapAndFlick;
@@ -194,7 +194,7 @@ public class FBView extends ZLTextView {
             return;
         }
 
-        final boolean horizontal = myReader.PageTurningOptions.Horizontal.getValue();
+        final boolean horizontal = myReader.PageTurningOptions.horizontal.getValue();
         final Direction direction = horizontal ? Direction.rightToLeft : Direction.up;
         myReader.getViewWidget().startManualScrolling(x, y, direction);
     }
@@ -234,7 +234,7 @@ public class FBView extends ZLTextView {
             myIsBrightnessAdjustmentInProgress = false;
         } else if (isFlickScrollingEnabled()) {
             myReader.getViewWidget().startAnimatedScrolling(
-                    x, y, myReader.PageTurningOptions.AnimationSpeed.getValue()
+                    x, y, myReader.PageTurningOptions.animationSpeed.getValue()
             );
         }
     }
@@ -528,7 +528,7 @@ public class FBView extends ZLTextView {
 
     @Override
     public Animation getAnimationType() {
-        return myReader.PageTurningOptions.Animation.getValue();
+        return myReader.PageTurningOptions.animation.getValue();
     }
 
     @Override

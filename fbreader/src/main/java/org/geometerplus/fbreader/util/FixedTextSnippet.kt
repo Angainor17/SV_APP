@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,19 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.encodings;
+package org.geometerplus.fbreader.util
 
-public final class Encoding {
-    public final String Family;
-    public final String Name;
-    public final String DisplayName;
+import org.geometerplus.zlibrary.text.view.ZLTextPosition
 
-    Encoding(String family, String name, String displayName) {
-        Family = family;
-        Name = name;
-        DisplayName = displayName;
-    }
+class FixedTextSnippet(
+    private val myStart: ZLTextPosition,
+    private val myEnd: ZLTextPosition,
+    private val myText: String
+) : TextSnippet {
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof Encoding && Name.equals(((Encoding) other).Name);
-    }
+    override fun getStart(): ZLTextPosition = myStart
 
-    @Override
-    public int hashCode() {
-        return Name.hashCode();
-    }
+    override fun getEnd(): ZLTextPosition = myEnd
 
-    public EncodingConverter createConverter() {
-        return new EncodingConverter(Name);
-    }
+    override fun getText(): String = myText
 }

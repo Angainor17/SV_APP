@@ -43,9 +43,9 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
      */
     fun getZoneMap(app: FBReaderView.FBReaderApp): TapZoneMap {
         val prefs: PageTurningOptions = app.PageTurningOptions
-        var id = prefs.TapZoneMap.value
+        var id = prefs.tapZoneMap.value
         if ("" == id)
-            id = if (prefs.Horizontal.value) "right_to_left" else "up"
+            id = if (prefs.horizontal.value) "right_to_left" else "up"
         return TapZoneMap.zoneMap(id)
     }
 

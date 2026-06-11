@@ -833,7 +833,7 @@ public class BookCollection extends AbstractBookCollection<DbBook> {
             if (uid == null) {
                 return null;
             }
-            hash = uid.Id.toLowerCase();
+            hash = uid.id.toLowerCase();
             try {
                 myDatabase.setHash(book.getId(), hash);
             } catch (BooksDatabase.NotAvailable e) {

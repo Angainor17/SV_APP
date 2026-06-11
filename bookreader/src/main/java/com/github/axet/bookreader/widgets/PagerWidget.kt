@@ -40,7 +40,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
         }
         isFocusable = true
 
-        fb.config.setValue(fb.app.PageTurningOptions.FingerScrolling, PageTurningOptions.FingerScrollingType.byTapAndFlick)
+        fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byTapAndFlick)
 
         pinch = if (Looper.myLooper() != null) { // render view only
             object : FBReaderView.PinchGesture(fb) {
