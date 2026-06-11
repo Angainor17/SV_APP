@@ -17,25 +17,16 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.library;
+package org.geometerplus.fbreader.library
 
-import org.geometerplus.fbreader.book.Book;
+internal class RecentBooksTree(root: RootTree) : FirstLevelTree(root, ROOT_RECENT) {
 
-public class RecentBooksTree extends FirstLevelTree {
-    RecentBooksTree(RootTree root) {
-        super(root, ROOT_RECENT);
-    }
+    override fun getOpeningStatus(): Status = Status.ALWAYS_RELOAD_BEFORE_OPENING
 
-    @Override
-    public Status getOpeningStatus() {
-        return Status.ALWAYS_RELOAD_BEFORE_OPENING;
-    }
-
-    @Override
-    public void waitForOpening() {
-        clear();
-        for (Book book : Collection.recentlyOpenedBooks(12)) {
-            new BookWithAuthorsTree(this, book);
+    override fun waitForOpening() {
+        clear()
+        for (book in Collection.recentlyOpenedBooks(12)) {
+            BookWithAuthorsTree(this, book)
         }
     }
 }

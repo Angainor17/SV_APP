@@ -869,16 +869,16 @@ final class SQLiteBooksDatabase extends BooksDatabase {
 
     @Override
     protected void addLabel(long bookId, Label label) {
-        myDatabase.execSQL("INSERT OR IGNORE INTO Labels (name) VALUES (?)", new Object[]{label.Name});
+        myDatabase.execSQL("INSERT OR IGNORE INTO Labels (name) VALUES (?)", new Object[]{label.name});
         final SQLiteStatement statement = get(
                 "INSERT OR IGNORE INTO BookLabel(label_id,book_id,uid,timestamp)" +
                         " SELECT label_id,?,?,? FROM Labels WHERE name=?"
         );
         synchronized (statement) {
             statement.bindLong(1, bookId);
-            statement.bindString(2, label.Uid);
+            statement.bindString(2, label.uid);
             statement.bindLong(3, System.currentTimeMillis());
-            statement.bindString(4, label.Name);
+            statement.bindString(4, label.name);
             statement.execute();
         }
     }
@@ -888,7 +888,7 @@ final class SQLiteBooksDatabase extends BooksDatabase {
         final int count = myDatabase.delete(
                 "BookLabel",
                 "book_id=? AND uid=?",
-                new String[]{String.valueOf(bookId), label.Uid}
+                new String[]{String.valueOf(bookId), label.uid}
         );
 
         if (count > 0) {
@@ -896,7 +896,7 @@ final class SQLiteBooksDatabase extends BooksDatabase {
                     "INSERT OR IGNORE INTO DeletedBookLabelIds (uid) VALUES (?)"
             );
             synchronized (statement) {
-                statement.bindString(1, label.Uid);
+                statement.bindString(1, label.uid);
                 statement.execute();
             }
         }

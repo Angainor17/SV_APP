@@ -17,26 +17,18 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.application;
+package org.geometerplus.zlibrary.core.application
 
-import org.geometerplus.zlibrary.core.view.ZLViewWidget;
+import org.geometerplus.zlibrary.core.view.ZLViewWidget
 
-public interface ZLApplicationWindow {
-    void setWindowTitle(String title);
-
-    void showErrorMessage(String resourceKey);
-
-    void showErrorMessage(String resourceKey, String parameter);
-
-    ZLApplication.SynchronousExecutor createExecutor(String key);
-
-    void processException(Exception e);
-
-    void refresh();
-
-    ZLViewWidget getViewWidget();
-
-    void close();
-
-    int getBatteryLevel();
+interface ZLApplicationWindow {
+    fun setWindowTitle(title: String)
+    fun showErrorMessage(resourceKey: String)
+    fun showErrorMessage(resourceKey: String, parameter: String)
+    fun createExecutor(key: String): ZLApplication.SynchronousExecutor
+    fun processException(e: Exception)
+    fun refresh()
+    val viewWidget: ZLViewWidget
+    fun close()
+    val batteryLevel: Int
 }

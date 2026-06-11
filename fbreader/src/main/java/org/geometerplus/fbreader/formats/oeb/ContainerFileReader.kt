@@ -17,23 +17,24 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.crash;
+package org.geometerplus.fbreader.formats.oeb
 
-import android.os.Bundle;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
+import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter
 
-import org.geometerplus.android.fbreader.util.SimpleDialogActivity;
-import org.geometerplus.zlibrary.core.resources.ZLResource;
+internal class ContainerFileReader : ZLXMLReaderAdapter() {
+    private var myRootPath: String? = null
 
-public class MissingNativeLibraryActivity extends SimpleDialogActivity {
-    @Override
-    protected void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
+    val rootPath: String?
+        get() = myRootPath
 
-        final ZLResource resource = ZLResource.resource("crash").getResource("missingNativeLibrary");
-
-        setTitle(resource.getResource("title").getValue());
-        textView().setText(resource.getResource("text").getValue());
-        okButton().setOnClickListener(finishListener());
-        setButtonTexts("ok", null);
+    override fun startElementHandler(tag: String, xmlattributes: ZLStringMap): Boolean {
+        if ("rootfile".equals(tag, ignoreCase = true)) {
+            myRootPath = xmlattributes.getValue("full-path")
+            if (myRootPath != null) {
+                return true
+            }
+        }
+        return false
     }
 }
