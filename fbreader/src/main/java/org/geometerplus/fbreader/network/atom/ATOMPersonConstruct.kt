@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,28 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.util;
+package org.geometerplus.fbreader.network.atom
 
-import org.geometerplus.zlibrary.text.view.ZLTextPosition;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public final class FixedTextSnippet implements TextSnippet {
-    private final ZLTextPosition myStart;
-    private final ZLTextPosition myEnd;
-    private final String myText;
+abstract class ATOMPersonConstruct protected constructor(attributes: ZLStringMap) : ATOMCommonAttributes(attributes) {
 
-    public FixedTextSnippet(ZLTextPosition start, ZLTextPosition end, String text) {
-        myStart = start;
-        myEnd = end;
-        myText = text;
-    }
+    @JvmField
+    var Name: String? = null
 
-    public ZLTextPosition getStart() {
-        return myStart;
-    }
+    @JvmField
+    var Uri: String? = null
 
-    public ZLTextPosition getEnd() {
-        return myEnd;
-    }
+    @JvmField
+    var Email: String? = null
 
-    public String getText() {
-        return myText;
+    override fun toString(): String {
+        val buf = StringBuilder("[")
+        buf.append(super.toString())
+        buf.append(",\nName=").append(Name)
+        buf.append(",\nUri=").append(Uri)
+        buf.append(",\nEmail=").append(Email)
+        buf.append("]")
+        return buf.toString()
     }
 }

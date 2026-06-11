@@ -17,31 +17,26 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.zlibrary.text.view
 
-public class ZLTextMark implements Comparable<ZLTextMark> {
-    public final int ParagraphIndex;
-    public final int Offset;
-    public final int Length;
+open class ZLTextControlElement protected constructor(
+    @JvmField val kind: Byte,
+    @JvmField val isStart: Boolean
+) : ZLTextElement() {
 
-    public ZLTextMark(int paragraphIndex, int offset, int length) {
-        ParagraphIndex = paragraphIndex;
-        Offset = offset;
-        Length = length;
-    }
+    companion object {
+        private val startElements = arrayOfNulls<ZLTextControlElement>(256)
+        private val endElements = arrayOfNulls<ZLTextControlElement>(256)
 
-    public ZLTextMark(final ZLTextMark mark) {
-        ParagraphIndex = mark.ParagraphIndex;
-        Offset = mark.Offset;
-        Length = mark.Length;
-    }
-
-    public int compareTo(ZLTextMark mark) {
-        final int diff = ParagraphIndex - mark.ParagraphIndex;
-        return diff != 0 ? diff : Offset - mark.Offset;
-    }
-
-    public String toString() {
-        return ParagraphIndex + " " + Offset + " " + Length;
+        @JvmStatic
+        fun get(kind: Byte, isStart: Boolean): ZLTextControlElement {
+            val elements = if (isStart) startElements else endElements
+            var element = elements[kind.toInt() and 0xFF]
+            if (element == null) {
+                element = ZLTextControlElement(kind, isStart)
+                elements[kind.toInt() and 0xFF] = element
+            }
+            return element
+        }
     }
 }

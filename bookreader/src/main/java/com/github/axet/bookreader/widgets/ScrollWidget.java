@@ -149,7 +149,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
 
         setItemAnimator(null);
 
-        fb.config.setValue(fb.app.PageTurningOptions.FingerScrolling, PageTurningOptions.FingerScrollingType.byFlick);
+        fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byFlick);
     }
 
     @Override

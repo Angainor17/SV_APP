@@ -32,7 +32,7 @@ class TurnPageAction extends FBAction {
     @Override
     public boolean isEnabled() {
         final PageTurningOptions.FingerScrollingType fingerScrolling =
-                Reader.PageTurningOptions.FingerScrolling.getValue();
+                Reader.PageTurningOptions.fingerScrolling.getValue();
         return
                 fingerScrolling == PageTurningOptions.FingerScrollingType.byTap ||
                         fingerScrolling == PageTurningOptions.FingerScrollingType.byTapAndFlick;
@@ -47,16 +47,16 @@ class TurnPageAction extends FBAction {
             Reader.getViewWidget().startAnimatedScrolling(
                     myForward ? FBView.PageIndex.next : FBView.PageIndex.previous,
                     x, y,
-                    preferences.Horizontal.getValue()
+                    preferences.horizontal.getValue()
                             ? FBView.Direction.rightToLeft : FBView.Direction.up,
-                    preferences.AnimationSpeed.getValue()
+                    preferences.animationSpeed.getValue()
             );
         } else {
             Reader.getViewWidget().startAnimatedScrolling(
                     myForward ? FBView.PageIndex.next : FBView.PageIndex.previous,
-                    preferences.Horizontal.getValue()
+                    preferences.horizontal.getValue()
                             ? FBView.Direction.rightToLeft : FBView.Direction.up,
-                    preferences.AnimationSpeed.getValue()
+                    preferences.animationSpeed.getValue()
             );
         }
     }

@@ -169,10 +169,10 @@ public abstract class ZLTextView extends ZLTextViewBase {
         if (myCurrentPage.StartCursor.isNull()) {
             return;
         }
-        if (myCurrentPage.StartCursor.getParagraphIndex() != mark.ParagraphIndex ||
+        if (myCurrentPage.StartCursor.getParagraphIndex() != mark.paragraphIndex ||
                 myCurrentPage.StartCursor.getMark().compareTo(mark) > 0) {
             doRepaint = true;
-            gotoPosition(mark.ParagraphIndex, 0, 0);
+            gotoPosition(mark.paragraphIndex, 0, 0);
             preparePaintInfo(myCurrentPage);
         }
         if (myCurrentPage.EndCursor.isNull()) {

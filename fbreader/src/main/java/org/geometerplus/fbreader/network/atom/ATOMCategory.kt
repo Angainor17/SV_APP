@@ -17,12 +17,30 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.fbreader.network.atom
 
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-public class ATOMContributor extends ATOMPersonConstruct {
-    protected ATOMContributor(ZLStringMap attributes) {
-        super(attributes);
+open class ATOMCategory protected constructor(source: ZLStringMap) : ATOMCommonAttributes(source) {
+
+    companion object {
+        const val TERM = "term"
+        const val SCHEME = "scheme"
+        const val LABEL = "label"
     }
+
+    init {
+        readAttribute(TERM, source)
+        readAttribute(SCHEME, source)
+        readAttribute(LABEL, source)
+    }
+
+    val term: String?
+        get() = getAttribute(TERM)
+
+    val scheme: String?
+        get() = getAttribute(SCHEME)
+
+    val label: String?
+        get() = getAttribute(LABEL)
 }

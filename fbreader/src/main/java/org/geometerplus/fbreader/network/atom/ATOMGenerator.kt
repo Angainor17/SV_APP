@@ -17,27 +17,28 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.fbreader.network.atom
 
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-abstract class ATOMPersonConstruct extends ATOMCommonAttributes {
-    public String Name;
-    public String Uri;
-    public String Email;
+class ATOMGenerator protected constructor(source: ZLStringMap) : ATOMCommonAttributes(source) {
 
-    protected ATOMPersonConstruct(ZLStringMap attributes) {
-        super(attributes);
+    companion object {
+        const val KEY_URI = "uri"
+        const val KEY_VERSION = "version"
     }
 
-    @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder("[");
-        buf.append(super.toString());
-        buf.append(",\nName=").append(Name);
-        buf.append(",\nUri=").append(Uri);
-        buf.append(",\nEmail=").append(Email);
-        buf.append("]");
-        return buf.toString();
+    @JvmField
+    var Text: String? = null
+
+    init {
+        readAttribute(KEY_URI, source)
+        readAttribute(KEY_VERSION, source)
     }
+
+    val uri: String?
+        get() = getAttribute(KEY_URI)
+
+    val version: String?
+        get() = getAttribute(KEY_VERSION)
 }

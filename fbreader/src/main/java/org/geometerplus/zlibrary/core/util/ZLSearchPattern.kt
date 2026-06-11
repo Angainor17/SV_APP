@@ -17,27 +17,26 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.view;
+package org.geometerplus.zlibrary.core.util
 
-import org.geometerplus.zlibrary.core.library.ZLibrary;
-import org.geometerplus.zlibrary.core.util.ZLColor;
+class ZLSearchPattern(pattern: String, @JvmField val ignoreCase: Boolean) {
 
-public abstract class SelectionCursor {
-    public static void draw(ZLPaintContext context, Which which, int x, int y, ZLColor color) {
-        context.setFillColor(color);
-        final int dpi = ZLibrary.Instance().getDisplayDPI();
-        final int unit = dpi / 120;
-        final int xCenter = which == Which.Left ? x - unit - 1 : x + unit + 1;
-        context.fillRectangle(xCenter - unit, y + dpi / 8, xCenter + unit, y - dpi / 8);
-        if (which == Which.Left) {
-            context.fillCircle(xCenter, y - dpi / 8, unit * 6);
+    @JvmField
+    val lowerCasePattern: CharArray
+
+    @JvmField
+    val upperCasePattern: CharArray?
+
+    init {
+        val cleanedPattern = pattern.replace("​", "")
+        if (ignoreCase) {
+            lowerCasePattern = cleanedPattern.lowercase().toCharArray()
+            upperCasePattern = cleanedPattern.uppercase().toCharArray()
         } else {
-            context.fillCircle(xCenter, y + dpi / 8, unit * 6);
+            lowerCasePattern = cleanedPattern.toCharArray()
+            upperCasePattern = null
         }
     }
 
-    public enum Which {
-        Left,
-        Right
-    }
+    fun getLength(): Int = lowerCasePattern.size
 }

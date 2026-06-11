@@ -623,8 +623,8 @@ final class SQLiteBooksDatabase extends BooksDatabase {
         );
         synchronized (statement) {
             statement.bindLong(1, bookId);
-            statement.bindString(2, uid.Type);
-            statement.bindString(3, uid.Id);
+            statement.bindString(2, uid.type);
+            statement.bindString(3, uid.id);
             statement.execute();
         }
     }
@@ -643,7 +643,7 @@ final class SQLiteBooksDatabase extends BooksDatabase {
     @Override
     protected Long bookIdByUid(UID uid) {
         Long bookId = null;
-        final Cursor cursor = myDatabase.rawQuery("SELECT book_id FROM BookUid WHERE type = ? AND uid = ? LIMIT 1", new String[]{uid.Type, uid.Id});
+        final Cursor cursor = myDatabase.rawQuery("SELECT book_id FROM BookUid WHERE type = ? AND uid = ? LIMIT 1", new String[]{uid.type, uid.id});
         if (cursor.moveToNext()) {
             bookId = cursor.getLong(0);
         }

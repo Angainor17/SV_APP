@@ -17,26 +17,27 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.text.model;
+package org.geometerplus.zlibrary.text.view
 
-import org.geometerplus.zlibrary.core.image.ZLImage;
+class ZLTextFixedHSpaceElement private constructor(
+    @JvmField val length: Short
+) : ZLTextElement() {
 
-import java.util.Map;
+    companion object {
+        private val collection = arrayOfNulls<ZLTextElement>(20)
 
-public final class ZLImageEntry {
-    public final String Id;
-    public final short VOffset;
-    public final boolean IsCover;
-    private final Map<String, ZLImage> myImageMap;
-
-    public ZLImageEntry(Map<String, ZLImage> imageMap, String id, short vOffset, boolean isCover) {
-        myImageMap = imageMap;
-        Id = id;
-        VOffset = vOffset;
-        IsCover = isCover;
-    }
-
-    public ZLImage getImage() {
-        return myImageMap.get(Id);
+        @JvmStatic
+        fun getElement(length: Short): ZLTextElement {
+            return if (length < 20) {
+                var cached = collection[length.toInt()]
+                if (cached == null) {
+                    cached = ZLTextFixedHSpaceElement(length)
+                    collection[length.toInt()] = cached
+                }
+                cached
+            } else {
+                ZLTextFixedHSpaceElement(length)
+            }
+        }
     }
 }

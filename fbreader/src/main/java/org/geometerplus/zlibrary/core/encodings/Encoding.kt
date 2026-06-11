@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,17 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.network.atom;
+package org.geometerplus.zlibrary.core.encodings
 
-import org.geometerplus.zlibrary.core.xml.ZLStringMap;
+class Encoding internal constructor(
+    @JvmField val family: String?,
+    @JvmField val name: String,
+    @JvmField val displayName: String
+) {
 
-public class ATOMGenerator extends ATOMCommonAttributes {
-    public static final String KEY_URI = "uri";
-    public static final String KEY_VERSION = "version";
+    override fun equals(other: Any?): Boolean = other is Encoding && name == other.name
 
-    public String Text;
+    override fun hashCode(): Int = name.hashCode()
 
-    protected ATOMGenerator(ZLStringMap source) {
-        super(source);
-        readAttribute(KEY_URI, source);
-        readAttribute(KEY_VERSION, source);
-    }
-
-    public final String getUri() {
-        return getAttribute(KEY_URI);
-    }
-
-    public final String getVersion() {
-        return getAttribute(KEY_VERSION);
-    }
+    fun createConverter(): EncodingConverter = EncodingConverter(name)
 }

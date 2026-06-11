@@ -956,9 +956,9 @@ public class FBReaderView extends RelativeLayout {
         final PageTurningOptions preferences = app.PageTurningOptions;
         widget.startAnimatedScrolling(
                 FBView.PageIndex.next,
-                preferences.Horizontal.getValue()
+                preferences.horizontal.getValue()
                         ? FBView.Direction.rightToLeft : FBView.Direction.up,
-                preferences.AnimationSpeed.getValue()
+                preferences.animationSpeed.getValue()
         );
     }
 
@@ -966,9 +966,9 @@ public class FBReaderView extends RelativeLayout {
         final PageTurningOptions preferences = app.PageTurningOptions;
         widget.startAnimatedScrolling(
                 FBView.PageIndex.previous,
-                preferences.Horizontal.getValue()
+                preferences.horizontal.getValue()
                         ? FBView.Direction.rightToLeft : FBView.Direction.up,
-                preferences.AnimationSpeed.getValue()
+                preferences.animationSpeed.getValue()
         );
     }
 
