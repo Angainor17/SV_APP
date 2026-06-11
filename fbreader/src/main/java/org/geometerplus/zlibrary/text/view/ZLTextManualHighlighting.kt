@@ -17,24 +17,19 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.view;
+package org.geometerplus.zlibrary.text.view
 
-public interface ZLViewWidget {
-    void reset();
+import org.geometerplus.zlibrary.core.util.ZLColor
 
-    void repaint();
+internal class ZLTextManualHighlighting(
+    view: ZLTextView,
+    start: ZLTextPosition,
+    end: ZLTextPosition
+) : ZLTextSimpleHighlighting(view, start, end) {
 
-    void startManualScrolling(int x, int y, ZLView.Direction direction);
+    override fun getBackgroundColor(): ZLColor = View.getHighlightingBackgroundColor()
 
-    void scrollManuallyTo(int x, int y);
+    override fun getForegroundColor(): ZLColor = View.getHighlightingForegroundColor()
 
-    void startAnimatedScrolling(ZLView.PageIndex pageIndex, int x, int y, ZLView.Direction direction, int speed);
-
-    void startAnimatedScrolling(ZLView.PageIndex pageIndex, ZLView.Direction direction, int speed);
-
-    void startAnimatedScrolling(int x, int y, int speed);
-
-    int getScreenBrightness();
-
-    void setScreenBrightness(int percent);
+    override fun getOutlineColor(): ZLColor? = null
 }
