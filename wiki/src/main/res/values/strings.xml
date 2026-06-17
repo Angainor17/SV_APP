@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Поиск -->
+    <string name="wiki_search_label">Поиск</string>
+    <string name="wiki_search_placeholder">Введите слово или фразу…</string>
+
+    <!-- Состояния -->
+    <string name="wiki_loading">Загрузка…</string>
+    <string name="wiki_not_found">Ничего не найдено</string>
+    <string name="wiki_error">Произошла ошибка</string>
+    <string name="wiki_retry">Повторить</string>
+
+    <!-- История -->
+    <string name="wiki_history_title">История поиска</string>
+    <string name="wiki_history_empty">История пуста</string>
+    <string name="wiki_history_clear">Очистить историю</string>
+
+    <!-- Избранное -->
+    <string name="wiki_add_favorite">Добавить в избранное</string>
+    <string name="wiki_remove_favorite">Удалить из избранного</string>
+    <string name="wiki_added_to_favorites">\"%s\" добавлено в избранное</string>
+    <string name="wiki_removed_from_favorites">\"%s\" удалено из избранного</string>
+</resources>
