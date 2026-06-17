@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -31,6 +32,7 @@ import su.sv.main.R
 import su.sv.main.Screens
 import su.sv.main.res.BooksVector
 import su.sv.news.presentation.root.ui.RootNews
+import su.sv.wiki.root.RootWiki
 
 @Composable
 internal fun BottomNavigationBar() {
@@ -94,6 +96,9 @@ private fun BottomNavHost(
         composable(Screens.Books.route) {
             RootBooksCatalog()
         }
+        composable(Screens.Wiki.route) {
+            RootWiki()
+        }
         composable(Screens.Info.route) {
             RootInfo()
         }
@@ -112,6 +117,11 @@ fun bottomNavigationItems(): List<BottomNavigationItem> {
             label = stringResource(R.string.nav_bar_books),
             icon = Icons.Filled.BooksVector,
             route = Screens.Books.route
+        ),
+        BottomNavigationItem(
+            label = stringResource(R.string.nav_bar_wiki),
+            icon = Icons.Filled.Search,
+            route = Screens.Wiki.route
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_info),

@@ -3,6 +3,7 @@
 
     <string name="nav_bar_news">Новости</string>
     <string name="nav_bar_books">Книги</string>
+    <string name="nav_bar_wiki">Wiki</string>
     <string name="nav_bar_info">Наши проекты</string>
 
 </resources>
