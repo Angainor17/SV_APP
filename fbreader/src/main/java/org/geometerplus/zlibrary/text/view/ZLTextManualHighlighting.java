@@ -17,26 +17,27 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.book
+package org.geometerplus.zlibrary.text.view;
 
-import java.util.UUID
+import org.geometerplus.zlibrary.core.util.ZLColor;
 
-class Label(@JvmField val uid: String, @JvmField val name: String) {
-
-    init {
-        if (uid.isEmpty() || name.isEmpty()) {
-            throw IllegalArgumentException("Label($uid,$name)")
-        }
+class ZLTextManualHighlighting extends ZLTextSimpleHighlighting {
+    ZLTextManualHighlighting(ZLTextView view, ZLTextPosition start, ZLTextPosition end) {
+        super(view, start, end);
     }
 
-    internal constructor(name: String) : this(UUID.randomUUID().toString(), name)
-
-    override fun toString(): String = "$name[$uid]"
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is Label) return false
-        return name == other.name
+    @Override
+    public ZLColor getBackgroundColor() {
+        return View.getHighlightingBackgroundColor();
     }
 
-    override fun hashCode(): Int = name.hashCode()
+    @Override
+    public ZLColor getForegroundColor() {
+        return View.getHighlightingForegroundColor();
+    }
+
+    @Override
+    public ZLColor getOutlineColor() {
+        return null;
+    }
 }

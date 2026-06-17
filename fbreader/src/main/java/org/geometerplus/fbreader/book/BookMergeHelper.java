@@ -70,7 +70,7 @@ class BookMergeHelper {
             return false;
         }
         for (Label l : labels) {
-            base.addNewLabel(l.name);
+            base.addNewLabel(l.Name);
         }
         return true;
     }

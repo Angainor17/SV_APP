@@ -375,8 +375,8 @@ class XMLSerializer extends AbstractSerializer {
         for (Label label : book.labels()) {
             appendTag(
                     buffer, "label", true,
-                    "uid", label.uid,
-                    "name", label.name
+                    "uid", label.Uid,
+                    "name", label.Name
             );
         }
 

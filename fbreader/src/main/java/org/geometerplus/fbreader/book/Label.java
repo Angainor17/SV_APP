@@ -17,21 +17,41 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.crash
+package org.geometerplus.fbreader.book;
 
-import android.os.Bundle
-import org.geometerplus.android.fbreader.util.SimpleDialogActivity
-import org.geometerplus.zlibrary.core.resources.ZLResource
+import java.util.UUID;
 
-class MissingNativeLibraryActivity : SimpleDialogActivity() {
-    override fun onCreate(bundle: Bundle?) {
-        super.onCreate(bundle)
+public class Label {
+    public final String Uid;
+    public final String Name;
 
-        val resource = ZLResource.resource("crash").getResource("missingNativeLibrary")
+    public Label(String uid, String name) {
+        if (uid == null || name == null) {
+            throw new IllegalArgumentException("Label(" + uid + "," + name + ")");
+        }
+        Uid = uid;
+        Name = name;
+    }
 
-        setTitle(resource.getResource("title").value)
-        textView().text = resource.getResource("text").value
-        okButton().setOnClickListener(finishListener())
-        setButtonTexts("ok", null)
+    Label(String name) {
+        this(UUID.randomUUID().toString(), name);
+    }
+
+    @Override
+    public String toString() {
+        return Name + "[" + Uid + "]";
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Label)) {
+            return false;
+        }
+        return Name.equals(((Label) other).Name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Name.hashCode();
     }
 }
