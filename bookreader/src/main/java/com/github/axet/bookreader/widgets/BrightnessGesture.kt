@@ -18,7 +18,7 @@ open class BrightnessGesture(private val fb: FBReaderView) {
                 if (fb.app!!.MiscOptions.AllowScreenBrightnessAdjustment.getValue() && x < areaWidth) {
                     myIsBrightnessAdjustmentInProgress = true
                     myStartY = y
-                    myStartBrightness = fb.widget!!.getScreenBrightness()
+                    myStartBrightness = fb.widget!!.screenBrightness
                     return true
                 }
             }

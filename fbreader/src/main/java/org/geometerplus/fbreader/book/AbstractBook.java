@@ -284,7 +284,7 @@ public abstract class AbstractBook extends TitledEntity<AbstractBook> {
 
     public boolean hasLabel(String name) {
         for (Label l : labels()) {
-            if (name.equals(l.name)) {
+            if (name.equals(l.Name)) {
                 return true;
             }
         }
