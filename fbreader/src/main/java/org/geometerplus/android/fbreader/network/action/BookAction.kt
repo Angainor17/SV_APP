@@ -27,5 +27,5 @@ import org.geometerplus.fbreader.network.tree.NetworkBookTree
 internal abstract class BookAction(activity: Activity, code: Int, resourceKey: String) : Action(activity, code, resourceKey, -1) {
     override fun isVisible(tree: NetworkTree): Boolean = tree is NetworkBookTree
 
-    protected fun getBook(tree: NetworkTree): NetworkBookItem = (tree as NetworkBookTree).Book
+    protected fun getBook(tree: NetworkTree): NetworkBookItem = (tree as NetworkBookTree).book
 }

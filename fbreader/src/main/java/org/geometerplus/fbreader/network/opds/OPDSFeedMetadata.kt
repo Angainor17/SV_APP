@@ -22,10 +22,10 @@ package org.geometerplus.fbreader.network.opds
 import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-internal class OPDSFeedMetadata(attributes: ZLStringMap) : ATOMFeedMetadata(attributes) {
-    @JvmField var OpensearchTotalResults: Int = -1
-    @JvmField var OpensearchItemsPerPage: Int = 0
-    @JvmField var OpensearchStartIndex: Int = 1
+open class OPDSFeedMetadata(attributes: ZLStringMap) : ATOMFeedMetadata(attributes) {
+    var opensearchTotalResults: Int = -1
+    var opensearchItemsPerPage: Int = 0
+    var opensearchStartIndex: Int = 1
 
-    @JvmField var ViewType: String? = null
+    var viewType: String? = null
 }

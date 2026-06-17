@@ -166,7 +166,7 @@ open class SelectionView(
 
     init {
         handles.style = Paint.Style.FILL
-        handles.color = 0xff shl 24 or custom.getSelectionBackgroundColor().intValue()
+        handles.color = 0xff shl 24 or custom.selectionBackgroundColor.intValue()
 
         layoutParams = MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         background = ColorDrawable(Color.TRANSPARENT)
@@ -620,7 +620,7 @@ open class SelectionView(
 
         init {
             paint.style = Paint.Style.FILL
-            paint.color = SELECTION_ALPHA shl 24 or custom.getSelectionBackgroundColor().intValue()
+            paint.color = SELECTION_ALPHA shl 24 or custom.selectionBackgroundColor.intValue()
 
             padding = ThemeUtils.dp2px(context, SELECTION_PADDING.toFloat()).toInt()
 

@@ -250,7 +250,7 @@ interface Plugin {
             if (p == null) {
                 load(0, 0)
             } else {
-                load(p.getParagraphIndex(), p.elementIndex)
+                load(p.paragraphIndex, p.elementIndex)
             }
         }
 
@@ -333,12 +333,12 @@ interface Plugin {
         open fun updateTheme() {
             try {
                 val app = FBReaderApp(null, BookCollectionShadow())
-                val wallpaper = app.BookTextView.getWallpaperFile()
+                val wallpaper = app.bookTextView.wallpaperFile
                 if (wallpaper != null)
                     this.wallpaper = BitmapFactory.decodeStream(wallpaper.getInputStream())
                 else
                     this.wallpaper = null
-                wallpaperColor = (0xff shl 24) or app.BookTextView.getBackgroundColor().intValue()
+                wallpaperColor = (0xff shl 24) or app.bookTextView.backgroundColor.intValue()
                 if (ColorUtils.calculateLuminance(wallpaperColor) < 0.5f && this !is ComicsPlugin.ComicsView)
                     paint.colorFilter = ColorMatrixColorFilter(NEGATIVE)
                 else
@@ -375,10 +375,10 @@ interface Plugin {
         open fun gotoPosition(p: ZLTextPosition?) {
             if (p == null)
                 return
-            if (current!!.pageNumber != p.getParagraphIndex() || current!!.pageOffset != p.elementIndex)
+            if (current!!.pageNumber != p.paragraphIndex || current!!.pageOffset != p.elementIndex)
                 current!!.load(p)
             if (reflower != null) {
-                if (reflower!!.page != p.getParagraphIndex()) {
+                if (reflower!!.page != p.paragraphIndex) {
                     reflower!!.reset()
                     reflower!!.page = current!!.pageNumber
                 }
@@ -470,7 +470,7 @@ interface Plugin {
             if (current!!.equals(next.pageNumber, next.pageOffset))
                 return null // !canScroll()
             val e = ZLTextFixedPosition(next.pageNumber, next.pageOffset, 0)
-            if (e.getParagraphIndex() >= next.getPagesCount())
+            if (e.paragraphIndex >= next.getPagesCount())
                 return null
             return e
         }
@@ -725,7 +725,7 @@ interface Plugin {
                 val reference = tree.reference
                 if (reference == null)
                     continue
-                if (reference.ParagraphIndex > current!!.pageNumber)
+                if (reference.paragraphIndex > current!!.pageNumber)
                     break
                 treeToSelect = tree
             }
@@ -758,9 +758,9 @@ interface Plugin {
          */
         open fun selectPage(start: ZLTextPosition, info: Reflow.Info?, w: Int, h: Int): Selection.Page {
             return if (reflow && info != null)
-                Selection.Page(start.getParagraphIndex(), info.bm.width(), info.bm.height())
+                Selection.Page(start.paragraphIndex, info.bm.width(), info.bm.height())
             else
-                Selection.Page(start.getParagraphIndex(), w, h)
+                Selection.Page(start.paragraphIndex, w, h)
         }
 
         /**

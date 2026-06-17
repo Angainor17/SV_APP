@@ -25,14 +25,14 @@ import org.geometerplus.R
 import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.fbreader.fbreader.FBReaderApp
 
-open class SelectionPopup(fbReader: FBReaderApp?) : PopupPanel(fbReader), View.OnClickListener {
+open class SelectionPopup(fbReader: FBReaderApp) : PopupPanel(fbReader), View.OnClickListener {
 
     override fun getId(): String {
         return ID
     }
 
     override fun createControlPanel(activity: Activity, root: RelativeLayout) {
-        if (myWindow != null && activity === myWindow.context) {
+        if (myWindow != null && activity === myWindow?.context) {
             return
         }
 
@@ -49,8 +49,8 @@ open class SelectionPopup(fbReader: FBReaderApp?) : PopupPanel(fbReader), View.O
     }
 
     private fun setupButton(buttonId: Int) {
-        val button = myWindow.findViewById<View>(buttonId)
-        button.setOnClickListener(this)
+        val button = myWindow?.findViewById<View>(buttonId)
+        button?.setOnClickListener(this)
     }
 
     fun move(selectionStartY: Int, selectionEndY: Int) {
@@ -67,36 +67,36 @@ open class SelectionPopup(fbReader: FBReaderApp?) : PopupPanel(fbReader), View.O
         val verticalPosition = getVerticalPosition(selectionStartY, selectionEndY)
 
         layoutParams.addRule(verticalPosition)
-        myWindow.setLayoutParams(layoutParams)
+        myWindow?.setLayoutParams(layoutParams)
     }
 
     private fun getVerticalPosition(selectionStartY: Int, selectionEndY: Int): Int {
         val verticalPosition: Int
-        val screenHeight = (myWindow.parent as View).height
+        val screenHeight = (myWindow?.parent as View).height
         val diffTop = screenHeight - selectionEndY
         val diffBottom = selectionStartY
         verticalPosition = if (diffTop > diffBottom) {
-            if (diffTop > myWindow.height + 20) RelativeLayout.ALIGN_PARENT_BOTTOM else RelativeLayout.CENTER_VERTICAL
+            if (diffTop > (myWindow?.height ?: 0) + 20) RelativeLayout.ALIGN_PARENT_BOTTOM else RelativeLayout.CENTER_VERTICAL
         } else {
-            if (diffBottom > myWindow.height + 20) RelativeLayout.ALIGN_PARENT_TOP else RelativeLayout.CENTER_VERTICAL
+            if (diffBottom > (myWindow?.height ?: 0) + 20) RelativeLayout.ALIGN_PARENT_TOP else RelativeLayout.CENTER_VERTICAL
         }
         return verticalPosition
     }
 
-    protected override fun update() {
+    override fun update() {
     }
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.selection_panel_copy -> Application.runAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD)
-            R.id.selection_panel_share -> Application.runAction(ActionCode.SELECTION_SHARE)
-            R.id.selection_panel_translate -> Application.runAction(ActionCode.SELECTION_TRANSLATE)
-            R.id.selection_panel_bookmark -> Application.runAction(ActionCode.SELECTION_BOOKMARK)
-            R.id.selection_panel_alert -> Application.runAction(ActionCode.ASK_QUESTION)
-            R.id.selection_panel_question -> Application.runAction(ActionCode.TEL_ABOUT_MISSPELL)
-            R.id.selection_panel_close -> Application.runAction(ActionCode.SELECTION_CLEAR)
+            R.id.selection_panel_copy -> reader.runAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD)
+            R.id.selection_panel_share -> reader.runAction(ActionCode.SELECTION_SHARE)
+            R.id.selection_panel_translate -> reader.runAction(ActionCode.SELECTION_TRANSLATE)
+            R.id.selection_panel_bookmark -> reader.runAction(ActionCode.SELECTION_BOOKMARK)
+            R.id.selection_panel_alert -> reader.runAction(ActionCode.ASK_QUESTION)
+            R.id.selection_panel_question -> reader.runAction(ActionCode.TEL_ABOUT_MISSPELL)
+            R.id.selection_panel_close -> reader.runAction(ActionCode.SELECTION_CLEAR)
         }
-        Application.hideActivePopup()
+        reader.hideActivePopup()
     }
 
     companion object {

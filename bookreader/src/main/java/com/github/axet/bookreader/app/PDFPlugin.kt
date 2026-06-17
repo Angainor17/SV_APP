@@ -18,6 +18,7 @@ import org.geometerplus.fbreader.bookmodel.BookModel
 import org.geometerplus.fbreader.bookmodel.TOCTree
 import org.geometerplus.fbreader.formats.BookReadingException
 import org.geometerplus.fbreader.formats.BuiltinFormatPlugin
+import org.geometerplus.zlibrary.core.encodings.Encoding
 import org.geometerplus.zlibrary.core.encodings.EncodingCollection
 import org.geometerplus.zlibrary.core.filesystem.ZLFile
 import org.geometerplus.zlibrary.core.image.ZLImage
@@ -91,14 +92,18 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
     override fun priority(): Int = 0
 
-    override fun supportedEncodings(): EncodingCollection? = null
+    override fun supportedEncodings(): EncodingCollection = object : EncodingCollection() {
+        override fun encodings(): List<Encoding> = emptyList()
+        override fun getEncoding(alias: String): Encoding? = null
+        override fun getEncoding(code: Int): Encoding? = null
+    }
 
     @Throws(BookReadingException::class)
     override fun readModel(model: BookModel) {
-        val m = PDFTextModel(BookUtil.fileByBook(model.Book))
+        val m = PDFTextModel(BookUtil.fileByBook(model.book))
         model.setBookTextModel(m)
         val bookmarks = m.doc.getTOC()
-        loadTOC(0, 0, bookmarks, model.TOCTree)
+        loadTOC(0, 0, bookmarks, model.tocTree)
     }
 
     private fun loadTOC(pos: Int, level: Int, bb: Array<Pdfium.Bookmark>, tree: TOCTree): Int {

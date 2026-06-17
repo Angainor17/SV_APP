@@ -189,6 +189,7 @@ class EditTagsPreference extends Preference {
         }
         intent.putExtra(EditListDialogActivity.Key.LIST, tags);
         intent.putExtra(EditListDialogActivity.Key.ALL_ITEMS_LIST, allTags);
+
         ((EditBookInfoActivity) getContext()).startActivityForResult(intent, EditTagsDialogActivity.REQ_CODE);
     }
 }
@@ -222,12 +223,12 @@ class EditAuthorsPreference extends Preference {
         intent.putExtra(EditListDialogActivity.Key.ACTIVITY_TITLE, myResource.getValue());
         final ArrayList<String> authors = new ArrayList<String>();
         for (Author author : myBook.authors()) {
-            authors.add(author.DisplayName);
+            authors.add(author.displayName);
         }
         ((EditBookInfoActivity) getContext()).saveBook();
         final ArrayList<String> allAuthors = new ArrayList<String>();
         for (Author author : ((EditBookInfoActivity) getContext()).authors()) {
-            allAuthors.add(author.DisplayName);
+            allAuthors.add(author.displayName);
         }
         intent.putExtra(EditListDialogActivity.Key.LIST, authors);
         intent.putExtra(EditListDialogActivity.Key.ALL_ITEMS_LIST, allAuthors);

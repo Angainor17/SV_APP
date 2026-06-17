@@ -22,12 +22,12 @@ package org.geometerplus.fbreader.network.urlInfo
 class DecoratedBookUrlInfo(
     base: BookUrlInfo,
     url: String
-) : BookUrlInfo(base.InfoType, url, base.Mime) {
+) : BookUrlInfo(base.infoType, url, base.mime) {
     companion object {
         private const val serialVersionUID: Long = 5678945586904L
     }
 
-    private val myCleanUrl: String = base.cleanUrl()
+    private val myCleanUrl: String? = base.cleanUrl()
 
-    override fun cleanUrl(): String = myCleanUrl
+    override fun cleanUrl(): String? = myCleanUrl
 }

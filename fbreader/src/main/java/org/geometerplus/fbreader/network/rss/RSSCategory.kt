@@ -22,4 +22,8 @@ package org.geometerplus.fbreader.network.rss
 import org.geometerplus.fbreader.network.atom.ATOMCategory
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-class RSSCategory(source: ZLStringMap) : ATOMCategory(source)
+class RSSCategory(source: ZLStringMap) : ATOMCategory(source) {
+    companion object {
+        const val LABEL = ATOMCategory.LABEL
+    }
+}

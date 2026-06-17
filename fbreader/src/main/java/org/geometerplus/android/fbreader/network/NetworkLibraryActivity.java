@@ -83,6 +83,7 @@ import org.geometerplus.zlibrary.core.util.MimeType;
 import org.geometerplus.zlibrary.ui.android.network.SQLiteCookieDatabase;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> implements ListView.OnScrollListener, NetworkLibrary.ChangeListener {
@@ -118,8 +119,8 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
 
     private static NetworkTree getLoadableNetworkTree(NetworkTree tree) {
         while (tree instanceof NetworkAuthorTree || tree instanceof NetworkSeriesTree) {
-            if (tree.Parent instanceof NetworkTree) {
-                tree = (NetworkTree) tree.Parent;
+            if (tree.parent instanceof NetworkTree) {
+                tree = (NetworkTree) tree.parent;
             } else {
                 return null;
             }
@@ -291,7 +292,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
 
     @Override
     protected boolean isTreeInvisible(FBTree tree) {
-        return tree instanceof RootTree && (mySingleCatalog || ((RootTree) tree).IsFake);
+        return tree instanceof RootTree && (mySingleCatalog || ((RootTree) tree).isFake);
     }
 
     @Override
@@ -359,12 +360,12 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
         }
 
         final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
-        final NetworkTree tree = (NetworkTree) getTreeAdapter().getItem(position);
+        final NetworkTree tree = (NetworkTree) getListAdapter().getItem(position);
         if (tree != null) {
             menu.setHeaderTitle(tree.getName());
             for (Action a : getContextMenuActions(tree)) {
                 if (a.isVisible(tree) && a.isEnabled(tree)) {
-                    menu.add(0, a.Code, 0, a.getContextLabel(tree));
+                    menu.add(0, a.getCode(), 0, a.getContextLabel(tree));
                 }
             }
         }
@@ -373,10 +374,10 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         final int position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
-        final NetworkTree tree = (NetworkTree) getTreeAdapter().getItem(position);
+        final NetworkTree tree = (NetworkTree) getListAdapter().getItem(position);
         if (tree != null) {
             for (Action a : getContextMenuActions(tree)) {
-                if (a.Code == item.getItemId()) {
+                if (a.getCode() == item.getItemId()) {
                     checkAndRun(a, tree);
                     return true;
                 }
@@ -391,7 +392,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
             fillListClickList();
         }
 
-        final NetworkTree tree = (NetworkTree) getTreeAdapter().getItem(position);
+        final NetworkTree tree = (NetworkTree) getListAdapter().getItem(position);
         for (Action a : myListClickActions) {
             if (a.isVisible(tree) && a.isEnabled(tree)) {
                 checkAndRun(a, tree);
@@ -411,9 +412,9 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
         }
 
         for (Action a : myOptionsMenuActions) {
-            final MenuItem item = menu.add(0, a.Code, Menu.NONE, "");
-            if (a.IconId != -1) {
-                item.setIcon(a.IconId);
+            final MenuItem item = menu.add(0, a.getCode(), Menu.NONE, "");
+            if (a.getIconId() != -1) {
+                item.setIcon(a.getIconId());
             }
         }
         return true;
@@ -425,7 +426,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
 
         final NetworkTree tree = getCurrentTree();
         for (Action a : myOptionsMenuActions) {
-            final MenuItem item = menu.findItem(a.Code);
+            final MenuItem item = menu.findItem(a.getCode());
             if (a.isVisible(tree)) {
                 item.setVisible(true);
                 item.setEnabled(a.isEnabled(tree));
@@ -441,7 +442,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
     public boolean onOptionsItemSelected(MenuItem item) {
         final NetworkTree tree = getCurrentTree();
         for (Action a : myOptionsMenuActions) {
-            if (a.Code == item.getItemId()) {
+            if (a.getCode() == item.getItemId()) {
                 checkAndRun(a, tree);
                 break;
             }
@@ -453,7 +454,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
         final NetworkLibrary library = Util.networkLibrary(this);
         final NetworkTree tree = getCurrentTree();
         final NetworkTree lTree = getLoadableNetworkTree(tree);
-        final NetworkTree sTree = RunSearchAction.getSearchTree(tree);
+        final NetworkTree sTree = RunSearchAction.Companion.getSearchTree(tree);
         setProgressBarIndeterminateVisibility(
                 library.isUpdateInProgress() ||
                         library.isLoadingInProgress(lTree) ||
@@ -468,7 +469,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
                 switch (code) {
                     default:
                         updateLoadingProgress();
-                        getTreeAdapter().replaceAll(getCurrentTree().subtrees(), true);
+                        getListAdapter().replaceAll(getCurrentTree().subtrees(), true);
                         break;
                     case InitializationFailed:
                         showInitLibraryDialog((String) params[0]);
@@ -545,7 +546,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
                             if (catalogTree.getVisibility() != Boolean3.TRUE) {
                                 return;
                             }
-                            if (action.Code != ActionCode.SIGNIN) {
+                            if (action.getCode() != ActionCode.SIGNIN) {
                                 action.run(tree);
                             }
                         }
@@ -582,10 +583,13 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
                 library,
                 INetworkLink.INVALID_ID,
                 INetworkLink.Type.Custom,
-                null, null, null,
-                new UrlInfoCollection<UrlInfoWithDate>(new UrlInfoWithDate(
-                        UrlInfo.Type.Catalog, url, MimeType.APP_ATOM_XML
-                ))
+                null,
+                null,
+                null,
+                new UrlInfoCollection<UrlInfoWithDate>(
+                        new UrlInfoWithDate(UrlInfo.Type.Catalog, url, MimeType.APP_ATOM_XML, new Date()
+                        )
+                )
         );
         final Runnable loader = new Runnable() {
             public void run() {

@@ -21,7 +21,7 @@ package org.geometerplus.fbreader.network.atom
 
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-open class ATOMCategory protected constructor(source: ZLStringMap) : ATOMCommonAttributes(source) {
+open class ATOMCategory(source: ZLStringMap) : ATOMCommonAttributes(source) {
 
     companion object {
         const val TERM = "term"

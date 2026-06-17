@@ -8,7 +8,6 @@ import android.view.MotionEvent
 import android.view.View
 import com.github.axet.bookreader.app.Plugin
 import com.github.axet.bookreader.app.Reflow
-import org.geometerplus.fbreader.fbreader.options.PageTurningOptions
 import org.geometerplus.zlibrary.core.application.ZLApplication
 import org.geometerplus.zlibrary.core.view.ZLViewEnums
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
@@ -40,7 +39,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
         }
         isFocusable = true
 
-        fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byTapAndFlick)
+        fb.config.setValue(fb.app.pageTurningOptions.fingerScrolling, org.geometerplus.fbreader.fbreader.options.PageTurningOptions.FingerScrollingType.byTapAndFlick)
 
         pinch = if (Looper.myLooper() != null) { // render view only
             object : FBReaderView.PinchGesture(fb) {
@@ -90,7 +89,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
 
     override fun drawOnBitmap(bitmap: Bitmap, index: ZLViewEnums.PageIndex) {
         if (fb.pluginview != null) {
-            fb.pluginview!!.drawOnBitmap(context, bitmap, width, mainAreaHeight, index, fb.app.BookTextView as FBReaderView.CustomView, fb.book.info)
+            fb.pluginview!!.drawOnBitmap(context, bitmap, width, mainAreaHeight, index, fb.app.bookTextView as FBReaderView.CustomView, fb.book.info)
             var info: Reflow.Info? = null
             val position: ZLTextPosition
             if (fb.pluginview!!.reflow) {
@@ -239,7 +238,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
                 fb.pluginview!!.reflower = null
             }
             if (fb.pluginview!!.reflower == null) {
-                fb.pluginview!!.reflower = Reflow(context, w, h, page, fb.app.BookTextView as FBReaderView.CustomView, fb.book.info)
+                fb.pluginview!!.reflower = Reflow(context, w, h, page, fb.app.bookTextView as FBReaderView.CustomView, fb.book.info)
                 val bm = fb.pluginview!!.render(fb.pluginview!!.reflower!!.rw, fb.pluginview!!.reflower!!.h, page)!!
                 fb.pluginview!!.reflower!!.load(bm, page, 0)
             }
@@ -361,7 +360,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
                             return bounds
                         }
                     }
-                    val view = SelectionView.PageView(context, fb.app.BookTextView as FBReaderView.CustomView, setter)
+                    val view = SelectionView.PageView(context, fb.app.bookTextView as FBReaderView.CustomView, setter)
                     fb.selection.add(view)
                     run()
                 }

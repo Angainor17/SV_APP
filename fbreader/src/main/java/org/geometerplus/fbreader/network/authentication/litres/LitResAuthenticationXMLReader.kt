@@ -25,7 +25,8 @@ import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter
 open class LitResAuthenticationXMLReader : ZLXMLReaderAdapter() {
     private var myException: ZLNetworkException? = null
 
-    fun getException(): ZLNetworkException? = myException
+    val exception: ZLNetworkException?
+        get() = myException
 
     protected fun setException(e: ZLNetworkException) {
         myException = e

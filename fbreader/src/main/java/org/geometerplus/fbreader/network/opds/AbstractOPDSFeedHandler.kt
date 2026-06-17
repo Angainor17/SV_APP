@@ -22,7 +22,7 @@ package org.geometerplus.fbreader.network.opds
 import org.geometerplus.fbreader.network.atom.ATOMFeedHandler
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-internal abstract class AbstractOPDSFeedHandler : ATOMFeedHandler<OPDSFeedMetadata, OPDSEntry>, OPDSConstants {
+abstract class AbstractOPDSFeedHandler : ATOMFeedHandler<OPDSFeedMetadata, OPDSEntry>, OPDSConstants {
     override fun createFeed(attributes: ZLStringMap): OPDSFeedMetadata = OPDSFeedMetadata(attributes)
     override fun createEntry(attributes: ZLStringMap): OPDSEntry = OPDSEntry(attributes)
     override fun createLink(attributes: ZLStringMap): OPDSLink = OPDSLink(attributes)

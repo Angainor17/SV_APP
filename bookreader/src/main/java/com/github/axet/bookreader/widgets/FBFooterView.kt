@@ -15,7 +15,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.bookreader.R
 import org.geometerplus.fbreader.fbreader.FBView
-import org.geometerplus.fbreader.fbreader.options.ColorProfile
 import org.geometerplus.zlibrary.core.fonts.FontEntry
 import org.geometerplus.zlibrary.core.library.ZLibrary
 import org.geometerplus.zlibrary.text.view.ZLTextView
@@ -71,29 +70,29 @@ class FBFooterView @JvmOverloads constructor(
         this.fb = fb
         update()
         orientation = HORIZONTAL
-        val cProfile: ColorProfile = fb.app.ViewOptions.getColorProfile()
-        setBackgroundColor(0xffffff and cProfile.FooterNGBackgroundOption.getValue().intValue() or 0xff000000.toInt())
+        val cProfile = fb.app.viewOptions.getColorProfile()
+        setBackgroundColor(0xffffff and cProfile.footerNGBackgroundOption.value!!.intValue() or 0xff000000.toInt())
         var lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         lp.gravity = Gravity.CENTER
         addView(TOCMarks(context), lp)
-        val footerOptions = fb.app.ViewOptions.getFooterOptions()
+        val footerOptions = fb.app.viewOptions.getFooterOptions()
         val lpText = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, footer!!.height)
         lpText.gravity = Gravity.CENTER
         if (footerOptions.showProgressAsPages())
             addView(ProgressAsPages(context), lpText)
-        if (footerOptions.showProgressAsPercentage() && pagePosition!!.Total != 0)
+        if (footerOptions.showProgressAsPercentage() && pagePosition!!.total != 0)
             addView(ProgressAsPercentage(context), lpText)
-        if (footerOptions.ShowClock.value) {
+        if (footerOptions.showClock.value) {
             val clock = Clock(context)
             val dp4 = ThemeUtils.dp2px(context, 4f).toInt()
             val dp2 = ThemeUtils.dp2px(context, 2f).toInt()
             clock.setPadding(dp4, 0, dp2, 0)
             addView(clock, lpText)
         }
-        if (footerOptions.ShowBattery.value) {
+        if (footerOptions.showBattery.value) {
             val image = AppCompatImageView(context)
             image.setImageResource(R.drawable.ic_battery_std_24)
-            image.setColorFilter(0xffffff and cProfile.FooterNGForegroundOption.getValue().intValue() or 0xff000000.toInt())
+            image.setColorFilter(0xffffff and cProfile.footerNGForegroundOption.value!!.intValue() or 0xff000000.toInt())
             val lpImage = LinearLayout.LayoutParams(footer!!.height, footer!!.height)
             lpImage.gravity = Gravity.CENTER
             addView(image, lpImage)
@@ -106,10 +105,10 @@ class FBFooterView @JvmOverloads constructor(
      * Обновляет состояние footer.
      */
     fun update() {
-        customview = fb!!.app.BookTextView as FBReaderView.CustomView
+        customview = fb!!.app.bookTextView as FBReaderView.CustomView
         footer = customview!!.footer
         pagePosition = customview!!.pagePosition()
-        family = fb!!.app.ViewOptions.getFooterOptions().Font.getValue()
+        family = fb!!.app.viewOptions.getFooterOptions().font.value
         tf = AndroidFontUtil.typeface(fb!!.app.SystemInfo, FontEntry.systemEntry(family!!), footer!!.height > 10, false)
         for (i in 0 until childCount) {
             val v = getChildAt(i)
@@ -174,8 +173,8 @@ class FBFooterView @JvmOverloads constructor(
         open fun update() {
             paint.typeface = tf
             paint.textSize = footer!!.height + 2f
-            val cProfile: ColorProfile = fb!!.app.ViewOptions.getColorProfile()
-            paint.color = 0xffffff and cProfile.FooterNGForegroundOption.getValue().intValue() or 0xff000000.toInt()
+            val cProfile = fb!!.app.viewOptions.getColorProfile()
+            paint.color = 0xffffff and cProfile.footerNGForegroundOption.value!!.intValue() or 0xff000000.toInt()
         }
 
         fun updateText(str: String) {
@@ -201,7 +200,7 @@ class FBFooterView @JvmOverloads constructor(
     inner class ProgressAsPages(context: Context) : FontTextView(context) {
         override fun update() {
             super.update()
-            updateText("${pagePosition!!.Current}/${pagePosition!!.Total}")
+            updateText("${pagePosition!!.current}/${pagePosition!!.total}")
         }
     }
 
@@ -211,7 +210,7 @@ class FBFooterView @JvmOverloads constructor(
     inner class ProgressAsPercentage(context: Context) : FontTextView(context) {
         override fun update() {
             super.update()
-            updateText("${100 * pagePosition!!.Current / pagePosition!!.Total}%")
+            updateText("${100 * pagePosition!!.current / pagePosition!!.total}%")
         }
     }
 

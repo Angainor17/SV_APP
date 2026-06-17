@@ -20,6 +20,7 @@ import org.geometerplus.fbreader.book.BookUtil
 import org.geometerplus.fbreader.bookmodel.BookModel
 import org.geometerplus.fbreader.bookmodel.TOCTree
 import org.geometerplus.fbreader.formats.BuiltinFormatPlugin
+import org.geometerplus.zlibrary.core.encodings.Encoding
 import org.geometerplus.zlibrary.core.encodings.EncodingCollection
 import org.geometerplus.zlibrary.core.filesystem.ZLFile
 import org.geometerplus.zlibrary.core.image.ZLImage
@@ -105,17 +106,21 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
 
     override fun priority(): Int = 0
 
-    override fun supportedEncodings(): EncodingCollection? = null
+    override fun supportedEncodings(): EncodingCollection = object : EncodingCollection() {
+        override fun encodings(): List<Encoding> = emptyList()
+        override fun getEncoding(alias: String): Encoding? = null
+        override fun getEncoding(code: Int): Encoding? = null
+    }
 
     /**
      * Читает модель книги.
      */
     override fun readModel(model: BookModel) {
-        val m = ComicsTextModel(BookUtil.fileByBook(model.Book))
+        val m = ComicsTextModel(BookUtil.fileByBook(model.book))
         model.setBookTextModel(m)
         if (m.doc!!.toc == null)
             return
-        loadTOC(0, 0, m.doc!!.toc!!, model.TOCTree)
+        loadTOC(0, 0, m.doc!!.toc!!, model.tocTree)
     }
 
     /**

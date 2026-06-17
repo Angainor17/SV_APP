@@ -91,14 +91,14 @@ public class BuyBooksActivity extends SimpleDialogActivity implements NetworkLib
         for (NetworkTree.Key k : keys) {
             final NetworkTree tree = myLibrary.getTreeByKey(k);
             if (tree instanceof NetworkBookTree) {
-                myBooks.add(((NetworkBookTree) tree).Book);
+                myBooks.add(((NetworkBookTree) tree).book);
             } else {
                 finish();
                 return;
             }
         }
 
-        myLink = myBooks.get(0).Link;
+        myLink = myBooks.get(0).link;
         final NetworkAuthenticationManager mgr = myLink.authenticationManager();
         if (mgr == null) {
             finish();
@@ -213,7 +213,7 @@ public class BuyBooksActivity extends SimpleDialogActivity implements NetworkLib
                         setButtonTexts("buy", "cancel");
                     } else if (myBooks.get(0).getStatus(myBookCollection) == NetworkBookItem.Status.CanBePurchased) {
                         textView().setText(
-                                resource.getResource("confirm").getValue().replace("%s", myBooks.get(0).Title)
+                                resource.getResource("confirm").getValue().replace("%s", myBooks.get(0).title)
                         );
                         setButtonTexts("buy", "cancel");
                     } else {
@@ -245,10 +245,10 @@ public class BuyBooksActivity extends SimpleDialogActivity implements NetworkLib
                 continue;
             }
             final BookBuyUrlInfo info = b.buyInfo();
-            if (info == null || info.Price == null) {
+            if (info == null || info.price == null) {
                 return null;
             }
-            cost = cost.add(info.Price);
+            cost = cost.add(info.price);
         }
         return cost;
     }

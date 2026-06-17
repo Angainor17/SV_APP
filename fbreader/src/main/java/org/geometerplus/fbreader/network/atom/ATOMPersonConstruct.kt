@@ -21,23 +21,23 @@ package org.geometerplus.fbreader.network.atom
 
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-abstract class ATOMPersonConstruct protected constructor(attributes: ZLStringMap) : ATOMCommonAttributes(attributes) {
+abstract class ATOMPersonConstruct internal constructor(attributes: ZLStringMap) : ATOMCommonAttributes(attributes) {
 
     @JvmField
-    var Name: String? = null
+    var name: String? = null
 
     @JvmField
-    var Uri: String? = null
+    var uri: String? = null
 
     @JvmField
-    var Email: String? = null
+    var email: String? = null
 
     override fun toString(): String {
         val buf = StringBuilder("[")
         buf.append(super.toString())
-        buf.append(",\nName=").append(Name)
-        buf.append(",\nUri=").append(Uri)
-        buf.append(",\nEmail=").append(Email)
+        buf.append(",\nName=").append(name)
+        buf.append(",\nUri=").append(uri)
+        buf.append(",\nEmail=").append(email)
         buf.append("]")
         return buf.toString()
     }

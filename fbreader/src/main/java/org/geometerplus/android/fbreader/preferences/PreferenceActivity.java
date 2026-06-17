@@ -147,14 +147,14 @@ public class PreferenceActivity extends ZLPreferenceActivity {
             }
         };
         directoriesScreen.addPreference(myChooserCollection.createPreference(
-                directoriesScreen.Resource, "bookPath", Paths.BookPathOption, libraryUpdater
+                directoriesScreen.Resource, "bookPath", Paths.bookPathOption, libraryUpdater
         ));
         directoriesScreen.addPreference(myChooserCollection.createPreference(
-                directoriesScreen.Resource, "downloadDir", Paths.DownloadsDirectoryOption, libraryUpdater
+                directoriesScreen.Resource, "downloadDir", Paths.downloadsDirectoryOption, libraryUpdater
         ));
         final PreferenceSet fontReloader = new PreferenceSet.Reloader();
         directoriesScreen.addPreference(myChooserCollection.createPreference(
-                directoriesScreen.Resource, "fontPath", Paths.FontPathOption, fontReloader
+                directoriesScreen.Resource, "fontPath", Paths.fontPathOption, fontReloader
         ));
         directoriesScreen.addPreference(myChooserCollection.createPreference(
                 directoriesScreen.Resource, "tempDir", Paths.TempDirectoryOption(this), null
@@ -164,7 +164,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final PreferenceSet syncPreferences = new PreferenceSet.Enabler() {
             @Override
             protected Boolean detectState() {
-                return syncOptions.Enabled.getValue();
+                return syncOptions.getEnabled().getValue();
             }
         };
         syncScreen.addPreference(new UrlPreference(this, syncScreen.Resource, "site"));
@@ -172,7 +172,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                 this, syncScreen.Resource.getResource("enable")
         ) {
             {
-                if (syncOptions.Enabled.getValue()) {
+                if (syncOptions.getEnabled().getValue()) {
                     setChecked(true);
                     setOnSummary(SyncUtil.getAccountName(myNetworkContext));
                 } else {
@@ -191,7 +191,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 
                 if (!isChecked()) {
                     SyncUtil.logout(myNetworkContext);
-                    syncOptions.Enabled.setValue(false);
+                    syncOptions.getEnabled().setValue(false);
                     enableSynchronisation();
                     syncPreferences.run();
                     new SyncData().reset();
@@ -206,7 +206,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                                         @Override
                                         public void processResponse(Object response) {
                                             final String account = (String) ((Map) response).get("user");
-                                            syncOptions.Enabled.setValue(account != null);
+                                            syncOptions.getEnabled().setValue(account != null);
                                             enableSynchronisation();
                                             runOnUiThread(new Runnable() {
                                                 public void run() {
@@ -240,11 +240,11 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                 });
             }
         });
-        syncPreferences.add(syncScreen.addOption(syncOptions.UploadAllBooks, "uploadAllBooks", "values"));
-        syncPreferences.add(syncScreen.addOption(syncOptions.Positions, "positions", "values"));
-        syncPreferences.add(syncScreen.addOption(syncOptions.ChangeCurrentBook, "changeCurrentBook"));
+        syncPreferences.add(syncScreen.addOption(syncOptions.getUploadAllBooks(), "uploadAllBooks", "values"));
+        syncPreferences.add(syncScreen.addOption(syncOptions.getPositions(), "positions", "values"));
+        syncPreferences.add(syncScreen.addOption(syncOptions.getChangeCurrentBook(), "changeCurrentBook"));
         //syncPreferences.add(syncScreen.addOption(syncOptions.Metainfo, "metainfo", "values"));
-        syncPreferences.add(syncScreen.addOption(syncOptions.Bookmarks, "bookmarks", "values"));
+        syncPreferences.add(syncScreen.addOption(syncOptions.getBookmarks(), "bookmarks", "values"));
         syncPreferences.run();
 
         final Screen appearanceScreen = createPreferenceScreen("appearance");
@@ -274,12 +274,12 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         ));
         appearanceScreen.addPreference(new ZLBooleanPreference(
                 this,
-                viewOptions.TwoColumnView,
+                viewOptions.twoColumnView,
                 appearanceScreen.Resource.getResource("twoColumnView")
         ));
         appearanceScreen.addPreference(new ZLBooleanPreference(
                 this,
-                miscOptions.AllowScreenBrightnessAdjustment,
+                miscOptions.allowScreenBrightnessAdjustment,
                 appearanceScreen.Resource.getResource("allowScreenBrightnessAdjustment")
         ) {
             private final int myLevel = androidLibrary.ScreenBrightnessLevelOption.getValue();
@@ -449,11 +449,11 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         }
 
         final Screen toastsScreen = createPreferenceScreen("toast");
-        toastsScreen.addOption(miscOptions.ToastFontSizePercent, "fontSizePercent");
-        toastsScreen.addOption(miscOptions.ShowFootnoteToast, "showFootnoteToast");
+        toastsScreen.addOption(miscOptions.toastFontSizePercent, "fontSizePercent");
+        toastsScreen.addOption(miscOptions.showFootnoteToast, "showFootnoteToast");
         toastsScreen.addPreference(new ZLEnumPreference(
                 this,
-                miscOptions.FootnoteToastDuration,
+                miscOptions.footnoteToastDuration,
                 toastsScreen.Resource.getResource("footnoteToastDuration"),
                 ZLResource.resource("duration")
         ));
@@ -469,7 +469,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final PreferenceSet backgroundSet = new PreferenceSet.Enabler() {
             @Override
             protected Boolean detectState() {
-                return profile.WallpaperOption.getValue().startsWith("/");
+                return profile.wallpaperOption.getValue().startsWith("/");
             }
         };
         myBackgroundPreference = new BackgroundPreference(
@@ -485,34 +485,34 @@ public class PreferenceActivity extends ZLPreferenceActivity {
             }
         };
         colorsScreen.addPreference(myBackgroundPreference);
-        backgroundSet.add(colorsScreen.addOption(profile.FillModeOption, "fillMode"));
+        backgroundSet.add(colorsScreen.addOption(profile.fillModeOption, "fillMode"));
         backgroundSet.run();
 
-        colorsScreen.addOption(profile.RegularTextOption, "text");
-        colorsScreen.addOption(profile.HyperlinkTextOption, "hyperlink");
-        colorsScreen.addOption(profile.VisitedHyperlinkTextOption, "hyperlinkVisited");
-        colorsScreen.addOption(profile.FooterFillOption, "footerOldStyle");
-        colorsScreen.addOption(profile.FooterNGBackgroundOption, "footerBackground");
-        colorsScreen.addOption(profile.FooterNGForegroundOption, "footerForeground");
-        colorsScreen.addOption(profile.FooterNGForegroundUnreadOption, "footerForegroundUnread");
-        colorsScreen.addOption(profile.SelectionBackgroundOption, "selectionBackground");
-        colorsScreen.addOption(profile.SelectionForegroundOption, "selectionForeground");
-        colorsScreen.addOption(profile.HighlightingForegroundOption, "highlightingForeground");
-        colorsScreen.addOption(profile.HighlightingBackgroundOption, "highlightingBackground");
+        colorsScreen.addOption(profile.regularTextOption, "text");
+        colorsScreen.addOption(profile.hyperlinkTextOption, "hyperlink");
+        colorsScreen.addOption(profile.visitedHyperlinkTextOption, "hyperlinkVisited");
+        colorsScreen.addOption(profile.footerFillOption, "footerOldStyle");
+        colorsScreen.addOption(profile.footerNGBackgroundOption, "footerBackground");
+        colorsScreen.addOption(profile.footerNGForegroundOption, "footerForeground");
+        colorsScreen.addOption(profile.footerNGForegroundUnreadOption, "footerForegroundUnread");
+        colorsScreen.addOption(profile.selectionBackgroundOption, "selectionBackground");
+        colorsScreen.addOption(profile.selectionForegroundOption, "selectionForeground");
+        colorsScreen.addOption(profile.highlightingForegroundOption, "highlightingForeground");
+        colorsScreen.addOption(profile.highlightingBackgroundOption, "highlightingBackground");
 
         final Screen marginsScreen = createPreferenceScreen("margins");
-        marginsScreen.addOption(viewOptions.LeftMargin, "left");
-        marginsScreen.addOption(viewOptions.RightMargin, "right");
-        marginsScreen.addOption(viewOptions.TopMargin, "top");
-        marginsScreen.addOption(viewOptions.BottomMargin, "bottom");
-        marginsScreen.addOption(viewOptions.SpaceBetweenColumns, "spaceBetweenColumns");
+        marginsScreen.addOption(viewOptions.leftMargin, "left");
+        marginsScreen.addOption(viewOptions.rightMargin, "right");
+        marginsScreen.addOption(viewOptions.topMargin, "top");
+        marginsScreen.addOption(viewOptions.bottomMargin, "bottom");
+        marginsScreen.addOption(viewOptions.spaceBetweenColumns, "spaceBetweenColumns");
 
         final Screen statusLineScreen = createPreferenceScreen("scrollBar");
 
         final PreferenceSet footerPreferences = new PreferenceSet.Enabler() {
             @Override
             protected Boolean detectState() {
-                switch (viewOptions.ScrollbarType.getValue()) {
+                switch (viewOptions.scrollbarType.getValue()) {
                     case FBView.SCROLLBAR_SHOW_AS_FOOTER:
                     case FBView.SCROLLBAR_SHOW_AS_FOOTER_OLD_STYLE:
                         return true;
@@ -524,10 +524,10 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final PreferenceSet tocPreferences = new PreferenceSet.Enabler() {
             @Override
             protected Boolean detectState() {
-                switch (viewOptions.ScrollbarType.getValue()) {
+                switch (viewOptions.scrollbarType.getValue()) {
                     case FBView.SCROLLBAR_SHOW_AS_FOOTER:
                     case FBView.SCROLLBAR_SHOW_AS_FOOTER_OLD_STYLE:
-                        return footerOptions.ShowTOCMarks.getValue();
+                        return footerOptions.showTOCMarks.getValue();
                     default:
                         return false;
                 }
@@ -536,7 +536,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final PreferenceSet oldStyleFooterPreferences = new PreferenceSet.Enabler() {
             @Override
             protected Boolean detectState() {
-                switch (viewOptions.ScrollbarType.getValue()) {
+                switch (viewOptions.scrollbarType.getValue()) {
                     case FBView.SCROLLBAR_SHOW_AS_FOOTER_OLD_STYLE:
                         return true;
                     default:
@@ -547,7 +547,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final PreferenceSet newStyleFooterPreferences = new PreferenceSet.Enabler() {
             @Override
             protected Boolean detectState() {
-                switch (viewOptions.ScrollbarType.getValue()) {
+                switch (viewOptions.scrollbarType.getValue()) {
                     case FBView.SCROLLBAR_SHOW_AS_FOOTER:
                         return true;
                     default:
@@ -560,7 +560,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final String[] scrollBarTypes = {"hide", "show", "showAsProgress", "showAsFooter", "showAsFooterOldStyle"};
         statusLineScreen.addPreference(new ZLChoicePreference(
                 this, statusLineScreen.Resource.getResource("scrollbarType"),
-                viewOptions.ScrollbarType, scrollBarTypes
+                viewOptions.scrollbarType, scrollBarTypes
         ) {
             @Override
             protected void onDialogClosed(boolean result) {
@@ -574,15 +574,15 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 
         footerPreferences.add(statusLineScreen.addPreference(new ZLIntegerRangePreference(
                 this, statusLineScreen.Resource.getResource("footerHeight"),
-                viewOptions.FooterHeight
+                viewOptions.footerHeight
         )));
-        oldStyleFooterPreferences.add(statusLineScreen.addOption(profile.FooterFillOption, "footerOldStyleColor"));
-        newStyleFooterPreferences.add(statusLineScreen.addOption(profile.FooterNGBackgroundOption, "footerBackgroundColor"));
-        newStyleFooterPreferences.add(statusLineScreen.addOption(profile.FooterNGForegroundOption, "footerForegroundColor"));
-        newStyleFooterPreferences.add(statusLineScreen.addOption(profile.FooterNGForegroundUnreadOption, "footerForegroundUnreadColor"));
+        oldStyleFooterPreferences.add(statusLineScreen.addOption(profile.footerFillOption, "footerOldStyleColor"));
+        newStyleFooterPreferences.add(statusLineScreen.addOption(profile.footerNGBackgroundOption, "footerBackgroundColor"));
+        newStyleFooterPreferences.add(statusLineScreen.addOption(profile.footerNGForegroundOption, "footerForegroundColor"));
+        newStyleFooterPreferences.add(statusLineScreen.addOption(profile.footerNGForegroundUnreadOption, "footerForegroundUnreadColor"));
         footerPreferences.add(statusLineScreen.addPreference(new ZLBooleanPreference(
                 PreferenceActivity.this,
-                footerOptions.ShowTOCMarks,
+                footerOptions.showTOCMarks,
                 statusLineScreen.Resource.getResource("tocMarks")
         ) {
             @Override
@@ -591,13 +591,13 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                 tocPreferences.run();
             }
         }));
-        tocPreferences.add(statusLineScreen.addOption(footerOptions.MaxTOCMarks, "tocMarksMaxNumber"));
-        footerPreferences.add(statusLineScreen.addOption(footerOptions.ShowProgress, "showProgress"));
-        footerPreferences.add(statusLineScreen.addOption(footerOptions.ShowClock, "showClock"));
-        footerPreferences.add(statusLineScreen.addOption(footerOptions.ShowBattery, "showBattery"));
+        tocPreferences.add(statusLineScreen.addOption(footerOptions.maxTOCMarks, "tocMarksMaxNumber"));
+        footerPreferences.add(statusLineScreen.addOption(footerOptions.showProgress, "showProgress"));
+        footerPreferences.add(statusLineScreen.addOption(footerOptions.showClock, "showClock"));
+        footerPreferences.add(statusLineScreen.addOption(footerOptions.showBattery, "showBattery"));
         footerPreferences.add(statusLineScreen.addPreference(new FontPreference(
                 this, statusLineScreen.Resource.getResource("font"),
-                footerOptions.Font, false
+                footerOptions.font, false
         )));
         footerPreferences.run();
         tocPreferences.run();
@@ -617,7 +617,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 
         final Screen scrollingScreen = createPreferenceScreen("scrolling");
         scrollingScreen.addOption(pageTurningOptions.fingerScrolling, "fingerScrolling");
-        scrollingScreen.addOption(miscOptions.EnableDoubleTap, "enableDoubleTapDetection");
+        scrollingScreen.addOption(miscOptions.enableDoubleTap, "enableDoubleTapDetection");
 
         final PreferenceSet volumeKeysPreferences = new PreferenceSet.Enabler() {
             @Override
@@ -693,12 +693,12 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         ) {
             @Override
             protected void init() {
-                setInitialValue(DictionaryUtil.TargetLanguageOption.getValue());
+                setInitialValue(DictionaryUtil.targetLanguageOption.getValue());
             }
 
             @Override
             protected void setLanguage(String code) {
-                DictionaryUtil.TargetLanguageOption.setValue(code);
+                DictionaryUtil.targetLanguageOption.setValue(code);
             }
         };
 
@@ -714,7 +714,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                     protected void onDialogClosed(boolean result) {
                         super.onDialogClosed(result);
                         targetLanguagePreference.setEnabled(
-                                DictionaryUtil.getCurrentDictionaryInfo(true).SupportsTargetLanguageSetting
+                                DictionaryUtil.getCurrentDictionaryInfo(true).getSupportsTargetLanguageSetting()
                         );
                     }
                 });
@@ -726,29 +726,29 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                 ));
                 dictionaryScreen.addPreference(new ZLBooleanPreference(
                         PreferenceActivity.this,
-                        miscOptions.NavigateAllWords,
+                        miscOptions.navigateAllWords,
                         dictionaryScreen.Resource.getResource("navigateOverAllWords")
                 ));
-                dictionaryScreen.addOption(miscOptions.WordTappingAction, "longTapAction");
+                dictionaryScreen.addOption(miscOptions.wordTappingAction, "longTapAction");
                 dictionaryScreen.addPreference(targetLanguagePreference);
                 targetLanguagePreference.setEnabled(
-                        DictionaryUtil.getCurrentDictionaryInfo(true).SupportsTargetLanguageSetting
+                        DictionaryUtil.getCurrentDictionaryInfo(true).getSupportsTargetLanguageSetting()
                 );
             }
         });
 
         final Screen imagesScreen = createPreferenceScreen("images");
-        imagesScreen.addOption(imageOptions.TapAction, "longTapAction");
-        imagesScreen.addOption(imageOptions.FitToScreen, "fitImagesToScreen");
-        imagesScreen.addOption(imageOptions.ImageViewBackground, "backgroundColor");
-        imagesScreen.addOption(imageOptions.MatchBackground, "matchBackground");
+        imagesScreen.addOption(imageOptions.tapAction, "longTapAction");
+        imagesScreen.addOption(imageOptions.fitToScreen, "fitImagesToScreen");
+        imagesScreen.addOption(imageOptions.imageViewBackground, "backgroundColor");
+        imagesScreen.addOption(imageOptions.matchBackground, "matchBackground");
 
         final CancelMenuHelper cancelMenuHelper = new CancelMenuHelper();
         final Screen cancelMenuScreen = createPreferenceScreen("cancelMenu");
-        cancelMenuScreen.addOption(cancelMenuHelper.ShowLibraryItemOption, "library");
-        cancelMenuScreen.addOption(cancelMenuHelper.ShowNetworkLibraryItemOption, "networkLibrary");
-        cancelMenuScreen.addOption(cancelMenuHelper.ShowPreviousBookItemOption, "previousBook");
-        cancelMenuScreen.addOption(cancelMenuHelper.ShowPositionItemsOption, "positions");
+        cancelMenuScreen.addOption(cancelMenuHelper.getShowLibraryItemOption(), "library");
+        cancelMenuScreen.addOption(cancelMenuHelper.getShowNetworkLibraryItemOption(), "networkLibrary");
+        cancelMenuScreen.addOption(cancelMenuHelper.getShowPreviousBookItemOption(), "previousBook");
+        cancelMenuScreen.addOption(cancelMenuHelper.getShowPositionItemsOption(), "positions");
         final String[] backKeyActions =
                 {ActionCode.EXIT, ActionCode.SHOW_CANCEL_MENU};
         cancelMenuScreen.addPreference(new ZLStringChoicePreference(
@@ -763,7 +763,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         ));
 
         final Screen tipsScreen = createPreferenceScreen("tips");
-        tipsScreen.addOption(TipsManager.ShowTipsOption, "showTips");
+        tipsScreen.addOption(TipsManager.showTipsOption, "showTips");
 
         final Screen aboutScreen = createPreferenceScreen("about");
         aboutScreen.addPreference(new InfoPreference(

@@ -21,11 +21,11 @@ package org.geometerplus.fbreader.library
 
 internal class RecentBooksTree(root: RootTree) : FirstLevelTree(root, ROOT_RECENT) {
 
-    override fun getOpeningStatus(): Status = Status.ALWAYS_RELOAD_BEFORE_OPENING
+    override val openingStatus: Status get() = Status.ALWAYS_RELOAD_BEFORE_OPENING
 
     override fun waitForOpening() {
         clear()
-        for (book in Collection.recentlyOpenedBooks(12)) {
+        for (book in collection.recentlyOpenedBooks(12)) {
             BookWithAuthorsTree(this, book)
         }
     }

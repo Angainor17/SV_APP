@@ -64,7 +64,7 @@ public abstract class NetworkBookActions {
         if (useFullReferences(book)) {
             final BookUrlInfo reference = book.reference(UrlInfo.Type.Book);
             if (reference != null
-                    && connection != null && connection.isBeingDownloaded(reference.Url)) {
+                    && connection != null && connection.isBeingDownloaded(reference.url)) {
                 return R.drawable.ic_list_downloading;
             } else if (book.localCopyFileName(collection) != null) {
                 return R.drawable.ic_list_flag;
@@ -82,12 +82,12 @@ public abstract class NetworkBookActions {
         if (tree == null) {
             throw new IllegalArgumentException("tree == null");
         }
-        final NetworkBookItem book = tree.Book;
+        final NetworkBookItem book = tree.book;
         List<NBAction> actions = new LinkedList<NBAction>();
         if (useFullReferences(book)) {
             final BookUrlInfo reference = book.reference(UrlInfo.Type.Book);
             if (reference != null
-                    && connection != null && connection.isBeingDownloaded(reference.Url)) {
+                    && connection != null && connection.isBeingDownloaded(reference.url)) {
                 actions.add(new NBAction(activity, collection, ActionCode.TREE_NO_ACTION, "alreadyDownloading"));
             } else if (book.localCopyFileName(collection) != null) {
                 actions.add(new NBAction(activity, collection, ActionCode.READ_BOOK, "read"));
@@ -98,7 +98,7 @@ public abstract class NetworkBookActions {
         }
         if (useDemoReferences(book, collection)) {
             final BookUrlInfo reference = book.reference(UrlInfo.Type.BookDemo);
-            if (connection != null && connection.isBeingDownloaded(reference.Url)) {
+            if (connection != null && connection.isBeingDownloaded(reference.url)) {
                 actions.add(new NBAction(activity, collection, ActionCode.TREE_NO_ACTION, "alreadyDownloadingDemo"));
             } else if (reference.localCopyFileName(UrlInfo.Type.BookDemo) != null) {
                 actions.add(new NBAction(activity, collection, ActionCode.READ_DEMO, "readDemo"));
@@ -109,14 +109,14 @@ public abstract class NetworkBookActions {
         }
         if (book.getStatus(collection) == NetworkBookItem.Status.CanBePurchased) {
             final BookBuyUrlInfo reference = book.buyInfo();
-            final int id = reference.InfoType == UrlInfo.Type.BookBuy
+            final int id = reference.infoType == UrlInfo.Type.BookBuy
                     ? ActionCode.BUY_DIRECTLY : ActionCode.BUY_IN_BROWSER;
-            final String priceString = reference.Price != null ? String.valueOf(reference.Price) : "";
+            final String priceString = reference.price != null ? String.valueOf(reference.price) : "";
             actions.add(new NBAction(activity, collection, id, "buy", priceString));
-            final BasketItem basketItem = book.Link.getBasketItem();
+            final BasketItem basketItem = book.link.getBasketItem();
             if (basketItem != null) {
                 if (basketItem.contains(book)) {
-                    if (tree.Parent instanceof BasketCatalogTree ||
+                    if (tree.parent instanceof BasketCatalogTree ||
                             activity instanceof NetworkLibraryActivity) {
                         actions.add(new NBAction(activity, collection, ActionCode.REMOVE_BOOK_FROM_BASKET, "removeFromBasket"));
                     } else {
@@ -131,7 +131,7 @@ public abstract class NetworkBookActions {
     }
 
     private static boolean runActionStatic(Activity activity, NetworkBookTree tree, int actionCode, IBookCollection collection) {
-        final NetworkBookItem book = tree.Book;
+        final NetworkBookItem book = tree.book;
         switch (actionCode) {
             case ActionCode.DOWNLOAD_BOOK:
                 Util.doDownloadBook(activity, book, false);
@@ -158,14 +158,14 @@ public abstract class NetworkBookActions {
                 doBuyInBrowser(activity, book);
                 return true;
             case ActionCode.ADD_BOOK_TO_BASKET:
-                book.Link.getBasketItem().add(book);
+                book.link.getBasketItem().add(book);
                 return true;
             case ActionCode.REMOVE_BOOK_FROM_BASKET:
-                book.Link.getBasketItem().remove(book);
+                book.link.getBasketItem().remove(book);
                 return true;
             case ActionCode.OPEN_BASKET:
                 new OpenCatalogAction(activity, new ActivityNetworkContext(activity))
-                        .run(Util.networkLibrary(activity).getFakeBasketTree(book.Link.getBasketItem()));
+                        .run(Util.networkLibrary(activity).getFakeBasketTree(book.link.getBasketItem()));
                 return true;
         }
         return false;
@@ -197,7 +197,7 @@ public abstract class NetworkBookActions {
         final ZLResource buttonResource = dialogResource.getResource("button");
         final ZLResource boxResource = dialogResource.getResource("deleteBookBox");
         new AlertDialog.Builder(activity)
-                .setTitle(book.Title)
+                .setTitle(book.title)
                 .setMessage(boxResource.getResource("message").getValue())
                 .setIcon(0)
                 .setPositiveButton(buttonResource.getResource("yes").getValue(), new DialogInterface.OnClickListener() {
@@ -228,7 +228,7 @@ public abstract class NetworkBookActions {
     private static void doBuyInBrowser(Activity activity, final NetworkBookItem book) {
         BookUrlInfo reference = book.reference(UrlInfo.Type.BookBuyInBrowser);
         if (reference != null) {
-            Util.openInBrowser(activity, reference.Url);
+            Util.openInBrowser(activity, reference.url);
         }
     }
 
@@ -261,7 +261,7 @@ public abstract class NetworkBookActions {
 
         @Override
         public void run(NetworkTree tree) {
-            runActionStatic(myActivity, (NetworkBookTree) tree, myId, myCollection);
+            runActionStatic(getMyActivity(), (NetworkBookTree) tree, myId, myCollection);
         }
     }
 }

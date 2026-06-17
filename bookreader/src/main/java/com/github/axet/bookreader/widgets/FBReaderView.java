@@ -241,8 +241,8 @@ public class FBReaderView extends RelativeLayout {
 
         config();
 
-        app.BookTextView = new CustomView(app);
-        app.setView(app.BookTextView);
+        app.setBookTextView(new CustomView(app));
+        app.setView(app.getBookTextView());
 
         footer = new FBFooterView(getContext(), this);
 
@@ -253,12 +253,12 @@ public class FBReaderView extends RelativeLayout {
         if (shared.getString(BookApplication.PREFERENCE_THEME, "").equals(getContext().getString(
                 com.github.axet.androidlibrary.R.string.Theme_Dark))
         ) {
-            config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.NIGHT);
+            config.setValue(app.getViewOptions().colorProfileName, ColorProfile.NIGHT);
         } else {
-            config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.DAY);
+            config.setValue(app.getViewOptions().colorProfileName, ColorProfile.DAY);
             ColorProfile p = ColorProfile.get(ColorProfile.DAY);
-            config.setValue(p.BackgroundOption, 0xF5E5CC);
-            config.setValue(p.WallpaperOption, "");
+            config.setValue(p.backgroundOption, 0xF5E5CC);
+            config.setValue(p.wallpaperOption, "");
         }
     }
 
@@ -271,23 +271,23 @@ public class FBReaderView extends RelativeLayout {
         SharedPreferences shared = android.preference.PreferenceManager.getDefaultSharedPreferences(getContext());
         configColorProfile(shared);
 
-        int d = shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue());
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, d);
+        int d = shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, app.getViewOptions().getTextStyleCollection().getBaseStyle().FontSizeOption.getValue());
+        config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().FontSizeOption, d);
 
-        String f = shared.getString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption.getValue());
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption, f);
+        String f = shared.getString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, app.getViewOptions().getTextStyleCollection().getBaseStyle().FontFamilyOption.getValue());
+        config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().FontFamilyOption, f);
 
         boolean ignoreCSSFonts = shared.getBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, false);
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption, !ignoreCSSFonts);
+        config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption, !ignoreCSSFonts);
 
-        config.setValue(app.MiscOptions.AllowScreenBrightnessAdjustment, false);
-        config.setValue(app.ViewOptions.ScrollbarType, 0); // FBView.SCROLLBAR_SHOW_AS_FOOTER
-        config.setValue(app.ViewOptions.getFooterOptions().ShowProgress, FooterOptions.ProgressDisplayType.asPages);
+        config.setValue(app.getMiscOptions().allowScreenBrightnessAdjustment, false);
+        config.setValue(app.getViewOptions().scrollbarType, 0); // FBView.SCROLLBAR_SHOW_AS_FOOTER
+        config.setValue(app.getViewOptions().getFooterOptions().showProgress, FooterOptions.ProgressDisplayType.asPages);
 
-        config.setValue(app.ImageOptions.TapAction, ImageOptions.TapActionEnum.openImageView);
-        config.setValue(app.ImageOptions.FitToScreen, FBView.ImageFitting.covers);
+        config.setValue(app.getImageOptions().tapAction, ImageOptions.TapActionEnum.openImageView);
+        config.setValue(app.getImageOptions().fitToScreen, FBView.ImageFitting.covers);
 
-        config.setValue(app.MiscOptions.WordTappingAction, MiscOptions.WordTappingActionEnum.startSelecting);
+        config.setValue(app.getMiscOptions().wordTappingAction, MiscOptions.WordTappingActionEnum.startSelecting);
     }
 
     public void setWidget(Widgets w) {
@@ -330,21 +330,21 @@ public class FBReaderView extends RelativeLayout {
             if (plugin instanceof Plugin) {
                 pluginview = ((Plugin) plugin).create(fbook);
                 BookModel Model = BookModel.createModel(fbook.book, plugin);
-                app.BookTextView.setModel(Model.getTextModel());
-                app.Model = Model;
+                app.getBookTextView().setModel(Model.getTextModel());
+                app.model = Model;
                 if (book.info.position != null)
                     gotoPluginPosition(book.info.position);
             } else {
                 BookModel Model = BookModel.createModel(fbook.book, plugin);
                 ZLTextHyphenator.Instance().load(fbook.book.getLanguage());
-                app.BookTextView.setModel(Model.getTextModel());
-                app.Model = Model;
+                app.getBookTextView().setModel(Model.getTextModel());
+                app.model = Model;
                 if (book.info.position != null)
-                    app.BookTextView.gotoPosition(book.info.position);
+                    app.getBookTextView().gotoPosition(book.info.position);
                 if (book.info.scale != null)
-                    config.setValue(app.ImageOptions.FitToScreen, book.info.scale);
+                    config.setValue(app.getImageOptions().fitToScreen, book.info.scale);
                 if (book.info.fontsize != null)
-                    config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, book.info.fontsize);
+                    config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().FontSizeOption, book.info.fontsize);
                 bookmarksUpdate();
             }
             widget.repaint();
@@ -360,8 +360,8 @@ public class FBReaderView extends RelativeLayout {
             pluginview.close();
             pluginview = null;
         }
-        app.BookTextView.setModel(null);
-        app.Model = null;
+        app.getBookTextView().setModel(null);
+        app.model = null;
         book = null;
         if (tts != null) {
             tts.close();
@@ -412,7 +412,7 @@ public class FBReaderView extends RelativeLayout {
                         int top = -p.getTop();
                         for (ZLTextElementArea a : p.text.areas()) {
                             if (a.YStart > top || (a.YStart < top && a.YEnd > top)) {
-                                ZLTextParagraphCursor paragraphCursor = new ZLTextParagraphCursor(app.Model.getTextModel(), a.getParagraphIndex());
+                                ZLTextParagraphCursor paragraphCursor = new ZLTextParagraphCursor(app.model.getTextModel(), a.getParagraphIndex());
                                 ZLTextWordCursor wordCursor = new ZLTextWordCursor(paragraphCursor);
                                 wordCursor.moveTo(a);
                                 ZLTextFixedPosition last;
@@ -428,7 +428,7 @@ public class FBReaderView extends RelativeLayout {
                     }
                 }
             }
-            return new ZLTextFixedPosition(app.BookTextView.getStartCursor());
+            return new ZLTextFixedPosition(app.getBookTextView().getStartCursor());
         }
     }
 
@@ -447,7 +447,7 @@ public class FBReaderView extends RelativeLayout {
                 final Runnable runnable = () -> {
                     final TextSearchPopup popup = (TextSearchPopup) app.getPopupById(TextSearchPopup.ID);
                     popup.initPosition();
-                    config.setValue(app.MiscOptions.TextSearchPattern, pattern);
+                    config.setValue(app.getMiscOptions().textSearchPattern, pattern);
                     if (pluginview != null) {
                         searchClose();
                         search = pluginview.search(pattern);
@@ -455,7 +455,7 @@ public class FBReaderView extends RelativeLayout {
                         a.runOnUiThread(() -> {
                             if (search.getCount() == 0) {
                                 UIMessageUtil.showErrorMessage(a, "textNotFound");
-                                popup.StartPosition = null;
+                                popup.startPosition = null;
                             } else {
                                 if (widget instanceof ScrollWidget)
                                     ((ScrollWidget) widget).updateOverlays();
@@ -475,7 +475,7 @@ public class FBReaderView extends RelativeLayout {
                     } else {
                         a.runOnUiThread(() -> {
                             UIMessageUtil.showErrorMessage(a, "textNotFound");
-                            popup.StartPosition = null;
+                            popup.startPosition = null;
                         });
                     }
                 };
@@ -496,14 +496,14 @@ public class FBReaderView extends RelativeLayout {
                     showHyperlink(l);
                     return;
                 }
-                final ZLTextRegion region = app.BookTextView.getOutlinedRegion();
+                final ZLTextRegion region = app.getBookTextView().getOutlinedRegion();
                 if (region == null) {
                     return;
                 }
                 final ZLTextRegion.Soul soul = region.getSoul();
                 if (soul instanceof ZLTextHyperlinkRegionSoul) {
-                    app.BookTextView.hideOutline();
-                    final ZLTextHyperlink hyperlink = ((ZLTextHyperlinkRegionSoul) soul).Hyperlink;
+                    app.getBookTextView().hideOutline();
+                    final ZLTextHyperlink hyperlink = ((ZLTextHyperlinkRegionSoul) soul).hyperlink;
                     switch (hyperlink.Type) {
                         case FBHyperlinkType.EXTERNAL:
                             AboutPreferenceCompat.openUrlDialog(getContext(), hyperlink.Id);
@@ -513,9 +513,9 @@ public class FBReaderView extends RelativeLayout {
                             final AutoTextSnippet snippet = app.getFootnoteData(hyperlink.Id);
                             if (snippet == null)
                                 break;
-                            app.Collection.markHyperlinkAsVisited(app.getCurrentBook(), hyperlink.Id);
+                            app.getCollection().markHyperlinkAsVisited(app.getCurrentBook(), hyperlink.Id);
                             final boolean showToast;
-                            switch (app.MiscOptions.ShowFootnoteToast.getValue()) {
+                            switch (app.getMiscOptions().showFootnoteToast.getValue()) {
                                 default:
                                 case never:
                                     showToast = false;
@@ -534,7 +534,7 @@ public class FBReaderView extends RelativeLayout {
                             }
                             if (showToast) {
                                 final SuperActivityToast toast;
-                                if (snippet.IsEndOfText) {
+                                if (snippet.isEndOfText) {
                                     toast = new SuperActivityToast(a, SuperToast.Type.STANDARD);
                                 } else {
                                     toast = new SuperActivityToast(a, SuperToast.Type.BUTTON);
@@ -550,14 +550,14 @@ public class FBReaderView extends RelativeLayout {
                                     }));
                                 }
                                 toast.setText(snippet.getText());
-                                toast.setDuration(app.MiscOptions.FootnoteToastDuration.getValue().Value);
+                                toast.setDuration(app.getMiscOptions().footnoteToastDuration.getValue().Value);
                                 toast.setOnDismissWrapper(new OnDismissWrapper("ftnt", new SuperToast.OnDismissListener() {
                                     @Override
                                     public void onDismiss(View view) {
-                                        app.BookTextView.hideOutline();
+                                        app.getBookTextView().hideOutline();
                                     }
                                 }));
-                                app.BookTextView.outlineRegion(region);
+                                app.getBookTextView().outlineRegion(region);
                                 showToast(toast);
                             } else {
                                 book.info.position = getPosition();
@@ -596,20 +596,20 @@ public class FBReaderView extends RelativeLayout {
                                 Intent intent = ImagesProvider.getProvider().shareIntent(uri, name, type, Storage.getTitle(book.info) + " (" + name + ")");
                                 getContext().startActivity(intent);
                             } else if (id == R.id.action_original) {
-                                ((CustomView) app.BookTextView).setScalingType(image.ImageElement, ZLPaintContext.ScalingType.OriginalSize);
+                                ((CustomView) app.getBookTextView()).setScalingType(image.ImageElement, ZLPaintContext.ScalingType.OriginalSize);
                                 resetCaches();
                             } else if (id == R.id.action_zoom) {
-                                ((CustomView) app.BookTextView).setScalingType(image.ImageElement, ZLPaintContext.ScalingType.FitMaximum);
+                                ((CustomView) app.getBookTextView()).setScalingType(image.ImageElement, ZLPaintContext.ScalingType.FitMaximum);
                                 resetCaches();
                             } else if (id == R.id.action_original_all) {
                                 book.info.scales.clear();
                                 book.info.scale = FBView.ImageFitting.covers;
-                                config.setValue(app.ImageOptions.FitToScreen, FBView.ImageFitting.covers);
+                                config.setValue(app.getImageOptions().fitToScreen, FBView.ImageFitting.covers);
                                 resetCaches();
                             } else if (id == R.id.action_zoom_all) {
                                 book.info.scales.clear();
                                 book.info.scale = FBView.ImageFitting.all;
-                                config.setValue(app.ImageOptions.FitToScreen, FBView.ImageFitting.all);
+                                config.setValue(app.getImageOptions().fitToScreen, FBView.ImageFitting.all);
                                 resetCaches();
                             }
                             return true;
@@ -618,7 +618,7 @@ public class FBReaderView extends RelativeLayout {
                     menu.setOnDismissListener(new PopupMenu.OnDismissListener() {
                         @Override
                         public void onDismiss(PopupMenu menu) {
-                            app.BookTextView.hideOutline();
+                            app.getBookTextView().hideOutline();
                             widget.repaint();
                             FBReaderView.this.removeView(anchor);
                         }
@@ -650,7 +650,7 @@ public class FBReaderView extends RelativeLayout {
             public boolean isVisible() {
                 if (pluginview != null)
                     return true;
-                final ZLTextModel textModel = app.BookTextView.getModel();
+                final ZLTextModel textModel = app.getBookTextView().getModel();
                 return textModel != null && textModel.getParagraphsNumber() != 0;
             }
 
@@ -684,13 +684,13 @@ public class FBReaderView extends RelativeLayout {
                 if (selection != null) {
                     text = selection.selection.getText();
                 } else {
-                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+                    TextSnippet snippet = app.getBookTextView().getSelectedSnippet();
                     if (snippet == null)
                         return;
                     text = snippet.getText();
                 }
 
-                app.BookTextView.clearSelection();
+                app.getBookTextView().clearSelection();
                 selectionClose();
 
                 final ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Application.CLIPBOARD_SERVICE);
@@ -711,13 +711,13 @@ public class FBReaderView extends RelativeLayout {
                 if (selection != null) {
                     text = selection.selection.getText();
                 } else {
-                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+                    TextSnippet snippet = app.getBookTextView().getSelectedSnippet();
                     if (snippet == null)
                         return;
                     text = snippet.getText();
                 }
 
-                app.BookTextView.clearSelection();
+                app.getBookTextView().clearSelection();
                 selectionClose();
 
                 final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
@@ -743,7 +743,7 @@ public class FBReaderView extends RelativeLayout {
                 if (selection != null) {
                     text = selection.selection.getText();
                 } else {
-                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+                    TextSnippet snippet = app.getBookTextView().getSelectedSnippet();
                     if (snippet == null)
                         return;
                     text = snippet.getText();
@@ -752,7 +752,7 @@ public class FBReaderView extends RelativeLayout {
                 Intent intent = translateIntent(text);
                 getContext().startActivity(intent);
 
-                app.BookTextView.clearSelection();
+                app.getBookTextView().clearSelection();
                 selectionClose();
             }
         });
@@ -766,7 +766,7 @@ public class FBReaderView extends RelativeLayout {
                     if (widget instanceof ScrollWidget)
                         union = ((ScrollWidget) widget).findUnion(bm);
                     else
-                        union = findUnion(app.BookTextView.myCurrentPage.TextElementMap.areas(), bm);
+                        union = findUnion(app.getBookTextView().currentPage.textElementMap.areas(), bm);
                     MarginLayoutParams lp = new MarginLayoutParams(union.width(), union.height());
                     lp.leftMargin = union.left;
                     lp.topMargin = union.top;
@@ -800,13 +800,13 @@ public class FBReaderView extends RelativeLayout {
                     if (selection != null) {
                         book.info.bookmarks.add(new Storage.Bookmark(selection.selection.getText(), selection.selection.getStart(), selection.selection.getEnd()));
                     } else {
-                        TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+                        TextSnippet snippet = app.getBookTextView().getSelectedSnippet();
                         book.info.bookmarks.add(new Storage.Bookmark(snippet.getText(), snippet.getStart(), snippet.getEnd()));
                     }
                     bookmarksUpdate();
                     if (listener != null)
                         listener.onBookmarksUpdate();
-                    app.BookTextView.clearSelection();
+                    app.getBookTextView().clearSelection();
                     selectionClose();
                 }
             }
@@ -814,7 +814,7 @@ public class FBReaderView extends RelativeLayout {
         app.addAction(ActionCode.SELECTION_CLEAR, new FBAction(app) {
             @Override
             protected void run(Object... params) {
-                app.BookTextView.clearSelection();
+                app.getBookTextView().clearSelection();
                 selectionClose();
                 if (widget instanceof ScrollWidget) {
                     ((ScrollWidget) widget).adapter.processInvalidate();
@@ -844,7 +844,7 @@ public class FBReaderView extends RelativeLayout {
                     UIUtil.wait("search", run, getContext());
                     return;
                 } else {
-                    app.BookTextView.findPrevious();
+                    app.getBookTextView().findPrevious();
                 }
                 resetNewPosition();
             }
@@ -870,7 +870,7 @@ public class FBReaderView extends RelativeLayout {
                     UIUtil.wait("search", run, getContext());
                     return;
                 } else {
-                    app.BookTextView.findNext();
+                    app.getBookTextView().findNext();
                 }
                 resetNewPosition();
             }
@@ -881,7 +881,7 @@ public class FBReaderView extends RelativeLayout {
                 if (listener != null)
                     listener.onSearchClose();
                 searchClose();
-                app.BookTextView.clearFindResults();
+                app.getBookTextView().clearFindResults();
                 resetNewPosition();
             }
         });
@@ -917,7 +917,7 @@ public class FBReaderView extends RelativeLayout {
     }
 
     private void selectionSVAction(CustomAction action) {
-        TextSnippet snippet = app.BookTextView.getSelectedSnippet();
+        TextSnippet snippet = app.getBookTextView().getSelectedSnippet();
 
         final String text;
         final int pageIndex;
@@ -931,7 +931,7 @@ public class FBReaderView extends RelativeLayout {
             pageIndex = snippet.getStart().getParagraphIndex();
         }
 
-        app.BookTextView.clearSelection();
+        app.getBookTextView().clearSelection();
         selectionClose();
         action.action(
                 this.getContext(),
@@ -953,7 +953,7 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void scrollNextPage() {
-        final PageTurningOptions preferences = app.PageTurningOptions;
+        final PageTurningOptions preferences = app.getPageTurningOptions();
         widget.startAnimatedScrolling(
                 FBView.PageIndex.next,
                 preferences.horizontal.getValue()
@@ -963,7 +963,7 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void scrollPrevPage() {
-        final PageTurningOptions preferences = app.PageTurningOptions;
+        final PageTurningOptions preferences = app.getPageTurningOptions();
         widget.startAnimatedScrolling(
                 FBView.PageIndex.previous,
                 preferences.horizontal.getValue()
@@ -977,7 +977,7 @@ public class FBReaderView extends RelativeLayout {
     }
 
     void showHyperlink(final ZLTextHyperlink hyperlink) {
-        final BookModel.Label label = app.Model.getLabel(hyperlink.Id);
+        final BookModel.Label label = app.model.getLabel(hyperlink.Id);
         showHyperlink(label);
     }
 
@@ -997,9 +997,9 @@ public class FBReaderView extends RelativeLayout {
             @Override
             public void config() {
                 super.config();
-                config.setValue(app.ViewOptions.ScrollbarType, 0);
-                config.setValue(app.MiscOptions.WordTappingAction, MiscOptions.WordTappingActionEnum.doNothing);
-                config.setValue(app.ImageOptions.TapAction, ImageOptions.TapActionEnum.doNothing);
+                config.setValue(app.getViewOptions().scrollbarType, 0);
+                config.setValue(app.getMiscOptions().wordTappingAction, MiscOptions.WordTappingActionEnum.doNothing);
+                config.setValue(app.getImageOptions().tapAction, ImageOptions.TapActionEnum.doNothing);
             }
         };
 
@@ -1008,27 +1008,27 @@ public class FBReaderView extends RelativeLayout {
             protected void run(Object... params) {
                 if (r.pluginview != null) {
                     BookModel.Label l = (BookModel.Label) params[0];
-                    r.app.BookTextView.gotoPosition(l.ParagraphIndex, 0, 0);
+                    r.app.getBookTextView().gotoPosition(l.paragraphIndex, 0, 0);
                     r.resetNewPosition();
                     return;
                 }
-                final ZLTextRegion region = r.app.BookTextView.getOutlinedRegion();
+                final ZLTextRegion region = r.app.getBookTextView().getOutlinedRegion();
                 if (region == null) {
                     return;
                 }
                 final ZLTextRegion.Soul soul = region.getSoul();
                 if (soul instanceof ZLTextHyperlinkRegionSoul) {
-                    r.app.BookTextView.hideOutline();
+                    r.app.getBookTextView().hideOutline();
                     r.widget.repaint();
-                    final ZLTextHyperlink hyperlink = ((ZLTextHyperlinkRegionSoul) soul).Hyperlink;
+                    final ZLTextHyperlink hyperlink = ((ZLTextHyperlinkRegionSoul) soul).hyperlink;
                     switch (hyperlink.Type) {
                         case FBHyperlinkType.EXTERNAL:
                             AboutPreferenceCompat.openUrlDialog(getContext(), hyperlink.Id);
                             break;
                         case FBHyperlinkType.INTERNAL:
                         case FBHyperlinkType.FOOTNOTE: {
-                            final BookModel.Label label = r.app.Model.getLabel(hyperlink.Id);
-                            r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
+                            final BookModel.Label label = r.app.model.getLabel(hyperlink.Id);
+                            r.app.getBookTextView().gotoPosition(label.paragraphIndex, 0, 0);
                             r.resetNewPosition();
                         }
                     }
@@ -1052,7 +1052,7 @@ public class FBReaderView extends RelativeLayout {
                 listener.onDismissDialog();
             }
         });
-        if (label.ModelId == null) {
+        if (label.modelId == null) {
             builder.setNeutralButton(R.string.keep_reading_position, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -1072,14 +1072,14 @@ public class FBReaderView extends RelativeLayout {
                 Window w = dialog.getWindow();
                 w.setLayout(getWidth(), getHeight()); // fixed size after creation
                 r.loadBook(book);
-                if (label.ModelId == null) {
-                    r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
-                    r.app.setView(r.app.BookTextView);
+                if (label.modelId == null) {
+                    r.app.getBookTextView().gotoPosition(label.paragraphIndex, 0, 0);
+                    r.app.setView(r.app.getBookTextView());
                 } else {
-                    final ZLTextModel model = r.app.Model.getFootnoteModel(label.ModelId);
-                    r.app.BookTextView.setModel(model);
-                    r.app.setView(r.app.BookTextView);
-                    r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
+                    final ZLTextModel model = r.app.model.getFootnoteModel(label.modelId);
+                    r.app.getBookTextView().setModel(model);
+                    r.app.setView(r.app.getBookTextView());
+                    r.app.getBookTextView().gotoPosition(label.paragraphIndex, 0, 0);
                 }
             }
         });
@@ -1109,16 +1109,16 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void gotoPosition(TOCTree.Reference p) {
-        if (p.Model != null)
-            app.BookTextView.setModel(p.Model);
-        gotoPosition(new ZLTextFixedPosition(p.ParagraphIndex, 0, 0));
+        if (p.model != null)
+            app.getBookTextView().setModel(p.model);
+        gotoPosition(new ZLTextFixedPosition(p.paragraphIndex, 0, 0));
     }
 
     public void gotoPosition(ZLTextPosition p) {
         if (pluginview != null)
             gotoPluginPosition(p);
         else
-            app.BookTextView.gotoPosition(p);
+            app.getBookTextView().gotoPosition(p);
         resetNewPosition();
     }
 
@@ -1179,7 +1179,7 @@ public class FBReaderView extends RelativeLayout {
 
     public void selectionOpen(Plugin.View.Selection s) {
         selectionClose();
-        selection = new SelectionView(getContext(), (CustomView) app.BookTextView, s) {
+        selection = new SelectionView(getContext(), (CustomView) app.getBookTextView(), s) {
             @Override
             public void onTouchLock() {
                 if (drawer != null)
@@ -1231,16 +1231,16 @@ public class FBReaderView extends RelativeLayout {
 
     public void bookmarksUpdate() {
         if (pluginview == null) {
-            app.BookTextView.removeHighlightings(ZLBookmark.class);
+            app.getBookTextView().removeHighlightings(ZLBookmark.class);
             ArrayList<ZLTextHighlighting> hi = new ArrayList<>();
             if (book.info.bookmarks != null) {
                 for (int i = 0; i < book.info.bookmarks.size(); i++) {
                     final Storage.Bookmark b = book.info.bookmarks.get(i);
-                    ZLBookmark h = new ZLBookmark(app.BookTextView, b);
+                    ZLBookmark h = new ZLBookmark(app.getBookTextView(), b);
                     hi.add(h);
                 }
             }
-            app.BookTextView.addHighlightings(hi);
+            app.getBookTextView().addHighlightings(hi);
         }
         if (widget instanceof ScrollWidget) {
             if (pluginview == null) {
@@ -1262,7 +1262,7 @@ public class FBReaderView extends RelativeLayout {
         if (widget instanceof PagerWidget)
             ((PagerWidget) widget).ttsClose();
         if (pluginview == null) {
-            app.BookTextView.removeHighlightings(ZLTTSMark.class);
+            app.getBookTextView().removeHighlightings(ZLTTSMark.class);
             if (widget instanceof ScrollWidget) {
                 for (ScrollWidget.ScrollAdapter.PageHolder h : ((ScrollWidget) widget).adapter.holders) {
                     h.page.recycle();
@@ -1276,14 +1276,14 @@ public class FBReaderView extends RelativeLayout {
         if (tts == null)
             return; // already closed, run from handler
         if (pluginview == null) {
-            app.BookTextView.removeHighlightings(ZLTTSMark.class);
+            app.getBookTextView().removeHighlightings(ZLTTSMark.class);
             if (tts != null) {
                 ArrayList<ZLTextHighlighting> hi = new ArrayList<>();
                 for (Storage.Bookmark m : tts.marks) {
-                    ZLTTSMark h = new ZLTTSMark(app.BookTextView, m);
+                    ZLTTSMark h = new ZLTTSMark(app.getBookTextView(), m);
                     hi.add(h);
                 }
-                app.BookTextView.addHighlightings(hi);
+                app.getBookTextView().addHighlightings(hi);
             }
         }
         if (widget instanceof ScrollWidget) {
@@ -1375,26 +1375,26 @@ public class FBReaderView extends RelativeLayout {
     public int getFontsizeFB() {
         if (book.info.fontsize != null)
             return book.info.fontsize;
-        return app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue();
+        return app.getViewOptions().getTextStyleCollection().getBaseStyle().FontSizeOption.getValue();
     }
 
     public void setFontsizeFB(int p) {
         book.info.fontsize = p;
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, p);
+        config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().FontSizeOption, p);
         resetCaches();
     }
 
     public boolean getIgnoreCssFonts() {
-        return !app.ViewOptions.getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption.getValue();
+        return !app.getViewOptions().getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption.getValue();
     }
 
     public void setIgnoreCssFonts(boolean b) {
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption, !b);
+        config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption, !b);
         resetCaches();
     }
 
     public void setFontFB(String f) {
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption, f);
+        config.setValue(app.getViewOptions().getTextStyleCollection().getBaseStyle().FontFamilyOption, f);
         resetCaches();
     }
 
@@ -1493,7 +1493,7 @@ public class FBReaderView extends RelativeLayout {
         }
 
         public void apply(ZLOption opt) {
-            opt.Config = new ZLOption.ConfigInstance() {
+            opt.config = new ZLOption.ConfigInstance() {
                 public Config Instance() {
                     return ConfigShadow.this;
                 }
@@ -1502,7 +1502,7 @@ public class FBReaderView extends RelativeLayout {
 
         @Override
         public String getValue(StringPair id, String defaultValue) {
-            String v = map.get(id.Group + ":" + id.Name);
+            String v = map.get(id.group + ":" + id.name);
             if (v != null)
                 return v;
             return super.getValue(id, defaultValue);
@@ -1510,12 +1510,12 @@ public class FBReaderView extends RelativeLayout {
 
         @Override
         public void setValue(StringPair id, String value) {
-            map.put(id.Group + ":" + id.Name, value);
+            map.put(id.group + ":" + id.name, value);
         }
 
         @Override
         public void unsetValue(StringPair id) {
-            map.remove(id.Group + ":" + id.Name);
+            map.remove(id.group + ":" + id.name);
         }
 
         @Override
@@ -1626,7 +1626,7 @@ public class FBReaderView extends RelativeLayout {
             if (fb.pluginview != null) {
                 pinch.image.setColorFilter(fb.pluginview.paint.getColorFilter());
             } else {
-                int wallpaperColor = (0xff << 24) | fb.app.BookTextView.getBackgroundColor().intValue();
+                int wallpaperColor = (0xff << 24) | fb.app.getBookTextView().getBackgroundColor().intValue();
                 if (ColorUtils.calculateLuminance(wallpaperColor) < 0.5f)
                     pinch.image.setColorFilter(new ColorMatrixColorFilter(Plugin.View.NEGATIVE));
                 else
@@ -1764,7 +1764,7 @@ public class FBReaderView extends RelativeLayout {
                             b.show();
                         }
                     });
-                    int color = l.color == 0 ? fb.app.BookTextView.getHighlightingBackgroundColor().intValue() : l.color;
+                    int color = l.color == 0 ? fb.app.getBookTextView().getHighlightingBackgroundColor().intValue() : l.color;
                     v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | (color & 0xffffff));
                     bmv.add(v);
                     addView(v);
@@ -1869,7 +1869,7 @@ public class FBReaderView extends RelativeLayout {
                 if (hh != null && hh.contains(l))
                     v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | 0x990000);
                 else
-                    v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | fb.app.BookTextView.getHighlightingBackgroundColor().intValue());
+                    v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | fb.app.getBookTextView().getHighlightingBackgroundColor().intValue());
                 words.add(v);
                 fb.addView(v);
             }
@@ -1945,7 +1945,7 @@ public class FBReaderView extends RelativeLayout {
         }
 
         public Footer getFooter() {
-            int type = SCROLLBAR_SHOW_AS_FOOTER; // app.ViewOptions.ScrollbarType.getValue();
+            int type = SCROLLBAR_SHOW_AS_FOOTER; // app.getViewOptions().scrollbarType.getValue();
             if (type == SCROLLBAR_SHOW_AS_FOOTER)
                 return new FooterNew();
             if (type == SCROLLBAR_SHOW_AS_FOOTER_OLD_STYLE)
@@ -1990,7 +1990,7 @@ public class FBReaderView extends RelativeLayout {
         }
 
         @Override
-        protected ZLTextRegion findRegion(int x, int y, int maxDistance, ZLTextRegion.Filter filter) {
+        public ZLTextRegion findRegion(int x, int y, int maxDistance, ZLTextRegion.Filter filter) {
             return super.findRegion(x, y, maxDistance, filter);
         }
 
@@ -2078,15 +2078,15 @@ public class FBReaderView extends RelativeLayout {
 
         @Override
         public int getSelectionStartY() {
-            if (selection != null)
-                return selection.getSelectionStartY();
+            if (FBReaderView.this.selection != null)
+                return FBReaderView.this.selection.getSelectionStartY();
             return super.getSelectionStartY();
         }
 
         @Override
         public int getSelectionEndY() {
-            if (selection != null)
-                return selection.getSelectionEndY();
+            if (FBReaderView.this.selection != null)
+                return FBReaderView.this.selection.getSelectionEndY();
             return super.getSelectionEndY();
         }
 
@@ -2156,8 +2156,8 @@ public class FBReaderView extends RelativeLayout {
 
         @Override
         public TOCTree getCurrentTOCElement() {
-            if (pluginview != null)
-                return pluginview.getCurrentTOCElement(Model.TOCTree);
+            if (pluginview != null && model != null)
+                return pluginview.getCurrentTOCElement(model.getTocTree());
             else
                 return super.getCurrentTOCElement();
         }
