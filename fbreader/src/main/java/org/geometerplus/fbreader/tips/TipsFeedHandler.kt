@@ -20,14 +20,15 @@
 package org.geometerplus.fbreader.tips
 
 import org.geometerplus.fbreader.network.atom.ATOMEntry
+import org.geometerplus.fbreader.network.atom.ATOMFeedMetadata
 import org.geometerplus.fbreader.network.atom.AbstractATOMFeedHandler
 
-internal class TipsFeedHandler : AbstractATOMFeedHandler() {
+internal class TipsFeedHandler : AbstractATOMFeedHandler<ATOMFeedMetadata, ATOMEntry>() {
     @JvmField
-    val Tips: MutableList<Tip> = mutableListOf()
+    val tips: MutableList<Tip> = mutableListOf()
 
     override fun processFeedEntry(entry: ATOMEntry): Boolean {
-        Tips.add(Tip(entry.Title, entry.Content))
+        tips.add(Tip(entry.title ?: "", entry.content ?: ""))
         return false
     }
 }

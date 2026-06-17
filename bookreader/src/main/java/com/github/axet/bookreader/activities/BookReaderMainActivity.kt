@@ -52,8 +52,6 @@ import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.FBReaderView.ZLTextIndexPosition
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import org.geometerplus.fbreader.fbreader.options.ImageOptions
-import org.geometerplus.fbreader.fbreader.options.MiscOptions
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import java.util.Collections
 import com.github.axet.androidlibrary.R as AxetR
@@ -314,10 +312,10 @@ class BookReaderMainActivity : FullscreenActivity(), NavigationView.OnNavigation
 
             val r = v.findViewById<View?>(R.id.recent_fbview) as FBReaderView
             r.config.setValue(
-                r.app.MiscOptions.WordTappingAction,
-                MiscOptions.WordTappingActionEnum.doNothing
+                r.app.miscOptions.wordTappingAction,
+                org.geometerplus.fbreader.fbreader.options.MiscOptions.WordTappingActionEnum.doNothing
             )
-            r.config.setValue(r.app.ImageOptions.TapAction, ImageOptions.TapActionEnum.doNothing)
+            r.config.setValue(r.app.imageOptions.tapAction, org.geometerplus.fbreader.fbreader.options.ImageOptions.TapActionEnum.doNothing)
 
             val shared = PreferenceManager.getDefaultSharedPreferences(this)
             val mode: String = shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "")!!

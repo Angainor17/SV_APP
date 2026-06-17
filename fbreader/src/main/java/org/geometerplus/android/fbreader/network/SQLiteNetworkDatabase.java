@@ -25,6 +25,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
+import androidx.annotation.NonNull;
+
 import org.geometerplus.android.util.SQLiteUtil;
 import org.geometerplus.fbreader.network.INetworkLink;
 import org.geometerplus.fbreader.network.IPredefinedNetworkLink;
@@ -34,6 +36,7 @@ import org.geometerplus.fbreader.network.urlInfo.UrlInfo;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfoCollection;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfoWithDate;
 import org.geometerplus.zlibrary.core.util.MimeType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -97,15 +100,16 @@ class SQLiteNetworkDatabase extends NetworkDatabase {
         }
     }
 
+    @NonNull
     @Override
-    protected synchronized List<INetworkLink> listLinks() {
+    public List<INetworkLink> listLinks() {
         final List<INetworkLink> links = new LinkedList<INetworkLink>();
 
         final Cursor cursor = myDatabase.rawQuery("SELECT link_id,type,predefined_id,title,summary,language FROM Links", null);
         final UrlInfoCollection<UrlInfoWithDate> linksMap = new UrlInfoCollection<UrlInfoWithDate>();
         while (cursor.moveToNext()) {
             final int id = cursor.getInt(0);
-            final INetworkLink.Type type = INetworkLink.Type.byIndex(cursor.getInt(1));
+            final INetworkLink.Type type = INetworkLink.Type.Companion.byIndex(cursor.getInt(1));
             final String predefinedId = cursor.getString(2);
             final String title = cursor.getString(3);
             final String summary = cursor.getString(4);
@@ -139,7 +143,7 @@ class SQLiteNetworkDatabase extends NetworkDatabase {
     }
 
     @Override
-    protected synchronized void saveLink(final INetworkLink link) {
+    public void saveLink(@NotNull INetworkLink link) {
         executeAsTransaction(new Runnable() {
             public void run() {
                 final SQLiteStatement statement;
@@ -173,7 +177,7 @@ class SQLiteNetworkDatabase extends NetworkDatabase {
                     } else {
                         SQLiteUtil.bindString(statement, 4, null);
                     }
-                    statement.bindLong(5, link.getType().Index);
+                    statement.bindLong(5, link.getType().getIndex());
                     id = statement.executeInsert();
                     link.setId((int) id);
                 } else {
@@ -218,16 +222,16 @@ class SQLiteNetworkDatabase extends NetworkDatabase {
                     } else {
                         continue;
                     }
-                    SQLiteUtil.bindString(urlStatement, 1, info.Url);
-                    SQLiteUtil.bindString(urlStatement, 2, info.Mime != null ? info.Mime.toString() : "");
-                    SQLiteUtil.bindDate(urlStatement, 3, info.Updated);
+                    SQLiteUtil.bindString(urlStatement, 1, info.url);
+                    SQLiteUtil.bindString(urlStatement, 2, info.mime != null ? info.mime.toString() : "");
+                    SQLiteUtil.bindDate(urlStatement, 3, info.updated);
                     urlStatement.bindLong(4, id);
                     urlStatement.bindString(5, key.toString());
                     urlStatement.execute();
                 }
                 for (UrlInfo info : linksMap.getAllInfos()) {
                     myDatabase.delete("LinkUrls", "link_id = ? AND key = ?",
-                            new String[]{String.valueOf(id), info.InfoType.toString()}
+                            new String[]{String.valueOf(id), info.infoType.toString()}
                     );
                 }
             }
@@ -235,7 +239,7 @@ class SQLiteNetworkDatabase extends NetworkDatabase {
     }
 
     @Override
-    protected synchronized void deleteLink(final INetworkLink link) {
+    public void deleteLink(@NotNull INetworkLink link) {
         if (link.getId() == INetworkLink.INVALID_ID) {
             return;
         }
@@ -389,7 +393,7 @@ class SQLiteNetworkDatabase extends NetworkDatabase {
 
     private void updateTables6() {
         myDatabase.execSQL("ALTER TABLE Links ADD COLUMN type INTEGER");
-        myDatabase.execSQL("UPDATE Links SET type=" + INetworkLink.Type.Custom.Index);
+        myDatabase.execSQL("UPDATE Links SET type=" + INetworkLink.Type.Custom.getIndex());
     }
 
     private void updateTables7() {

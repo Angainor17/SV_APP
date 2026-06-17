@@ -31,7 +31,6 @@ import com.github.axet.bookreader.app.Plugin;
 import com.github.axet.bookreader.app.Reflow;
 import com.github.axet.bookreader.app.Storage;
 
-import org.geometerplus.fbreader.fbreader.FBView;
 import org.geometerplus.fbreader.fbreader.options.PageTurningOptions;
 import org.geometerplus.zlibrary.core.view.ZLView;
 import org.geometerplus.zlibrary.core.view.ZLViewEnums;
@@ -149,7 +148,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
 
         setItemAnimator(null);
 
-        fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byFlick);
+        fb.config.setValue(fb.app.getPageTurningOptions().fingerScrolling, PageTurningOptions.FingerScrollingType.byFlick);
     }
 
     @Override
@@ -406,8 +405,8 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
     }
 
     void drawFooter(Canvas c) {
-        if (fb.app.Model != null) {
-            FBView.Footer footer = fb.app.BookTextView.getFooterArea();
+        if (fb.app.model != null) {
+            ZLView.FooterArea footer = fb.app.getBookTextView().getFooterArea();
             if (footer == null)
                 return;
             ZLAndroidPaintContext context = new ZLAndroidPaintContext(
@@ -432,7 +431,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
     }
 
     public int getMainAreaHeight() {
-        final ZLView.FooterArea footer = fb.app.BookTextView.getFooterArea();
+        final ZLView.FooterArea footer = fb.app.getBookTextView().getFooterArea();
         return footer != null ? getHeight() - footer.getHeight() : getHeight();
     }
 
@@ -919,7 +918,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                             return bounds;
                         }
                     };
-                    view.selection = new SelectionView.PageView(getContext(), (FBReaderView.CustomView) fb.app.BookTextView, setter);
+                    view.selection = new SelectionView.PageView(getContext(), (FBReaderView.CustomView) fb.app.getBookTextView(), setter);
                     fb.selection.add(view.selection);
                 }
                 int x = view.getLeft();
@@ -953,8 +952,8 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                     fb.pluginview.current.pageOffset = 0; // widget instanceof ScrollView
                     c.update(getCurrent());
                 } else {
-                    fb.app.BookTextView.gotoPosition(c.end);
-                    fb.app.BookTextView.onScrollingFinished(ZLViewEnums.PageIndex.previous);
+                    fb.app.getBookTextView().gotoPosition(c.end);
+                    fb.app.getBookTextView().onScrollingFinished(ZLViewEnums.PageIndex.previous);
                     c.update(getCurrent());
                 }
             } else {
@@ -963,7 +962,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                 else {
                     PageCursor cc = getCurrent();
                     if (!cc.equals(c)) {
-                        fb.app.BookTextView.gotoPosition(c.start, c.end);
+                        fb.app.getBookTextView().gotoPosition(c.start, c.end);
                     }
                 }
             }
@@ -1109,8 +1108,8 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             }
             getRecycledViewPool().clear();
             pages.clear();
-            if (fb.app.Model != null) {
-                fb.app.BookTextView.preparePage(((FBReaderView.CustomView) fb.app.BookTextView).createContext(new Canvas()), ZLViewEnums.PageIndex.current);
+            if (fb.app.model != null) {
+                fb.app.getBookTextView().preparePage(((FBReaderView.CustomView) fb.app.getBookTextView()).createContext(new Canvas()), ZLViewEnums.PageIndex.current);
                 PageCursor c = getCurrent();
                 pages.add(c);
                 oldTurn = c.start;
@@ -1140,12 +1139,12 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                     return new PageCursor(fb.pluginview.getPosition(), fb.pluginview.getNextPosition());
                 }
             } else {
-                return new PageCursor(fb.app.BookTextView.getStartCursor(), fb.app.BookTextView.getEndCursor());
+                return new PageCursor(fb.app.getBookTextView().getStartCursor(), fb.app.getBookTextView().getEndCursor());
             }
         }
 
         void update() {
-            if (fb.app.Model == null)
+            if (fb.app.model == null)
                 return;
             PageCursor c = getCurrent();
             int page;
@@ -1160,14 +1159,14 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                 pages.add(c);
                 notifyItemInserted(page);
             }
-            if (fb.app.BookTextView.canScroll(ZLViewEnums.PageIndex.previous)) {
+            if (fb.app.getBookTextView().canScroll(ZLViewEnums.PageIndex.previous)) {
                 if (page == 0) {
                     pages.add(page, new PageCursor(null, c.start));
                     notifyItemInserted(page);
                     page++; // 'c' page moved to + 1
                 }
             }
-            if (fb.app.BookTextView.canScroll(ZLViewEnums.PageIndex.next)) {
+            if (fb.app.getBookTextView().canScroll(ZLViewEnums.PageIndex.next)) {
                 if (page == pages.size() - 1) {
                     page++;
                     pages.add(page, new PageCursor(c.end, null));
@@ -1315,7 +1314,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                                         public void run() {
                                             int i = index;
                                             final Plugin.View pluginview = fb.pluginview; // closeBook
-                                            Reflow reflower = new Reflow(getContext(), w, h, page, (FBReaderView.CustomView) fb.app.BookTextView, fb.book.info);
+                                            Reflow reflower = new Reflow(getContext(), w, h, page, (FBReaderView.CustomView) fb.app.getBookTextView(), fb.book.info);
                                             Bitmap bm = pluginview.render(reflower.w, reflower.h, page);
                                             reflower.load(bm);
                                             if (reflower.count() > 0)
@@ -1359,7 +1358,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                             if (fb.pluginview.reflower.count() > 0) {
                                 Bitmap bm = fb.pluginview.reflower.render(c.start.getElementIndex());
                                 Rect src = new Rect(0, 0, bm.getWidth(), bm.getHeight());
-                                Rect dst = new Rect(fb.app.BookTextView.getLeftMargin(), 0, fb.app.BookTextView.getLeftMargin() + fb.pluginview.reflower.rw, fb.pluginview.reflower.h);
+                                Rect dst = new Rect(fb.app.getBookTextView().getLeftMargin(), 0, fb.app.getBookTextView().getLeftMargin() + fb.pluginview.reflower.rw, fb.pluginview.reflower.h);
                                 canvas.drawColor(Color.WHITE); // cache color always white
                                 canvas.drawBitmap(bm, src, dst, null); // cache paint always clean
                                 info = new Reflow.Info(fb.pluginview.reflower, c.start.getElementIndex());
@@ -1374,7 +1373,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                         return;
                     }
                     open(c);
-                    fb.pluginview.drawOnCanvas(getContext(), draw, getWidth(), getHeight(), ZLViewEnums.PageIndex.current, (FBReaderView.CustomView) fb.app.BookTextView, fb.book.info);
+                    fb.pluginview.drawOnCanvas(getContext(), draw, getWidth(), getHeight(), ZLViewEnums.PageIndex.current, (FBReaderView.CustomView) fb.app.getBookTextView(), fb.book.info);
                     update();
                 } else {
                     open(c);
@@ -1391,9 +1390,9 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                             ),
                             getVerticalScrollbarWidth()
                     );
-                    fb.app.BookTextView.paint(context, ZLViewEnums.PageIndex.current);
-                    text = fb.app.BookTextView.myCurrentPage.TextElementMap;
-                    fb.app.BookTextView.myCurrentPage.TextElementMap = new ZLTextElementAreaVector();
+                    fb.app.getBookTextView().paint(context, ZLViewEnums.PageIndex.current);
+                    text = fb.app.getBookTextView().currentPage.textElementMap;
+                    fb.app.getBookTextView().currentPage.textElementMap = new ZLTextElementAreaVector();
                     update();
                 }
             }
@@ -1584,23 +1583,23 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         boolean openText(MotionEvent e) {
             if (v.text == null)
                 return false;
-            if (!fb.app.BookTextView.getStartCursor().samePositionAs(c.start))
-                fb.app.BookTextView.gotoPosition(c.start);
-            fb.app.BookTextView.myCurrentPage.TextElementMap = v.text;
+            if (!fb.app.getBookTextView().getStartCursor().samePositionAs(c.start))
+                fb.app.getBookTextView().gotoPosition(c.start);
+            fb.app.getBookTextView().currentPage.textElementMap = v.text;
             return true;
         }
 
         void closeText() {
-            fb.app.BookTextView.myCurrentPage.TextElementMap = new ZLTextElementAreaVector();
+            fb.app.getBookTextView().currentPage.textElementMap = new ZLTextElementAreaVector();
         }
 
         @Override
         public boolean onDown(MotionEvent e) {
-            if (fb.app.BookTextView.mySelection.isEmpty())
+            if (fb.app.getBookTextView().selection.isEmpty())
                 return false;
             if (!open(e))
                 return false;
-            fb.app.BookTextView.onFingerPress(x, y);
+            fb.app.getBookTextView().onFingerPress(x, y);
             v.invalidate();
             closeText();
             return true;
@@ -1613,10 +1612,10 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             if (!open(e)) { // pluginview or reflow
-                ((FBReaderView.CustomView) fb.app.BookTextView).onFingerSingleTapLastResort(e);
+                ((FBReaderView.CustomView) fb.app.getBookTextView()).onFingerSingleTapLastResort(e);
                 return true;
             }
-            fb.app.BookTextView.onFingerSingleTap(x, y);
+            fb.app.getBookTextView().onFingerSingleTap(x, y);
             v.invalidate();
             adapter.invalidates.add(v.holder);
             closeText();
@@ -1625,11 +1624,11 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            if (fb.app.BookTextView.mySelection.isEmpty())
+            if (fb.app.getBookTextView().selection.isEmpty())
                 return false;
             if (!open(e))
                 return false;
-            fb.app.BookTextView.onFingerMove(x, y);
+            fb.app.getBookTextView().onFingerMove(x, y);
             v.invalidate();
             adapter.invalidates.add(v.holder);
             closeText();
@@ -1659,8 +1658,8 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             if (fb.tts != null) {
                 fb.tts.selectionOpen(c, x, y);
             } else {
-                fb.app.BookTextView.onFingerLongPress(x, y);
-                fb.app.BookTextView.onFingerReleaseAfterLongPress(x, y);
+                fb.app.getBookTextView().onFingerLongPress(x, y);
+                fb.app.getBookTextView().onFingerReleaseAfterLongPress(x, y);
             }
             v.invalidate();
             adapter.invalidates.add(v.holder);
@@ -1673,12 +1672,12 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
 
         public boolean onReleaseCheck(MotionEvent e) {
-            if (fb.app.BookTextView.mySelection.isEmpty())
+            if (fb.app.getBookTextView().selection.isEmpty())
                 return false;
             if (e.getAction() == MotionEvent.ACTION_UP) {
                 if (!open(e))
                     return false;
-                fb.app.BookTextView.onFingerRelease(x, y);
+                fb.app.getBookTextView().onFingerRelease(x, y);
                 v.invalidate();
                 closeText();
                 return true;
@@ -1687,10 +1686,10 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
 
         public boolean onCancelCheck(MotionEvent e) {
-            if (fb.app.BookTextView.mySelection.isEmpty())
+            if (fb.app.getBookTextView().selection.isEmpty())
                 return false;
             if (e.getAction() == MotionEvent.ACTION_CANCEL) {
-                fb.app.BookTextView.onFingerEventCancelled();
+                fb.app.getBookTextView().onFingerEventCancelled();
                 v.invalidate();
                 return true;
             }
@@ -1698,7 +1697,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
 
         public boolean onFilter(MotionEvent e) {
-            return !fb.app.BookTextView.mySelection.isEmpty();
+            return !fb.app.getBookTextView().selection.isEmpty();
         }
 
         public boolean onTouchEvent(MotionEvent e) {

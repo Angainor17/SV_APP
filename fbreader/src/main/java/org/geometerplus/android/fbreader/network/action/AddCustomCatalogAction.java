@@ -41,6 +41,6 @@ public class AddCustomCatalogAction extends Action {
 
     @Override
     public void run(NetworkTree tree) {
-        myActivity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://data.fbreader.org/add_catalog"), myActivity, AddCatalogMenuActivity.class));
+        getMyActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://data.fbreader.org/add_catalog"), getMyActivity(), AddCatalogMenuActivity.class));
     }
 }

@@ -24,7 +24,7 @@ import org.geometerplus.android.fbreader.network.NetworkLibraryActivity
 import org.geometerplus.fbreader.network.NetworkTree
 
 class RefreshRootCatalogAction(activity: NetworkLibraryActivity) : RootAction(activity, ActionCode.REFRESH, "refreshCatalogsList", R.drawable.ic_menu_refresh) {
-    override fun isEnabled(tree: NetworkTree): Boolean = !myLibrary.isUpdateInProgress
+    override fun isEnabled(tree: NetworkTree): Boolean = !myLibrary.isUpdateInProgress()
 
     override fun run(tree: NetworkTree) {
         myLibrary.runBackgroundUpdate(true)

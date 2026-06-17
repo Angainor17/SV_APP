@@ -44,13 +44,13 @@ public class ManageCatalogsAction extends RootAction {
 
     @Override
     public void run(NetworkTree tree) {
-        final ArrayList<String> ids = new ArrayList<String>(myLibrary.activeIds());
-        final ArrayList<String> inactiveIds = new ArrayList<String>(myLibrary.allIds());
+        final ArrayList<String> ids = new ArrayList<String>(getMyLibrary().activeIds());
+        final ArrayList<String> inactiveIds = new ArrayList<String>(getMyLibrary().allIds());
         inactiveIds.removeAll(ids);
 
         OrientationUtil.startActivityForResult(
-                myActivity,
-                new Intent(myActivity.getApplicationContext(), CatalogManagerActivity.class)
+                getMyActivity(),
+                new Intent(getMyActivity().getApplicationContext(), CatalogManagerActivity.class)
                         .putStringArrayListExtra(NetworkLibraryActivity.ENABLED_CATALOG_IDS_KEY, ids)
                         .putStringArrayListExtra(NetworkLibraryActivity.DISABLED_CATALOG_IDS_KEY, inactiveIds),
                 NetworkLibraryActivity.REQUEST_MANAGE_CATALOGS

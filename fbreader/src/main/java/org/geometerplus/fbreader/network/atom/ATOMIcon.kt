@@ -21,15 +21,15 @@ package org.geometerplus.fbreader.network.atom
 
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
-class ATOMIcon protected constructor(attributes: ZLStringMap) : ATOMCommonAttributes(attributes) {
+open class ATOMIcon(attributes: ZLStringMap) : ATOMCommonAttributes(attributes) {
 
     @JvmField
-    var Uri: String? = null
+    var uri: String? = null
 
     override fun toString(): String {
         val buf = StringBuilder("[")
         buf.append(super.toString())
-        buf.append(",\nUri=").append(Uri)
+        buf.append(",\nUri=").append(uri)
         buf.append("]")
         return buf.toString()
     }

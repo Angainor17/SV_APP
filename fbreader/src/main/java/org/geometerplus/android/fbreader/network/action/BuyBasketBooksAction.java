@@ -44,13 +44,13 @@ public class BuyBasketBooksAction extends CatalogAction {
 
     @Override
     public boolean isEnabled(NetworkTree tree) {
-        if (myLibrary.getStoredLoader(tree) != null) {
+        if (getMyLibrary().getStoredLoader(tree) != null) {
             return false;
         }
         final Set<String> bookIds = new HashSet<String>();
         for (FBTree t : tree.subtrees()) {
             if (t instanceof NetworkBookTree) {
-                bookIds.add(((NetworkBookTree) t).Book.Id);
+                bookIds.add(((NetworkBookTree) t).book.id);
             }
         }
         final BasketItem item = (BasketItem) ((BasketCatalogTree) tree).Item;
@@ -65,6 +65,6 @@ public class BuyBasketBooksAction extends CatalogAction {
                 bookTrees.add((NetworkBookTree) t);
             }
         }
-        BuyBooksActivity.run(myActivity, bookTrees);
+        BuyBooksActivity.run(getMyActivity(), bookTrees);
     }
 }

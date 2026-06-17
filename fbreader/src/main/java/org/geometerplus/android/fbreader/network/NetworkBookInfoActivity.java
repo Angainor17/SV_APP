@@ -75,7 +75,7 @@ public class NetworkBookInfoActivity extends Activity implements NetworkLibrary.
             if (myBook == null) {
                 finish();
             } else {
-                setTitle(myBook.Title);
+                setTitle(myBook.title);
 
                 setupDescription();
                 setupExtraLinks();
@@ -109,7 +109,7 @@ public class NetworkBookInfoActivity extends Activity implements NetworkLibrary.
                 final Uri uri = Util.rewriteUri(getIntent().getData());
                 if (uri != null && "litres-book".equals(uri.getScheme())) {
                     try {
-                        myBook = OPDSBookItem.create(
+                        myBook = OPDSBookItem.Companion.create(
                                 library,
                                 myNetworkContext,
                                 library.getLinkByStringId("litres.ru"),
@@ -129,7 +129,7 @@ public class NetworkBookInfoActivity extends Activity implements NetworkLibrary.
                     );
                     if (tree instanceof NetworkBookTree) {
                         myTree = (NetworkBookTree) tree;
-                        myBook = myTree.Book;
+                        myBook = myTree.book;
                     }
                 }
 
@@ -233,8 +233,8 @@ public class NetworkBookInfoActivity extends Activity implements NetworkLibrary.
                         if (catalogItem != null) {
                             new OpenCatalogAction(NetworkBookInfoActivity.this, myNetworkContext)
                                     .run(Util.networkLibrary(NetworkBookInfoActivity.this).getFakeCatalogTree(catalogItem));
-                        } else if (MimeType.TEXT_HTML.equals(relatedInfo.Mime)) {
-                            Util.openInBrowser(NetworkBookInfoActivity.this, relatedInfo.Url);
+                        } else if (MimeType.TEXT_HTML.equals(relatedInfo.mime)) {
+                            Util.openInBrowser(NetworkBookInfoActivity.this, relatedInfo.url);
                         }
                     }
                 });
@@ -269,27 +269,27 @@ public class NetworkBookInfoActivity extends Activity implements NetworkLibrary.
         setPairLabelTextFromResource(R.id.network_book_series_index, "indexInSeries");
         setPairLabelTextFromResource(R.id.network_book_catalog, "catalog");
 
-        setPairValueText(R.id.network_book_title, myBook.Title);
+        setPairValueText(R.id.network_book_title, myBook.title);
 
-        if (myBook.Authors.size() > 0) {
+        if (myBook.authors.size() > 0) {
             findViewById(R.id.network_book_authors).setVisibility(View.VISIBLE);
             final StringBuilder authorsText = new StringBuilder();
-            for (NetworkBookItem.AuthorData author : myBook.Authors) {
+            for (NetworkBookItem.AuthorData author : myBook.authors) {
                 if (authorsText.length() > 0) {
                     authorsText.append(", ");
                 }
-                authorsText.append(author.DisplayName);
+                authorsText.append(author.displayName);
             }
-            setPairLabelTextFromResource(R.id.network_book_authors, "authors", myBook.Authors.size());
+            setPairLabelTextFromResource(R.id.network_book_authors, "authors", myBook.authors.size());
             setPairValueText(R.id.network_book_authors, authorsText);
         } else {
             findViewById(R.id.network_book_authors).setVisibility(View.GONE);
         }
 
-        if (myBook.SeriesTitle != null) {
+        if (myBook.seriesTitle != null) {
             findViewById(R.id.network_book_series_title).setVisibility(View.VISIBLE);
-            setPairValueText(R.id.network_book_series_title, myBook.SeriesTitle);
-            final float indexInSeries = myBook.IndexInSeries;
+            setPairValueText(R.id.network_book_series_title, myBook.seriesTitle);
+            final float indexInSeries = myBook.indexInSeries;
             if (indexInSeries > 0) {
                 final String seriesIndexString;
                 if (Math.abs(indexInSeries - Math.round(indexInSeries)) < 0.01) {
@@ -307,22 +307,22 @@ public class NetworkBookInfoActivity extends Activity implements NetworkLibrary.
             findViewById(R.id.network_book_series_index).setVisibility(View.GONE);
         }
 
-        if (myBook.Tags.size() > 0) {
+        if (myBook.tags.size() > 0) {
             findViewById(R.id.network_book_tags).setVisibility(View.VISIBLE);
             final StringBuilder tagsText = new StringBuilder();
-            for (String tag : myBook.Tags) {
+            for (String tag : myBook.tags) {
                 if (tagsText.length() > 0) {
                     tagsText.append(", ");
                 }
                 tagsText.append(tag);
             }
-            setPairLabelTextFromResource(R.id.network_book_tags, "tags", myBook.Tags.size());
+            setPairLabelTextFromResource(R.id.network_book_tags, "tags", myBook.tags.size());
             setPairValueText(R.id.network_book_tags, tagsText);
         } else {
             findViewById(R.id.network_book_tags).setVisibility(View.GONE);
         }
 
-        setPairValueText(R.id.network_book_catalog, myBook.Link.getTitle());
+        setPairValueText(R.id.network_book_catalog, myBook.link.getTitle());
     }
 
     public final void setupCover() {

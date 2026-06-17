@@ -26,7 +26,7 @@ class BookBuyUrlInfo(
     type: Type,
     url: String,
     mime: MimeType,
-    @JvmField val Price: Money
+    @JvmField val price: Money
 ) : BookUrlInfo(type, url, mime) {
     companion object {
         private const val serialVersionUID: Long = 7086586069650L

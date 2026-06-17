@@ -23,18 +23,18 @@ import org.geometerplus.zlibrary.core.tree.ZLTree
 
 class FileInfo : ZLTree<FileInfo> {
     @JvmField
-    val Name: String
+    val name: String
 
     @JvmField
-    var Id: Long
+    var id: Long
 
     @JvmField
-    var FileSize: Long = -1
+    var fileSize: Long = -1
 
     constructor(name: String, parent: FileInfo?) : this(name, parent, -1)
 
     constructor(name: String, parent: FileInfo?, id: Long) : super(parent) {
-        Name = name
-        Id = id
+        this@FileInfo.name = name
+        this@FileInfo.id = id
     }
 }

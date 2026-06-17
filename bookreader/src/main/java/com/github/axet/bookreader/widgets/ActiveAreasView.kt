@@ -15,7 +15,6 @@ import com.github.axet.androidlibrary.widgets.PopupWindowCompat
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.bookreader.R
 import org.geometerplus.fbreader.fbreader.TapZoneMap
-import org.geometerplus.fbreader.fbreader.options.PageTurningOptions
 
 /**
  * View для отображения активных зон касания.
@@ -42,7 +41,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
      * Возвращает карту зон касания.
      */
     fun getZoneMap(app: FBReaderView.FBReaderApp): TapZoneMap {
-        val prefs: PageTurningOptions = app.PageTurningOptions
+        val prefs = app.pageTurningOptions
         var id = prefs.tapZoneMap.value
         if ("" == id)
             id = if (prefs.horizontal.value) "right_to_left" else "up"
@@ -106,15 +105,15 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
      */
     fun create(app: FBReaderView.FBReaderApp, ww: Int) {
         val zz = getZoneMap(app)
-        val w = PERC / zz.width
-        val h = PERC / zz.height
-        for (x in 0 until zz.width) {
-            for (y in 0 until zz.height) {
+        val w = PERC / zz.getWidth
+        val h = PERC / zz.getHeight
+        for (x in 0 until zz.getWidth) {
+            for (y in 0 until zz.getHeight) {
                 val z = zz.getActionByZone(
                     x, y,
-                    if (app.MiscOptions.EnableDoubleTap.value) TapZoneMap.Tap.singleNotDoubleTap else TapZoneMap.Tap.singleTap
+                    if (app.miscOptions.enableDoubleTap.value) TapZoneMap.Tap.singleNotDoubleTap else TapZoneMap.Tap.singleTap
                 )
-                if (!app.isActionEnabled(z))
+                if (z == null || !app.isActionEnabled(z))
                     continue
                 val r = maps[z]
                 val xx = w * x // смещение по x
@@ -126,7 +125,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
                     r.union(c)
             }
         }
-        if (app.MiscOptions.AllowScreenBrightnessAdjustment.value) {
+        if (app.miscOptions.allowScreenBrightnessAdjustment.value) {
             val bw = if (app.viewWidget is ScrollWidget)
                 (app.viewWidget as ScrollWidget).gesturesListener.brightness.areaWidth * PERC / ww
             else

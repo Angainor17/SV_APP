@@ -40,12 +40,18 @@ class TTSPopup(val fb: FBReaderView) {
     companion object {
         val TAG: String = TTSPopup::class.java.simpleName
 
-        @JvmField val EOL = arrayOf("\n", "\r")
-        @JvmField val STOPS = arrayOf(".", ";") // ",", "\"", "'", "!", "?", """, ":", "(", ")"
-        @JvmField val MAX_COUNT = getMaxSpeechInputLength(200)
-        @JvmField val TTS_BG_COLOR = 0xaaaaaa00.toInt()
-        @JvmField val TTS_BG_ERROR_COLOR = 0xaaff0000.toInt()
-        @JvmField val TTS_WORD_COLOR = 0x33333333
+        @JvmField
+        val EOL = arrayOf("\n", "\r")
+        @JvmField
+        val STOPS = arrayOf(".", ";") // ",", "\"", "'", "!", "?", """, ":", "(", ")"
+        @JvmField
+        val MAX_COUNT = getMaxSpeechInputLength(200)
+        @JvmField
+        val TTS_BG_COLOR = 0xaaaaaa00.toInt()
+        @JvmField
+        val TTS_BG_ERROR_COLOR = 0xaaff0000.toInt()
+        @JvmField
+        val TTS_WORD_COLOR = 0x33333333
 
         @JvmStatic
         fun getMaxSpeechInputLength(max: Int): Int {
@@ -53,7 +59,11 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         @JvmStatic
-        fun getRect(pluginview: Plugin.View, v: ScrollWidget.ScrollAdapter.PageView, bm: Storage.Bookmark): Rect? {
+        fun getRect(
+            pluginview: Plugin.View,
+            v: ScrollWidget.ScrollAdapter.PageView,
+            bm: Storage.Bookmark
+        ): Rect? {
             val page = pluginview.selectPage(bm.start, v.info, v.width, v.height)
             val s = pluginview.select(bm.start, bm.end)
             return if (s != null) {
@@ -66,9 +76,9 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         @JvmStatic
-        fun isStopSymbol(e: ZLTextElement): Boolean {
+        fun isStopSymbol(e: ZLTextElement?): Boolean {
             if (e is ZLTextWord) {
-                val str = e.string
+                val str = e.getString()
                 return isStopSymbol(str)
             }
             return false
@@ -95,7 +105,7 @@ class TTSPopup(val fb: FBReaderView) {
         @JvmStatic
         fun stopOnLeft(e: ZLTextElement): Boolean {
             if (e is ZLTextWord) {
-                val str = e.string
+                val str = e.getString()
                 return stopOnLeft(str)
             }
             return false
@@ -113,7 +123,7 @@ class TTSPopup(val fb: FBReaderView) {
         @JvmStatic
         fun stopOnRight(e: ZLTextElement): Boolean {
             if (e is ZLTextWord) {
-                val str = e.string
+                val str = e.getString()
                 return stopOnRight(str)
             }
             return false
@@ -198,9 +208,12 @@ class TTSPopup(val fb: FBReaderView) {
         }
     }
 
-    @JvmField val marks: Storage.Bookmarks = Storage.Bookmarks()
-    @JvmField var panel: View
-    @JvmField var view: View
+    @JvmField
+    val marks: Storage.Bookmarks = Storage.Bookmarks()
+    @JvmField
+    var panel: View
+    @JvmField
+    var view: View
     var fragment: Fragment? = null
     var play: ImageView
     var onScrollFinished: ArrayList<Runnable> = ArrayList()
@@ -249,7 +262,14 @@ class TTSPopup(val fb: FBReaderView) {
         round.setBackgroundResource(org.geometerplus.R.drawable.panel)
         round.addView(view)
         gravity = Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
-        f.addView(round, FrameLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT, gravity))
+        f.addView(
+            round,
+            FrameLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                gravity
+            )
+        )
         f.setPadding(dp20, dp20, dp20, dp20)
         this.view = f
         this.panel = round
@@ -312,7 +332,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
         if (fb.widget is PagerWidget) {
             if (fb.pluginview == null) {
-                val start = fb.app.BookTextView.startCursor
+                val start = fb.app.bookTextView.getStartCursor()
                 if (start != null && start.compareTo(fragment!!.fragment.end!!) >= 0) {
                     onScrollFinished.add { updateGravity() }
                     fb.scrollPrevPage()
@@ -327,10 +347,18 @@ class TTSPopup(val fb: FBReaderView) {
                     onScrollFinished.add { updateGravity() }
                     fb.scrollPrevPage()
                 } else {
-                    val page = fb.pluginview.selectPage(px, (fb.widget as PagerWidget).getInfo(), dst.width(), dst.height())
+                    val page = fb.pluginview.selectPage(
+                        px,
+                        (fb.widget as PagerWidget).getInfo(),
+                        dst.width(),
+                        dst.height()
+                    )
                     val bounds = s!!.getBounds(page)
                     if (fb.pluginview.reflow) {
-                        bounds!!.rr = fb.pluginview.boundsUpdate(bounds.rr!!, (fb.widget as PagerWidget).getInfo()!!)
+                        bounds!!.rr = fb.pluginview.boundsUpdate(
+                            bounds.rr!!,
+                            (fb.widget as PagerWidget).getInfo()!!
+                        )
                         bounds.start = true
                         bounds.end = true
                     }
@@ -395,7 +423,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
         if (fb.widget is PagerWidget) {
             if (fb.pluginview == null) {
-                val end = fb.app.BookTextView.endCursor
+                val end = fb.app.bookTextView.getEndCursor()
                 if (end != null && end.compareTo(fragment!!.fragment.start!!) <= 0) {
                     onScrollFinished.add { updateGravity() }
                     fb.scrollNextPage()
@@ -409,10 +437,18 @@ class TTSPopup(val fb: FBReaderView) {
                 if (px.paragraphIndex < fragment!!.fragment.start!!.paragraphIndex) {
                     fb.scrollNextPage()
                 } else {
-                    val page = fb.pluginview.selectPage(px, (fb.widget as PagerWidget).getInfo(), dst.width(), dst.height())
+                    val page = fb.pluginview.selectPage(
+                        px,
+                        (fb.widget as PagerWidget).getInfo(),
+                        dst.width(),
+                        dst.height()
+                    )
                     val bounds = s!!.getBounds(page)
                     if (fb.pluginview.reflow) {
-                        bounds!!.rr = fb.pluginview.boundsUpdate(bounds.rr!!, (fb.widget as PagerWidget).getInfo()!!)
+                        bounds!!.rr = fb.pluginview.boundsUpdate(
+                            bounds.rr!!,
+                            (fb.widget as PagerWidget).getInfo()!!
+                        )
                         bounds.start = true
                         bounds.end = true
                     }
@@ -460,7 +496,8 @@ class TTSPopup(val fb: FBReaderView) {
             return bm
         } else {
             var start = bm.end!!
-            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.getTextModel(), start.paragraphIndex)
+            val paragraphCursor =
+                ZLTextParagraphCursor(fb.app.model!!.getTextModel()!!, start.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(start)
             if (wordCursor.isEndOfParagraph) wordCursor.nextParagraph() else wordCursor.nextWord()
@@ -482,7 +519,8 @@ class TTSPopup(val fb: FBReaderView) {
             return bm
         } else {
             var end = bm.start!!
-            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.getTextModel(), end.paragraphIndex)
+            val paragraphCursor =
+                ZLTextParagraphCursor(fb.app.model!!.getTextModel()!!, end.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(end)
             wordCursor.previousWord()
@@ -495,15 +533,21 @@ class TTSPopup(val fb: FBReaderView) {
                 }
             }
             end = wordCursor
-            val e = wordCursor.element
-            if (e is ZLTextWord) wordCursor.setCharIndex(e.Length - 1)
+            val e = wordCursor.getElement()
+            if (e is ZLTextWord) wordCursor.setCharIndex(e.length - 1)
             val start = expandLeft(end)
             return Storage.Bookmark(bm.text!!, start, end)
         }
     }
 
     fun show() {
-        fb.addView(view, RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        fb.addView(
+            view,
+            RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
         view.visibility = View.VISIBLE
     }
 
@@ -542,7 +586,8 @@ class TTSPopup(val fb: FBReaderView) {
     }
 
     fun scrollVerticallyBy(dy: Int) {
-        gravity = if (dy > 0) Gravity.CENTER_HORIZONTAL or Gravity.TOP else Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+        gravity =
+            if (dy > 0) Gravity.CENTER_HORIZONTAL or Gravity.TOP else Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
         updateGravity()
     }
 
@@ -570,7 +615,7 @@ class TTSPopup(val fb: FBReaderView) {
             }
             if (fb.widget is PagerWidget) {
                 view = fb.widget as View
-                text = fb.app.BookTextView.myCurrentPage.TextElementMap
+                text = fb.app.bookTextView.currentPage.textElementMap
             }
             if (view == null || text == null) {
                 updateGravity(gravity)
@@ -607,7 +652,12 @@ class TTSPopup(val fb: FBReaderView) {
             }
             val s = fb.pluginview.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
             if (s != null) {
-                val page = fb.pluginview.selectPage(fragment!!.fragment.start!!, info, view!!.width, view.height)
+                val page = fb.pluginview.selectPage(
+                    fragment!!.fragment.start!!,
+                    info,
+                    view!!.width,
+                    view.height
+                )
                 val bounds = s.getBounds(page)
                 val r = SelectionView.union(Arrays.asList(*bounds!!.rr!!))
                 s.close()
@@ -628,9 +678,9 @@ class TTSPopup(val fb: FBReaderView) {
                 str
             } else null
         } else {
-            val tt = TextBuildTraverser(fb.app.BookTextView)
+            val tt = TextBuildTraverser(fb.app.bookTextView)
             tt.traverse(start, end)
-            return tt.text
+            return tt.getText()
         }
     }
 
@@ -645,7 +695,7 @@ class TTSPopup(val fb: FBReaderView) {
     }
 
     fun selectionOpen(x: Int, y: Int) {
-        var bm = selectWord(fb.app.BookTextView.myCurrentPage.TextElementMap, x, y)
+        var bm = selectWord(fb.app.bookTextView.currentPage.textElementMap, x, y)
         bm = expandWord(bm)
         marks.clear()
         if (!isEmpty(bm)) {
@@ -680,7 +730,11 @@ class TTSPopup(val fb: FBReaderView) {
         updateGravity()
     }
 
-    fun selectWord(text: org.geometerplus.zlibrary.text.view.ZLTextElementAreaVector?, x: Int, y: Int): Storage.Bookmark {
+    fun selectWord(
+        text: org.geometerplus.zlibrary.text.view.ZLTextElementAreaVector?,
+        x: Int,
+        y: Int
+    ): Storage.Bookmark {
         var start: ZLTextPosition? = null
         var end: ZLTextPosition? = null
         for (a in text!!.areas()) {
@@ -691,7 +745,12 @@ class TTSPopup(val fb: FBReaderView) {
                 if (end!!.compareTo(a) < 0) end = a
             }
         }
-        return if (start == null || end == null) Storage.Bookmark() else Storage.Bookmark(getText(start, end)!!, start, end)
+        return if (start == null || end == null) Storage.Bookmark() else Storage.Bookmark(
+            getText(
+                start,
+                end
+            )!!, start, end
+        )
     }
 
     fun expandLeft(start: ZLTextPosition): ZLTextPosition {
@@ -708,7 +767,8 @@ class TTSPopup(val fb: FBReaderView) {
             k.close()
             return last
         } else {
-            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.getTextModel(), start.paragraphIndex)
+            val paragraphCursor =
+                ZLTextParagraphCursor(fb.app.model!!.getTextModel()!!, start.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(start)
             wordCursor.setCharIndex(0)
@@ -722,7 +782,7 @@ class TTSPopup(val fb: FBReaderView) {
                     if (!wordCursor.previousParagraph()) wordCursor.moveTo(0, 0)
                     break
                 }
-                e = wordCursor.element
+                e = wordCursor.getElement()
                 count++
             } while (!isStopSymbol(e) && count < MAX_COUNT)
             if (stopOnLeft(e!!)) last = wordCursor
@@ -742,18 +802,19 @@ class TTSPopup(val fb: FBReaderView) {
             k.close()
             return result
         } else {
-            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.getTextModel(), end.paragraphIndex)
+            val paragraphCursor =
+                ZLTextParagraphCursor(fb.app.model!!.getTextModel()!!, end.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(end)
             var count = 0
-            var e: ZLTextElement = wordCursor.element
+            var e: ZLTextElement = wordCursor.getElement()!!
             while (!(isStopSymbol(e) && stopOnRight(e)) && count < MAX_COUNT) {
                 wordCursor.nextWord()
                 count++
-                e = wordCursor.element
+                e = wordCursor.getElement()!!
             }
-            e = wordCursor.element
-            if (e is ZLTextWord) wordCursor.setCharIndex(e.Length - 1)
+            e = wordCursor.getElement()!!
+            if (e is ZLTextWord) wordCursor.setCharIndex(e.length - 1)
             return wordCursor
         }
     }
@@ -787,7 +848,8 @@ class TTSPopup(val fb: FBReaderView) {
                 val k = PluginWordCursor(start)
                 if (k.nextWord()) {
                     while (k.compareTo(end) <= 0) {
-                        val b = Bookmark(k.text!!, ZLTextFixedPosition(start), ZLTextFixedPosition(k))
+                        val b =
+                            Bookmark(k.text!!, ZLTextFixedPosition(start), ZLTextFixedPosition(k))
                         b.strStart = str.length
                         str += k.text!!
                         b.strEnd = str.length
@@ -799,14 +861,25 @@ class TTSPopup(val fb: FBReaderView) {
                 }
                 k.close()
             } else {
-                val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.getTextModel(), bm.start!!.paragraphIndex)
+                val paragraphCursor = ZLTextParagraphCursor(
+                    model = fb.app.model!!.getTextModel()!!,
+                    index = bm.start!!.paragraphIndex
+                )
                 val wordCursor = ZLTextWordCursor(paragraphCursor)
                 wordCursor.moveTo(bm.start!!)
-                var e: ZLTextElement = wordCursor.element
+                var e: ZLTextElement = wordCursor.getElement()!!
                 while (wordCursor.compareTo(bm.end!!) < 0) {
                     if (e is ZLTextWord) {
-                        val z = e.string
-                        val b = Bookmark(z, ZLTextFixedPosition(wordCursor), ZLTextFixedPosition(wordCursor.paragraphIndex, wordCursor.elementIndex, wordCursor.charIndex + e.Length))
+                        val z = e.getString()
+                        val b = Bookmark(
+                            z,
+                            ZLTextFixedPosition(wordCursor),
+                            ZLTextFixedPosition(
+                                wordCursor.paragraphIndex,
+                                wordCursor.elementIndex,
+                                wordCursor.charIndex + e.length
+                            )
+                        )
                         b.strStart = str.length
                         str += z
                         b.strEnd = str.length
@@ -814,7 +887,7 @@ class TTSPopup(val fb: FBReaderView) {
                         list.add(b)
                     }
                     wordCursor.nextWord()
-                    e = wordCursor.element
+                    e = wordCursor.getElement()!!
                 }
             }
             fragmentText = str
@@ -835,7 +908,8 @@ class TTSPopup(val fb: FBReaderView) {
             return fragmentText.trim().isEmpty()
         }
 
-        inner class Bookmark(z: String, s: ZLTextPosition, e: ZLTextPosition) : Storage.Bookmark(z, s, e) {
+        inner class Bookmark(z: String, s: ZLTextPosition, e: ZLTextPosition) :
+            Storage.Bookmark(z, s, e) {
             var strStart: Int = 0
             var strEnd: Int = 0
 
@@ -900,7 +974,8 @@ class TTSPopup(val fb: FBReaderView) {
             all = null
         }
 
-        fun select(): String? = allText?.substring(getCurrent().elementIndex, getCurrent().elementIndex + 1)
+        fun select(): String? =
+            allText?.substring(getCurrent().elementIndex, getCurrent().elementIndex + 1)
 
         fun prevWord(): Boolean {
             all()
@@ -921,7 +996,8 @@ class TTSPopup(val fb: FBReaderView) {
                 s = select()
             } while (isWord(s) && !stopOnLeft(s))
             e = last
-            val m = fb.pluginview.select(ZLTextFixedPosition(p, e, 0), ZLTextFixedPosition(sp, k, 0))
+            val m =
+                fb.pluginview.select(ZLTextFixedPosition(p, e, 0), ZLTextFixedPosition(sp, k, 0))
             if (m != null) {
                 text = m.getText()
                 m.close()
@@ -956,7 +1032,8 @@ class TTSPopup(val fb: FBReaderView) {
                 s = select()
             } while (isWord(s) && !stopOnRight(s))
             e = last
-            val m = fb.pluginview.select(ZLTextFixedPosition(sp, k, 0), ZLTextFixedPosition(p, e, 0))
+            val m =
+                fb.pluginview.select(ZLTextFixedPosition(sp, k, 0), ZLTextFixedPosition(p, e, 0))
             if (m != null) {
                 text = m.getText()
                 m.close()
@@ -964,8 +1041,8 @@ class TTSPopup(val fb: FBReaderView) {
             return true
         }
 
-        override fun getParagraphIndex(): Int = p
-        override fun getElementIndex(): Int = e
-        override fun getCharIndex(): Int = c
+        override val paragraphIndex: Int get() = p
+        override val elementIndex: Int get() = e
+        override val charIndex: Int get() = c
     }
 }

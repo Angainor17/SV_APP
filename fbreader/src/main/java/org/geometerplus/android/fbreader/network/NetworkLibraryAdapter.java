@@ -56,7 +56,7 @@ class NetworkLibraryAdapter extends TreeAdapter {
                 view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 final int coverHeight = view.getMeasuredHeight();
                 final TreeActivity activity = getActivity();
-                myCoverManager = new CoverManager(activity, activity.ImageSynchronizer, coverHeight * 15 / 32, coverHeight);
+                myCoverManager = new CoverManager(activity, activity.getImageSynchronizer(), coverHeight * 15 / 32, coverHeight);
                 view.requestLayout();
             }
         }
@@ -68,7 +68,7 @@ class NetworkLibraryAdapter extends TreeAdapter {
         final ImageView statusView = ViewUtil.findImageView(view, R.id.library_tree_item_status);
         final int status = (tree instanceof NetworkBookTree)
                 ? NetworkBookActions.getBookStatus(
-                ((NetworkBookTree) tree).Book,
+                ((NetworkBookTree) tree).book,
                 ((NetworkLibraryActivity) getActivity()).BookCollection,
                 ((NetworkLibraryActivity) getActivity()).Connection
         )

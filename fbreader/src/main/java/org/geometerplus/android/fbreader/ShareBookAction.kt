@@ -25,11 +25,14 @@ import org.geometerplus.fbreader.fbreader.FBReaderApp
 
 internal class ShareBookAction(baseActivity: FBReader, fbreader: FBReaderApp) : FBAndroidAction(baseActivity, fbreader) {
     override fun isVisible(): Boolean {
-        val book: Book? = Reader.getCurrentBook()
+        val book: Book? = Reader.currentBook
         return book != null && BookUtil.fileByBook(book).physicalFile != null
     }
 
     override fun run(vararg params: Any?) {
-        FBUtil.shareBook(BaseActivity, Reader.getCurrentBook())
+        val book = Reader.currentBook
+        if (book != null) {
+            FBUtil.shareBook(BaseActivity, book)
+        }
     }
 }

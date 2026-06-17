@@ -46,8 +46,7 @@ public class TopupMenuActivity extends MenuActivity {
     }
 
     public static void runMenu(Context context, INetworkLink link, Money amount) {
-        final Intent intent =
-                Util.intentByLink(new Intent(context, TopupMenuActivity.class), link);
+        final Intent intent = Util.intentByLink(new Intent(context, TopupMenuActivity.class), link);
         intent.putExtra(AMOUNT_KEY, amount);
         context.startActivity(intent);
     }

@@ -44,13 +44,15 @@ import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.util.MimeType;
 import org.geometerplus.zlibrary.ui.android.network.SQLiteCookieDatabase;
 
+import java.util.Date;
+
 public class AddCustomCatalogActivity extends Activity {
     static final String TYPE = "type";
     private final ActivityNetworkContext myNetworkContext = new ActivityNetworkContext(this);
     private ZLResource myResource;
     private volatile ICustomNetworkLink myLink;
     private boolean myEditNotAdd;
-    private INetworkLink.Type myType = INetworkLink.Type.Custom;
+    INetworkLink.Type myType = INetworkLink.Type.Custom;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -139,7 +141,7 @@ public class AddCustomCatalogActivity extends Activity {
                 }
             }
 
-            myType = INetworkLink.Type.byIndex(intent.getIntExtra(TYPE, myType.Index));
+            myType = INetworkLink.Type.Companion.byIndex(intent.getIntExtra(TYPE, myType.getIndex()));
         }
 
         if (myLink != null) {
@@ -276,7 +278,9 @@ public class AddCustomCatalogActivity extends Activity {
             return;
         }
         final UrlInfoCollection<UrlInfoWithDate> infos = new UrlInfoCollection<UrlInfoWithDate>();
-        infos.addInfo(new UrlInfoWithDate(UrlInfo.Type.Catalog, textUrl, MimeType.APP_ATOM_XML));
+        infos.addInfo(
+                new UrlInfoWithDate(UrlInfo.Type.Catalog, textUrl, MimeType.APP_ATOM_XML, new Date())
+        );
         myLink = new OPDSCustomNetworkLink(
                 Util.networkLibrary(this),
                 ICustomNetworkLink.INVALID_ID, myType, null, null, null, infos

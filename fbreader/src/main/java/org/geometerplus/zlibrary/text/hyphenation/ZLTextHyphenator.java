@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- * 02110-1301, USA.
- */
-
 package org.geometerplus.zlibrary.text.hyphenation;
 
 import org.geometerplus.zlibrary.text.view.ZLTextWord;
@@ -50,12 +31,12 @@ public abstract class ZLTextHyphenator {
     public abstract void unload();
 
     public ZLTextHyphenationInfo getInfo(final ZLTextWord word) {
-        final int len = word.Length;
+        final int len = word.getLength();
         final boolean[] isLetter = new boolean[len];
         final char[] pattern = new char[len + 2];
-        final char[] data = word.Data;
+        final char[] data = word.getData();
         pattern[0] = ' ';
-        for (int i = 0, j = word.Offset; i < len; ++i, ++j) {
+        for (int i = 0, j = word.getOffset(); i < len; ++i, ++j) {
             char character = data[j];
             if (character == '\'' || character == '^' || Character.isLetter(character)) {
                 isLetter[i] = true;
@@ -69,7 +50,7 @@ public abstract class ZLTextHyphenator {
         final ZLTextHyphenationInfo info = new ZLTextHyphenationInfo(len + 2);
         final boolean[] mask = info.Mask;
         hyphenate(pattern, mask, len + 2);
-        for (int i = 0, j = word.Offset - 1; i <= len; ++i, ++j) {
+        for (int i = 0, j = word.getOffset() - 1; i <= len; ++i, ++j) {
             if ((i < 2) || (i > len - 2)) {
                 mask[i] = false;
             } else {

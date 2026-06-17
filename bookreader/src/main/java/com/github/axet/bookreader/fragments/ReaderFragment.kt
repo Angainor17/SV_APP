@@ -401,8 +401,8 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
                 fontsPopup!!.code = RESULT_FONTS
                 fontsPopup!!.loadFonts()
                 fontsPopup!!.fonts.select(
-                    fb!!.app.ViewOptions.getTextStyleCollection()
-                        .baseStyle.FontFamilyOption.value
+                    fb!!.app.viewOptions.getTextStyleCollection()
+                        .getBaseStyle().fontFamilyOption.value
                 )
                 fontsPopup!!.ignoreEmbeddedFonts.setChecked(fb!!.ignoreCssFonts)
                 fontsPopup!!.fontsList.scrollToPosition(fontsPopup!!.fonts.selected)
@@ -445,7 +445,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
             )
         }
         if (id == R.id.action_rtl) {
-            fb?.app?.BookTextView?.rtlMode = !fb!!.app.BookTextView.rtlMode
+            fb?.app?.bookTextView?.rtlMode = !fb!!.app.bookTextView.rtlMode
             fb?.reset()
             updateToolbar()
         }
@@ -515,7 +515,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         homeMenu.isVisible = false
         sort.isVisible = false
         tocMenu.isVisible =
-            fb!!.app.Model != null && fb!!.app.Model.TOCTree != null && fb!!.app.Model.TOCTree.hasChildren()
+            fb!!.app.model != null && fb!!.app.model!!.tocTree.hasChildren()
         searchMenu!!.isVisible = search
         reflow.isVisible = fb!!.pluginview != null && fb!!.pluginview !is ComicsView
 
@@ -542,16 +542,16 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
         mode.setIcon(if (fb!!.widget is ScrollWidget) R.drawable.ic_view_day_black_24dp else R.drawable.ic_view_carousel_black_24dp) // icon current
         mode.setTitle(if (fb!!.widget is ScrollWidget) R.string.view_mode_paging else R.string.view_mode_continuous) // text next
 
-        showRTL = showRTL or (!fb!!.app.BookTextView.rtlMode && fb!!.app.BookTextView.rtlDetected)
+        showRTL = showRTL or (!fb!!.app.bookTextView.rtlMode && fb!!.app.bookTextView.rtlDetected)
         rtl.isVisible = showRTL
         MenuItemCompat.getActionView(rtl).setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 onOptionsItemSelected(rtl)
             }
         })
-        rtl.title = if (fb!!.app.BookTextView.rtlMode) "RTL" else "LTR"
+        rtl.title = if (fb!!.app.bookTextView.rtlMode) "RTL" else "LTR"
         (MenuItemCompat.getActionView(rtl) as ToolbarButtonView).text.text =
-            if (fb!!.app.BookTextView.rtlMode) "RTL" else "LTR"
+            if (fb!!.app.bookTextView.rtlMode) "RTL" else "LTR"
         if (fb!!.book != null)  // call before onCreateView
             bookmarksMenu.isVisible =
                 fb!!.book.info.bookmarks != null && fb!!.book.info.bookmarks.isNotEmpty()
@@ -562,7 +562,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
     fun showTOC() {
         val builder = AlertDialog.Builder(requireContext())
         val current = fb!!.app.currentTOCElement
-        val a = TOCAdapter(fb!!.app.Model.TOCTree.subtrees(), current)
+        val a = TOCAdapter(fb!!.app.model!!.tocTree.subtrees(), current)
         val tree = TreeRecyclerView(requireContext())
         tree.setAdapter(a)
         builder.setView(tree)
@@ -709,7 +709,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
                 h.i.setColorFilter(Color.GRAY)
                 h.textView.setTypeface(null, Typeface.NORMAL)
             }
-            h.textView.text = tt.text
+            h.textView.text = tt.getText()
             h.itemView.setOnClickListener(object : View.OnClickListener {
                 override fun onClick(v: View?) {
                     val n = getItem(h.getAdapterPosition(this@TOCAdapter)).tag as TOCTree
@@ -725,7 +725,7 @@ class ReaderFragment : Fragment(), SearchListener, OnSharedPreferenceChangeListe
             val r1 = t.reference
             val r2 = t2.reference
             if (r1 == null || r2 == null) return false
-            return r1.ParagraphIndex == r2.ParagraphIndex
+            return r1.paragraphIndex == r2.paragraphIndex
         }
     }
 

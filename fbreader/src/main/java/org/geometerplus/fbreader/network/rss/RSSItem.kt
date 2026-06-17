@@ -23,6 +23,9 @@ import org.geometerplus.fbreader.network.atom.ATOMEntry
 import org.geometerplus.zlibrary.core.xml.ZLStringMap
 
 open class RSSItem(attributes: ZLStringMap) : ATOMEntry(attributes) {
-    @JvmField var SeriesTitle: String? = null
-    @JvmField var SeriesIndex: Float = 0f
+    @JvmField
+    var seriesTitle: String? = null
+
+    @JvmField
+    var seriesIndex: Float = 0f
 }
