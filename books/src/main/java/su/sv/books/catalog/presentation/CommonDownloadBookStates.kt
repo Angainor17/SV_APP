@@ -4,7 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Общая информаия для считывания статуса загрузки
+ * Общая информация для считывания статуса загрузки
  */
 @Singleton
 class CommonDownloadBookStates @Inject constructor() {
