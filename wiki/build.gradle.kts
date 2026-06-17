@@ -28,4 +28,14 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // API
+    implementation(libs.bundles.retrofit)
+
+    // Logging
+    implementation(libs.timber)
+
+    // Room
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
 }

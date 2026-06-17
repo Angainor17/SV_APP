@@ -73,7 +73,8 @@
       "Bash(sed -n '340,342p' org/geometerplus/zlibrary/text/view/ZLTextViewBase.java)",
       "Bash(curl -s \"https://svremya.su/api/rest_v1/page/%D0%9A%D0%BE%D0%BD%D0%B5%D1%87%D0%BD%D0%BE%D0%B5\")",
       "Bash(curl -s \"https://svremya.su/api/rest_v1/search/page?q=%D0%9A%D0%BE%D0%BD%D0%B5%D1%87%D0%BD%D0%BE%D0%B5&limit=5\")",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(./gradlew :wiki:assembleDebug)"
     ]
   }
 }
