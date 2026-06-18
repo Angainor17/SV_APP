@@ -101,7 +101,7 @@ class BookDetailViewModel @Inject constructor(
     }
 
     // конец загрузки
-    override fun handleBookDownloadEnd() {
+    override fun onBookDownloadEnd() {
         updateState { state ->
             uiMapper.createStateAfterDownload(state)
         }
@@ -124,10 +124,10 @@ class BookDetailViewModel @Inject constructor(
         }
     }
 
-    override fun showErrorSnack(textResId: Int) {
+    override fun showErrorSnack(resId: Int) {
         _oneTimeEffect.trySend(
             BookDetailOneTimeEffect.ShowErrorSnackBar(
-                text = resourcesRepository.get().getString(textResId)
+                text = resourcesRepository.get().getString(resId)
             )
         )
     }

@@ -1,5 +1,6 @@
 package su.sv.books.catalog.presentation.base
 
+import android.net.Uri
 import dagger.Lazy
 import su.sv.books.R
 import su.sv.books.catalog.data.receivers.BookDownloadedActionHandler
@@ -10,7 +11,7 @@ import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 
 /**
- * Общая логика скачивания книги
+ * Базовый ViewModel с общей логикой скачивания книг
  */
 abstract class BaseBookViewModel(
     private val downloadBookStates: CommonDownloadBookStates,
@@ -18,50 +19,60 @@ abstract class BaseBookViewModel(
 ) : BaseViewModel() {
 
     protected abstract fun showErrorSnack(resId: Int)
-
     protected abstract fun updateBookState(action: (UiBook) -> UiBook)
-    protected open fun handleBookDownloadEnd() = Unit
+    protected open fun onBookDownloadEnd() = Unit
 
+    /**
+     * Обработать завершение скачивания книги
+     */
     protected fun handleDownloadedBook(state: BookDownloadedActionHandler.BookState) {
-        val (downloadId) = state
-        val bookId = downloadBookStates.loadingInProgressMap[downloadId]
+        val downloadId = state.downloadID
+        val bookId = downloadBookStates.loadingInProgressMap[downloadId] ?: return
 
-        var currentBook: UiBook? = null // FIXME
-        // обновляется на статус скачанного (или нет)
-        updateBookState { oldBook ->
-            if (oldBook.id == bookId) {
-                currentBook = getBookWithActualDownloadState(oldBook)
-                currentBook
+        // Обновляем состояние книги и получаем обновлённую версию
+        var updatedBook: UiBook? = null
+        updateBookState { book ->
+            if (book.id == bookId) {
+                getBookWithActualDownloadState(book).also { updatedBook = it }
             } else {
-                oldBook
+                book
             }
         }
 
-        //TODO : refactor
-        val uri = getBookUriUseCase.get().execute(currentBook?.fileNameWithExt.orEmpty())
-        val isSuccess = currentBook != null && uri != null
+        // Проверяем успешность загрузки
+        val isSuccess = updatedBook?.fileUri != null
         if (!isSuccess) {
             showErrorSnack(R.string.books_download_snack_error)
         }
 
-        handleBookDownloadEnd()
+        // Уведомляем о завершении
+        onBookDownloadEnd()
 
+        // Очищаем карту загрузок
         downloadBookStates.loadingInProgressMap.remove(downloadId)
     }
 
+    /**
+     * Получить книгу с актуальным состоянием скачивания
+     */
     protected fun getBookWithActualDownloadState(book: UiBook): UiBook {
         val uri = getBookUriUseCase.get().execute(book.fileNameWithExt)
+        val isDownloading = downloadBookStates.loadingInProgressMap.values.contains(book.id)
 
         return book.copy(
-            downloadState = when {
-                uri != null -> {
-                    UIBookState.DOWNLOADED
-                }
-                // скачивание ещё идёт
-                downloadBookStates.loadingInProgressMap.values.contains(book.id) -> UIBookState.DOWNLOADING
-                else -> UIBookState.AVAILABLE_TO_DOWNLOAD
-            },
+            downloadState = determineDownloadState(uri, isDownloading),
             fileUri = uri,
         )
+    }
+
+    /**
+     * Определить состояние скачивания книги
+     */
+    private fun determineDownloadState(uri: Uri?, isDownloading: Boolean): UIBookState {
+        return when {
+            uri != null -> UIBookState.DOWNLOADED
+            isDownloading -> UIBookState.DOWNLOADING
+            else -> UIBookState.AVAILABLE_TO_DOWNLOAD
+        }
     }
 }
