@@ -79,7 +79,8 @@
       "Bash(./gradlew :app:assembleDebug --warning-mode all)",
       "Bash(./gradlew help *)",
       "Bash(./gradlew :app:dependencies --configuration releaseRuntimeClasspath)",
-      "Bash(./gradlew :wiki:compileDebugKotlin --no-daemon)"
+      "Bash(./gradlew :wiki:compileDebugKotlin --no-daemon)",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }

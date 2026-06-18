@@ -27,9 +27,6 @@ import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 import javax.inject.Inject
 
-/**
- * TODO: permission!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- */
 @HiltViewModel
 class RootBooksCatalogViewModel @Inject constructor(
     private val getBooksListUseCase: GetBooksListUseCase,
