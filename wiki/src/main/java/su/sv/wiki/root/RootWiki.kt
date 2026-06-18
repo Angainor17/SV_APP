@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -127,6 +128,7 @@ private fun HandleEffects(
     snackbarHostState: SnackbarHostState,
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
@@ -142,7 +144,7 @@ private fun HandleEffects(
             is WikiOneTimeEffect.ShowAddedToFavorites -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        message = "\"${effect.title}\" добавлено в избранное",
+                        message = context.getString(R.string.wiki_added_to_favorites, effect.title),
                         duration = SnackbarDuration.Short,
                     )
                 }
@@ -151,7 +153,7 @@ private fun HandleEffects(
             is WikiOneTimeEffect.ShowRemovedFromFavorites -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        message = "\"${effect.title}\" удалено из избранного",
+                        message = context.getString(R.string.wiki_removed_from_favorites, effect.title),
                         duration = SnackbarDuration.Short,
                     )
                 }
@@ -176,7 +178,7 @@ private fun NotFoundContent(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Попробуйте изменить запрос",
+                text = stringResource(R.string.wiki_not_found_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
