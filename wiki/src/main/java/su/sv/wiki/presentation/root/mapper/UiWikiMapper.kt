@@ -24,6 +24,7 @@ class UiWikiMapper @Inject constructor() {
             content = article.content,
             links = article.links.map { it.toUi() },
             externalLinks = article.externalLinks.map { it.toUi() },
+            articleUrl = article.articleUrl,
         )
     }
 

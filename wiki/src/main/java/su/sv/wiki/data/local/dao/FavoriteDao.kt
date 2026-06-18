@@ -21,6 +21,12 @@ interface FavoriteDao {
     fun getAllFavorites(): Flow<List<FavoriteEntity>>
 
     /**
+     * Получить количество избранных статей
+     */
+    @Query("SELECT COUNT(*) FROM favorites")
+    fun getFavoritesCount(): Flow<Int>
+
+    /**
      * Получить избранную статью по заголовку
      */
     @Query("SELECT * FROM favorites WHERE title = :title")
@@ -49,4 +55,10 @@ interface FavoriteDao {
      */
     @Query("DELETE FROM favorites WHERE title = :title")
     suspend fun deleteFavoriteByTitle(title: String)
+
+    /**
+     * Очистить всё избранное
+     */
+    @Query("DELETE FROM favorites")
+    suspend fun clearFavorites()
 }

@@ -104,13 +104,15 @@ class WikiRepositoryImpl @Inject constructor(
                 else -> {
                     val parseData = response.body()!!.parse!!
                     val htmlContent = parseData.text?.content.orEmpty()
+                    val title = parseData.title.orEmpty()
                     WikiResult.Success(
                         WikiArticle(
-                            title = parseData.title.orEmpty(),
+                            title = title,
                             pageId = parseData.pageId ?: 0,
                             content = htmlContent,
                             links = parseData.links?.map { it.toDomain() }.orEmpty(),
                             externalLinks = parseExternalLinks(htmlContent),
+                            articleUrl = "https://svremya.su/${title.replace(" ", "_")}",
                         )
                     )
                 }
@@ -154,6 +156,16 @@ class WikiRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getFavoriteTitles(): Flow<List<String>> {
+        return favoriteDao.getAllFavorites().map { entities ->
+            entities.map { it.title }
+        }
+    }
+
+    override fun hasFavorites(): Flow<Boolean> {
+        return favoriteDao.getFavoritesCount().map { count -> count > 0 }
+    }
+
     override suspend fun isFavorite(title: String): Boolean {
         return favoriteDao.isFavorite(title)
     }
@@ -165,6 +177,10 @@ class WikiRepositoryImpl @Inject constructor(
 
     override suspend fun removeFromFavorites(title: String) {
         favoriteDao.deleteFavoriteByTitle(title)
+    }
+
+    override suspend fun clearFavorites() {
+        favoriteDao.clearFavorites()
     }
 
     // ========== Локальные операции (история) ==========
@@ -222,6 +238,7 @@ class WikiRepositoryImpl @Inject constructor(
             content = this.content,
             links = links,
             externalLinks = externalLinks,
+            articleUrl = this.articleUrl,
         )
     }
 
@@ -231,6 +248,7 @@ class WikiRepositoryImpl @Inject constructor(
             content = this.content,
             links = gson.toJson(this.links),
             externalLinks = gson.toJson(this.externalLinks),
+            articleUrl = this.articleUrl,
             savedAt = System.currentTimeMillis(),
         )
     }
