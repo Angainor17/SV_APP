@@ -84,6 +84,11 @@ class RootWikiViewModel @Inject constructor(
                 _suggestions.value = suggestions.map { it.title }
             } else {
                 _suggestions.value = emptyList()
+                // При очистке поля возвращаемся к начальному состоянию
+                if (query.isEmpty()) {
+                    _state.value = UiWikiState.Initial
+                    currentQuery = ""
+                }
             }
         }
     }
