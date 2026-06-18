@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "su.sv.commonui"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
