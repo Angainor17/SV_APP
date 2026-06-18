@@ -9,6 +9,7 @@ data class WikiArticle(
     val content: String,           // HTML контент
     val links: List<WikiLink>,     // Список внутренних ссылок в тексте
     val externalLinks: List<WikiExternalLink>, // Список внешних ссылок
+    val articleUrl: String = "",   // URL статьи на сайте
 )
 
 /**

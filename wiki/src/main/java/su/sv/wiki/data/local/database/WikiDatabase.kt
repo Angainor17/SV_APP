@@ -15,7 +15,7 @@ import su.sv.wiki.data.local.entity.HistoryEntity
         FavoriteEntity::class,
         HistoryEntity::class,
     ],
-    version = 2,
+    version = 1,
     exportSchema = false,
 )
 abstract class WikiDatabase : RoomDatabase() {

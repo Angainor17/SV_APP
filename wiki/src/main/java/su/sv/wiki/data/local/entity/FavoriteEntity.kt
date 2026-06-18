@@ -13,5 +13,6 @@ data class FavoriteEntity(
     val content: String,           // HTML контент
     val links: String,             // JSON строка со списком внутренних ссылок
     val externalLinks: String,     // JSON строка со списком внешних ссылок
+    val articleUrl: String,        // URL статьи на сайте (например, https://svremya.su/Марксизм)
     val savedAt: Long,             // Timestamp сохранения
 )

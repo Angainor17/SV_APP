@@ -17,6 +17,7 @@ import su.sv.wiki.domain.usecase.ClearHistoryUseCase
 import su.sv.wiki.domain.usecase.GetArticleUseCase
 import su.sv.wiki.domain.usecase.GetHistoryUseCase
 import su.sv.wiki.domain.usecase.GetSearchSuggestionsUseCase
+import su.sv.wiki.domain.usecase.HasFavoritesUseCase
 import su.sv.wiki.domain.usecase.IsFavoriteUseCase
 import su.sv.wiki.domain.usecase.RemoveFavoriteUseCase
 import su.sv.wiki.domain.usecase.SearchArticleUseCase
@@ -41,6 +42,7 @@ class RootWikiViewModel @Inject constructor(
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val getSearchSuggestionsUseCase: GetSearchSuggestionsUseCase,
+    private val hasFavoritesUseCase: HasFavoritesUseCase,
     private val mapper: UiWikiMapper,
 ) : BaseViewModel(), WikiActionsHandler {
 
@@ -54,6 +56,9 @@ class RootWikiViewModel @Inject constructor(
 
     /** История поиска */
     val history: Flow<List<String>> = getHistoryUseCase()
+
+    /** Наличие избранных статей */
+    val hasFavorites: Flow<Boolean> = hasFavoritesUseCase.execute()
 
     /** Одноразовые события */
     private val _oneTimeEffect = Channel<WikiOneTimeEffect>(capacity = Channel.BUFFERED)
@@ -185,6 +190,7 @@ class RootWikiViewModel @Inject constructor(
                                 url = it.url,
                             )
                         },
+                        articleUrl = currentState.article.articleUrl,
                     ),
                 )
 

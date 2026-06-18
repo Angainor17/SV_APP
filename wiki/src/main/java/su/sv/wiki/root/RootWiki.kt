@@ -1,12 +1,25 @@
 package su.sv.wiki.root
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -26,11 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
 import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.wiki.R
+import su.sv.wiki.presentation.article.ArticleScreen
+import su.sv.wiki.presentation.favorites.FavoritesScreen
 import su.sv.wiki.presentation.root.model.UiWikiState
 import su.sv.wiki.presentation.root.ui.ArticleView
 import su.sv.wiki.presentation.root.ui.HistoryList
@@ -50,8 +67,10 @@ fun RootWiki(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsState(initial = emptyList())
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val hasFavorites by viewModel.hasFavorites.collectAsState(initial = false)
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val stackNavigation = LocalStackNavigation.current
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -65,17 +84,51 @@ fun RootWiki(
                 .fillMaxSize()
                 .padding(bottom = paddingValues.calculateBottomPadding()),
         ) {
-            // Поле поиска с debounce
-            WikiSearchBar(
-                onSearch = { query ->
-                    if (query.length >= 3) {
-                        viewModel.onAction(WikiActions.OnSearch(query))
+            // Поле поиска с иконкой избранного
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                WikiSearchBar(
+                    onSearch = { query ->
+                        if (query.length >= 3) {
+                            viewModel.onAction(WikiActions.OnSearch(query))
+                        }
+                    },
+                    onQueryChanged = { query ->
+                        viewModel.onAction(WikiActions.OnSearchQueryChanged(query))
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+
+                // Иконка избранного с анимацией
+                AnimatedVisibility(
+                    visible = hasFavorites,
+                    enter = fadeIn(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    ) + scaleIn(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        initialScale = 0.8f,
+                    ),
+                    exit = fadeOut(
+                        animationSpec = tween(200, easing = FastOutSlowInEasing),
+                    ) + scaleOut(
+                        animationSpec = tween(200, easing = FastOutSlowInEasing),
+                        targetScale = 0.8f,
+                    ),
+                ) {
+                    IconButton(
+                        onClick = { stackNavigation.forward(FavoritesScreen()) },
+                        modifier = Modifier.padding(end = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = stringResource(R.string.wiki_favorites),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
                     }
-                },
-                onQueryChanged = { query ->
-                    viewModel.onAction(WikiActions.OnSearchQueryChanged(query))
-                },
-            )
+                }
+            }
 
             // Подсказки поиска
             SearchSuggestions(
@@ -92,7 +145,7 @@ fun RootWiki(
                     HistoryList(
                         history = history,
                         onItemClick = { title ->
-                            viewModel.onAction(WikiActions.OnHistoryItemClick(title))
+                            stackNavigation.forward(ArticleScreen(title = title))
                         },
                         onClearClick = {
                             viewModel.onAction(WikiActions.OnClearHistory)

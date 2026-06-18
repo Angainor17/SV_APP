@@ -107,6 +107,12 @@ GET https://svremya.su/api.php?action=opensearch&search={query}&limit=5&format=j
    - Показывает последние успешные запросы
    - При клике на элемент → загрузка статьи в БЛОК ПРОСМОТРА
 
+5. **Иконка избранного**
+   - Отображается справа от поля поиска
+   - Видна только при наличии избранных статей
+   - При нажатии → переход на экран "Избранное"
+   - Плавная анимация появления/исчезновения
+
 #### Состояния экрана:
 ```
 sealed class UiWikiState {
@@ -162,6 +168,83 @@ sealed class UiWikiState {
 
 ---
 
+### 2.3 Экран "Избранное" (FavoritesScreen)
+
+#### Компоненты UI:
+1. **TopAppBar**
+   - Заголовок: "Избранное"
+   - Стрелка назад: возврат на RootWiki
+   - Иконка корзины: очистка избранного (только при наличии элементов)
+
+2. **AlertDialog (очистка)**
+   - Текст: "Вы точно хотите очистить избранное?"
+   - Кнопки: "Да", "Нет"
+   - При "Да" → очистка БД и возврат на RootWiki
+
+3. **Список избранного**
+   - Элементы: названия статей с иконкой сердечка
+   - При клике → переход на экран "Статья"
+
+4. **Пустое состояние**
+   - Иконка сердечка
+   - Текст: "Избранное пусто"
+
+#### Состояния экрана:
+```kotlin
+sealed class FavoritesState {
+    object Loading : FavoritesState()
+    data class Content(val favorites: List<String>) : FavoritesState()
+    object Empty : FavoritesState()
+}
+```
+
+---
+
+### 2.4 Экран "Статья" (ArticleScreen)
+
+#### Компоненты UI:
+1. **TopAppBar**
+   - Заголовок: название статьи
+   - Стрелка назад: возврат
+   - Иконка избранного (сердечко): добавить/удалить из избранного
+   - Иконка внешней ссылки: открыть в браузере
+
+2. **Контент статьи**
+   - Текст с вертикальным скроллом
+   - Выделение и копирование текста (SelectionContainer)
+   - Кликабельные внутренние ссылки
+   - Кликабельные внешние ссылки (другой цвет)
+
+#### Модель данных:
+```kotlin
+data class UiWikiArticle(
+    val title: String,
+    val content: String,
+    val links: List<UiWikiLink>,
+    val externalLinks: List<UiExternalLink>,
+    val articleUrl: String,  // URL для открытия в браузере
+)
+```
+
+---
+
+### 2.5 Навигация
+
+#### Граф навигации:
+```
+wiki (RootWiki)
+├── favorites (FavoritesScreen)
+└── article/{title} (ArticleScreen)
+```
+
+#### Переходы:
+- RootWiki → FavoritesScreen (иконка избранного)
+- RootWiki → ArticleScreen (история поиска)
+- FavoritesScreen → ArticleScreen (клик по статье)
+- ArticleScreen → ArticleScreen (внутренние ссылки)
+
+---
+
 ## 3. Технические требования
 
 ### 3.1 Архитектура
@@ -174,6 +257,8 @@ sealed class UiWikiState {
 wiki/src/main/java/su/sv/wiki/
 ├── di/
 │   └── WikiModule.kt                    # Hilt модуль
+├── navigation/
+│   └── WikiNavGraph.kt                  # Граф навигации
 ├── data/
 │   ├── api/
 │   │   ├── WikiApi.kt                   # Retrofit интерфейс
@@ -197,6 +282,46 @@ wiki/src/main/java/su/sv/wiki/
 │   │   ├── WikiExternalLink.kt          # Модель внешней ссылки
 │   │   ├── WikiSearchResult.kt          # Результат поиска
 │   │   └── WikiSearchSuggestion.kt      # Подсказка поиска
+│   ├── repository/
+│   │   └── WikiRepository.kt            # Интерфейс репозитория
+│   └── usecase/
+│       ├── SearchArticleUseCase.kt      # Поиск статьи
+│       ├── GetArticleUseCase.kt         # Получение статьи
+│       ├── GetSearchSuggestionsUseCase.kt # Получение подсказок
+│       ├── AddFavoriteUseCase.kt        # Добавление в избранное
+│       ├── RemoveFavoriteUseCase.kt     # Удаление из избранного
+│       ├── GetFavoritesUseCase.kt       # Получение избранного
+│       ├── GetFavoriteTitlesUseCase.kt  # Получение названий избранного
+│       ├── HasFavoritesUseCase.kt       # Проверка наличия избранного
+│       ├── ClearFavoritesUseCase.kt     # Очистка избранного
+│       ├── AddHistoryUseCase.kt         # Добавление в историю
+│       └── GetHistoryUseCase.kt         # Получение истории
+├── presentation/
+│   ├── root/
+│   │   ├── RootWiki.kt                  # Главный Composable
+│   │   └── RootWikiViewModel.kt         # ViewModel
+│   ├── favorites/
+│   │   ├── FavoritesScreen.kt           # Экран избранного
+│   │   └── FavoritesViewModel.kt        # ViewModel избранного
+│   ├── article/
+│   │   ├── ArticleScreen.kt             # Экран статьи
+│   │   └── ArticleViewModel.kt          # ViewModel статьи
+│   ├── model/
+│   │   ├── UiWikiState.kt               # Состояния UI
+│   │   └── UiWikiArticle.kt             # Модель статьи для UI
+│   ├── ui/
+│   │   ├── WikiSearchBar.kt             # Поле поиска
+│   │   ├── SearchSuggestions.kt         # Подсказки поиска с анимацией
+│   │   ├── ArticleView.kt               # Блок просмотра статьи
+│   │   └── HistoryList.kt               # Список истории
+│   ├── mapper/
+│   │   └── UiWikiMapper.kt              # Маппер в UI модели
+│   └── viewmodel/
+│       ├── actions/
+│       │   ├── WikiActions.kt           # Интерфейс действий
+│       │   └── WikiActionsHandler.kt    # Обработчик действий
+│       └── effects/
+│           └── WikiOneTimeEffect.kt     # Одноразовые эффекты
 │   ├── repository/
 │   │   └── WikiRepository.kt            # Интерфейс репозитория
 │   └── usecase/

@@ -8,6 +8,7 @@ data class UiWikiArticle(
     val content: String,           // HTML контент
     val links: List<UiWikiLink>,
     val externalLinks: List<UiExternalLink>,
+    val articleUrl: String = "",   // URL статьи на сайте
 )
 
 /**

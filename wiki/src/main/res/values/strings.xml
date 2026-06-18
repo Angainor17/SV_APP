@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Общие -->
+    <string name="wiki_back">Назад</string>
+
     <!-- Поиск -->
     <string name="wiki_search_label">Поиск</string>
     <string name="wiki_search_placeholder">Введите слово или фразу…</string>
@@ -18,8 +21,16 @@
     <string name="wiki_history_clear">Очистить историю</string>
 
     <!-- Избранное -->
+    <string name="wiki_favorites">Избранное</string>
+    <string name="wiki_favorites_title">Избранное</string>
+    <string name="wiki_favorites_empty">Избранное пусто</string>
+    <string name="wiki_favorites_clear">Очистить избранное</string>
+    <string name="wiki_favorites_clear_confirm">Вы точно хотите очистить избранное?</string>
+    <string name="wiki_favorites_clear_yes">Да</string>
+    <string name="wiki_favorites_clear_no">Нет</string>
     <string name="wiki_add_favorite">Добавить в избранное</string>
     <string name="wiki_remove_favorite">Удалить из избранного</string>
     <string name="wiki_added_to_favorites">\"%s\" добавлено в избранное</string>
     <string name="wiki_removed_from_favorites">\"%s\" удалено из избранного</string>
+    <string name="wiki_open_in_browser">Открыть в браузере</string>
 </resources>

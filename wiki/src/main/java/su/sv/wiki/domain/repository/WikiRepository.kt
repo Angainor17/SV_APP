@@ -51,6 +51,16 @@ interface WikiRepository {
     fun getFavorites(): Flow<List<WikiArticle>>
 
     /**
+     * Получить список названий избранных статей
+     */
+    fun getFavoriteTitles(): Flow<List<String>>
+
+    /**
+     * Проверить, есть ли хоть одно избранное
+     */
+    fun hasFavorites(): Flow<Boolean>
+
+    /**
      * Проверить, есть ли статья в избранном
      */
     suspend fun isFavorite(title: String): Boolean
@@ -64,6 +74,11 @@ interface WikiRepository {
      * Удалить статью из избранного
      */
     suspend fun removeFromFavorites(title: String)
+
+    /**
+     * Очистить всё избранное
+     */
+    suspend fun clearFavorites()
 
     // ========== Локальные операции (история) ==========
 
