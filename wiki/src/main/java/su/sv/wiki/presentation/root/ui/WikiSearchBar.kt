@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import su.sv.wiki.R
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Поле поиска статей с debounce
@@ -39,7 +40,7 @@ fun WikiSearchBar(
     // Debounce поиск
     LaunchedEffect(searchText) {
         if (searchText.length >= minQueryLength) {
-            delay(debounceMillis)
+            delay(debounceMillis.milliseconds)
             onSearch(searchText)
         }
     }
@@ -68,6 +69,6 @@ fun WikiSearchBar(
         },
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp),
     )
 }
