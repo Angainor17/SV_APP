@@ -6,8 +6,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import su.sv.wiki.data.api.WikiApi
 import su.sv.wiki.data.api.model.ApiLink
+import su.sv.wiki.data.local.dao.ArticleCacheDao
 import su.sv.wiki.data.local.dao.FavoriteDao
 import su.sv.wiki.data.local.dao.HistoryDao
+import su.sv.wiki.data.local.entity.ArticleCacheEntity
 import su.sv.wiki.data.local.entity.FavoriteEntity
 import su.sv.wiki.data.local.entity.HistoryEntity
 import su.sv.wiki.domain.model.WikiArticle
@@ -29,6 +31,7 @@ class WikiRepositoryImpl @Inject constructor(
     private val api: WikiApi,
     private val favoriteDao: FavoriteDao,
     private val historyDao: HistoryDao,
+    private val articleCacheDao: ArticleCacheDao,
     private val gson: Gson,
 ) : WikiRepository {
 
@@ -71,6 +74,14 @@ class WikiRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getArticle(title: String): WikiResult<WikiArticle> {
+        // Сначала проверяем кэш
+        val cachedArticle = articleCacheDao.getArticleByTitle(title)
+        if (cachedArticle != null) {
+            Timber.d("Article loaded from cache: $title")
+            return WikiResult.Success(cachedArticle.toDomain(gson))
+        }
+
+        // Если в кэше нет - загружаем из сети
         return try {
             val response = api.getPage(title = title)
 
@@ -104,17 +115,21 @@ class WikiRepositoryImpl @Inject constructor(
                 else -> {
                     val parseData = response.body()!!.parse!!
                     val htmlContent = parseData.text?.content.orEmpty()
-                    val title = parseData.title.orEmpty()
-                    WikiResult.Success(
-                        WikiArticle(
-                            title = title,
-                            pageId = parseData.pageId ?: 0,
-                            content = htmlContent,
-                            links = parseData.links?.map { it.toDomain() }.orEmpty(),
-                            externalLinks = parseExternalLinks(htmlContent),
-                            articleUrl = "https://svremya.su/${title.replace(" ", "_")}",
-                        )
+                    val articleTitle = parseData.title.orEmpty()
+                    val article = WikiArticle(
+                        title = articleTitle,
+                        pageId = parseData.pageId ?: 0,
+                        content = htmlContent,
+                        links = parseData.links?.map { it.toDomain() }.orEmpty(),
+                        externalLinks = parseExternalLinks(htmlContent),
+                        articleUrl = "https://svremya.su/${articleTitle.replace(" ", "_")}",
                     )
+
+                    // Сохраняем в кэш
+                    articleCacheDao.insertArticle(article.toCacheEntity(gson))
+                    Timber.d("Article cached: $articleTitle")
+
+                    WikiResult.Success(article)
                 }
             }
         } catch (e: Exception) {
@@ -250,6 +265,45 @@ class WikiRepositoryImpl @Inject constructor(
             externalLinks = gson.toJson(this.externalLinks),
             articleUrl = this.articleUrl,
             savedAt = System.currentTimeMillis(),
+        )
+    }
+
+    private fun ArticleCacheEntity.toDomain(gson: Gson): WikiArticle {
+        val linksType = object : TypeToken<List<WikiLink>>() {}.type
+        val externalLinksType = object : TypeToken<List<WikiExternalLink>>() {}.type
+
+        val links: List<WikiLink> = try {
+            gson.fromJson(this.links, linksType) ?: emptyList()
+        } catch (e: Exception) {
+            Timber.e(e, "Error parsing links from cache")
+            emptyList()
+        }
+
+        val externalLinks: List<WikiExternalLink> = try {
+            gson.fromJson(this.externalLinks, externalLinksType) ?: emptyList()
+        } catch (e: Exception) {
+            Timber.e(e, "Error parsing external links from cache")
+            emptyList()
+        }
+
+        return WikiArticle(
+            title = this.title,
+            pageId = 0,
+            content = this.content,
+            links = links,
+            externalLinks = externalLinks,
+            articleUrl = this.articleUrl,
+        )
+    }
+
+    private fun WikiArticle.toCacheEntity(gson: Gson): ArticleCacheEntity {
+        return ArticleCacheEntity(
+            title = this.title,
+            content = this.content,
+            links = gson.toJson(this.links),
+            externalLinks = gson.toJson(this.externalLinks),
+            articleUrl = this.articleUrl,
+            cachedAt = System.currentTimeMillis(),
         )
     }
 

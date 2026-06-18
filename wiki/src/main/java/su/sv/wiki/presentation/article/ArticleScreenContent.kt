@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,9 +19,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -48,6 +49,11 @@ fun ArticleScreenContent(
     val stackNavigation = LocalStackNavigation.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    // Загружаем статью при первом отображении
+    LaunchedEffect(articleTitle) {
+        viewModel.loadArticle(articleTitle)
+    }
 
     Scaffold(
         topBar = {
@@ -115,7 +121,7 @@ fun ArticleScreenContent(
             }
             is ArticleState.Error -> {
                 FullScreenError {
-                    viewModel.loadArticle(viewModel.articleTitle)
+                    viewModel.loadArticle(articleTitle)
                 }
             }
         }
@@ -167,7 +173,7 @@ private fun ArticleTopAppBar(
             if (articleUrl.isNotEmpty()) {
                 IconButton(onClick = { onExternalLinkClick(articleUrl) }) {
                     Icon(
-                        imageVector = Icons.Default.Share,
+                        painter = painterResource(R.drawable.ic_open_in_new),
                         contentDescription = stringResource(R.string.wiki_open_in_browser),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

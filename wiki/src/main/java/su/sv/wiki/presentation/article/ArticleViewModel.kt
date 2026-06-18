@@ -1,6 +1,5 @@
 package su.sv.wiki.presentation.article
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,19 +26,11 @@ class ArticleViewModel @Inject constructor(
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val mapper: UiWikiMapper,
-    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-
-    /** Название статьи из навигации */
-    val articleTitle: String = savedStateHandle.get<String>("title") ?: ""
 
     /** Состояние экрана */
     private val _state = MutableStateFlow<ArticleState>(ArticleState.Loading)
     val state: StateFlow<ArticleState> = _state.asStateFlow()
-
-    init {
-        loadArticle(articleTitle)
-    }
 
     /**
      * Загрузить статью
