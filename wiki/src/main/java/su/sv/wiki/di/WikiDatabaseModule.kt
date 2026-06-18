@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import su.sv.wiki.data.local.dao.ArticleCacheDao
 import su.sv.wiki.data.local.dao.FavoriteDao
 import su.sv.wiki.data.local.dao.HistoryDao
 import su.sv.wiki.data.local.database.WikiDatabase
@@ -36,5 +37,10 @@ internal object WikiDatabaseModule {
     @Provides
     fun provideHistoryDao(database: WikiDatabase): HistoryDao {
         return database.historyDao()
+    }
+
+    @Provides
+    fun provideArticleCacheDao(database: WikiDatabase): ArticleCacheDao {
+        return database.articleCacheDao()
     }
 }
