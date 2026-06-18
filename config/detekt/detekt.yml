@@ -1,0 +1,61 @@
+# Detekt configuration
+# Documentation: https://detekt.dev/docs/rules/introduction
+
+complexity:
+  LongMethod:
+    threshold: 60
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreDefaultParameters: true
+  ComplexCondition:
+    threshold: 5
+  CyclomaticComplexMethod:
+    threshold: 20
+    ignoreAnnotated: ['Composable']
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: true
+
+empty-blocks:
+  EmptyFunctionBlock:
+    ignoreOverridden: true
+
+exceptions:
+  TooGenericExceptionThrown:
+    active: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+  VariableNaming:
+    active: true
+  ClassNaming:
+    active: true
+
+performance:
+  ArrayPrimitive:
+    active: true
+
+style:
+  MaxLineLength:
+    maxLineLength: 120
+    ignoreAnnotated: ['Composable']
+  ForbiddenComment:
+    active: false
+  MagicNumber:
+    active: false
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview', 'Composable']
+  ReturnCount:
+    max: 4
+    excludeLabeled: false
+    excludeReturnFromLambda: true
+
+comments:
+  CommentOverPrivateFunction:
+    active: false
+  CommentOverPrivateProperty:
+    active: false
