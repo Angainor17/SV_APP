@@ -1,40 +1,161 @@
 # Wiki Module
 
-Модуль Wiki-страницы.
+Модуль Wiki-страницы для отображения статей с сайта svremya.su.
 
 ## Обзор
 
-Модуль `wiki` отображает Wiki-контент (Википедию или внутреннюю wiki).
+Модуль `wiki` предоставляет функционал:
+- Поиск статей с автодополнением
+- Просмотр статей с кликабельными ссылками
+- Избранное (сохранение статей)
+- История просмотра
+- Кэширование статей для офлайн-доступа
+
+## Навигация
+
+Используется библиотека **Modo** (`com.github.terrakok.modo`):
+- `RootWiki` — главный экран (точка входа)
+- `ArticleScreen` — экран статьи
+- `FavoritesScreen` — экран избранного
+
+## Архитектура
+
+```
+wiki/src/main/java/su/sv/wiki/
+├── data/                          # Data слой
+│   ├── api/                       # API клиент
+│   │   ├── WikiApi.kt             # Retrofit интерфейс
+│   │   └── model/                 # API модели
+│   ├── local/                     # Локальное хранилище (Room)
+│   │   ├── dao/                   # DAO интерфейсы
+│   │   │   ├── ArticleCacheDao.kt # Кэш статей
+│   │   │   ├── FavoriteDao.kt     # Избранное
+│   │   │   └── HistoryDao.kt      # История
+│   │   ├── database/              # База данных
+│   │   └── entity/                # Entity классы
+│   └── repository/                # Реализация репозитория
+│       └── WikiRepositoryImpl.kt
+├── domain/                        # Domain слой
+│   ├── model/                     # Доменные модели
+│   │   └── WikiArticle.kt
+│   ├── repository/                # Интерфейсы репозиториев
+│   │   └── WikiRepository.kt
+│   └── usecase/                   # Use Cases
+├── presentation/                  # Presentation слой
+│   ├── article/                   # Экран статьи
+│   │   ├── ArticleScreen.kt       # Modo Screen
+│   │   ├── ArticleScreenContent.kt
+│   │   └── ArticleViewModel.kt
+│   ├── favorites/                 # Экран избранного
+│   │   ├── FavoritesScreen.kt
+│   │   ├── FavoritesScreenContent.kt
+│   │   └── FavoritesViewModel.kt
+│   └── root/                      # Главный экран
+│       ├── mapper/                # Мапперы
+│       ├── model/                 # UI модели
+│       ├── ui/                    # UI компоненты
+│       │   ├── ArticleContent.kt  # Контент статьи с ссылками
+│       │   ├── ArticleView.kt     # Карточка статьи
+│       │   ├── HistoryList.kt     # Список истории
+│       │   ├── SearchSuggestions.kt
+│       │   └── WikiSearchBar.kt   # Поле поиска
+│       └── viewmodel/             # ViewModel
+│           ├── RootWikiViewModel.kt
+│           ├── actions/           # Действия (MVI)
+│           └── effects/           # Одноразовые эффекты
+├── di/                            # Dependency Injection
+│   ├── WikiApiModule.kt
+│   └── WikiDatabaseModule.kt
+└── root/
+    └── RootWiki.kt                # Точка входа
+```
 
 ## Основные компоненты
 
 ### RootWiki
-Главный экран Wiki:
-
+Главный экран Wiki с поиском и историей:
 ```kotlin
 @Composable
-fun RootWiki(
-    navController: NavHostController
+fun RootWiki(viewModel: RootWikiViewModel = hiltViewModel())
+```
+
+### ArticleScreen
+Экран статьи с кэшированием:
+```kotlin
+@Parcelize
+class ArticleScreen(private val title: String) : Screen
+```
+
+### FavoritesScreen
+Экран списка избранных статей:
+```kotlin
+@Parcelize
+class FavoritesScreen : Screen
+```
+
+## Кэширование статей
+
+Статьи автоматически кэшируются при первом просмотре:
+1. При запросе статьи сначала проверяется локальный кэш
+2. Если статьи нет в кэше — загружается из сети
+3. После успешной загрузки статья сохраняется в кэш
+
+Это позволяет открывать статьи из истории/избранного без сетевых запросов.
+
+## База данных (Room)
+
+**Таблицы:**
+- `article_cache` — кэш статей (контент, ссылки, URL)
+- `favorites` — избранные статьи
+- `history` — история поиска (только заголовки)
+
+**Версия БД:** 2
+
+## API
+
+Базовый URL: `https://svremya.su/`
+
+**Методы:**
+- `search()` — поиск статей
+- `getPage()` — получение статьи по заголовку
+- `openSearch()` — подсказки для поиска
+
+## Модели
+
+### WikiArticle (Domain)
+```kotlin
+data class WikiArticle(
+    val title: String,
+    val pageId: Int,
+    val content: String,           // HTML контент
+    val links: List<WikiLink>,     // Внутренние ссылки
+    val externalLinks: List<WikiExternalLink>, // Внешние ссылки
+    val articleUrl: String,        // URL на сайте
 )
 ```
 
-## Структура файлов
-
-```
-wiki/src/main/java/su/sv/wiki/
-└── root/
-    └── RootWiki.kt
+### UiWikiState (UI)
+```kotlin
+sealed class UiWikiState {
+    object Initial : UiWikiState()
+    object Loading : UiWikiState()
+    data class Content(...) : UiWikiState()
+    object NotFound : UiWikiState()
+    data class Error(...) : UiWikiState()
+}
 ```
 
 ## Правила разработки
 
-- **Все строки, видимые пользователю, должны быть вынесены в строковые ресурсы** (`strings.xml`)
-- Использовать `stringResource()` для получения строк в Compose
-- Для строк с параметрами использовать формат `%s` в ресурсах и передавать параметры в `stringResource(R.string.key, param)`
+- **Строковые ресурсы**: Все строки выносить в `strings.xml`
+- **MVI паттерн**: Actions → ViewModel → State/Efffects
+- **Кэширование**: Статьи кэшируются автоматически
+- **Клавиатура**: Скрывается при кликах вне поля ввода
 
-## Примечания
+## Используемые библиотеки
 
-Модуль минимален и может быть расширен для:
-- Отображения статей Wiki
-- Поиска по Wiki
-- Закладок и истории
+- **Modo** — навигация
+- **Hilt** — DI
+- **Room** — локальная база данных
+- **Retrofit** — API клиент
+- **Timber** — логирование
