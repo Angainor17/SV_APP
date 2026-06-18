@@ -8,6 +8,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -71,6 +74,7 @@ fun RootWiki(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val stackNavigation = LocalStackNavigation.current
+    val focusManager = LocalFocusManager.current
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -82,7 +86,13 @@ fun RootWiki(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding()),
+                .padding(bottom = paddingValues.calculateBottomPadding())
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    focusManager.clearFocus()
+                },
         ) {
             // Поле поиска с иконкой избранного
             Row(
@@ -97,6 +107,9 @@ fun RootWiki(
                     },
                     onQueryChanged = { query ->
                         viewModel.onAction(WikiActions.OnSearchQueryChanged(query))
+                    },
+                    onClearClick = {
+                        focusManager.clearFocus()
                     },
                     modifier = Modifier.weight(1f),
                 )
@@ -118,7 +131,10 @@ fun RootWiki(
                     ),
                 ) {
                     IconButton(
-                        onClick = { stackNavigation.forward(FavoritesScreen()) },
+                        onClick = {
+                            focusManager.clearFocus()
+                            stackNavigation.forward(FavoritesScreen())
+                        },
                         modifier = Modifier.padding(end = 8.dp),
                     ) {
                         Icon(
@@ -134,6 +150,7 @@ fun RootWiki(
             SearchSuggestions(
                 suggestions = suggestions,
                 onSuggestionClick = { title ->
+                    focusManager.clearFocus()
                     viewModel.onAction(WikiActions.OnSuggestionClick(title))
                 },
             )
@@ -145,6 +162,7 @@ fun RootWiki(
                     HistoryList(
                         history = history,
                         onItemClick = { title ->
+                            focusManager.clearFocus()
                             stackNavigation.forward(ArticleScreen(title = title))
                         },
                         onClearClick = {

@@ -26,6 +26,7 @@ import kotlin.time.Duration.Companion.milliseconds
  *
  * @param onSearch callback при поиске (вызывается через 1.5 сек после прекращения ввода)
  * @param onQueryChanged callback при изменении текста (для подсказок)
+ * @param onClearClick callback при нажатии на крестик (для скрытия клавиатуры)
  * @param minQueryLength минимальная длина запроса для поиска (по умолчанию 3)
  * @param debounceMillis задержка в миллисекундах (по умолчанию 1500)
  */
@@ -33,6 +34,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun WikiSearchBar(
     onSearch: (String) -> Unit,
     onQueryChanged: (String) -> Unit,
+    onClearClick: () -> Unit,
     modifier: Modifier = Modifier,
     minQueryLength: Int = 3,
     debounceMillis: Long = 1500L,
@@ -65,6 +67,7 @@ fun WikiSearchBar(
                 IconButton(onClick = {
                     searchText = ""
                     onQueryChanged("")
+                    onClearClick()
                 }) {
                     Icon(
                         imageVector = Icons.Default.Close,
