@@ -1,7 +1,9 @@
 package su.sv.main.bottomnav
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -18,9 +20,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,16 +35,21 @@ import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
 import su.sv.info.rootinfo.ui.RootInfo
 import su.sv.main.R
 import su.sv.main.Screens
+import su.sv.main.badge.BadgeViewModel
+import su.sv.main.badge.NewBadge
 import su.sv.main.res.BooksVector
 import su.sv.news.presentation.root.ui.RootNews
 import su.sv.wiki.root.RootWiki
 
 @Composable
-internal fun BottomNavigationBar() {
+internal fun BottomNavigationBar(
+    badgeViewModel: BadgeViewModel = hiltViewModel(),
+) {
     var navigationSelectedItem by remember {
         mutableIntStateOf(0)
     }
     val navController = rememberNavController()
+    val showWikiBadge by badgeViewModel.showWikiBadge.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -53,13 +63,17 @@ internal fun BottomNavigationBar() {
                                 Text(navigationItem.label)
                             },
                             icon = {
-                                Icon(
-                                    imageVector = navigationItem.icon,
-                                    contentDescription = navigationItem.label,
-                                    modifier = Modifier.size(24.dp),
+                                NavigationIcon(
+                                    icon = navigationItem.icon,
+                                    label = navigationItem.label,
+                                    showBadge = navigationItem.route == Screens.Wiki.route && showWikiBadge,
                                 )
                             },
                             onClick = {
+                                // Скрываем бейдж при клике на Wiki
+                                if (navigationItem.route == Screens.Wiki.route && showWikiBadge) {
+                                    badgeViewModel.markWikiAsVisited()
+                                }
                                 navigationSelectedItem = index
                                 navController.navigate(navigationItem.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
@@ -75,6 +89,28 @@ internal fun BottomNavigationBar() {
         },
     ) { paddingValues ->
         BottomNavHost(navController, paddingValues)
+    }
+}
+
+@Composable
+private fun NavigationIcon(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    showBadge: Boolean,
+) {
+    Box {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            modifier = Modifier.size(24.dp),
+        )
+        if (showBadge) {
+            NewBadge(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 4.dp, y = 4.dp),
+            )
+        }
     }
 }
 
