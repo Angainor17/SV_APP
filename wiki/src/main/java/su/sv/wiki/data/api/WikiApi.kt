@@ -41,6 +41,21 @@ interface WikiApi {
         @Query("format") format: String = "json",
     ): Response<ApiParseResponse>
 
+    /**
+     * Автодополнение поиска (OpenSearch)
+     * Возвращает JSON-массив: [query, titles[], descriptions[], urls[]]
+     * @param query поисковый запрос
+     * @param limit максимальное количество результатов (по умолчанию 5)
+     */
+    @GET("api.php")
+    suspend fun openSearch(
+        @Query("action") action: String = "opensearch",
+        @Query("search") query: String,
+        @Query("limit") limit: Int = 5,
+        @Query("format") format: String = "json",
+        @Query("utf8") utf8: String = "",
+    ): Response<List<Any?>>
+
     companion object {
         const val BASE_URL = "https://svremya.su/"
     }

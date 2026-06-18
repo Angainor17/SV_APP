@@ -14,6 +14,7 @@ import su.sv.wiki.domain.model.WikiArticle
 import su.sv.wiki.domain.model.WikiExternalLink
 import su.sv.wiki.domain.model.WikiLink
 import su.sv.wiki.domain.model.WikiSearchResult
+import su.sv.wiki.domain.model.WikiSearchSuggestion
 import su.sv.wiki.domain.repository.WikiRepository
 import su.sv.wiki.domain.repository.WikiResult
 import timber.log.Timber
@@ -120,6 +121,28 @@ class WikiRepositoryImpl @Inject constructor(
                 message = e.message ?: "Неизвестная ошибка",
                 code = "NETWORK_ERROR",
             )
+        }
+    }
+
+    override suspend fun getSearchSuggestions(query: String, limit: Int): List<WikiSearchSuggestion> {
+        return try {
+            if (query.length < 2) return emptyList()
+
+            val response = api.openSearch(query = query, limit = limit)
+
+            if (!response.isSuccessful || response.body() == null) {
+                return emptyList()
+            }
+
+            val body = response.body()!!
+            val titles = body.getOrNull(1) as? List<*> ?: return emptyList()
+
+            titles.mapNotNull { title ->
+                (title as? String)?.let { WikiSearchSuggestion(title = it) }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting search suggestions: $query")
+            emptyList()
         }
     }
 
