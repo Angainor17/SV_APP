@@ -11,6 +11,7 @@ import su.sv.wiki.data.local.dao.HistoryDao
 import su.sv.wiki.data.local.entity.FavoriteEntity
 import su.sv.wiki.data.local.entity.HistoryEntity
 import su.sv.wiki.domain.model.WikiArticle
+import su.sv.wiki.domain.model.WikiExternalLink
 import su.sv.wiki.domain.model.WikiLink
 import su.sv.wiki.domain.model.WikiSearchResult
 import su.sv.wiki.domain.repository.WikiRepository
@@ -101,12 +102,14 @@ class WikiRepositoryImpl @Inject constructor(
 
                 else -> {
                     val parseData = response.body()!!.parse!!
+                    val htmlContent = parseData.text?.content.orEmpty()
                     WikiResult.Success(
                         WikiArticle(
                             title = parseData.title.orEmpty(),
                             pageId = parseData.pageId ?: 0,
-                            content = parseData.text?.content.orEmpty(),
+                            content = htmlContent,
                             links = parseData.links?.map { it.toDomain() }.orEmpty(),
+                            externalLinks = parseExternalLinks(htmlContent),
                         )
                     )
                 }
@@ -174,10 +177,19 @@ class WikiRepositoryImpl @Inject constructor(
 
     private fun FavoriteEntity.toDomain(gson: Gson): WikiArticle {
         val linksType = object : TypeToken<List<WikiLink>>() {}.type
+        val externalLinksType = object : TypeToken<List<WikiExternalLink>>() {}.type
+
         val links: List<WikiLink> = try {
             gson.fromJson(this.links, linksType) ?: emptyList()
         } catch (e: Exception) {
             Timber.e(e, "Error parsing links from favorite")
+            emptyList()
+        }
+
+        val externalLinks: List<WikiExternalLink> = try {
+            gson.fromJson(this.externalLinks, externalLinksType) ?: emptyList()
+        } catch (e: Exception) {
+            Timber.e(e, "Error parsing external links from favorite")
             emptyList()
         }
 
@@ -186,6 +198,7 @@ class WikiRepositoryImpl @Inject constructor(
             pageId = 0, // Не храним pageId в избранном
             content = this.content,
             links = links,
+            externalLinks = externalLinks,
         )
     }
 
@@ -194,7 +207,24 @@ class WikiRepositoryImpl @Inject constructor(
             title = this.title,
             content = this.content,
             links = gson.toJson(this.links),
+            externalLinks = gson.toJson(this.externalLinks),
             savedAt = System.currentTimeMillis(),
         )
+    }
+
+    // ========== Парсинг HTML ==========
+
+    /**
+     * Извлекает внешние ссылки из HTML-контента
+     * Ищет теги <a> с class="external"
+     */
+    private fun parseExternalLinks(html: String): List<WikiExternalLink> {
+        val regex = """<a[^>]*class="external[^"]*"[^>]*href="([^"]+)"[^>]*>([^<]*)</a>""".toRegex()
+        return regex.findAll(html).map { match ->
+            WikiExternalLink(
+                url = match.groupValues[1],
+                text = match.groupValues[2].trim(),
+            )
+        }.filter { it.text.isNotEmpty() }.toList()
     }
 }
