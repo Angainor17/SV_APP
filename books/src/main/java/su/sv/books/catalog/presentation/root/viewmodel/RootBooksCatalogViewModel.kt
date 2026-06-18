@@ -173,10 +173,10 @@ class RootBooksCatalogViewModel @Inject constructor(
         }
     }
 
-    override fun showErrorSnack(textResId: Int) {
+    override fun showErrorSnack(resId: Int) {
         _oneTimeEffect.trySend(
             BooksListOneTimeEffect.ShowErrorSnackBar(
-                text = resourcesRepository.get().getString(textResId)
+                text = resourcesRepository.get().getString(resId)
             )
         )
     }
