@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "org.geometerplus"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -63,6 +63,7 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.material)
+//    implementation(libs.androidx.preference)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
