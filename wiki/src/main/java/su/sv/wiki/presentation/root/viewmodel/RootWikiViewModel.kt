@@ -146,6 +146,12 @@ class RootWikiViewModel @Inject constructor(
                                 exists = it.exists,
                             )
                         },
+                        externalLinks = currentState.article.externalLinks.map {
+                            su.sv.wiki.domain.model.WikiExternalLink(
+                                text = it.text,
+                                url = it.url,
+                            )
+                        },
                     ),
                 )
 

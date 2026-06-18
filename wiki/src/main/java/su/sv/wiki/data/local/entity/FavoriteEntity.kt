@@ -11,6 +11,7 @@ data class FavoriteEntity(
     @PrimaryKey
     val title: String,
     val content: String,           // HTML контент
-    val links: String,             // JSON строка со списком ссылок
+    val links: String,             // JSON строка со списком внутренних ссылок
+    val externalLinks: String,     // JSON строка со списком внешних ссылок
     val savedAt: Long,             // Timestamp сохранения
 )

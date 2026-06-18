@@ -30,7 +30,9 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import su.sv.wiki.R
+import su.sv.wiki.presentation.root.model.UiExternalLink
 import su.sv.wiki.presentation.root.model.UiWikiArticle
+import su.sv.wiki.presentation.root.model.UiWikiLink
 
 /**
  * Карточка статьи с кликабельными ссылками
@@ -40,6 +42,7 @@ fun ArticleView(
     article: UiWikiArticle,
     isFavorite: Boolean,
     onLinkClick: (String) -> Unit,
+    onExternalLinkClick: (String) -> Unit,
     onFavoriteClick: (String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -82,7 +85,9 @@ fun ArticleView(
             ArticleContent(
                 content = article.content,
                 links = article.links,
+                externalLinks = article.externalLinks,
                 onLinkClick = onLinkClick,
+                onExternalLinkClick = onExternalLinkClick,
             )
         }
     }
@@ -94,11 +99,19 @@ fun ArticleView(
 @Composable
 private fun ArticleContent(
     content: String,
-    links: List<su.sv.wiki.presentation.root.model.UiWikiLink>,
+    links: List<UiWikiLink>,
+    externalLinks: List<UiExternalLink>,
     onLinkClick: (String) -> Unit,
+    onExternalLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val annotatedContent = buildAnnotatedContent(content, links, onLinkClick)
+    val annotatedContent = buildAnnotatedContent(
+        htmlContent = content,
+        links = links,
+        externalLinks = externalLinks,
+        onLinkClick = onLinkClick,
+        onExternalLinkClick = onExternalLinkClick,
+    )
 
     SelectionContainer {
         Text(
@@ -117,8 +130,10 @@ private fun ArticleContent(
 @Composable
 private fun buildAnnotatedContent(
     htmlContent: String,
-    links: List<su.sv.wiki.presentation.root.model.UiWikiLink>,
+    links: List<UiWikiLink>,
+    externalLinks: List<UiExternalLink>,
     onLinkClick: (String) -> Unit,
+    onExternalLinkClick: (String) -> Unit,
 ): AnnotatedString {
     return buildAnnotatedString {
         // Убираем HTML теги и оставляем текст
@@ -131,23 +146,82 @@ private fun buildAnnotatedContent(
             .replace("&quot;", "\"")
             .trim()
 
-        // Добавляем текст с кликабельными ссылками
-        var currentIndex = 0
-        val sortedLinks = links.sortedBy { plainText.indexOf(it.text, ignoreCase = true) }
+        // Собираем все позиции ссылок (внутренние и внешние)
+        data class LinkPosition(
+            val startIndex: Int,
+            val endIndex: Int,
+            val isExternal: Boolean,
+            val url: String = "",
+            val targetTitle: String = "",
+        )
 
-        for (link in sortedLinks) {
-            val linkText = link.text
-            val startIndex = plainText.indexOf(linkText, currentIndex, ignoreCase = true)
+        val linkPositions = mutableListOf<LinkPosition>()
 
+        // Находим позиции внутренних ссылок
+        for (link in links) {
+            val startIndex = plainText.indexOf(link.text, ignoreCase = true)
             if (startIndex >= 0) {
-                // Добавляем текст до ссылки
-                if (startIndex > currentIndex) {
-                    append(plainText.substring(currentIndex, startIndex))
-                }
+                linkPositions.add(
+                    LinkPosition(
+                        startIndex = startIndex,
+                        endIndex = startIndex + link.text.length,
+                        isExternal = false,
+                        targetTitle = link.targetTitle,
+                    )
+                )
+            }
+        }
 
-                // Добавляем ссылку с помощью LinkAnnotation
-                withLink(LinkAnnotation.Clickable(tag = link.targetTitle) {
-                    onLinkClick(link.targetTitle)
+        // Находим позиции внешних ссылок
+        for (link in externalLinks) {
+            val startIndex = plainText.indexOf(link.text, ignoreCase = true)
+            if (startIndex >= 0) {
+                linkPositions.add(
+                    LinkPosition(
+                        startIndex = startIndex,
+                        endIndex = startIndex + link.text.length,
+                        isExternal = true,
+                        url = link.url,
+                    )
+                )
+            }
+        }
+
+        // Сортируем по позиции
+        linkPositions.sortBy { it.startIndex }
+
+        // Строим текст с ссылками
+        var currentIndex = 0
+
+        for (linkPos in linkPositions) {
+            // Пропускаем пересекающиеся ссылки
+            if (linkPos.startIndex < currentIndex) continue
+
+            // Добавляем текст до ссылки
+            if (linkPos.startIndex > currentIndex) {
+                append(plainText.substring(currentIndex, linkPos.startIndex))
+            }
+
+            val linkText = plainText.substring(linkPos.startIndex, linkPos.endIndex)
+
+            if (linkPos.isExternal) {
+                // Внешняя ссылка - открываем в браузере
+                withLink(LinkAnnotation.Clickable(tag = linkPos.url) {
+                    onExternalLinkClick(linkPos.url)
+                }) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                        ),
+                    ) {
+                        append(linkText)
+                    }
+                }
+            } else {
+                // Внутренняя ссылка - открываем статью
+                withLink(LinkAnnotation.Clickable(tag = linkPos.targetTitle) {
+                    onLinkClick(linkPos.targetTitle)
                 }) {
                     withStyle(
                         style = SpanStyle(
@@ -158,9 +232,9 @@ private fun buildAnnotatedContent(
                         append(linkText)
                     }
                 }
-
-                currentIndex = startIndex + linkText.length
             }
+
+            currentIndex = linkPos.endIndex
         }
 
         // Добавляем оставшийся текст

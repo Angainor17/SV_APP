@@ -1,5 +1,6 @@
 package su.sv.wiki.root
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -47,6 +49,7 @@ fun RootWiki(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsState(initial = emptyList())
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -94,6 +97,10 @@ fun RootWiki(
                         isFavorite = currentState.isFavorite,
                         onLinkClick = { title ->
                             viewModel.onAction(WikiActions.OnLinkClick(title))
+                        },
+                        onExternalLinkClick = { url ->
+                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                            context.startActivity(intent)
                         },
                         onFavoriteClick = { title, isFavorite ->
                             if (isFavorite) {
