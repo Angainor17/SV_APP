@@ -16,6 +16,7 @@ import su.sv.wiki.domain.usecase.AddHistoryUseCase
 import su.sv.wiki.domain.usecase.ClearHistoryUseCase
 import su.sv.wiki.domain.usecase.GetArticleUseCase
 import su.sv.wiki.domain.usecase.GetHistoryUseCase
+import su.sv.wiki.domain.usecase.GetSearchSuggestionsUseCase
 import su.sv.wiki.domain.usecase.IsFavoriteUseCase
 import su.sv.wiki.domain.usecase.RemoveFavoriteUseCase
 import su.sv.wiki.domain.usecase.SearchArticleUseCase
@@ -39,12 +40,17 @@ class RootWikiViewModel @Inject constructor(
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
+    private val getSearchSuggestionsUseCase: GetSearchSuggestionsUseCase,
     private val mapper: UiWikiMapper,
 ) : BaseViewModel(), WikiActionsHandler {
 
     /** Состояние экрана */
     private val _state = MutableStateFlow<UiWikiState>(UiWikiState.Initial)
     val state: StateFlow<UiWikiState> = _state.asStateFlow()
+
+    /** Подсказки поиска */
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
     /** История поиска */
     val history: Flow<List<String>> = getHistoryUseCase()
@@ -66,21 +72,43 @@ class RootWikiViewModel @Inject constructor(
             is WikiActions.OnClearHistory -> onClearHistory()
             is WikiActions.OnRetryClick -> onRetry()
             is WikiActions.OnCloseArticle -> onCloseArticle()
+            is WikiActions.OnSearchQueryChanged -> onSearchQueryChanged(action.query)
+            is WikiActions.OnSuggestionClick -> onSuggestionClick(action.title)
         }
+    }
+
+    private fun onSearchQueryChanged(query: String) {
+        viewModelScope.launch {
+            if (query.length >= 2) {
+                val suggestions = getSearchSuggestionsUseCase.execute(query)
+                _suggestions.value = suggestions.map { it.title }
+            } else {
+                _suggestions.value = emptyList()
+            }
+        }
+    }
+
+    private fun onSuggestionClick(title: String) {
+        _suggestions.value = emptyList()
+        currentQuery = title
+        loadArticle(title)
     }
 
     private fun onSearch(query: String) {
         if (query.isBlank()) return
 
+        _suggestions.value = emptyList()
         currentQuery = query
         searchAndLoadArticle(query)
     }
 
     private fun onLinkClick(title: String) {
+        _suggestions.value = emptyList()
         loadArticle(title)
     }
 
     private fun onHistoryItemClick(title: String) {
+        _suggestions.value = emptyList()
         currentQuery = title
         loadArticle(title)
     }

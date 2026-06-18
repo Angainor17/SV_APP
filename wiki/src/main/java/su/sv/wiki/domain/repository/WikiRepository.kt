@@ -3,6 +3,7 @@ package su.sv.wiki.domain.repository
 import kotlinx.coroutines.flow.Flow
 import su.sv.wiki.domain.model.WikiArticle
 import su.sv.wiki.domain.model.WikiSearchResult
+import su.sv.wiki.domain.model.WikiSearchSuggestion
 
 /**
  * Результат операции
@@ -33,6 +34,14 @@ interface WikiRepository {
      * @return статья или ошибка
      */
     suspend fun getArticle(title: String): WikiResult<WikiArticle>
+
+    /**
+     * Получение подсказок для поиска (автодополнение)
+     * @param query поисковый запрос
+     * @param limit максимальное количество подсказок
+     * @return список подсказок
+     */
+    suspend fun getSearchSuggestions(query: String, limit: Int = 5): List<WikiSearchSuggestion>
 
     // ========== Локальные операции (избранное) ==========
 

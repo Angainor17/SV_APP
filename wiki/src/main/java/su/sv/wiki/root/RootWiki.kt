@@ -34,6 +34,7 @@ import su.sv.wiki.R
 import su.sv.wiki.presentation.root.model.UiWikiState
 import su.sv.wiki.presentation.root.ui.ArticleView
 import su.sv.wiki.presentation.root.ui.HistoryList
+import su.sv.wiki.presentation.root.ui.SearchSuggestions
 import su.sv.wiki.presentation.root.ui.WikiSearchBar
 import su.sv.wiki.presentation.root.viewmodel.RootWikiViewModel
 import su.sv.wiki.presentation.root.viewmodel.actions.WikiActions
@@ -48,6 +49,7 @@ fun RootWiki(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsState(initial = emptyList())
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -69,6 +71,17 @@ fun RootWiki(
                     if (query.length >= 3) {
                         viewModel.onAction(WikiActions.OnSearch(query))
                     }
+                },
+                onQueryChanged = { query ->
+                    viewModel.onAction(WikiActions.OnSearchQueryChanged(query))
+                },
+            )
+
+            // Подсказки поиска
+            SearchSuggestions(
+                suggestions = suggestions,
+                onSuggestionClick = { title ->
+                    viewModel.onAction(WikiActions.OnSuggestionClick(title))
                 },
             )
 

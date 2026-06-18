@@ -35,3 +35,10 @@ data class WikiSearchResult(
     val pageId: Int,
     val snippet: String,
 )
+
+/**
+ * Подсказка для поиска (автодополнение)
+ */
+data class WikiSearchSuggestion(
+    val title: String,             // Название статьи
+)

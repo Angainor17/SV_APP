@@ -25,12 +25,14 @@ import kotlin.time.Duration.Companion.milliseconds
  * Поле поиска статей с debounce
  *
  * @param onSearch callback при поиске (вызывается через 1.5 сек после прекращения ввода)
+ * @param onQueryChanged callback при изменении текста (для подсказок)
  * @param minQueryLength минимальная длина запроса для поиска (по умолчанию 3)
  * @param debounceMillis задержка в миллисекундах (по умолчанию 1500)
  */
 @Composable
 fun WikiSearchBar(
     onSearch: (String) -> Unit,
+    onQueryChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
     minQueryLength: Int = 3,
     debounceMillis: Long = 1500L,
@@ -49,6 +51,7 @@ fun WikiSearchBar(
         value = searchText,
         onValueChange = { newText ->
             searchText = newText
+            onQueryChanged(newText)
         },
         label = {
             Text(stringResource(R.string.wiki_search_label))
@@ -59,7 +62,10 @@ fun WikiSearchBar(
         singleLine = true,
         trailingIcon = {
             if (searchText.isNotEmpty()) {
-                IconButton(onClick = { searchText = "" }) {
+                IconButton(onClick = {
+                    searchText = ""
+                    onQueryChanged("")
+                }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.wiki_search_clear),

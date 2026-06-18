@@ -8,6 +8,12 @@ sealed class WikiActions {
     /** Поиск статьи */
     data class OnSearch(val query: String) : WikiActions()
 
+    /** Изменение текста поиска (для подсказок) */
+    data class OnSearchQueryChanged(val query: String) : WikiActions()
+
+    /** Нажатие на подсказку */
+    data class OnSuggestionClick(val title: String) : WikiActions()
+
     /** Нажатие на ссылку в тексте статьи */
     data class OnLinkClick(val title: String) : WikiActions()
 
