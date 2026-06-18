@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -21,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import su.sv.wiki.R
@@ -94,44 +98,27 @@ private fun ArticleContent(
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val annotatedContent = buildAnnotatedContent(content, links)
+    val annotatedContent = buildAnnotatedContent(content, links, onLinkClick)
 
-    ClickableText(
-        text = annotatedContent,
-        style = MaterialTheme.typography.bodyLarge.copy(
-            color = MaterialTheme.colorScheme.onSurface,
-        ),
-        modifier = modifier,
-        onClick = { offset ->
-            // Проверяем, был ли клик по ссылке
-            links.forEach { link ->
-                val linkText = link.text
-                val plainText = content
-                    .replace(Regex("<[^>]*>"), "")
-                    .replace("&nbsp;", " ")
-                    .replace("&amp;", "&")
-                    .replace("&lt;", "<")
-                    .replace("&gt;", ">")
-                    .replace("&quot;", "\"")
-                    .trim()
-
-                val startIndex = plainText.indexOf(linkText, ignoreCase = true)
-                if (startIndex >= 0 && offset in startIndex until (startIndex + linkText.length)) {
-                    onLinkClick(link.targetTitle)
-                    return@ClickableText
-                }
-            }
-        },
-    )
+    SelectionContainer {
+        Text(
+            text = annotatedContent,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+            ),
+            modifier = modifier.verticalScroll(rememberScrollState()),
+        )
+    }
 }
 
 /**
- * Создаёт AnnotatedString из HTML с подсвеченными ссылками
+ * Создаёт AnnotatedString из HTML с кликабельными ссылками
  */
 @Composable
 private fun buildAnnotatedContent(
     htmlContent: String,
     links: List<su.sv.wiki.presentation.root.model.UiWikiLink>,
+    onLinkClick: (String) -> Unit,
 ): AnnotatedString {
     return buildAnnotatedString {
         // Убираем HTML теги и оставляем текст
@@ -144,7 +131,7 @@ private fun buildAnnotatedContent(
             .replace("&quot;", "\"")
             .trim()
 
-        // Добавляем текст с подсвеченными ссылками
+        // Добавляем текст с кликабельными ссылками
         var currentIndex = 0
         val sortedLinks = links.sortedBy { plainText.indexOf(it.text, ignoreCase = true) }
 
@@ -158,14 +145,18 @@ private fun buildAnnotatedContent(
                     append(plainText.substring(currentIndex, startIndex))
                 }
 
-                // Добавляем ссылку
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
-                    ),
-                ) {
-                    append(linkText)
+                // Добавляем ссылку с помощью LinkAnnotation
+                withLink(LinkAnnotation.Clickable(tag = link.targetTitle) {
+                    onLinkClick(link.targetTitle)
+                }) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                        ),
+                    ) {
+                        append(linkText)
+                    }
                 }
 
                 currentIndex = startIndex + linkText.length

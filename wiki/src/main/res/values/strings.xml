@@ -3,10 +3,12 @@
     <!-- Поиск -->
     <string name="wiki_search_label">Поиск</string>
     <string name="wiki_search_placeholder">Введите слово или фразу…</string>
+    <string name="wiki_search_clear">Очистить поиск</string>
 
     <!-- Состояния -->
     <string name="wiki_loading">Загрузка…</string>
     <string name="wiki_not_found">Ничего не найдено</string>
+    <string name="wiki_not_found_hint">Попробуйте изменить запрос</string>
     <string name="wiki_error">Произошла ошибка</string>
     <string name="wiki_retry">Повторить</string>
 
