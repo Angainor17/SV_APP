@@ -34,12 +34,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.wiki.R
 import su.sv.wiki.presentation.article.ArticleScreen
 
@@ -203,4 +205,49 @@ private fun ClearFavoritesDialog(
             }
         },
     )
+}
+
+// ============================================
+// Preview
+// ============================================
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun FavoriteItemPreview() {
+    SVAPPTheme {
+        FavoriteItem(
+            title = "Государство и революция",
+            onClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun EmptyFavoritesPreview() {
+    SVAPPTheme {
+        EmptyFavorites(
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun ClearFavoritesDialogPreview() {
+    SVAPPTheme {
+        ClearFavoritesDialog(
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
 }

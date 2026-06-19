@@ -19,9 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.wiki.R
+import su.sv.wiki.presentation.root.model.UiExternalLink
 import su.sv.wiki.presentation.root.model.UiWikiArticle
+import su.sv.wiki.presentation.root.model.UiWikiLink
 
 /**
  * Карточка статьи с кликабельными ссылками
@@ -79,5 +83,66 @@ fun ArticleView(
                 onExternalLinkClick = onExternalLinkClick,
             )
         }
+    }
+}
+
+// ============================================
+// Preview
+// ============================================
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun ArticleViewPreview() {
+    SVAPPTheme {
+        ArticleView(
+            article = UiWikiArticle(
+                title = "Государство и революция",
+                content = "Государство и революция — работа В. И. Ленина, написанная в 1917 году.",
+                links = listOf(
+                    UiWikiLink(
+                        text = "Ленина",
+                        targetTitle = "Ленин",
+                        exists = true,
+                    ),
+                ),
+                externalLinks = listOf(
+                    UiExternalLink(
+                        text = "марксистское",
+                        url = "https://ru.wikipedia.org/wiki/Марксизм",
+                    ),
+                ),
+                articleUrl = "https://svremya.su/wiki/Государство_и_революция",
+            ),
+            isFavorite = true,
+            onLinkClick = {},
+            onExternalLinkClick = {},
+            onFavoriteClick = { _, _ -> },
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun ArticleViewNotFavoritePreview() {
+    SVAPPTheme {
+        ArticleView(
+            article = UiWikiArticle(
+                title = "Государство и революция",
+                content = "Государство и революция — работа В. И. Ленина, написанная в 1917 году.",
+                links = emptyList(),
+                externalLinks = emptyList(),
+                articleUrl = "",
+            ),
+            isFavorite = false,
+            onLinkClick = {},
+            onExternalLinkClick = {},
+            onFavoriteClick = { _, _ -> },
+        )
     }
 }

@@ -24,7 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import su.sv.commonui.theme.SVAPPTheme
 
 /**
  * Список подсказок поиска с анимацией
@@ -113,6 +115,57 @@ private fun SuggestionItem(
                 .height(1.dp)
                 .padding(start = 52.dp)
                 .background(MaterialTheme.colorScheme.outlineVariant),
+        )
+    }
+}
+
+// ============================================
+// Preview
+// ============================================
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun SearchSuggestionsPreview() {
+    SVAPPTheme {
+        SearchSuggestions(
+            suggestions = listOf(
+                "Государство",
+                "Государство и революция",
+                "Государственный строй",
+            ),
+            onSuggestionClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun SearchSuggestionsEmptyPreview() {
+    SVAPPTheme {
+        SearchSuggestions(
+            suggestions = emptyList(),
+            onSuggestionClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun SuggestionItemPreview() {
+    SVAPPTheme {
+        SuggestionItem(
+            text = "Государство и революция",
+            onClick = {},
+            showDivider = true,
         )
     }
 }
