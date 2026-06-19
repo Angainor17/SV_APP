@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.FullScreenLoading
 import su.sv.wiki.R
@@ -204,6 +206,59 @@ private fun NotFoundContent(modifier: Modifier = Modifier) {
             text = stringResource(R.string.wiki_not_found_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+// ============================================
+// Preview
+// ============================================
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun ArticleTopAppBarPreview() {
+    SVAPPTheme {
+        ArticleTopAppBar(
+            title = "Государство и революция",
+            isFavorite = true,
+            articleUrl = "https://svremya.su/wiki/Государство_и_революция",
+            onBackClick = {},
+            onFavoriteClick = {},
+            onExternalLinkClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun ArticleTopAppBarNotFavoritePreview() {
+    SVAPPTheme {
+        ArticleTopAppBar(
+            title = "Государство и революция",
+            isFavorite = false,
+            articleUrl = "https://svremya.su/wiki/Государство_и_революция",
+            onBackClick = {},
+            onFavoriteClick = {},
+            onExternalLinkClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun NotFoundContentPreview() {
+    SVAPPTheme {
+        NotFoundContent(
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

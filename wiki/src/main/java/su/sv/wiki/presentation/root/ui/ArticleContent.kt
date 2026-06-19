@@ -1,5 +1,6 @@
 package su.sv.wiki.presentation.root.ui
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -13,6 +14,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.wiki.presentation.root.model.UiExternalLink
 import su.sv.wiki.presentation.root.model.UiWikiLink
 
@@ -157,5 +161,40 @@ private fun buildAnnotatedContent(
 
     if (currentIndex < plainText.length) {
         append(plainText.substring(currentIndex))
+    }
+}
+
+// ============================================
+// Preview
+// ============================================
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun ArticleContentPreview() {
+    SVAPPTheme {
+        ArticleContent(
+            content = "Государство и революция — работа В. И. Ленина, написанная в 1917 году. " +
+                "В этом труде Ленин развивает марксистское учение о государстве и определяет " +
+                "задачи пролетариата в революции.",
+            links = listOf(
+                UiWikiLink(
+                    text = "Ленина",
+                    targetTitle = "Ленин",
+                    exists = true,
+                ),
+            ),
+            externalLinks = listOf(
+                UiExternalLink(
+                    text = "марксистское",
+                    url = "https://ru.wikipedia.org/wiki/Марксизм",
+                ),
+            ),
+            onLinkClick = {},
+            onExternalLinkClick = {},
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }

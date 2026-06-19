@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.wiki.R
 
 /**
@@ -126,5 +128,68 @@ private fun EmptyHistory(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+// ============================================
+// Preview
+// ============================================
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun HistoryListPreview() {
+    SVAPPTheme {
+        HistoryList(
+            history = listOf(
+                "Государство и революция",
+                "Ленин",
+                "Октябрьская революция",
+            ),
+            onItemClick = {},
+            onClearClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun HistoryListEmptyPreview() {
+    SVAPPTheme {
+        HistoryList(
+            history = emptyList(),
+            onItemClick = {},
+            onClearClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun HistoryItemPreview() {
+    SVAPPTheme {
+        HistoryItem(
+            title = "Государство и революция",
+            onClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun EmptyHistoryPreview() {
+    SVAPPTheme {
+        EmptyHistory()
     }
 }
