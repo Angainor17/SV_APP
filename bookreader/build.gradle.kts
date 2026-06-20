@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-parcelize")
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -25,6 +26,7 @@ dependencies {
 
     // Модули-фичи
     implementation(project(":managers"))
+    implementation(project(":commonui"))
     implementation(project(":fbreader")) {
         exclude("org.apache.httpcomponents", "httpmime")
     }
@@ -38,6 +40,12 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
+
+    // Navigation (Modo)
+    implementation(libs.modo.compose)
+
+    // DI
+    implementation(libs.androidx.hilt.navigation.compose)
 
     implementation("com.github.axet:android-library:1.35.21") {
         exclude("org.apache.httpcomponents", "httpmime")

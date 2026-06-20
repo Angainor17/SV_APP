@@ -1,5 +1,9 @@
 <resources>
     <string name="reader_app_name">Книги</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="theme_system">Системная</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_light">Светлая</string>
 
     <string-array name="viewmode_text">
         <item>@string/view_mode_paging</item>

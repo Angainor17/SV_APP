@@ -1,11 +1,12 @@
 package su.sv.app
 
+import android.app.Application
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
-import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.BookReaderInitializer
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.hilt.android.HiltAndroidApp
 import okio.Path.Companion.toOkioPath
@@ -18,11 +19,18 @@ import ru.ok.tracer.heap.dumps.HeapDumpConfiguration
 import timber.log.Timber
 
 @HiltAndroidApp
-class SvApp : BookApplication(), SingletonImageLoader.Factory, HasTracerConfiguration {
+class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguration {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidThreeTen.init(this);
+
+        // Инициализация BookReader
+        BookReaderInitializer.init(this)
+
+        // Инициализация ThreeTenABP
+        AndroidThreeTen.init(this)
+
+        // Инициализация логирования
         Timber.plant(Timber.DebugTree())
     }
 
