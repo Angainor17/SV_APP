@@ -38,6 +38,9 @@ class ReaderViewModel @Inject constructor(
     // Ссылка на FBReaderView (управляется из Compose)
     var fbReaderView: FBReaderView? = null
 
+    // Сохранённая позиция для восстановления при пересоздании FBReaderView
+    private var savedPosition: FBReaderView.ZLTextIndexPosition? = null
+
     // Настройки
     private val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -159,6 +162,9 @@ class ReaderViewModel @Inject constructor(
         val fbBook = fb.book ?: return
 
         try {
+            // Сохраняем позицию для восстановления при пересоздании FBReaderView
+            savedPosition = fb.position as? FBReaderView.ZLTextIndexPosition
+
             val save = Storage.RecentInfo(fbBook.info)
             save.position = fb.position
 
@@ -196,6 +202,11 @@ class ReaderViewModel @Inject constructor(
             Timber.e(e, "Failed to save position")
         }
     }
+
+    /**
+     * Получить сохранённую позицию для восстановления при пересоздании FBReaderView
+     */
+    fun getSavedPosition(): FBReaderView.ZLTextIndexPosition? = savedPosition
 
     // ==================== Навигация ====================
 

@@ -82,10 +82,13 @@ fun ReaderContent(
     var fbReaderView by remember { mutableStateOf<FBReaderView?>(null) }
     var isLoaded by remember { mutableStateOf(false) }
 
-    // Загрузка книги при первом отображении
+    // Загрузка книги только если ещё не загружена
     LaunchedEffect(bookUri) {
-        val position = initialPosition as? FBReaderView.ZLTextIndexPosition
-        viewModel.onAction(ReaderActions.LoadBook(bookUri, position))
+        // Проверяем, что книга ещё не загружена в ViewModel
+        if (viewModel.getCurrentBook() == null) {
+            val position = initialPosition as? FBReaderView.ZLTextIndexPosition
+            viewModel.onAction(ReaderActions.LoadBook(bookUri, position))
+        }
     }
 
     // Обработка батареи
@@ -94,11 +97,12 @@ fun ReaderContent(
     // Обработка клавиш громкости
     VolumeKeysHandler(fbReaderView, viewModel)
 
-    // Сохранение позиции при выходе
+    // Сохранение позиции при уходе с экрана (не закрываем книгу!)
     DisposableEffect(Unit) {
         onDispose {
             viewModel.savePosition()
-            viewModel.closeBook()
+            // НЕ вызываем closeBook() - книга должна оставаться открытой
+            // closeBook() вызовется в ViewModel.onCleared() при уничтожении ViewModel
         }
     }
 
