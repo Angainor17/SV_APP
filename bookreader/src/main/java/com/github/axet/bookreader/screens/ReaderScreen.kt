@@ -8,6 +8,7 @@ import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
 import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
@@ -34,6 +35,9 @@ class ReaderScreen(
             ReaderContent(
                 bookUri = bookUri,
                 initialPosition = position,
+                onNavigateBack = {
+                    stackNavigation.back()
+                },
                 onNavigateToSettings = {
                     stackNavigation.forward(ReaderSettingsScreen())
                 },

@@ -53,11 +53,6 @@ sealed class ReaderActions {
     object ToggleViewMode : ReaderActions()
 
     /**
-     * Переключить RTL режим
-     */
-    object ToggleRtl : ReaderActions()
-
-    /**
      * Переключить Reflow режим (для PDF)
      */
     object ToggleReflow : ReaderActions()
@@ -83,13 +78,6 @@ sealed class ReaderActions {
      * Скрыть все диалоги
      */
     object HideDialogs : ReaderActions()
-
-    // === TTS ===
-
-    /**
-     * Переключить Text-to-Speech
-     */
-    object ToggleTts : ReaderActions()
 
     // === Закладки ===
 

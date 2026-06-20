@@ -64,7 +64,6 @@ class ReaderViewModel @Inject constructor(
             // Отображение
             ReaderActions.ToggleFullscreen -> toggleFullscreen()
             ReaderActions.ToggleViewMode -> toggleViewMode()
-            ReaderActions.ToggleRtl -> toggleRtl()
             ReaderActions.ToggleReflow -> toggleReflow()
 
             // Диалоги
@@ -72,9 +71,6 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.ToggleBookmarks -> toggleBookmarks()
             ReaderActions.ToggleFontSettings -> toggleFontSettings()
             ReaderActions.HideDialogs -> hideDialogs()
-
-            // TTS
-            ReaderActions.ToggleTts -> toggleTts()
 
             // Закладки
             is ReaderActions.AddBookmark -> addBookmark(action.bookmark)
@@ -101,6 +97,29 @@ class ReaderViewModel @Inject constructor(
             _state.value = ReaderState.Loading
 
             try {
+                // Проверяем доступность файла
+                val inputStream = try {
+                    context.contentResolver.openInputStream(uri)
+                } catch (e: SecurityException) {
+                    Timber.e(e, "Security exception accessing file: $uri")
+                    _state.value = ReaderState.Error(
+                        "Нет доступа к файлу. Файл был перемещён или удалён. Попробуйте скачать книгу заново."
+                    )
+                    return@launch
+                } catch (e: Exception) {
+                    Timber.e(e, "Error accessing file: $uri")
+                    null
+                }
+
+                if (inputStream == null) {
+                    _state.value = ReaderState.Error(
+                        "Файл не найден или недоступен. Попробуйте скачать книгу заново."
+                    )
+                    return@launch
+                }
+
+                inputStream.close()
+
                 // Загружаем информацию о книге
                 currentBook = storage.load(uri)
 
@@ -119,7 +138,15 @@ class ReaderViewModel @Inject constructor(
                 Timber.d("Book loaded: ${currentBook?.info?.title}")
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load book")
-                _state.value = ReaderState.Error(e.message ?: "Unknown error")
+                val errorMessage = when {
+                    e.message?.contains("EACCES") == true ->
+                        "Нет доступа к файлу. Попробуйте скачать книгу заново."
+                    e.message?.contains("ENOENT") == true ||
+                    e.message?.contains("No such file") == true ->
+                        "Файл не найден. Попробуйте скачать книгу заново."
+                    else -> e.message ?: "Не удалось открыть книгу"
+                }
+                _state.value = ReaderState.Error(errorMessage)
             }
         }
     }
@@ -211,15 +238,6 @@ class ReaderViewModel @Inject constructor(
         _state.value = currentState.copy(viewMode = newMode)
     }
 
-    private fun toggleRtl() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        fbReaderView?.app?.BookTextView?.let { view ->
-            view.rtlMode = !view.rtlMode
-            fbReaderView?.reset()
-        }
-        _state.value = currentState.copy(rtlMode = !currentState.rtlMode)
-    }
-
     private fun toggleReflow() {
         val currentState = _state.value as? ReaderState.Content ?: return
         fbReaderView?.setReflow(!fbReaderView!!.isReflow)
@@ -262,22 +280,6 @@ class ReaderViewModel @Inject constructor(
             showBookmarks = false,
             showFontSettings = false
         )
-    }
-
-    // ==================== TTS ====================
-
-    private fun toggleTts() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        val fb = fbReaderView ?: return
-
-        if (fb.tts != null) {
-            fb.tts?.dismiss()
-            fb.tts = null
-            _state.value = currentState.copy(ttsEnabled = false)
-        } else {
-            fb.ttsOpen()
-            _state.value = currentState.copy(ttsEnabled = true)
-        }
     }
 
     // ==================== Закладки ====================

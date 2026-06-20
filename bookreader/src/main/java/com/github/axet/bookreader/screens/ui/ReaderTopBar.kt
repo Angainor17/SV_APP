@@ -99,26 +99,6 @@ fun ReaderTopBar(
                     },
                 )
 
-                // RTL mode
-                if (state.rtlMode || true) { // Show always for now
-                    DropdownMenuItem(
-                        text = { Text(if (state.rtlMode) "LTR mode" else "RTL mode") },
-                        onClick = {
-                            onAction(ReaderActions.ToggleRtl)
-                            showMenu = false
-                        },
-                    )
-                }
-
-                // TTS
-                DropdownMenuItem(
-                    text = { Text(if (state.ttsEnabled) "Stop TTS" else "Text-to-Speech") },
-                    onClick = {
-                        onAction(ReaderActions.ToggleTts)
-                        showMenu = false
-                    },
-                )
-
                 // Reflow (for PDF)
                 DropdownMenuItem(
                     text = { Text(if (state.isReflow) "Original layout" else "Reflow text") },
