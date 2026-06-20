@@ -5,3 +5,4 @@
 - [BookReader Migration Plan](bookreader-migration-plan.md) — поэтапный план миграции BookReader в основное приложение
 - [BookReader Migration Notes](bookreader-migration-notes.md) — заметки по выполненным этапам 1-4, текущая структура, TODO для этапа 5
 - [BookReader Migration Complete](bookreader-migration-complete.md) — завершение миграции (этап 5), результаты и оставшиеся задачи
+- [BookReader Post-Migration Fixes](bookreader-post-migration-fixes.md) — исправление 8 багов после миграции, включая улучшенный поиск файлов на Android 10+

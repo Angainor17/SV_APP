@@ -10,18 +10,35 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Parcelable
 import android.view.View
-import android.widget.FrameLayout
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +46,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,24 +57,19 @@ import com.github.axet.bookreader.screens.ui.ReaderTopBar
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
 import com.github.axet.bookreader.screens.viewmodel.ReaderViewModel
-import com.github.axet.bookreader.widgets.BookmarksDialog
 import com.github.axet.bookreader.widgets.FBReaderView
-import com.github.axet.bookreader.widgets.FontsPopup
 import org.geometerplus.fbreader.fbreader.ActionCode
+import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
 import timber.log.Timber
 
 /**
  * Контент экрана чтения книги
- *
- * @param bookUri URI файла книги
- * @param initialPosition Начальная позиция в книге
- * @param onNavigateToSettings Callback для перехода к настройкам
- * @param modifier Modifier
  */
 @Composable
 fun ReaderContent(
     bookUri: Uri,
     initialPosition: Parcelable?,
+    onNavigateBack: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ReaderViewModel = hiltViewModel(),
@@ -80,25 +94,6 @@ fun ReaderContent(
     // Обработка клавиш громкости
     VolumeKeysHandler(fbReaderView, viewModel)
 
-    // Обработка диалогов
-    val currentState = state as? ReaderState.Content
-    if (currentState != null) {
-        BookmarksDialogHandler(
-            state = currentState,
-            viewModel = viewModel,
-        )
-        FontsPopupHandler(
-            state = currentState,
-            fbReaderView = fbReaderView,
-            viewModel = viewModel,
-        )
-        TocDialogHandler(
-            state = currentState,
-            fbReaderView = fbReaderView,
-            viewModel = viewModel,
-        )
-    }
-
     // Сохранение позиции при выходе
     DisposableEffect(Unit) {
         onDispose {
@@ -118,6 +113,47 @@ fun ReaderContent(
         }
 
         is ReaderState.Content -> {
+            // Диалоги
+            if (currentState.showToc) {
+                TocComposeDialog(
+                    fbReaderView = fbReaderView,
+                    onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
+                    onNavigate = { position ->
+                        fbReaderView?.gotoPosition(position)
+                        viewModel.onAction(ReaderActions.HideDialogs)
+                    }
+                )
+            }
+
+            if (currentState.showBookmarks) {
+                BookmarksComposeDialog(
+                    book = viewModel.getCurrentBook(),
+                    onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
+                    onNavigate = { bookmark ->
+                        viewModel.onAction(ReaderActions.GoToBookmark(bookmark))
+                    },
+                    onDelete = { bookmark ->
+                        viewModel.onAction(ReaderActions.DeleteBookmark(bookmark))
+                    }
+                )
+            }
+
+            if (currentState.showFontSettings) {
+                FontsComposeBottomSheet(
+                    fbReaderView = fbReaderView,
+                    onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
+                    onFontSizeChange = { size ->
+                        viewModel.onAction(ReaderActions.SetFontSize(size))
+                    },
+                    onFontFamilyChange = { family ->
+                        viewModel.onAction(ReaderActions.SetFontFamily(family))
+                    },
+                    onIgnoreEmbeddedFontsChange = { ignore ->
+                        viewModel.onAction(ReaderActions.SetIgnoreEmbeddedFonts(ignore))
+                    }
+                )
+            }
+
             Scaffold(
                 topBar = {
                     if (!currentState.isFullscreen) {
@@ -125,6 +161,7 @@ fun ReaderContent(
                             state = currentState,
                             onAction = { action ->
                                 when (action) {
+                                    ReaderActions.NavigateBack -> onNavigateBack()
                                     ReaderActions.NavigateToSettings -> onNavigateToSettings()
                                     else -> viewModel.onAction(action)
                                 }
@@ -141,44 +178,23 @@ fun ReaderContent(
                     // FBReaderView через AndroidView
                     AndroidView(
                         factory = { ctx ->
-                            Timber.d("Creating FBReaderView")
+                            Timber.d("Creating FBReaderView for $bookUri")
                             FBReaderView(ctx).apply {
-                                // Устанавливаем listener
                                 listener = object : FBReaderView.Listener {
                                     override fun onScrollingFinished(index: org.geometerplus.zlibrary.core.view.ZLViewEnums.PageIndex?) {
                                         viewModel.savePosition()
                                     }
 
-                                    override fun onSearchClose() {
-                                        // TODO: Закрыть поиск
-                                    }
-
-                                    override fun onBookmarksUpdate() {
-                                        // Обновление UI
-                                    }
-
-                                    override fun onDismissDialog() {
-                                        // Скрытие системного UI
-                                    }
-
+                                    override fun onSearchClose() {}
+                                    override fun onBookmarksUpdate() {}
+                                    override fun onDismissDialog() {}
                                     override fun ttsStatus(speaking: Boolean) {
                                         viewModel.volumeKeysEnabled = !speaking
                                     }
                                 }
 
-                                // Устанавливаем режим просмотра
-                                val viewMode = currentState.viewMode
-                                setWidget(
-                                    if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
-                                    else FBReaderView.Widgets.PAGING
-                                )
-
-                                // Устанавливаем Activity и Window
                                 if (context is Activity) {
                                     setWindow(context.window)
-
-                                    // Устанавливаем Activity для FBReaderView
-                                    // OnBookPagerManager будет инжектирован через Hilt
                                     setActivity(context, null)
                                 }
 
@@ -190,6 +206,12 @@ fun ReaderContent(
                                 if (fbook != null) {
                                     try {
                                         loadBook(fbook)
+                                        // Устанавливаем режим просмотра
+                                        val viewMode = currentState.viewMode
+                                        setWidget(
+                                            if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
+                                            else FBReaderView.Widgets.PAGING
+                                        )
                                         isLoaded = true
                                         Timber.d("Book loaded successfully")
                                     } catch (e: Exception) {
@@ -199,10 +221,14 @@ fun ReaderContent(
                             }
                         },
                         modifier = Modifier.fillMaxSize(),
-                        update = { fbView ->
-                            // Обновление при изменении состояния
+                        update = { view ->
+                            // Обновление view при изменении состояния (без пересоздания)
                             if (isLoaded) {
-                                // Обновление темы и других настроек
+                                val viewMode = currentState.viewMode
+                                view.setWidget(
+                                    if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
+                                    else FBReaderView.Widgets.PAGING
+                                )
                             }
                         }
                     )
@@ -217,6 +243,294 @@ fun ReaderContent(
             ) {
                 Text("Ошибка: ${currentState.message}")
             }
+        }
+    }
+}
+
+/**
+ * Compose диалог содержания (TOC)
+ */
+@Composable
+private fun TocComposeDialog(
+    fbReaderView: FBReaderView?,
+    onDismiss: () -> Unit,
+    onNavigate: (org.geometerplus.zlibrary.text.view.ZLTextPosition) -> Unit,
+) {
+    // Собираем TOC элементы
+    val tocItems = remember(fbReaderView) {
+        val items = mutableListOf<TocItem>()
+        fbReaderView?.app?.Model?.TOCTree?.let { tree ->
+            collectTocItems(tree, items, 0)
+        }
+        items
+    }
+
+    if (tocItems.isEmpty()) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Оглавление") },
+            text = { Text("Оглавление недоступно для этой книги") },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Закрыть")
+                }
+            }
+        )
+    } else {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Оглавление") },
+            text = {
+                LazyColumn {
+                    items(tocItems) { item ->
+                        Text(
+                            text = item.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigate(item.position) }
+                                .padding(vertical = 12.dp, horizontal = 8.dp),
+                            fontWeight = if (item.level == 0) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Закрыть")
+                }
+            }
+        )
+    }
+}
+
+private data class TocItem(
+    val title: String,
+    val position: org.geometerplus.zlibrary.text.view.ZLTextPosition,
+    val level: Int = 0
+)
+
+private fun collectTocItems(
+    tree: org.geometerplus.fbreader.bookmodel.TOCTree,
+    items: MutableList<TocItem>,
+    level: Int
+) {
+    for (child in tree.subtrees()) {
+        val text = child.text
+        val ref = child.reference
+        if (text != null && ref != null) {
+            items.add(
+                TocItem(
+                    title = "${"  ".repeat(level)}$text",
+                    position = ZLTextFixedPosition(ref.ParagraphIndex, 0, 0),
+                    level = level
+                )
+            )
+        }
+        collectTocItems(child, items, level + 1)
+    }
+}
+
+/**
+ * Compose диалог закладок
+ */
+@Composable
+private fun BookmarksComposeDialog(
+    book: com.github.axet.bookreader.app.Storage.Book?,
+    onDismiss: () -> Unit,
+    onNavigate: (com.github.axet.bookreader.app.Storage.Bookmark) -> Unit,
+    onDelete: (com.github.axet.bookreader.app.Storage.Bookmark) -> Unit,
+) {
+    val bookmarks = remember(book) {
+        book?.info?.bookmarks ?: emptyList()
+    }
+
+    if (bookmarks.isEmpty()) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Закладки") },
+            text = { Text("Нет сохранённых закладок") },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Закрыть")
+                }
+            }
+        )
+    } else {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Закладки") },
+            text = {
+                LazyColumn {
+                    itemsIndexed(bookmarks) { index, bookmark ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigate(bookmark) }
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = bookmark.text.take(100) + if (bookmark.text.length > 100) "..." else "",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            if (!bookmark.name.isNullOrBlank()) {
+                                Text(
+                                    text = bookmark.name,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (index < bookmarks.lastIndex) {
+                                HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Закрыть")
+                }
+            }
+        )
+    }
+}
+
+/**
+ * Compose BottomSheet для настроек шрифтов
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun FontsComposeBottomSheet(
+    fbReaderView: FBReaderView?,
+    onDismiss: () -> Unit,
+    onFontSizeChange: (Int) -> Unit,
+    onFontFamilyChange: (String) -> Unit,
+    onIgnoreEmbeddedFontsChange: (Boolean) -> Unit,
+) {
+    val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val shared = remember {
+        android.preference.PreferenceManager.getDefaultSharedPreferences(context)
+    }
+
+    var fontSize by remember { mutableFloatStateOf(shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, 16).toFloat()) }
+    var selectedFont by remember { mutableStateOf(shared.getString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, "sans-serif") ?: "sans-serif") }
+    var ignoreEmbeddedFonts by remember { mutableStateOf(shared.getBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, false)) }
+
+    // Получаем список доступных шрифтов
+    val fonts = remember {
+        val ttf = BookReaderInitializer.getTTFManager()
+        val fontList = mutableListOf("sans-serif", "serif", "monospace")
+        ttf?.let {
+            // Добавляем системные шрифты
+            org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil.ourFontFileMap.keys.forEach { name ->
+                if (!fontList.contains(name)) {
+                    fontList.add(name)
+                }
+            }
+        }
+        fontList.sorted()
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Настройки шрифта",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // Размер шрифта
+            Text(
+                text = "Размер шрифта: ${fontSize.toInt()}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Slider(
+                value = fontSize,
+                onValueChange = { newSize ->
+                    fontSize = newSize
+                    onFontSizeChange(newSize.toInt())
+                },
+                valueRange = 8f..48f,
+                steps = 40,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Выбор шрифта
+            Text(
+                text = "Шрифт",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            ) {
+                items(fonts) { font ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                selectedFont = font
+                                onFontFamilyChange(font)
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedFont == font,
+                            onClick = {
+                                selectedFont = font
+                                onFontFamilyChange(font)
+                            }
+                        )
+                        Text(
+                            text = font,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Игнорировать встроенные шрифты
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        ignoreEmbeddedFonts = !ignoreEmbeddedFonts
+                        onIgnoreEmbeddedFontsChange(ignoreEmbeddedFonts)
+                    }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Switch(
+                    checked = ignoreEmbeddedFonts,
+                    onCheckedChange = { checked ->
+                        ignoreEmbeddedFonts = checked
+                        onIgnoreEmbeddedFontsChange(checked)
+                    }
+                )
+                Text(
+                    text = "Игнорировать встроенные шрифты",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -240,8 +554,7 @@ private fun BatteryReceiver(fbReaderView: FBReaderView?) {
             }
         }
 
-        // Регистрируем приёмник
-        val batteryIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val batteryIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.registerReceiver(
                 receiver,
                 IntentFilter(Intent.ACTION_BATTERY_CHANGED),
@@ -254,7 +567,6 @@ private fun BatteryReceiver(fbReaderView: FBReaderView?) {
             )
         }
 
-        // Сразу отправляем текущий уровень
         receiver.onReceive(context, batteryIntent ?: return@DisposableEffect onDispose {
             context.unregisterReceiver(receiver)
         })
@@ -280,7 +592,6 @@ private fun VolumeKeysHandler(
     val view = LocalView.current
     val context = LocalContext.current
 
-    // Проверяем настройку клавиш громкости
     val volumeKeysEnabled = remember {
         val shared = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
         shared.getBoolean(BookApplication.PREFERENCE_VOLUME_KEYS, false)
@@ -314,191 +625,6 @@ private fun VolumeKeysHandler(
 
         onDispose {
             view.setOnKeyListener(null)
-        }
-    }
-}
-
-/**
- * Обработчик диалога закладок
- */
-@Composable
-private fun BookmarksDialogHandler(
-    state: ReaderState.Content,
-    viewModel: ReaderViewModel,
-) {
-    val context = LocalContext.current
-    var dialog by remember { mutableStateOf<AlertDialog?>(null) }
-
-    DisposableEffect(state.showBookmarks) {
-        if (state.showBookmarks && dialog == null) {
-            val book = viewModel.getCurrentBook()
-            if (book != null) {
-                val bookmarksDialog = object : BookmarksDialog(context) {
-                    override fun onSelected(b: com.github.axet.bookreader.app.Storage.Bookmark) {
-                        viewModel.onAction(ReaderActions.GoToBookmark(b))
-                    }
-
-                    override fun onDelete(b: com.github.axet.bookreader.app.Storage.Bookmark) {
-                        viewModel.onAction(ReaderActions.DeleteBookmark(b))
-                    }
-                }
-                bookmarksDialog.load(book.info.bookmarks)
-                dialog = bookmarksDialog.show()
-                dialog?.setOnDismissListener {
-                    viewModel.onAction(ReaderActions.HideDialogs)
-                    dialog = null
-                }
-            }
-        }
-
-        onDispose {
-            dialog?.dismiss()
-            dialog = null
-        }
-    }
-}
-
-/**
- * Обработчик popup со шрифтами
- */
-@Composable
-private fun FontsPopupHandler(
-    state: ReaderState.Content,
-    fbReaderView: FBReaderView?,
-    viewModel: ReaderViewModel,
-) {
-    val context = LocalContext.current
-    var popup by remember { mutableStateOf<FontsPopup?>(null) }
-
-    DisposableEffect(state.showFontSettings) {
-        if (state.showFontSettings && popup == null && fbReaderView != null) {
-            val ttf = BookReaderInitializer.getTTFManager()
-            if (ttf != null) {
-                val fontsPopup = object : FontsPopup(context, ttf) {
-                    override fun setFontsize(f: Int) {
-                        viewModel.onAction(ReaderActions.SetFontSize(f))
-                    }
-
-                    override fun setFont(str: String) {
-                        viewModel.onAction(ReaderActions.SetFontFamily(str))
-                    }
-
-                    override fun setIgnoreEmbeddedFonts(f: Boolean) {
-                        viewModel.onAction(ReaderActions.SetIgnoreEmbeddedFonts(f))
-                    }
-
-                    override fun updateFontsize(f: Int) {
-                        // Обновление UI слайдера
-                    }
-                }
-
-                // Настраиваем popup
-                val shared = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
-                val currentSize = shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, 16)
-                fontsPopup.updateFontsize(8, 48, currentSize)
-                fontsPopup.loadFonts()
-
-                val currentFont = shared.getString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, "sans-serif") ?: "sans-serif"
-                fontsPopup.fonts.select(currentFont)
-
-                val ignoreEmbedded = shared.getBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, false)
-                fontsPopup.ignoreEmbeddedFonts.isChecked = ignoreEmbedded
-
-                // Показываем popup
-                val parent = FrameLayout(context)
-                fontsPopup.showAtLocation(parent, android.view.Gravity.BOTTOM, 0, 0)
-                popup = fontsPopup
-
-                fontsPopup.setOnDismissListener {
-                    viewModel.onAction(ReaderActions.HideDialogs)
-                    popup = null
-                }
-            }
-        }
-
-        onDispose {
-            popup?.dismiss()
-            popup = null
-        }
-    }
-}
-
-/**
- * Обработчик диалога содержания (TOC)
- */
-@Composable
-private fun TocDialogHandler(
-    state: ReaderState.Content,
-    fbReaderView: FBReaderView?,
-    viewModel: ReaderViewModel,
-) {
-    val context = LocalContext.current
-    var dialog by remember { mutableStateOf<AlertDialog?>(null) }
-
-    DisposableEffect(state.showToc) {
-        if (state.showToc && fbReaderView != null && dialog == null) {
-            // Получаем TOC из книги
-            val tocTree = fbReaderView.app?.Model?.TOCTree
-            if (tocTree != null) {
-                // Собираем все элементы TOC в плоский список
-                data class TocItem(
-                    val title: String,
-                    val position: org.geometerplus.zlibrary.text.view.ZLTextPosition,
-                )
-
-                val tocItems = mutableListOf<TocItem>()
-                fun collectTocItems(tree: org.geometerplus.fbreader.bookmodel.TOCTree, level: Int = 0) {
-                    for (child in tree.subtrees()) {
-                        val text = child.text
-                        val ref = child.reference
-                        if (text != null && ref != null) {
-                            tocItems.add(
-                                TocItem(
-                                    title = "${"  ".repeat(level)}$text",
-                                    position = org.geometerplus.zlibrary.text.view.ZLTextFixedPosition(
-                                        ref.ParagraphIndex,
-                                        0,
-                                        0
-                                    )
-                                )
-                            )
-                        }
-                        collectTocItems(child, level + 1)
-                    }
-                }
-                collectTocItems(tocTree)
-
-                if (tocItems.isNotEmpty()) {
-                    val items = tocItems.map { it.title }.toTypedArray()
-
-                    dialog = androidx.appcompat.app.AlertDialog.Builder(context)
-                        .setTitle("Содержание")
-                        .setItems(items) { _, which ->
-                            val selected = tocItems[which]
-                            fbReaderView.gotoPosition(selected.position)
-                            viewModel.onAction(ReaderActions.HideDialogs)
-                        }
-                        .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            viewModel.onAction(ReaderActions.HideDialogs)
-                        }
-                        .setOnDismissListener {
-                            viewModel.onAction(ReaderActions.HideDialogs)
-                            dialog = null
-                        }
-                        .create()
-                    dialog?.show()
-                } else {
-                    // Нет элементов TOC
-                    viewModel.onAction(ReaderActions.HideDialogs)
-                }
-            } else {
-                viewModel.onAction(ReaderActions.HideDialogs)
-            }
-        }
-
-        onDispose {
-            dialog?.dismiss()
-            dialog = null
         }
     }
 }
