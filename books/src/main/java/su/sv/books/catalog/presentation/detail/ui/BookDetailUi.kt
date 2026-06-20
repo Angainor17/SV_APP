@@ -1,7 +1,5 @@
 package su.sv.books.catalog.presentation.detail.ui
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -21,13 +19,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.axet.bookreader.activities.BookReaderMainActivity
+import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
+import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
 import su.sv.books.catalog.presentation.detail.actions.DetailBookActions
 import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
@@ -101,8 +98,8 @@ private fun HandleEffects(
     viewModel: BookDetailViewModel,
     snackbarHostState: SnackbarHostState,
 ) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val stackNavigation = LocalStackNavigation.current
 
     val downloadState = viewModel.bookDownloadedActionHandler.get()
         .sharedStateFlow
@@ -116,7 +113,13 @@ private fun HandleEffects(
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
             is BookDetailOneTimeEffect.OpenBook -> {
-                openBook(context, effect.book)
+                // Открываем книгу через ReaderScreen (Modo навигация)
+                val uri = effect.book.fileUri
+                if (uri != null) {
+                    stackNavigation.forward(
+                        ReaderScreen(bookUri = uri)
+                    )
+                }
             }
 
             is BookDetailOneTimeEffect.ShowErrorSnackBar -> {
@@ -129,13 +132,4 @@ private fun HandleEffects(
             }
         }
     }
-}
-
-private fun openBook(context: Context, uiBook: UiBook) {
-    val intent = Intent(context, BookReaderMainActivity::class.java).apply {
-        action = Intent.ACTION_VIEW
-        data = uiBook.fileUri
-    }
-
-    context.startActivity(intent)
 }

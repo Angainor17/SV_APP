@@ -29,22 +29,6 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity
-            android:name=".activities.BookReaderMainActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false"
-            android:label="@string/reader_app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/ReaderTheme"
-            android:windowSoftInputMode="adjustNothing">
-
-        </activity>
-
-        <activity
-            android:name=".activities.SettingsActivity"
-            android:label="@string/menu_settings"
-            android:theme="@style/ReaderTheme" />
-
         <provider
             android:name="com.github.axet.androidlibrary.services.FileProvider"
             android:authorities="com.github.axet.bookreader.files"

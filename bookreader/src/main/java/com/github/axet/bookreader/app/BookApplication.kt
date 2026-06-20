@@ -1,33 +1,35 @@
 package com.github.axet.bookreader.app
 
 import android.content.Context
-import android.preference.PreferenceManager
-import androidx.core.net.toUri
 import com.github.axet.androidlibrary.app.MainApplication
-import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication
 
+/**
+ * Application класс для BookReader.
+ *
+ * Для использования в собственном приложении наследуйте свой Application класс
+ * от Application напрямую и вызовите BookReaderInitializer.init(this) в onCreate().
+ *
+ * Пример:
+ * ```
+ * class MyApplication : Application() {
+ *     override fun onCreate() {
+ *         super.onCreate()
+ *         BookReaderInitializer.init(this)
+ *     }
+ * }
+ * ```
+ */
 open class BookApplication : MainApplication() {
 
-    private lateinit var zlib: ZLAndroidApplication
-    lateinit var ttf: TTFManager
+    /**
+     * Получить менеджер TTF-шрифтов
+     */
+    val ttf: TTFManager?
+        get() = BookReaderInitializer.getTTFManager()
 
     override fun onCreate() {
         super.onCreate()
-        zlib = object : ZLAndroidApplication() {
-            init {
-                attachBaseContext(this@BookApplication)
-                onCreate()
-            }
-        }
-        ttf = TTFManager(this)
-        val shared = PreferenceManager.getDefaultSharedPreferences(this)
-        val fonts: String = shared.getString(PREFERENCE_FONTS_FOLDER, "").orEmpty()
-        if (!fonts.isEmpty()) {
-            val u = fonts.toUri()
-            Storage.takePersistableUriPermission(this, u, Storage.SAF_RW)
-            ttf.setFolder(u)
-        }
-        ttf.preloadFonts()
+        BookReaderInitializer.init(this)
     }
 
     companion object {
@@ -47,10 +49,21 @@ open class BookApplication : MainApplication() {
         const val PREFERENCE_IGNORE_EMBEDDED_FONTS: String = "ignore_embedded_fonts"
         const val PREFERENCE_FONTS_FOLDER: String = "fonts_folder"
 
+        /**
+         * Получить BookApplication из контекста.
+         * @deprecated Используйте BookReaderInitializer.getTTFManager() напрямую
+         */
+        @Deprecated(
+            message = "Use BookReaderInitializer.getTTFManager() directly",
+            replaceWith = ReplaceWith("BookReaderInitializer.getTTFManager()")
+        )
         fun from(context: Context): BookApplication? {
-            return MainApplication.from(context) as BookApplication?
+            return MainApplication.from(context) as? BookApplication?
         }
 
+        /**
+         * Получить тему для текущих настроек
+         */
         fun getTheme(context: Context, light: Int, dark: Int): Int {
             return getTheme(context, PREFERENCE_THEME, light, dark)
         }
