@@ -28,7 +28,7 @@ data class UiBook(
     /** Ссылка для скачивания */
     val downloadUrl: String,
 
-    /** Имя скачиваемого файла с раширением. Типо "Lenin.pdf" */
+    /** Имя скачиваемого файла с расширением. Например, "Lenin.pdf" */
     val fileNameWithExt: String,
 
     /** Категория */
