@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
@@ -100,6 +101,15 @@ private fun HandleEffects(
                         uiBook = effect.book,
                     )
                 )
+            }
+
+            is BooksListOneTimeEffect.OpenReader -> {
+                val uri = effect.book.fileUri
+                if (uri != null) {
+                    stackNavigation.forward(
+                        ReaderScreen(bookUri = uri)
+                    )
+                }
             }
 
             is BooksListOneTimeEffect.ShowErrorSnackBar -> {

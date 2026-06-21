@@ -88,8 +88,16 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
 private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions) {
     Button(
         onClick = {
-            if (item.downloadState == UIBookState.AVAILABLE_TO_DOWNLOAD) {
-                actions.onAction(RootBookActions.OnDownloadBookClick(item))
+            when (item.downloadState) {
+                UIBookState.DOWNLOADED -> {
+                    actions.onAction(RootBookActions.OnOpenDownloadedBook(item))
+                }
+                UIBookState.AVAILABLE_TO_DOWNLOAD -> {
+                    actions.onAction(RootBookActions.OnDownloadBookClick(item))
+                }
+                UIBookState.DOWNLOADING -> {
+                    // Ничего не делаем при клике во время загрузки
+                }
             }
         },
         contentPadding = PaddingValues(all = 3.dp),

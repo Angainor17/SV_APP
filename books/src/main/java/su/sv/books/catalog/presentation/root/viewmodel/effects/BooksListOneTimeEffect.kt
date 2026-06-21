@@ -17,6 +17,11 @@ sealed class BooksListOneTimeEffect {
         val book: UiBook,
     ) : BooksListOneTimeEffect()
 
+    /** Открытие книги в читалке */
+    data class OpenReader(
+        val book: UiBook,
+    ) : BooksListOneTimeEffect()
+
     /** Отображение экрана со скачанными книгами */
     object OpenStoredBooksList : BooksListOneTimeEffect()
 }
