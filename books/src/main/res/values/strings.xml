@@ -15,4 +15,16 @@
     <string name="books_title">Книги</string>
     <string name="books_menu_action_content_description">Скачанные книги</string>
 
+    <!-- Downloaded Books Screen -->
+    <string name="books_downloaded_title">Ваши книги</string>
+    <string name="books_downloaded_empty_title">Нет скачанных книг</string>
+    <string name="books_downloaded_read_button">Читать</string>
+    <string name="books_downloaded_page_progress">Страница: %1$d / %2$d</string>
+    <string name="books_downloaded_delete_content_description">Удалить</string>
+    <string name="books_downloaded_delete_dialog_title">Подтверждение</string>
+    <string name="books_downloaded_delete_dialog_message">Вы точно хотите удалить \"%1$s\"?</string>
+    <string name="books_downloaded_delete_dialog_yes">Да</string>
+    <string name="books_downloaded_delete_dialog_no">Нет</string>
+    <string name="books_back_content_description">Назад</string>
+
 </resources>

@@ -1,6 +1,7 @@
 package su.sv.books.catalog.presentation.root.viewmodel.actions
 
 import su.sv.books.catalog.data.receivers.BookDownloadedActionHandler.BookState
+import su.sv.books.catalog.domain.model.BookFilter
 import su.sv.models.ui.book.UiBook
 
 sealed class RootBookActions {
@@ -28,4 +29,10 @@ sealed class RootBookActions {
 
     /** Получение уведомления о скачивании */
     data class OnBookStateHandle(val bookState: BookState) : RootBookActions()
+
+    /** Выбор фильтра */
+    data class OnFilterSelect(val filter: BookFilter) : RootBookActions()
+
+    /** Удаление фильтра */
+    data class OnFilterRemove(val filter: BookFilter) : RootBookActions()
 }

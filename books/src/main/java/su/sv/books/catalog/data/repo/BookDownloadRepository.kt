@@ -272,4 +272,25 @@ class BookDownloadRepository @Inject constructor(
     fun fileExists(fileNameWithExt: String): Boolean {
         return getDownloadsUri(fileNameWithExt) != null
     }
+
+    /**
+     * Удаляет скачанный файл книги
+     * @param uri URI файла для удаления
+     * @return true если удаление успешно, иначе false
+     */
+    fun deleteBook(uri: Uri): Boolean {
+        return try {
+            val deletedRows = context.contentResolver.delete(uri, null, null)
+            val success = deletedRows > 0
+            if (success) {
+                Timber.d("Book deleted successfully: $uri")
+            } else {
+                Timber.w("Book deletion returned 0 rows: $uri")
+            }
+            success
+        } catch (e: Exception) {
+            Timber.e(e, "Error deleting book: $uri")
+            false
+        }
+    }
 }
