@@ -13,6 +13,9 @@ apply(
 
 android {
     namespace = "su.sv.books"
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -47,5 +50,4 @@ dependencies {
 
     // Network
     implementation(libs.bundles.retrofit)
-    implementation(libs.retrofit2.kotlin.coroutines.adapter)
 }

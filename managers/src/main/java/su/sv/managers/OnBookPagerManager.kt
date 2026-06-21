@@ -7,7 +7,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import javax.inject.Inject
 
 private const val MISSPELL_TG_LINK = "https://t.me/SVremya/9244"

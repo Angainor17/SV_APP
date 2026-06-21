@@ -13,6 +13,9 @@ apply(
 
 android {
     namespace = "su.sv.wiki"
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {

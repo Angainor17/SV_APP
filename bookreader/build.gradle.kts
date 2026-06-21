@@ -12,6 +12,9 @@ apply(
 )
 android {
     namespace = "com.github.axet.bookreader"
+    buildFeatures {
+        compose = true
+    }
     packaging {
         jniLibs {
             excludes.add("META-INF/DEPENDENCIES")

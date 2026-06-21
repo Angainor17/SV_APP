@@ -10,6 +10,9 @@ plugins {
 
 android {
     namespace = "su.sv.commonui"
+    buildFeatures {
+        compose = true
+    }
     compileSdk = 37
 
     defaultConfig {

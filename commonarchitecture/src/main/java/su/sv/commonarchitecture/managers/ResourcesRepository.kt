@@ -1,4 +1,4 @@
-package su.sv.commonui.managers
+package su.sv.commonarchitecture.managers
 
 import android.content.Context
 import androidx.annotation.ArrayRes

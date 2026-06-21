@@ -4,7 +4,7 @@ import su.sv.api.R
 import su.sv.api.data.api.VkApi
 import su.sv.api.data.model.ApiNewsItem
 import su.sv.commonarchitecture.data.runCatchingHttpRequest
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import javax.inject.Inject
 
 class NewsRepo @Inject constructor(
