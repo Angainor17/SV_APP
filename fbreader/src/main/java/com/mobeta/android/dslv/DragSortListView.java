@@ -44,7 +44,7 @@ import android.widget.Checkable;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.mobeta.R;
+import org.geometerplus.R;
 
 import java.io.File;
 import java.io.FileWriter;

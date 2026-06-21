@@ -44,10 +44,9 @@ dependencies {
 
     // Модули-фичи
     api(project(":util"))
-    api(project(":dragSortListview"))
+    // dragSortListview и ambilWarna перенесены в этот модуль
     api(project(":androidFileChooser"))
     api(project(":superToasts"))
-    api(project(":ambilWarna"))
 
 //    api("com.github.axet.fbreader:ambilwarna:1.0") // compile project(":ambilWarna")
 //    api( "com.github.axet.fbreader:androidfilechooser:5.0" )// compile project(":androidFileChooser")
