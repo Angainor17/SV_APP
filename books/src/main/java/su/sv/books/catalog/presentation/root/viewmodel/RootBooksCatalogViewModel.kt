@@ -26,7 +26,7 @@ import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 import javax.inject.Inject

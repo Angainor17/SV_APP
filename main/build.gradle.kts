@@ -13,6 +13,9 @@ apply(
 
 android {
     namespace = "su.sv.main"
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {

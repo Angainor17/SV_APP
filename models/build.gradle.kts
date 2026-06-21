@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
 }
 
@@ -14,9 +13,5 @@ android {
 }
 
 dependencies {
-
-    // Compose
-    implementation(libs.bundles.coil)
-    implementation(libs.bundles.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    // Только базовые зависимости для моделей данных
 }

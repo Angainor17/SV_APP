@@ -10,7 +10,7 @@ import android.os.Environment.DIRECTORY_DOWNLOADS
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import su.sv.books.R
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

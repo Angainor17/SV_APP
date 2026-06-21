@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
@@ -21,18 +20,12 @@ dependencies {
     implementation(project(":api"))
 
     // Модули-common
-    implementation(project(":commonui"))
     implementation(project(":commonarchitecture"))
 
     implementation(libs.androidx.core.ktx)
 
     // Logging
     implementation(libs.timber)
-
-    // Compose
-    implementation(libs.bundles.coil)
-    implementation(libs.bundles.compose)
-    implementation(platform(libs.androidx.compose.bom))
 
     // DI
     implementation(libs.hilt.android)

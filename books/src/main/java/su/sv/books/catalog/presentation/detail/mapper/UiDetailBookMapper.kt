@@ -2,7 +2,7 @@ package su.sv.books.catalog.presentation.detail.mapper
 
 import su.sv.books.R
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState.Content
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 import javax.inject.Inject

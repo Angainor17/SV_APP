@@ -12,6 +12,9 @@ apply(
 
 android {
     namespace = "su.sv.info"
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {

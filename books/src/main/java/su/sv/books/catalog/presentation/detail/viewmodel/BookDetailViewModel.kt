@@ -21,7 +21,7 @@ import su.sv.books.catalog.presentation.detail.actions.DetailBooksActionsHandler
 import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
 import su.sv.books.catalog.presentation.detail.mapper.UiDetailBookMapper
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 import javax.inject.Inject

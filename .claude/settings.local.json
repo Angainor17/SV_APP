@@ -80,7 +80,9 @@
       "Bash(./gradlew help *)",
       "Bash(./gradlew :app:dependencies --configuration releaseRuntimeClasspath)",
       "Bash(./gradlew :wiki:compileDebugKotlin --no-daemon)",
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "Bash(./gradlew app:dependencies --configuration releaseRuntimeClasspath)",
+      "Bash(./gradlew :app:assembleDebug --dry-run)"
     ]
   }
 }

@@ -14,6 +14,9 @@ apply(
 
 android {
     namespace = "su.sv.news"
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {

@@ -19,7 +19,7 @@ import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
 import su.sv.books.catalog.presentation.downloaded.mapper.UiDownloadedBookMapper
 import su.sv.books.catalog.presentation.downloaded.model.DeleteDialogState
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
-import su.sv.commonui.managers.ResourcesRepository
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import javax.inject.Inject
 
 @HiltViewModel
