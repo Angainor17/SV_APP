@@ -11,8 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +29,7 @@ import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
 import su.sv.books.R
 import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
+import su.sv.books.catalog.presentation.downloaded.ui.DownloadedBooksScreen
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.RootBooksCatalogViewModel
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
@@ -43,8 +47,16 @@ fun RootBooksCatalog(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var scrollEffect by remember { mutableStateOf<BooksListOneTimeEffect.ScrollToTop?>(null) }
 
-    HandleEffects(viewModel, snackbarHostState)
+    HandleEffects(viewModel, snackbarHostState) { effect ->
+        when (effect) {
+            is BooksListOneTimeEffect.ScrollToTop -> {
+                scrollEffect = effect
+            }
+            else -> { /* другие эффекты обрабатываются в HandleEffects */ }
+        }
+    }
 
     when (state.value) {
         is UiRootBooksState.Content -> {
@@ -52,7 +64,12 @@ fun RootBooksCatalog(
                 actions = viewModel,
                 state = state.value as UiRootBooksState.Content,
                 snackbarHostState = snackbarHostState,
+                scrollEffect = scrollEffect,
             )
+            // Сбрасываем эффект после обработки
+            LaunchedEffect(scrollEffect) {
+                scrollEffect = null
+            }
         }
 
         UiRootBooksState.EmptyState -> {
@@ -74,7 +91,8 @@ fun RootBooksCatalog(
 @Composable
 private fun HandleEffects(
     viewModel: RootBooksCatalogViewModel,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    onEffect: (BooksListOneTimeEffect) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val stackNavigation = LocalStackNavigation.current
@@ -91,8 +109,7 @@ private fun HandleEffects(
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
             BooksListOneTimeEffect.OpenStoredBooksList -> {
-                // Локальная библиотека книг теперь не используется
-                // Книги отображаются в каталоге books модуля
+                stackNavigation.forward(DownloadedBooksScreen())
             }
 
             is BooksListOneTimeEffect.OpenBook -> {
@@ -119,6 +136,10 @@ private fun HandleEffects(
                         duration = SnackbarDuration.Short,
                     )
                 }
+            }
+
+            is BooksListOneTimeEffect.ScrollToTop -> {
+                onEffect(effect)
             }
         }
     }

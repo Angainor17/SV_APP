@@ -1,0 +1,27 @@
+package su.sv.books.catalog.presentation.downloaded.actions
+
+import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
+
+/**
+ * Действия на экране скачанных книг
+ */
+sealed class DownloadedBookActions {
+
+    /** Нажатие кнопки "Назад" */
+    object OnBackClick : DownloadedBookActions()
+
+    /** Нажатие кнопки "Читать" */
+    data class OnReadClick(val book: UiDownloadedBook) : DownloadedBookActions()
+
+    /** Запрос на удаление книги (свайп) */
+    data class OnDeleteRequest(val book: UiDownloadedBook) : DownloadedBookActions()
+
+    /** Подтверждение удаления */
+    object OnDeleteConfirm : DownloadedBookActions()
+
+    /** Отмена удаления */
+    object OnDeleteCancel : DownloadedBookActions()
+
+    /** Подсказка свайпа была показана */
+    object OnSwipeHintShown : DownloadedBookActions()
+}

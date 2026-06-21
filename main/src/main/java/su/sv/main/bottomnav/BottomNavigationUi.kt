@@ -17,9 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -30,6 +28,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
 import su.sv.info.rootinfo.ui.RootInfo
@@ -45,11 +44,23 @@ import su.sv.wiki.root.RootWiki
 internal fun BottomNavigationBar(
     badgeViewModel: BadgeViewModel = hiltViewModel(),
 ) {
-    var navigationSelectedItem by remember {
-        mutableIntStateOf(0)
-    }
     val navController = rememberNavController()
     val showWikiBadge by badgeViewModel.showWikiBadge.collectAsStateWithLifecycle()
+
+    // Отслеживаем текущий маршрут для правильного выделения в bottom navigation
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // Определяем индекс текущего элемента на основе маршрута
+    val navigationSelectedItem = remember(currentRoute) {
+        when (currentRoute) {
+            Screens.News.route -> 0
+            Screens.Books.route -> 1
+            Screens.Wiki.route -> 2
+            Screens.Info.route -> 3
+            else -> 0
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -74,7 +85,6 @@ internal fun BottomNavigationBar(
                                 if (navigationItem.route == Screens.Wiki.route && showWikiBadge) {
                                     badgeViewModel.markWikiAsVisited()
                                 }
-                                navigationSelectedItem = index
                                 navController.navigate(navigationItem.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
@@ -124,7 +134,7 @@ private fun BottomNavHost(
         startDestination = Screens.News.route,
         modifier = Modifier.padding(
             paddingValues = paddingValues,
-        )
+        ),
     ) {
         composable(Screens.News.route) {
             RootNews()

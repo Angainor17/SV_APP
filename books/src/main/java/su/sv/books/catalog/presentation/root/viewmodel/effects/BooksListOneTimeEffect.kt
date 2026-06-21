@@ -24,4 +24,7 @@ sealed class BooksListOneTimeEffect {
 
     /** Отображение экрана со скачанными книгами */
     object OpenStoredBooksList : BooksListOneTimeEffect()
+
+    /** Скролл к началу списка */
+    object ScrollToTop : BooksListOneTimeEffect()
 }
