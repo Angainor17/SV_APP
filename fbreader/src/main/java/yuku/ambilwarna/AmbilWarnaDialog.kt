@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import org.geometerplus.R
 
 /**
  * Диалоговое окно для выбора цвета (Color Picker).
