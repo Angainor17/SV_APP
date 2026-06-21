@@ -113,6 +113,10 @@ class RootBooksCatalogViewModel @Inject constructor(
             is RootBookActions.OnDownloadBookClick -> {
                 loadBook(action.book)
             }
+
+            is RootBookActions.OnOpenDownloadedBook -> {
+                openDownloadedBook(action.book)
+            }
         }
     }
 
@@ -150,6 +154,12 @@ class RootBooksCatalogViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun openDownloadedBook(book: UiBook) {
+        if (book.fileUri != null) {
+            _oneTimeEffect.trySend(BooksListOneTimeEffect.OpenReader(book))
         }
     }
 

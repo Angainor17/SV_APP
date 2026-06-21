@@ -23,6 +23,9 @@ sealed class RootBookActions {
     /** Нажатие на иконку книг в тулбаре */
     object OnToolbarBooksClick : RootBookActions()
 
+    /** Нажатие на иконку скачанной книги (открытие читалки) */
+    data class OnOpenDownloadedBook(val book: UiBook) : RootBookActions()
+
     /** Получение уведомления о скачивании */
     data class OnBookStateHandle(val bookState: BookState) : RootBookActions()
 }
