@@ -338,7 +338,7 @@ interface Plugin {
                     this.wallpaper = BitmapFactory.decodeStream(wallpaper.getInputStream())
                 else
                     this.wallpaper = null
-                wallpaperColor = (0xff shl 24) or app.BookTextView.getBackgroundColor().intValue()
+                wallpaperColor = (0xff shl 24) or app.BookTextView.backgroundColor.intValue()
                 if (ColorUtils.calculateLuminance(wallpaperColor) < 0.5f && this !is ComicsPlugin.ComicsView)
                     paint.colorFilter = ColorMatrixColorFilter(NEGATIVE)
                 else
@@ -470,7 +470,7 @@ interface Plugin {
             if (current!!.equals(next.pageNumber, next.pageOffset))
                 return null // !canScroll()
             val e = ZLTextFixedPosition(next.pageNumber, next.pageOffset, 0)
-            if (e.getParagraphIndex() >= next.getPagesCount())
+            if (e.paragraphIndex >= next.getPagesCount())
                 return null
             return e
         }

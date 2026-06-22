@@ -97,7 +97,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     override fun readModel(model: BookModel) {
         val m = PDFTextModel(BookUtil.fileByBook(model.Book))
         model.setBookTextModel(m)
-        val bookmarks = m.doc.getTOC()
+        val bookmarks = m.doc.toc
         loadTOC(0, 0, bookmarks, model.TOCTree)
     }
 
@@ -120,7 +120,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 break
             } else {
                 val t = TOCTree(tree)
-                t.setText(tt)
+                t.text = tt
                 t.setReference(null, b.page)
                 last = t
                 i++
@@ -197,10 +197,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         var endPage: SelectionPage? = null
         var map: SparseArray<SelectionPage> = SparseArray()
 
-        constructor(pdfium: Pdfium, page: SelectionPage, point: Plugin.View.Selection.Point) {
+        constructor(pdfium: Pdfium, page: SelectionPage, point: Point) {
             this.pdfium = pdfium
             map.put(page.page, page)
-            val p = Plugin.View.Selection.Point(page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
+            val p = Point(page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
             selectWord(page, p)
         }
 
@@ -232,7 +232,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return isWord(s.toCharArray()[0])
         }
 
-        internal fun openSelPage(selPage: Plugin.View.Selection.Page): SelectionPage {
+        internal fun openSelPage(selPage: Page): SelectionPage {
             var p = map.get(selPage.page)
             if (p != null) {
                 p.w = selPage.w
@@ -254,7 +254,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return SelectionPage(p)
         }
 
-        private fun selectWord(page: SelectionPage, point: Plugin.View.Selection.Point) {
+        private fun selectWord(page: SelectionPage, point: Point) {
             startPage = page
             val idx = startPage!!.text.getIndex(point.x, point.y)
             if (idx < 0 || idx >= startPage!!.count) return
@@ -271,10 +271,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
-        override fun setStart(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point) {
+        override fun setStart(page: Page, point: Point) {
             val sp = openSelPage(page)
             if (sp.count > 0) {
-                val p = Plugin.View.Selection.Point(sp.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
+                val p = Point(sp.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
                 val idx = sp.text.getIndex(p.x, p.y)
                 if (idx == -1) return
                 sp.index = idx
@@ -282,10 +282,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
-        override fun setEnd(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point) {
+        override fun setEnd(page: Page, point: Point) {
             val ep = openSelPage(page)
             if (ep.count > 0) {
-                val p = Plugin.View.Selection.Point(ep.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
+                val p = Point(ep.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
                 val idx = ep.text.getIndex(p.x, p.y)
                 if (idx == -1) return
                 ep.index = idx
@@ -306,7 +306,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return b.page.text.getText(b.ss, b.cc)
         }
 
-        override fun getBoundsAll(page: Plugin.View.Selection.Page): Array<Rect>? {
+        override fun getBoundsAll(page: Page): Array<Rect>? {
             val p = openSelPage(page)
             val rr = p.text.getBounds(0, p.count)
             for (i in rr.indices) {
@@ -317,8 +317,8 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return rr
         }
 
-        override fun getBounds(p: Plugin.View.Selection.Page): Plugin.View.Selection.Bounds? {
-            val bounds = Plugin.View.Selection.Bounds()
+        override fun getBounds(p: Page): Bounds {
+            val bounds = Bounds()
             val b = SelectionBounds(p)
             bounds.reverse = b.reverse
             bounds.start = b.first
@@ -332,14 +332,14 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return bounds
         }
 
-        override fun inBetween(page: Plugin.View.Selection.Page, start: Plugin.View.Selection.Point, end: Plugin.View.Selection.Point): Boolean? {
+        override fun inBetween(page: Page, start: Point, end: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.s.page < page.page && page.page < b.e.page) return true
             if (b.page.count > 0) {
-                val p1 = Plugin.View.Selection.Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, start.x, start.y))
+                val p1 = Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, start.x, start.y))
                 val i1 = b.page.text.getIndex(p1.x, p1.y)
                 if (i1 == -1) return null
-                val p2 = Plugin.View.Selection.Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, end.x, end.y))
+                val p2 = Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, end.x, end.y))
                 val i2 = b.page.text.getIndex(p2.x, p2.y)
                 if (i2 == -1) return null
                 if (i2 < i1) return null
@@ -348,10 +348,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return null
         }
 
-        override fun isValid(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Boolean {
+        override fun isValid(page: Page, point: Point): Boolean {
             val b = SelectionBounds(page)
             if (b.page.count > 0) {
-                val p = Plugin.View.Selection.Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
+                val p = Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
                 return b.page.text.getIndex(p.x, p.y) != -1
             }
             return false
@@ -362,11 +362,11 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return b.s.page <= page && page <= b.e.page
         }
 
-        override fun isAbove(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Boolean? {
+        override fun isAbove(page: Page, point: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.s.page < page.page) return true
             if (b.page.count > 0) {
-                val p = Plugin.View.Selection.Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
+                val p = Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
                 val idx = b.page.text.getIndex(p.x, p.y)
                 if (idx == -1) return null
                 return b.ss < idx || b.ll < idx
@@ -374,11 +374,11 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return null
         }
 
-        override fun isBelow(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Boolean? {
+        override fun isBelow(page: Page, point: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.e.page > page.page) return true
             if (b.page.count > 0) {
-                val p = Plugin.View.Selection.Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
+                val p = Point(b.page.ppage.toPage(0, 0, page.w, page.h, 0, point.x, point.y))
                 val idx = b.page.text.getIndex(p.x, p.y)
                 if (idx == -1) return null
                 return idx < b.ss || idx < b.ll
@@ -409,7 +409,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             var last: Boolean = false
             var reverse: Boolean = false
 
-            constructor(p: Plugin.View.Selection.Page) : this(p.page) {
+            constructor(p: Page) : this(p.page) {
                 startPage?.w = p.w
                 startPage?.h = p.h
                 endPage?.w = p.w
@@ -514,8 +514,8 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return rr
         }
 
-        override fun getBounds(page: Plugin.View.Selection.Page): Plugin.View.Search.Bounds? {
-            val bounds = Plugin.View.Search.Bounds()
+        override fun getBounds(page: Plugin.View.Selection.Page): Bounds? {
+            val bounds = Bounds()
             val list = pages.get(page.page) ?: return null
             val p = pdfium.openPage(page.page)
             val t = p.open()
@@ -766,16 +766,16 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return s
         }
 
-        override fun getLinks(page: Plugin.View.Selection.Page): Array<Plugin.View.Link>? {
+        override fun getLinks(page: Plugin.View.Selection.Page): Array<Link>? {
             val p = doc.openPage(page.page)
-            val ll = p.getLinks()
+            val ll = p.links
             return Array(ll.size) { i ->
                 val l = ll[i]
-                Plugin.View.Link(l.uri, l.index, p.toDevice(0, 0, page.w, page.h, 0, l.bounds))
+                Link(l.uri, l.index, p.toDevice(0, 0, page.w, page.h, 0, l.bounds))
             }
         }
 
-        override fun search(text: String): Plugin.View.Search? {
+        override fun search(text: String): Search? {
             val s = PdfSearch(doc, text)
             for (i in 0 until doc.pagesCount) {
                 if (s.hasText(i)) return s

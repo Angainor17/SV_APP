@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -141,7 +140,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
             views[k] = v
             addView(v)
         }
-        val lp = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        val lp = MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         layoutParams = lp
     }
 
@@ -157,14 +156,14 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
                 setTextColor(Color.WHITE)
                 setTypeface(typeface, Typeface.BOLD)
             }
-            addView(text, LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER))
+            addView(text, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
             g = GradientDrawable().apply {
                 cornerRadius = ThemeUtils.dp2px(context, 20f).toFloat() // радиус скругления углов
                 gradientType = GradientDrawable.LINEAR_GRADIENT
                 setColor(BACKGROUND)
             }
             background = g
-            val lp = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            val lp = MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
             layoutParams = lp
             ViewCompat.setAlpha(text, 0.7f)
         }

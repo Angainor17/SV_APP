@@ -9,7 +9,6 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import com.github.axet.androidlibrary.widgets.ThemeUtils
@@ -73,11 +72,11 @@ class FBFooterView @JvmOverloads constructor(
         orientation = HORIZONTAL
         val cProfile: ColorProfile = fb.app.ViewOptions.getColorProfile()
         setBackgroundColor(0xffffff and cProfile.FooterNGBackgroundOption.getValue().intValue() or 0xff000000.toInt())
-        var lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+        var lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
         lp.gravity = Gravity.CENTER
         addView(TOCMarks(context), lp)
         val footerOptions = fb.app.ViewOptions.getFooterOptions()
-        val lpText = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, footer!!.height)
+        val lpText = LayoutParams(LayoutParams.WRAP_CONTENT, footer!!.height)
         lpText.gravity = Gravity.CENTER
         if (footerOptions.showProgressAsPages())
             addView(ProgressAsPages(context), lpText)
@@ -94,7 +93,7 @@ class FBFooterView @JvmOverloads constructor(
             val image = AppCompatImageView(context)
             image.setImageResource(R.drawable.ic_battery_std_24)
             image.setColorFilter(0xffffff and cProfile.FooterNGForegroundOption.getValue().intValue() or 0xff000000.toInt())
-            val lpImage = LinearLayout.LayoutParams(footer!!.height, footer!!.height)
+            val lpImage = LayoutParams(footer!!.height, footer!!.height)
             lpImage.gravity = Gravity.CENTER
             addView(image, lpImage)
             addView(Battery(context), lpText)
@@ -109,7 +108,7 @@ class FBFooterView @JvmOverloads constructor(
         customview = fb!!.app.BookTextView as FBReaderView.CustomView
         footer = customview!!.footer
         pagePosition = customview!!.pagePosition()
-        family = fb!!.app.ViewOptions.getFooterOptions().Font.getValue()
+        family = fb!!.app.ViewOptions.getFooterOptions().Font.value
         tf = AndroidFontUtil.typeface(fb!!.app.SystemInfo, FontEntry.systemEntry(family!!), footer!!.height > 10, false)
         for (i in 0 until childCount) {
             val v = getChildAt(i)
@@ -231,7 +230,7 @@ class FBFooterView @JvmOverloads constructor(
     inner class Battery(context: Context) : FontTextView(context) {
         override fun update() {
             super.update()
-            updateText("${fb!!.app.getBatteryLevel()}%")
+            updateText("${fb!!.app.batteryLevel}%")
         }
     }
 }

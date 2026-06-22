@@ -32,7 +32,7 @@ class StoragePathPreferenceCompat @JvmOverloads constructor(
                     val editor: SharedPreferences.Editor = sharedPreferences.edit()
                     editor.remove(key)
                     editor.apply()
-                    setSummary(defSummary)
+                    summary = defSummary
                 } else {
                     if (callChangeListener(uri.toString())) {
                         setText(uri.toString())
@@ -66,7 +66,7 @@ class StoragePathPreferenceCompat @JvmOverloads constructor(
         val u = storage.getStoragePath(v)
         if (u != null) {
             setText(u.toString())
-            setSummary(Storage.getDisplayName(context, u))
+            summary = Storage.getDisplayName(context, u)
         }
     }
 

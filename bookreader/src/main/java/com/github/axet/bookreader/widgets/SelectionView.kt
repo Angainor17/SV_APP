@@ -9,7 +9,6 @@ import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.bookreader.app.Plugin
@@ -166,9 +165,9 @@ open class SelectionView(
 
     init {
         handles.style = Paint.Style.FILL
-        handles.color = 0xff shl 24 or custom.getSelectionBackgroundColor().intValue()
+        handles.color = 0xff shl 24 or custom.selectionBackgroundColor.intValue()
 
-        layoutParams = MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         background = ColorDrawable(Color.TRANSPARENT)
     }
 
@@ -331,7 +330,7 @@ open class SelectionView(
      * Рисует маркер выделения.
      */
     fun drawHandle(canvas: Canvas, which: SelectionCursor.Which, rect: HandleRect) {
-        SelectionView.drawHandle(canvas, which, rect.draw!!.x, rect.draw!!.y, handles)
+        drawHandle(canvas, which, rect.draw!!.x, rect.draw!!.y, handles)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -620,11 +619,11 @@ open class SelectionView(
 
         init {
             paint.style = Paint.Style.FILL
-            paint.color = SELECTION_ALPHA shl 24 or custom.getSelectionBackgroundColor().intValue()
+            paint.color = SELECTION_ALPHA shl 24 or custom.selectionBackgroundColor.intValue()
 
             padding = ThemeUtils.dp2px(context, SELECTION_PADDING.toFloat()).toInt()
 
-            layoutParams = MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }
 
         /**
