@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="@string/add_more_fonts_to"
+                android:text="@string/sv_add_more_fonts_to"
                 android:textSize="12sp" />
 
             <ImageButton
@@ -91,5 +91,5 @@
         android:layout_height="wrap_content"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:text="@string/ignore_embedded_fonts" />
+        android:text="@string/sv_ignore_embedded_fonts" />
 </LinearLayout>

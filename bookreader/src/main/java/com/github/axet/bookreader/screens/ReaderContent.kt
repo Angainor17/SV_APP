@@ -21,10 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
@@ -46,13 +44,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
 import com.github.axet.bookreader.app.BookReaderInitializer
+import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
+import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
 import com.github.axet.bookreader.screens.ui.ReaderTopBar
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
@@ -132,10 +134,8 @@ fun ReaderContent(
             if (currentState.showBookmarks) {
                 BookmarksComposeDialog(
                     book = viewModel.getCurrentBook(),
+                    fbReaderView = fbReaderView,
                     onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
-                    onNavigate = { bookmark ->
-                        viewModel.onAction(ReaderActions.GoToBookmark(bookmark))
-                    },
                     onDelete = { bookmark ->
                         viewModel.onAction(ReaderActions.DeleteBookmark(bookmark))
                     }
@@ -154,6 +154,29 @@ fun ReaderContent(
                     },
                     onIgnoreEmbeddedFontsChange = { ignore ->
                         viewModel.onAction(ReaderActions.SetIgnoreEmbeddedFonts(ignore))
+                    }
+                )
+            }
+
+            // Редактирование закладки
+            if (currentState.showBookmarkEdit && currentState.editingBookmark != null) {
+                BookmarkBottomSheet(
+                    bookmarkText = currentState.editingBookmark.text,
+                    initialName = currentState.editingBookmark.name,
+                    initialColor = currentState.editingBookmark.color,
+                    onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
+                    onSave = { name, color ->
+                        viewModel.onAction(
+                            ReaderActions.SaveBookmarkEdit(
+                                currentState.editingBookmark,
+                                name,
+                                color
+                            )
+                        )
+                    },
+                    onDelete = {
+                        viewModel.onAction(ReaderActions.DeleteBookmark(currentState.editingBookmark))
+                        viewModel.onAction(ReaderActions.HideDialogs)
                     }
                 )
             }
@@ -190,10 +213,17 @@ fun ReaderContent(
                                     }
 
                                     override fun onSearchClose() {}
-                                    override fun onBookmarksUpdate() {}
+                                    override fun onBookmarksUpdate() {
+                                        viewModel.syncBookmarksFromFBook()
+                                    }
+
                                     override fun onDismissDialog() {}
                                     override fun ttsStatus(speaking: Boolean) {
                                         viewModel.volumeKeysEnabled = !speaking
+                                    }
+
+                                    override fun onEditBookmark(bookmark: com.github.axet.bookreader.app.Storage.Bookmark) {
+                                        viewModel.onAction(ReaderActions.EditBookmark(bookmark))
                                     }
                                 }
 
@@ -245,7 +275,7 @@ fun ReaderContent(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Ошибка: ${currentState.message}")
+                Text(stringResource(R.string.sv_error_prefix, currentState.message))
             }
         }
     }
@@ -272,18 +302,18 @@ private fun TocComposeDialog(
     if (tocItems.isEmpty()) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("Оглавление") },
-            text = { Text("Оглавление недоступно для этой книги") },
+            title = { Text(stringResource(R.string.sv_toc_title)) },
+            text = { Text(stringResource(R.string.sv_toc_not_available)) },
             confirmButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("Закрыть")
+                    Text(stringResource(R.string.sv_close))
                 }
             }
         )
     } else {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("Оглавление") },
+            title = { Text(stringResource(R.string.sv_toc_title)) },
             text = {
                 LazyColumn {
                     items(tocItems) { item ->
@@ -300,7 +330,7 @@ private fun TocComposeDialog(
             },
             confirmButton = {
                 TextButton(onClick = onDismiss) {
-                    Text("Закрыть")
+                    Text(stringResource(R.string.sv_close))
                 }
             }
         )
@@ -335,71 +365,6 @@ private fun collectTocItems(
 }
 
 /**
- * Compose диалог закладок
- */
-@Composable
-private fun BookmarksComposeDialog(
-    book: com.github.axet.bookreader.app.Storage.Book?,
-    onDismiss: () -> Unit,
-    onNavigate: (com.github.axet.bookreader.app.Storage.Bookmark) -> Unit,
-    onDelete: (com.github.axet.bookreader.app.Storage.Bookmark) -> Unit,
-) {
-    val bookmarks = remember(book) {
-        book?.info?.bookmarks ?: emptyList()
-    }
-
-    if (bookmarks.isEmpty()) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Закладки") },
-            text = { Text("Нет сохранённых закладок") },
-            confirmButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("Закрыть")
-                }
-            }
-        )
-    } else {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Закладки") },
-            text = {
-                LazyColumn {
-                    itemsIndexed(bookmarks) { index, bookmark ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigate(bookmark) }
-                                .padding(vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = bookmark.text.take(100) + if (bookmark.text.length > 100) "..." else "",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            if (!bookmark.name.isNullOrBlank()) {
-                                Text(
-                                    text = bookmark.name,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            if (index < bookmarks.lastIndex) {
-                                HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("Закрыть")
-                }
-            }
-        )
-    }
-}
-
-/**
  * Compose BottomSheet для настроек шрифтов
  */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -418,9 +383,30 @@ private fun FontsComposeBottomSheet(
         android.preference.PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    var fontSize by remember { mutableFloatStateOf(shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, 16).toFloat()) }
-    var selectedFont by remember { mutableStateOf(shared.getString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, "sans-serif") ?: "sans-serif") }
-    var ignoreEmbeddedFonts by remember { mutableStateOf(shared.getBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, false)) }
+    var fontSize by remember {
+        mutableFloatStateOf(
+            shared.getInt(
+                BookApplication.PREFERENCE_FONTSIZE_FBREADER,
+                16
+            ).toFloat()
+        )
+    }
+    var selectedFont by remember {
+        mutableStateOf(
+            shared.getString(
+                BookApplication.PREFERENCE_FONTFAMILY_FBREADER,
+                "sans-serif"
+            ) ?: "sans-serif"
+        )
+    }
+    var ignoreEmbeddedFonts by remember {
+        mutableStateOf(
+            shared.getBoolean(
+                BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS,
+                false
+            )
+        )
+    }
 
     // Получаем список доступных шрифтов
     val fonts = remember {
@@ -611,15 +597,17 @@ private fun VolumeKeysHandler(
 
             when {
                 keyCode == android.view.KeyEvent.KEYCODE_VOLUME_DOWN &&
-                    event.action == android.view.KeyEvent.ACTION_DOWN -> {
+                        event.action == android.view.KeyEvent.ACTION_DOWN -> {
                     fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
                     true
                 }
+
                 keyCode == android.view.KeyEvent.KEYCODE_VOLUME_UP &&
-                    event.action == android.view.KeyEvent.ACTION_DOWN -> {
+                        event.action == android.view.KeyEvent.ACTION_DOWN -> {
                     fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
                     true
                 }
+
                 else -> false
             }
         }

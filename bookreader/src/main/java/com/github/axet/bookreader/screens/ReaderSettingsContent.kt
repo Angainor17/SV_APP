@@ -100,7 +100,7 @@ fun ReaderSettingsContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.menu_settings)) },
+                title = { Text(stringResource(R.string.sv_menu_settings)) },
                 navigationIcon = {
                     IconButton(onClick = { stackNavigation.back() }) {
                         Icon(
@@ -121,11 +121,11 @@ fun ReaderSettingsContent(
         ) {
             // Режим просмотра
             SettingsItem(
-                title = stringResource(R.string.view_mode),
+                title = stringResource(R.string.sv_view_mode),
                 subtitle = if (viewMode == "CONTINUOUS") {
-                    stringResource(R.string.view_mode_continuous)
+                    stringResource(R.string.sv_view_mode_continuous)
                 } else {
-                    stringResource(R.string.view_mode_paging)
+                    stringResource(R.string.sv_view_mode_paging)
                 },
                 onClick = {
                     val newMode = if (viewMode == "PAGING") "CONTINUOUS" else "PAGING"
@@ -135,8 +135,8 @@ fun ReaderSettingsContent(
 
             // Кнопки громкости
             SettingsSwitch(
-                title = stringResource(R.string.pref_volume_title),
-                subtitle = stringResource(R.string.pref_volume_summary),
+                title = stringResource(R.string.sv_pref_volume_title),
+                subtitle = stringResource(R.string.sv_pref_volume_summary),
                 checked = volumeKeys,
                 onCheckedChange = { checked ->
                     shared.edit { putBoolean(BookApplication.PREFERENCE_VOLUME_KEYS, checked) }
@@ -145,8 +145,8 @@ fun ReaderSettingsContent(
 
             // Поворот экрана
             SettingsSwitch(
-                title = stringResource(R.string.pref_rotate_title),
-                subtitle = stringResource(R.string.pref_rotate_summary),
+                title = stringResource(R.string.sv_pref_rotate_title),
+                subtitle = stringResource(R.string.sv_pref_rotate_summary),
                 checked = rotate,
                 onCheckedChange = { checked ->
                     shared.edit { putBoolean(BookApplication.PREFERENCE_ROTATE, checked) }
@@ -155,11 +155,11 @@ fun ReaderSettingsContent(
 
             // Тема (упрощённая версия)
             SettingsItem(
-                title = stringResource(R.string.pref_theme_title),
+                title = stringResource(R.string.sv_pref_theme_title),
                 subtitle = when (theme) {
-                    "Theme_Dark" -> stringResource(R.string.theme_dark)
-                    "Theme_Light" -> stringResource(R.string.theme_light)
-                    else -> stringResource(R.string.theme_system)
+                    "Theme_Dark" -> stringResource(R.string.sv_theme_dark)
+                    "Theme_Light" -> stringResource(R.string.sv_theme_light)
+                    else -> stringResource(R.string.sv_theme_system)
                 },
                 onClick = {
                     val themes = listOf("", "Theme_Dark", "Theme_Light")

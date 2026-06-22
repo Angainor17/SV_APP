@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -761,39 +760,10 @@ public class FBReaderView extends RelativeLayout {
             protected void run(Object... params) {
                 if (params.length != 0) {
                     Storage.Bookmark bm = (Storage.Bookmark) params[0];
-                    Rect union;
-                    final View anchor = new View(getContext());
-                    if (widget instanceof ScrollWidget)
-                        union = ((ScrollWidget) widget).findUnion(bm);
-                    else
-                        union = findUnion(app.BookTextView.myCurrentPage.TextElementMap.areas(), bm);
-                    MarginLayoutParams lp = new MarginLayoutParams(union.width(), union.height());
-                    lp.leftMargin = union.left;
-                    lp.topMargin = union.top;
-                    FBReaderView.this.addView(anchor, lp);
-                    final BookmarkPopup b = new BookmarkPopup(anchor, bm, new ArrayList<View>()) {
-                        @Override
-                        public void onDelete(Storage.Bookmark l) {
-                            book.info.bookmarks.remove(l);
-                            bookmarksUpdate();
-                            if (listener != null)
-                                listener.onBookmarksUpdate();
-                        }
-
-                        @Override
-                        public void onSelect(int color) {
-                            super.onSelect(color);
-                            bookmarksUpdate();
-                        }
-
-                        @Override
-                        public void onDismiss() {
-                            super.onDismiss();
-                            FBReaderView.this.removeView(anchor);
-                            bookmarksUpdate();
-                        }
-                    };
-                    FBReaderView.this.post(() -> b.show());
+                    // Открываем BottomSheet через listener
+                    if (listener != null) {
+                        listener.onEditBookmark(bm);
+                    }
                 } else {
                     if (book.info.bookmarks == null)
                         book.info.bookmarks = new Storage.Bookmarks();
@@ -1050,41 +1020,25 @@ public class FBReaderView extends RelativeLayout {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(ll);
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                listener.onDismissDialog();
-            }
-        });
+        builder.setOnDismissListener(dialog -> listener.onDismissDialog());
         if (label.ModelId == null) {
-            builder.setNeutralButton(R.string.keep_reading_position, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    gotoPosition(r.getPosition());
-                }
-            });
+            builder.setNeutralButton(R.string.sv_keep_reading_position, (dialog, which) -> gotoPosition(r.getPosition()));
         }
-        builder.setPositiveButton(com.github.axet.androidlibrary.R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
+        builder.setPositiveButton(com.github.axet.androidlibrary.R.string.close, (dialog, which) -> {
         });
         final AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface d) {
-                Window w = dialog.getWindow();
-                w.setLayout(getWidth(), getHeight()); // fixed size after creation
-                r.loadBook(book);
-                if (label.ModelId == null) {
-                    r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
-                    r.app.setView(r.app.BookTextView);
-                } else {
-                    final ZLTextModel model = r.app.Model.getFootnoteModel(label.ModelId);
-                    r.app.BookTextView.setModel(model);
-                    r.app.setView(r.app.BookTextView);
-                    r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
-                }
+        dialog.setOnShowListener(d -> {
+            Window w = dialog.getWindow();
+            w.setLayout(getWidth(), getHeight()); // fixed size after creation
+            r.loadBook(book);
+            if (label.ModelId == null) {
+                r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
+                r.app.setView(r.app.BookTextView);
+            } else {
+                final ZLTextModel model = r.app.Model.getFootnoteModel(label.ModelId);
+                r.app.BookTextView.setModel(model);
+                r.app.setView(r.app.BookTextView);
+                r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0);
             }
         });
         c.setOnClickListener(new OnClickListener() {
@@ -1436,6 +1390,8 @@ public class FBReaderView extends RelativeLayout {
         void onDismissDialog();
 
         void ttsStatus(boolean speaking);
+
+        void onEditBookmark(Storage.Bookmark bookmark);
     }
 
     public static class ZLTextIndexPosition extends com.github.axet.bookreader.widgets.ZLTextIndexPosition {
@@ -1756,16 +1712,10 @@ public class FBReaderView extends RelativeLayout {
                     v.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            BookmarkPopup b = new BookmarkPopup(v, l, bmv) {
-                                @Override
-                                public void onDelete(Storage.Bookmark l) {
-                                    fb.book.info.bookmarks.remove(l);
-                                    fb.bookmarksUpdate();
-                                    if (fb.listener != null)
-                                        fb.listener.onBookmarksUpdate();
-                                }
-                            };
-                            b.show();
+                            // Открываем BottomSheet через listener
+                            if (fb.listener != null) {
+                                fb.listener.onEditBookmark(l);
+                            }
                         }
                     });
                     int color = l.color == 0 ? fb.app.BookTextView.getHighlightingBackgroundColor().intValue() : l.color;

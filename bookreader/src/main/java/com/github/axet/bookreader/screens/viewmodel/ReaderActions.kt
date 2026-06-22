@@ -82,6 +82,16 @@ sealed class ReaderActions {
     // === Закладки ===
 
     /**
+     * Открыть редактирование закладки
+     */
+    data class EditBookmark(val bookmark: Storage.Bookmark) : ReaderActions()
+
+    /**
+     * Сохранить изменения закладки
+     */
+    data class SaveBookmarkEdit(val bookmark: Storage.Bookmark, val name: String, val color: Int) : ReaderActions()
+
+    /**
      * Добавить закладку
      */
     data class AddBookmark(val bookmark: Storage.Bookmark) : ReaderActions()

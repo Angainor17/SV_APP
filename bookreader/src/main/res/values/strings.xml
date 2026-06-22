@@ -1,35 +1,62 @@
 <resources>
-    <string name="menu_settings">Настройки</string>
-    <string name="theme_system">Системная</string>
-    <string name="theme_dark">Тёмная</string>
-    <string name="theme_light">Светлая</string>
+    <string name="sv_menu_settings">Настройки</string>
+    <string name="sv_theme_system">Системная</string>
+    <string name="sv_theme_dark">Тёмная</string>
+    <string name="sv_theme_light">Светлая</string>
 
-    <string name="book_open">Открыть</string>
-    <string name="book_delete">Удалить</string>
-    <string name="pref_theme_title">Тема приложения</string>
-    <string name="pref_rotate_title">Поворот</string>
-    <string name="pref_rotate_summary">Разрешить поворот экрана</string>
-    <string name="view_mode_continuous">Прокрутка страниц</string>
-    <string name="view_mode_paging">Постраничный режим</string>
-    <string name="view_mode">Режим просмотра</string>
-    <string name="image_original_size">Оригинальный размер</string>
-    <string name="image_fit_to_screen">Растянуть на весь экран</string>
-    <string name="image_original_size_all_images">Оригинальный размер (все изображения)</string>
-    <string name="image_fit_to_screen_all_images">Растянуть на весь экран (все изображения)</string>
-    <string name="keep_reading_position">Сохранить позицию</string>
-    <string name="add_more_fonts_to">Дополнительные шрифты загружать в \'%s\'</string>
-    <string name="controls_fullscreen">Полныйэкран</string>
-    <string name="controls_navigate">Навигация</string>
-    <string name="controls_nextpage">Следующая страница</string>
-    <string name="controls_prevpage">Предыдущая страница</string>
-    <string name="controls_brightness">Яркость</string>
-    <string name="delete_bookmark">Удалить заметку</string>
-    <string name="pref_volume_title">Кнопки громкости</string>
-    <string name="pref_volume_summary">Использовать кнопки громкости для перелистывания страниц</string>
-    <string name="bookmark_edit">Редактировать</string>
-    <string name="ignore_embedded_fonts">Игнорировать встроенные в книгу шрифты</string>
+    <string name="sv_book_open">Открыть</string>
+    <string name="sv_book_delete">Удалить</string>
+    <string name="sv_pref_theme_title">Тема приложения</string>
+    <string name="sv_pref_rotate_title">Поворот</string>
+    <string name="sv_pref_rotate_summary">Разрешить поворот экрана</string>
+    <string name="sv_view_mode_continuous">Прокрутка страниц</string>
+    <string name="sv_view_mode_paging">Постраничный режим</string>
+    <string name="sv_view_mode">Режим просмотра</string>
+    <string name="sv_image_original_size">Оригинальный размер</string>
+    <string name="sv_image_fit_to_screen">Растянуть на весь экран</string>
+    <string name="sv_image_original_size_all_images">Оригинальный размер (все изображения)</string>
+    <string name="sv_image_fit_to_screen_all_images">Растянуть на весь экран (все изображения)</string>
+    <string name="sv_keep_reading_position">Сохранить позицию</string>
+    <string name="sv_add_more_fonts_to">Дополнительные шрифты загружать в \'%s\'</string>
+    <string name="sv_controls_fullscreen">Полныйэкран</string>
+    <string name="sv_controls_navigate">Навигация</string>
+    <string name="sv_controls_nextpage">Следующая страница</string>
+    <string name="sv_controls_prevpage">Предыдущая страница</string>
+    <string name="sv_controls_brightness">Яркость</string>
+    <string name="sv_delete_bookmark">Удалить заметку</string>
+    <string name="sv_pref_volume_title">Кнопки громкости</string>
+    <string name="sv_pref_volume_summary">Использовать кнопки громкости для перелистывания страниц</string>
+    <string name="sv_bookmark_edit">Редактировать</string>
+    <string name="sv_ignore_embedded_fonts">Игнорировать встроенные в книгу шрифты</string>
 
     <!-- Reflow (PDF) -->
-    <string name="reflow_text">Адаптировать текст</string>
-    <string name="original_layout">Оригинальный макет</string>
+    <string name="sv_reflow_text">Адаптировать текст</string>
+    <string name="sv_original_layout">Оригинальный макет</string>
+
+    <!-- TOC Dialog -->
+    <string name="sv_toc_title">Оглавление</string>
+    <string name="sv_toc_not_available">Оглавление недоступно для этой книги</string>
+    <string name="sv_close">Закрыть</string>
+
+    <!-- Bookmarks Dialog -->
+    <string name="sv_bookmarks_title">Закладки</string>
+    <string name="sv_bookmarks_empty">Нет сохранённых закладок</string>
+    <string name="sv_bookmark_page_prefix">С.</string>
+    <string name="sv_delete">Удалить</string>
+
+    <!-- Bookmark BottomSheet -->
+    <string name="sv_bookmark_title">Закладка</string>
+    <string name="sv_bookmark_name_label">Название</string>
+    <string name="sv_bookmark_name_hint">Введите название закладки</string>
+    <string name="sv_bookmark_color_label">Цвет выделения</string>
+    <string name="sv_bookmark_save">Сохранить</string>
+    <string name="sv_bookmark_color_selected">Выбрано</string>
+
+    <!-- Font Settings -->
+    <string name="sv_font_settings_title">Настройки шрифта</string>
+    <string name="sv_font_size_label">Размер шрифта: %d</string>
+    <string name="sv_font_family_label">Шрифт</string>
+
+    <!-- Error -->
+    <string name="sv_error_prefix">Ошибка: %s</string>
 </resources>

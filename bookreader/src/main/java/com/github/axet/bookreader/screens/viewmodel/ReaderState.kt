@@ -21,6 +21,8 @@ sealed class ReaderState {
         val showToc: Boolean = false,
         val showBookmarks: Boolean = false,
         val showFontSettings: Boolean = false,
+        val showBookmarkEdit: Boolean = false,
+        val editingBookmark: Storage.Bookmark? = null,
         val viewMode: ViewMode = ViewMode.PAGING,
         val isReflow: Boolean = false,
     ) : ReaderState()

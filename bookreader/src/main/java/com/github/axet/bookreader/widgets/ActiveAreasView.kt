@@ -31,11 +31,11 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
     private val views = HashMap<String, ZoneView>()
 
     private val names = HashMap<String, String>().apply {
-        put("menu", context.getString(R.string.controls_fullscreen))
-        put("navigate", context.getString(R.string.controls_navigate))
-        put("nextPage", context.getString(R.string.controls_nextpage))
-        put("previousPage", context.getString(R.string.controls_prevpage))
-        put("brightness", context.getString(R.string.controls_brightness))
+        put("menu", context.getString(R.string.sv_controls_fullscreen))
+        put("navigate", context.getString(R.string.sv_controls_navigate))
+        put("nextPage", context.getString(R.string.sv_controls_nextpage))
+        put("previousPage", context.getString(R.string.sv_controls_prevpage))
+        put("brightness", context.getString(R.string.sv_controls_brightness))
     }
 
     /**

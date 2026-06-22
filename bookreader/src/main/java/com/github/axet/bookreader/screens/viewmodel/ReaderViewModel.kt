@@ -83,6 +83,8 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.HideDialogs -> hideDialogs()
 
             // Закладки
+            is ReaderActions.EditBookmark -> editBookmark(action.bookmark)
+            is ReaderActions.SaveBookmarkEdit -> saveBookmarkEdit(action.bookmark, action.name, action.color)
             is ReaderActions.AddBookmark -> addBookmark(action.bookmark)
             is ReaderActions.DeleteBookmark -> deleteBookmark(action.bookmark)
 
@@ -296,11 +298,68 @@ class ReaderViewModel @Inject constructor(
         _state.value = currentState.copy(
             showToc = false,
             showBookmarks = false,
-            showFontSettings = false
+            showFontSettings = false,
+            showBookmarkEdit = false,
+            editingBookmark = null
         )
     }
 
     // ==================== Закладки ====================
+
+    /**
+     * Синхронизировать закладки из FBook и обновить состояние
+     */
+    fun syncBookmarksFromFBook() {
+        val book = currentBook ?: return
+        val fbookBookmarks = fbReaderView?.book?.info?.bookmarks
+        if (fbookBookmarks != null) {
+            book.info.bookmarks = fbookBookmarks
+        }
+        // Триггерим обновление состояния для рекомпозиции диалога
+        val currentState = _state.value as? ReaderState.Content ?: return
+        _state.value = currentState.copy(book = book)
+        storage.save(book)
+    }
+
+    /**
+     * Открыть редактирование закладки
+     */
+    private fun editBookmark(bookmark: Storage.Bookmark) {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        _state.value = currentState.copy(
+            showBookmarkEdit = true,
+            editingBookmark = bookmark,
+            showToc = false,
+            showBookmarks = false,
+            showFontSettings = false
+        )
+    }
+
+    /**
+     * Сохранить изменения закладки
+     */
+    private fun saveBookmarkEdit(bookmark: Storage.Bookmark, name: String, color: Int) {
+        // Обновляем данные в закладке
+        bookmark.name = name.ifBlank { null }
+        bookmark.color = color
+        bookmark.last = System.currentTimeMillis()
+
+        // Обновляем в FBook если есть
+        val fbBookmark = fbReaderView?.book?.info?.bookmarks?.find { it.start.samePositionAs(bookmark.start) }
+        if (fbBookmark != null) {
+            fbBookmark.name = bookmark.name
+            fbBookmark.color = bookmark.color
+            fbBookmark.last = bookmark.last
+        }
+
+        // Сохраняем и обновляем отображение
+        currentBook?.let { storage.save(it) }
+        fbReaderView?.bookmarksUpdate()
+        syncBookmarksFromFBook()
+
+        // Закрываем диалог
+        hideDialogs()
+    }
 
     private fun addBookmark(bookmark: Storage.Bookmark) {
         val book = currentBook ?: return
@@ -312,16 +371,36 @@ class ReaderViewModel @Inject constructor(
 
     private fun deleteBookmark(bookmark: Storage.Bookmark) {
         val book = currentBook ?: return
-        val index = book.info.bookmarks.indexOf(bookmark)
+
+        // Удаляем из Storage.Book по позиции и создаём новый список
+        val index = book.info.bookmarks.indexOfFirst {
+            it.start.samePositionAs(bookmark.start) && it.end.samePositionAs(bookmark.end)
+        }
         if (index >= 0) {
             book.info.bookmarks.removeAt(index)
         }
-        val fbIndex = fbReaderView?.book?.info?.bookmarks?.indexOf(bookmark) ?: -1
-        if (fbIndex >= 0) {
-            fbReaderView?.book?.info?.bookmarks?.removeAt(fbIndex)
+        // Создаём новый объект списка для триггера рекомпозиции
+        val newBookmarks = Storage.Bookmarks()
+        newBookmarks.addAll(book.info.bookmarks)
+        book.info.bookmarks = newBookmarks
+
+        // Удаляем из FBook по позиции
+        val fbBookmarks = fbReaderView?.book?.info?.bookmarks
+        if (fbBookmarks != null) {
+            val fbIndex = fbBookmarks.indexOfFirst {
+                it.start.samePositionAs(bookmark.start) && it.end.samePositionAs(bookmark.end)
+            }
+            if (fbIndex >= 0) {
+                fbBookmarks.removeAt(fbIndex)
+            }
         }
+
         fbReaderView?.bookmarksUpdate()
         storage.save(book)
+
+        // Обновляем состояние для рекомпозиции
+        val currentState = _state.value as? ReaderState.Content ?: return
+        _state.value = currentState.copy(book = book)
     }
 
     // ==================== Шрифты ====================
