@@ -53,9 +53,6 @@
     <string name="sv_bookmark_color_selected">Выбрано</string>
 
     <!-- Font Settings -->
-    <string name="sv_font_settings_title">Настройки шрифта</string>
-    <string name="sv_font_size_label">Размер шрифта: %d</string>
-    <string name="sv_font_family_label">Шрифт</string>
 
     <!-- Error -->
     <string name="sv_error_prefix">Ошибка: %s</string>
