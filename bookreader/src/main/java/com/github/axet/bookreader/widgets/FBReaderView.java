@@ -134,6 +134,7 @@ public class FBReaderView extends RelativeLayout {
     FBFooterView footer;
     SelectionView selection;
     ZLTextPosition scrollDelayed;
+    boolean scrollCentered; // центрировать позицию при прокрутке
     DrawerLayout drawer;
     Plugin.View.Search search;
     int searchPagePending;
@@ -1058,7 +1059,8 @@ public class FBReaderView extends RelativeLayout {
         if (p == null)
             return;
         if (widget instanceof ScrollWidget) {
-            if (p.getElementIndex() != 0) {
+            // Для центрирования или при наличии offset - используем scrollDelayed
+            if (p.getElementIndex() != 0 || scrollCentered) {
                 scrollDelayed = p;
                 p = new ZLTextFixedPosition(p.getParagraphIndex(), 0, 0);
             }
@@ -1073,6 +1075,19 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void gotoPosition(ZLTextPosition p) {
+        scrollCentered = false;
+        if (pluginview != null)
+            gotoPluginPosition(p);
+        else
+            app.BookTextView.gotoPosition(p);
+        resetNewPosition();
+    }
+
+    /**
+     * Переход к позиции с центрированием на экране (для непрерывного режима)
+     */
+    public void gotoPositionCentered(ZLTextPosition p) {
+        scrollCentered = true;
         if (pluginview != null)
             gotoPluginPosition(p);
         else

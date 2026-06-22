@@ -97,20 +97,20 @@ fun BookmarksComposeDialog(
                                     .clickable {
                                         onDismiss()
                                         fbReaderView?.apply {
-                                            // Для постраничного режима игнорируем offset (как в TOC)
-                                            val position = if (widget is PagerWidget) {
-                                                ZLTextFixedPosition(
-                                                    bookmark.start.paragraphIndex,
-                                                    0,
-                                                    0
-                                                )
-                                            } else {
-                                                bookmark.start
-                                            }
-                                            gotoPosition(position)
+                                            // Игнорируем offset, открываем страницу с закладкой
+                                            val position = ZLTextFixedPosition(
+                                                bookmark.start.paragraphIndex,
+                                                0,
+                                                0
+                                            )
                                             if (widget is PagerWidget) {
+                                                // Постраничный режим
+                                                gotoPosition(position)
                                                 widget?.reset()
                                                 widget?.repaint()
+                                            } else {
+                                                // Непрерывный режим - центрируем страницу
+                                                gotoPositionCentered(position)
                                             }
                                         }
                                     }
