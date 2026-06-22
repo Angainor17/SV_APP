@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 
 import org.geometerplus.android.fbreader.network.Util;
-import org.geometerplus.android.fbreader.network.litres.UserRegistrationActivity;
 import org.geometerplus.fbreader.network.INetworkLink;
 import org.geometerplus.fbreader.network.NetworkTree;
 import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationManager;
@@ -47,11 +46,7 @@ public class SignUpAction extends Action {
     @Override
     public void run(NetworkTree tree) {
         final INetworkLink link = tree.getLink();
-        try {
-            myActivity.startActivity(Util.authorisationIntent(
-                    link, myActivity, UserRegistrationActivity.class
-            ));
-        } catch (ActivityNotFoundException e) {
-        }
+        // SignUp functionality removed - was LitRes-specific
+        // No alternative activity available
     }
 }

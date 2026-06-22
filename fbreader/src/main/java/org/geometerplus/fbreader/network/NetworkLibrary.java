@@ -19,9 +19,7 @@
 
 package org.geometerplus.fbreader.network;
 
-import org.geometerplus.fbreader.fbreader.options.SyncOptions;
 import org.geometerplus.fbreader.network.opds.OPDSLinkReader;
-import org.geometerplus.fbreader.network.opds.OPDSSyncNetworkLink;
 import org.geometerplus.fbreader.network.tree.AddCustomCatalogItemTree;
 import org.geometerplus.fbreader.network.tree.BasketCatalogTree;
 import org.geometerplus.fbreader.network.tree.ManageCatalogsItemTree;
@@ -174,11 +172,6 @@ public class NetworkLibrary {
         }
 
         final List<INetworkLink> result = new LinkedList<INetworkLink>();
-        INetworkLink syncLink = linksById.get(SyncOptions.DOMAIN);
-        if (syncLink == null) {
-            syncLink = new OPDSSyncNetworkLink(this);
-        }
-        result.add(syncLink);
         for (String id : activeIds()) {
             final INetworkLink link = linksById.get(id);
             if (link != null) {

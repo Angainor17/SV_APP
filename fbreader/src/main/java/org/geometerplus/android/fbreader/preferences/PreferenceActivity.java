@@ -29,7 +29,6 @@ import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
 import org.geometerplus.android.fbreader.network.auth.ActivityNetworkContext;
 import org.geometerplus.android.fbreader.preferences.background.BackgroundPreference;
 import org.geometerplus.android.fbreader.preferences.fileChooser.FileChooserCollection;
-import org.geometerplus.android.fbreader.sync.SyncOperations;
 import org.geometerplus.android.util.DeviceType;
 import org.geometerplus.android.util.UIUtil;
 import org.geometerplus.fbreader.Paths;
@@ -43,11 +42,7 @@ import org.geometerplus.fbreader.fbreader.options.FooterOptions;
 import org.geometerplus.fbreader.fbreader.options.ImageOptions;
 import org.geometerplus.fbreader.fbreader.options.MiscOptions;
 import org.geometerplus.fbreader.fbreader.options.PageTurningOptions;
-import org.geometerplus.fbreader.fbreader.options.SyncOptions;
 import org.geometerplus.fbreader.fbreader.options.ViewOptions;
-import org.geometerplus.fbreader.network.sync.SyncData;
-import org.geometerplus.fbreader.network.sync.SyncUtil;
-import org.geometerplus.fbreader.tips.TipsManager;
 import org.geometerplus.zlibrary.core.application.ZLKeyBindings;
 import org.geometerplus.zlibrary.core.language.Language;
 import org.geometerplus.zlibrary.core.network.JsonRequest;
@@ -115,7 +110,6 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         config.requestAllValuesForGroup("Files");
         config.requestAllValuesForGroup("Scrolling");
         config.requestAllValuesForGroup("Colors");
-        config.requestAllValuesForGroup("Sync");
         setResult(FBReader.RESULT_REPAINT);
 
         final ViewOptions viewOptions = new ViewOptions();
@@ -123,7 +117,6 @@ public class PreferenceActivity extends ZLPreferenceActivity {
         final FooterOptions footerOptions = viewOptions.getFooterOptions();
         final PageTurningOptions pageTurningOptions = new PageTurningOptions();
         final ImageOptions imageOptions = new ImageOptions();
-        final SyncOptions syncOptions = new SyncOptions();
         final ColorProfile profile = viewOptions.getColorProfile();
         final ZLTextStyleCollection collection = viewOptions.getTextStyleCollection();
         final ZLKeyBindings keyBindings = new ZLKeyBindings();
@@ -160,92 +153,8 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                 directoriesScreen.Resource, "tempDir", Paths.TempDirectoryOption(this), null
         ));
 
-        final Screen syncScreen = createPreferenceScreen("sync");
-        final PreferenceSet syncPreferences = new PreferenceSet.Enabler() {
-            @Override
-            protected Boolean detectState() {
-                return syncOptions.Enabled.getValue();
-            }
-        };
-        syncScreen.addPreference(new UrlPreference(this, syncScreen.Resource, "site"));
-        syncScreen.addPreference(new ZLCheckBoxPreference(
-                this, syncScreen.Resource.getResource("enable")
-        ) {
-            {
-                if (syncOptions.Enabled.getValue()) {
-                    setChecked(true);
-                    setOnSummary(SyncUtil.getAccountName(myNetworkContext));
-                } else {
-                    setChecked(false);
-                }
-            }
-
-            private void enableSynchronisation() {
-                SyncOperations.enableSync(PreferenceActivity.this, syncOptions);
-            }
-
-            @Override
-            protected void onClick() {
-                super.onClick();
-                syncPreferences.run();
-
-                if (!isChecked()) {
-                    SyncUtil.logout(myNetworkContext);
-                    syncOptions.Enabled.setValue(false);
-                    enableSynchronisation();
-                    syncPreferences.run();
-                    new SyncData().reset();
-                    return;
-                }
-
-                UIUtil.createExecutor(PreferenceActivity.this, "tryConnect").execute(new Runnable() {
-                    public void run() {
-                        try {
-                            myNetworkContext.perform(
-                                    new JsonRequest(SyncOptions.BASE_URL + "login/test") {
-                                        @Override
-                                        public void processResponse(Object response) {
-                                            final String account = (String) ((Map) response).get("user");
-                                            syncOptions.Enabled.setValue(account != null);
-                                            enableSynchronisation();
-                                            runOnUiThread(new Runnable() {
-                                                public void run() {
-                                                    setOnSummary(account);
-                                                    syncPreferences.run();
-                                                }
-                                            });
-                                        }
-                                    }
-                            );
-                        } catch (ZLNetworkException e) {
-                            e.printStackTrace();
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                    setChecked(false);
-                                }
-                            });
-                        }
-                    }
-                }, null);
-            }
-
-            private void setOnSummary(String account) {
-                final String summary = account != null
-                        ? Resource.getResource("summaryOnWithAccount").getValue().replace("%s", account)
-                        : Resource.getResource("summaryOn").getValue();
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        setSummaryOn(summary);
-                    }
-                });
-            }
-        });
-        syncPreferences.add(syncScreen.addOption(syncOptions.UploadAllBooks, "uploadAllBooks", "values"));
-        syncPreferences.add(syncScreen.addOption(syncOptions.Positions, "positions", "values"));
-        syncPreferences.add(syncScreen.addOption(syncOptions.ChangeCurrentBook, "changeCurrentBook"));
-        //syncPreferences.add(syncScreen.addOption(syncOptions.Metainfo, "metainfo", "values"));
-        syncPreferences.add(syncScreen.addOption(syncOptions.Bookmarks, "bookmarks", "values"));
-        syncPreferences.run();
+        // Sync screen disabled - sync functionality removed
+        // final Screen syncScreen = createPreferenceScreen("sync");
 
         final Screen appearanceScreen = createPreferenceScreen("appearance");
         appearanceScreen.addPreference(new LanguagePreference(
@@ -762,8 +671,9 @@ public class PreferenceActivity extends ZLPreferenceActivity {
                 keyBindings.getOption(KeyEvent.KEYCODE_BACK, true), backKeyLongPressActions
         ));
 
-        final Screen tipsScreen = createPreferenceScreen("tips");
-        tipsScreen.addOption(TipsManager.ShowTipsOption, "showTips");
+        // Tips screen removed - functionality not used
+        // final Screen tipsScreen = createPreferenceScreen("tips");
+        // tipsScreen.addOption(TipsManager.ShowTipsOption, "showTips");
 
         final Screen aboutScreen = createPreferenceScreen("about");
         aboutScreen.addPreference(new InfoPreference(

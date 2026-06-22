@@ -23,7 +23,6 @@ import org.geometerplus.fbreader.network.INetworkLink;
 import org.geometerplus.fbreader.network.NetworkBookItem;
 import org.geometerplus.fbreader.network.NetworkException;
 import org.geometerplus.fbreader.network.NetworkLibrary;
-import org.geometerplus.fbreader.network.authentication.litres.LitResAuthenticationManager;
 import org.geometerplus.fbreader.network.opds.OPDSNetworkLink;
 import org.geometerplus.fbreader.network.urlInfo.BookUrlInfo;
 import org.geometerplus.zlibrary.core.money.Money;
@@ -48,9 +47,8 @@ public abstract class NetworkAuthenticationManager {
     public static NetworkAuthenticationManager createManager(NetworkLibrary library, INetworkLink link, Class<? extends NetworkAuthenticationManager> managerClass) {
         NetworkAuthenticationManager mgr = ourManagers.get(link.getStringId());
         if (mgr == null) {
-            if (managerClass == LitResAuthenticationManager.class) {
-                mgr = new LitResAuthenticationManager(library, (OPDSNetworkLink) link);
-            }
+            // No authentication manager implementations available
+            // To add a new authentication manager, extend NetworkAuthenticationManager
             if (mgr != null) {
                 ourManagers.put(link.getStringId(), mgr);
             }

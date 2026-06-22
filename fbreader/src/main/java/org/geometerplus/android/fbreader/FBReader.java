@@ -48,8 +48,6 @@ import org.geometerplus.android.fbreader.dict.DictionaryUtil;
 import org.geometerplus.android.fbreader.formatPlugin.PluginUtil;
 import org.geometerplus.android.fbreader.httpd.DataService;
 import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
-import org.geometerplus.android.fbreader.sync.SyncOperations;
-import org.geometerplus.android.fbreader.tips.TipsActivity;
 import org.geometerplus.android.util.DeviceType;
 import org.geometerplus.android.util.SearchDialogUtil;
 import org.geometerplus.android.util.UIMessageUtil;
@@ -66,7 +64,6 @@ import org.geometerplus.fbreader.fbreader.options.CancelMenuHelper;
 import org.geometerplus.fbreader.fbreader.options.ColorProfile;
 import org.geometerplus.fbreader.formats.ExternalFormatPlugin;
 import org.geometerplus.fbreader.formats.PluginCollection;
-import org.geometerplus.fbreader.tips.TipsManager;
 import org.geometerplus.zlibrary.core.application.ZLApplicationWindow;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.library.ZLibrary;
@@ -153,11 +150,6 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
             );
         }
     };
-    private BroadcastReceiver mySyncUpdateReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            myFBReaderApp.useSyncInfo(myResumeTimestamp + 10 * 1000 > System.currentTimeMillis(), myNotifier);
-        }
-    };
 
     public static Intent defaultIntent(Context context) {
         return new Intent(context, FBReader.class)
@@ -229,7 +221,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
             public void run() {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        new TipRunner().start();
+                        // TipRunner removed - Tips functionality not used
                         DictionaryUtil.init(FBReader.this, null);
                         final Intent intent = getIntent();
                         if (intent != null && FBReaderIntents.Action.PLUGIN.equals(intent.getAction())) {
@@ -530,8 +522,6 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         myStartTimer = true;
         Config.Instance().runOnConnect(new Runnable() {
             public void run() {
-                SyncOperations.enableSync(FBReader.this, myFBReaderApp.SyncOptions);
-
                 final int brightnessLevel =
                         getZLibrary().ScreenBrightnessLevelOption.getValue();
                 if (brightnessLevel != 0) {
@@ -564,7 +554,6 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
             action.run();
         }
 
-        registerReceiver(mySyncUpdateReceiver, new IntentFilter(FBReaderIntents.Event.SYNC_UPDATED));
 
         SetScreenOrientationAction.setOrientation(this, getZLibrary().getOrientationOption().getValue());
         if (myCancelIntent != null) {
@@ -584,22 +573,10 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
                     openBook(intent, null, true);
                 }
             });
-        } else if (myFBReaderApp.getCurrentServerBook(null) != null) {
-            getCollection().bindToService(this, new Runnable() {
-                public void run() {
-                    myFBReaderApp.useSyncInfo(true, myNotifier);
-                }
-            });
         } else if (myFBReaderApp.Model == null && myFBReaderApp.ExternalBook != null) {
             getCollection().bindToService(this, new Runnable() {
                 public void run() {
                     myFBReaderApp.openBook(myFBReaderApp.ExternalBook, null, null, myNotifier);
-                }
-            });
-        } else {
-            getCollection().bindToService(this, new Runnable() {
-                public void run() {
-                    myFBReaderApp.useSyncInfo(true, myNotifier);
                 }
             });
         }
@@ -610,13 +587,7 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
 
     @Override
     protected void onPause() {
-        SyncOperations.quickSync(this, myFBReaderApp.SyncOptions);
-
         IsPaused = true;
-        try {
-            unregisterReceiver(mySyncUpdateReceiver);
-        } catch (IllegalArgumentException e) {
-        }
 
         try {
             unregisterReceiver(myBatteryInfoReceiver);
@@ -1031,30 +1002,5 @@ public final class FBReader extends FBReaderMainActivity implements ZLApplicatio
         myFBReaderApp.getViewWidget().repaint();
     }
 
-    private class TipRunner extends Thread {
-        TipRunner() {
-            setPriority(MIN_PRIORITY);
-        }
-
-        public void run() {
-            final TipsManager manager = new TipsManager(Paths.systemInfo(FBReader.this));
-            switch (manager.requiredAction()) {
-                case Initialize:
-                    startActivity(new Intent(
-                            TipsActivity.INITIALIZE_ACTION, null, FBReader.this, TipsActivity.class
-                    ));
-                    break;
-                case Show:
-                    startActivity(new Intent(
-                            TipsActivity.SHOW_TIP_ACTION, null, FBReader.this, TipsActivity.class
-                    ));
-                    break;
-                case Download:
-                    manager.startDownloading();
-                    break;
-                case None:
-                    break;
-            }
-        }
-    }
+    // TipRunner class removed - Tips functionality not used
 }

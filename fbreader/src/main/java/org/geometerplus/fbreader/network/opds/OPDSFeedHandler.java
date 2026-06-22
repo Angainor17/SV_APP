@@ -25,8 +25,6 @@ import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.fbreader.network.TopUpItem;
 import org.geometerplus.fbreader.network.atom.ATOMId;
 import org.geometerplus.fbreader.network.atom.ATOMLink;
-import org.geometerplus.fbreader.network.authentication.litres.LitResBookshelfItem;
-import org.geometerplus.fbreader.network.authentication.litres.LitResRecommendationsItem;
 import org.geometerplus.fbreader.network.urlInfo.BookUrlInfo;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfo;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfoCollection;
@@ -272,21 +270,7 @@ class OPDSFeedHandler extends AbstractOPDSFeedHandler implements OPDSConstants {
         }
 
         if (litresRel != null) {
-            if (REL_BOOKSHELF.equals(litresRel)) {
-                return new LitResBookshelfItem(
-                        opdsLink,
-                        entry.Title,
-                        annotation,
-                        urlMap
-                );
-            } else if (REL_RECOMMENDATIONS.equals(litresRel)) {
-                return new LitResRecommendationsItem(
-                        opdsLink,
-                        entry.Title,
-                        annotation,
-                        urlMap
-                );
-            } else if (REL_TOPUP.equals(litresRel)) {
+            if (REL_TOPUP.equals(litresRel)) {
                 return new TopUpItem(opdsLink, urlMap);
             } else {
                 return null;
