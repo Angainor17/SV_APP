@@ -933,11 +933,15 @@ public class FBReaderView extends RelativeLayout {
 
         app.BookTextView.clearSelection();
         selectionClose();
+
+        final String title = book.info != null ? book.info.title : "";
+        final String authors = book.info != null ? book.info.authors : "";
+
         action.action(
                 this.getContext(),
                 text,
-                book.info.title,
-                book.info.authors,
+                title != null ? title : "",
+                authors != null ? authors : "",
                 pageIndex
         );
     }

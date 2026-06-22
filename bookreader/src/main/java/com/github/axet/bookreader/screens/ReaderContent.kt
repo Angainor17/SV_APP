@@ -199,7 +199,7 @@ fun ReaderContent(
 
                                 if (context is Activity) {
                                     setWindow(context.window)
-                                    setActivity(context, null)
+                                    setActivity(context, viewModel.getOnBookPagerManager())
                                 }
 
                                 fbReaderView = this

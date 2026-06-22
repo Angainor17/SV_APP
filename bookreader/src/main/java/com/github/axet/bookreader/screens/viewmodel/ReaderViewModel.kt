@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
+import su.sv.managers.OnBookPagerManager
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val onBookPagerManager: OnBookPagerManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ReaderState>(ReaderState.Loading)
@@ -46,6 +48,11 @@ class ReaderViewModel @Inject constructor(
 
     // Флаг для управления клавишами громкости
     var volumeKeysEnabled: Boolean = true
+
+    /**
+     * Получить менеджер для обработки действий с книгой
+     */
+    fun getOnBookPagerManager(): OnBookPagerManager = onBookPagerManager
 
     /**
      * Обработка действий пользователя

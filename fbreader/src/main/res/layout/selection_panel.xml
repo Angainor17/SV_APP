@@ -80,7 +80,6 @@
                 android:layout_height="35dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:background="?selectableItemBackground"
                 android:contentDescription="@string/panel_misspell"
                 android:tooltipText="@string/panel_misspell"
                 android:scaleType="centerCrop"
