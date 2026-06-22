@@ -34,13 +34,11 @@ import org.geometerplus.fbreader.fbreader.options.CancelMenuHelper;
 import org.geometerplus.fbreader.fbreader.options.ImageOptions;
 import org.geometerplus.fbreader.fbreader.options.MiscOptions;
 import org.geometerplus.fbreader.fbreader.options.PageTurningOptions;
-import org.geometerplus.fbreader.fbreader.options.SyncOptions;
 import org.geometerplus.fbreader.fbreader.options.ViewOptions;
 import org.geometerplus.fbreader.formats.BookReadingException;
 import org.geometerplus.fbreader.formats.ExternalFormatPlugin;
 import org.geometerplus.fbreader.formats.FormatPlugin;
 import org.geometerplus.fbreader.formats.PluginCollection;
-import org.geometerplus.fbreader.network.sync.SyncData;
 import org.geometerplus.fbreader.util.AutoTextSnippet;
 import org.geometerplus.fbreader.util.EmptyTextSnippet;
 import org.geometerplus.fbreader.util.TextSnippet;
@@ -68,10 +66,8 @@ public class FBReaderApp extends ZLApplication {
     public final ImageOptions ImageOptions = new ImageOptions();
     public final ViewOptions ViewOptions = new ViewOptions();
     public final PageTurningOptions PageTurningOptions = new PageTurningOptions();
-    public final SyncOptions SyncOptions = new SyncOptions();
     public final IBookCollection<Book> Collection;
     private final ZLKeyBindings myBindings = new ZLKeyBindings();
-    private final SyncData mySyncData = new SyncData();
     private final SaverThread mySaverThread = new SaverThread();
     public FBView BookTextView;
     public FBView FootnoteView;
@@ -157,21 +153,7 @@ public class FBReaderApp extends ZLApplication {
         openBook(Collection.getBookByFile(BookUtil.getHelpFile().getPath()), null, null, null);
     }
 
-    public Book getCurrentServerBook(Notifier notifier) {
-        final SyncData.ServerBookInfo info = mySyncData.getServerBookInfo();
-        if (info == null) {
-            return null;
-        }
-
-        for (String hash : info.Hashes) {
-            final Book book = Collection.getBookByHash(hash);
-            if (book != null) {
-                return book;
-            }
-        }
-        if (notifier != null) {
-            notifier.showMissingBookNotification(info);
-        }
+    public MissingBookInfo getCurrentServerBook(Notifier notifier) {
         return null;
     }
 
@@ -183,7 +165,7 @@ public class FBReaderApp extends ZLApplication {
         }
 
         if (book == null) {
-            book = getCurrentServerBook(notifier);
+            book = getCurrentServerBook(notifier) != null ? Collection.getRecentBook(0) : null;
             if (book == null) {
                 book = Collection.getRecentBook(0);
             }
@@ -489,34 +471,17 @@ public class FBReaderApp extends ZLApplication {
     }
 
     public void useSyncInfo(boolean openOtherBook, Notifier notifier) {
-        if (openOtherBook && SyncOptions.ChangeCurrentBook.getValue()) {
-            final Book fromServer = getCurrentServerBook(notifier);
-            if (fromServer != null && !Collection.sameBook(fromServer, Collection.getRecentBook(0))) {
-                openBook(fromServer, null, null, notifier);
-                return;
-            }
-        }
-
-        if (myStoredPositionBook != null &&
-                mySyncData.hasPosition(Collection.getHash(myStoredPositionBook, true))) {
-            gotoStoredPosition();
-            storePosition();
-        }
+        // Sync functionality removed - stub method
     }
 
     private ZLTextFixedPosition getStoredPosition(Book book) {
-        final ZLTextFixedPosition.WithTimestamp fromServer =
-                mySyncData.getAndCleanPosition(Collection.getHash(book, true));
         final ZLTextFixedPosition.WithTimestamp local =
                 Collection.getStoredPosition(book.getId());
 
         if (local == null) {
-            return fromServer != null ? fromServer : new ZLTextFixedPosition(0, 0, 0);
-        } else if (fromServer == null) {
-            return local;
-        } else {
-            return fromServer.Timestamp >= local.Timestamp ? fromServer : local;
+            return new ZLTextFixedPosition(0, 0, 0);
         }
+        return local;
     }
 
     private void gotoStoredPosition() {
@@ -691,7 +656,11 @@ public class FBReaderApp extends ZLApplication {
     }
 
     public static interface Notifier {
-        void showMissingBookNotification(SyncData.ServerBookInfo info);
+        void showMissingBookNotification(MissingBookInfo info);
+    }
+
+    public static class MissingBookInfo {
+        // Stub class for sync functionality removed
     }
 
     private class PositionSaver implements Runnable {

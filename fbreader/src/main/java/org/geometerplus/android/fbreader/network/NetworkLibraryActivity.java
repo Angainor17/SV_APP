@@ -45,7 +45,6 @@ import org.geometerplus.android.fbreader.network.action.BuyBasketBooksAction;
 import org.geometerplus.android.fbreader.network.action.ClearBasketAction;
 import org.geometerplus.android.fbreader.network.action.DisableCatalogAction;
 import org.geometerplus.android.fbreader.network.action.EditCustomCatalogAction;
-import org.geometerplus.android.fbreader.network.action.ManageCatalogsAction;
 import org.geometerplus.android.fbreader.network.action.NetworkBookActions;
 import org.geometerplus.android.fbreader.network.action.OpenCatalogAction;
 import org.geometerplus.android.fbreader.network.action.OpenInBrowserAction;
@@ -56,7 +55,6 @@ import org.geometerplus.android.fbreader.network.action.RemoveCustomCatalogActio
 import org.geometerplus.android.fbreader.network.action.RunSearchAction;
 import org.geometerplus.android.fbreader.network.action.ShowBookInfoAction;
 import org.geometerplus.android.fbreader.network.action.SignInAction;
-import org.geometerplus.android.fbreader.network.action.SignOutAction;
 import org.geometerplus.android.fbreader.network.action.SignUpAction;
 import org.geometerplus.android.fbreader.network.action.TopupAction;
 import org.geometerplus.android.fbreader.network.auth.ActivityNetworkContext;
@@ -310,11 +308,10 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
         myOptionsMenuActions.add(new RunSearchAction(this, false));
         myOptionsMenuActions.add(new AddCustomCatalogAction(this));
         myOptionsMenuActions.add(new RefreshRootCatalogAction(this));
-        myOptionsMenuActions.add(new ManageCatalogsAction(this));
+        // ManageCatalogsAction removed - functionality not used
         myOptionsMenuActions.add(new ReloadCatalogAction(this, myNetworkContext));
         myOptionsMenuActions.add(new SignInAction(this));
         myOptionsMenuActions.add(new SignUpAction(this));
-        myOptionsMenuActions.add(new SignOutAction(this, myNetworkContext));
         myOptionsMenuActions.add(new TopupAction(this));
         myOptionsMenuActions.add(new BuyBasketBooksAction(this));
         myOptionsMenuActions.add(new ClearBasketAction(this));
@@ -326,7 +323,6 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
         myContextMenuActions.add(new OpenInBrowserAction(this));
         myContextMenuActions.add(new RunSearchAction(this, true));
         myContextMenuActions.add(new AddCustomCatalogAction(this));
-        myContextMenuActions.add(new SignOutAction(this, myNetworkContext));
         myContextMenuActions.add(new TopupAction(this));
         myContextMenuActions.add(new SignInAction(this));
         myContextMenuActions.add(new EditCustomCatalogAction(this));
@@ -343,7 +339,7 @@ public abstract class NetworkLibraryActivity extends TreeActivity<NetworkTree> i
         myListClickActions.add(new AddCustomCatalogAction(this));
         myListClickActions.add(new TopupAction(this));
         myListClickActions.add(new ShowBookInfoAction(this, myNetworkContext));
-        myListClickActions.add(new ManageCatalogsAction(this));
+        // ManageCatalogsAction removed - functionality not used
     }
 
     private List<? extends Action> getContextMenuActions(NetworkTree tree) {

@@ -25,8 +25,6 @@ import android.content.Intent;
 import android.net.Uri;
 
 import org.geometerplus.android.fbreader.api.PluginApi;
-import org.geometerplus.android.fbreader.network.litres.AutoRegistrationActivity;
-import org.geometerplus.android.fbreader.network.litres.UserRegistrationActivity;
 import org.geometerplus.fbreader.network.INetworkLink;
 import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationManager;
@@ -89,9 +87,9 @@ public class AuthorisationMenuActivity extends MenuActivity {
             if (info.getId().toString().endsWith("/signIn")) {
                 Util.runAuthenticationDialog(AuthorisationMenuActivity.this, myLink, null);
             } else if (info.getId().toString().endsWith("/signUp")) {
-                startActivity(Util.authorisationIntent(myLink, this, UserRegistrationActivity.class));
+                // SignUp functionality removed - was LitRes-specific
             } else if (info.getId().toString().endsWith("/quickBuy")) {
-                startActivity(Util.authorisationIntent(myLink, this, AutoRegistrationActivity.class));
+                // QuickBuy functionality removed - was LitRes-specific
             }
         } catch (Exception e) {
             // do nothing

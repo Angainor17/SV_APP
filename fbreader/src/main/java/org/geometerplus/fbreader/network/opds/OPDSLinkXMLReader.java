@@ -23,8 +23,6 @@ import org.geometerplus.fbreader.network.INetworkLink;
 import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.fbreader.network.atom.ATOMLink;
 import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationManager;
-import org.geometerplus.fbreader.network.authentication.litres.LitResAuthenticationManager;
-import org.geometerplus.fbreader.network.rss.RSSNetworkLink;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfo;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfoCollection;
 import org.geometerplus.fbreader.network.urlInfo.UrlInfoWithDate;
@@ -228,24 +226,10 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants {
                 opdsLink.setUrlRewritingRules(myUrlRewritingRules);
                 opdsLink.setExtraData(myExtraData);
 
-                if (myAuthenticationType == "litres") {
-                    opdsLink.setAuthenticationManager(
-                            NetworkAuthenticationManager.createManager(
-                                    myLibrary, opdsLink, LitResAuthenticationManager.class
-                            )
-                    );
-                }
+                // Authentication manager setup removed - no authentication implementations available
                 return opdsLink;
-            } else if (MimeType.APP_RSS_XML.weakEquals(catalogInfo.Mime)) {
-                return new RSSNetworkLink(
-                        OPDSNetworkLink.INVALID_ID,
-                        id,
-                        titleString,
-                        summaryString,
-                        language,
-                        infos
-                );
             } else {
+                // RSS network link removed - RSS functionality not used
                 return null;
             }
         }
