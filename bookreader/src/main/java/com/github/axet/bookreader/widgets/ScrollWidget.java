@@ -374,21 +374,32 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                     Plugin.Page info = fb.pluginview.getPageInfo(getWidth(), getHeight(), c);
                     for (ScrollAdapter.PageCursor p : adapter.pages) {
                         if (p.start != null && p.start.getParagraphIndex() == fb.scrollDelayed.getParagraphIndex()) {
+                            int offset;
                             if (fb.scrollDelayed instanceof FBReaderView.ZLTextIndexPosition) {
                                 Plugin.View.Selection s = fb.pluginview.select(fb.scrollDelayed, ((FBReaderView.ZLTextIndexPosition) fb.scrollDelayed).getEnd());
                                 Plugin.View.Selection.Page page = fb.pluginview.selectPage(fb.scrollDelayed, null, info.w, info.h);
                                 Plugin.View.Selection.Bounds bb = s.getBounds(page);
                                 s.close();
                                 Rect union = SelectionView.union(Arrays.asList(bb.rr));
-                                int offset = union.top;
-                                scrollBy(0, offset);
-                                adapter.oldTurn = pos;
+                                offset = union.top;
+                                // Центрирование позиции на экране
+                                if (fb.scrollCentered) {
+                                    offset = offset - getMainAreaHeight() / 2 + union.height() / 2;
+                                }
+                            } else if (fb.scrollDelayed.getElementIndex() != 0) {
+                                offset = (int) (fb.scrollDelayed.getElementIndex() / info.ratio);
+                                // Центрирование позиции на экране
+                                if (fb.scrollCentered) {
+                                    offset = offset - getMainAreaHeight() / 2;
+                                }
                             } else {
-                                int offset = (int) (fb.scrollDelayed.getElementIndex() / info.ratio);
-                                scrollBy(0, offset);
-                                adapter.oldTurn = pos;
+                                // elementIndex = 0 - просто центрируем страницу
+                                offset = fb.scrollCentered ? -getMainAreaHeight() / 2 : 0;
                             }
+                            scrollBy(0, offset);
+                            adapter.oldTurn = pos;
                             fb.scrollDelayed = null;
+                            fb.scrollCentered = false;
                             break;
                         }
                     }
@@ -396,6 +407,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                     fb.gotoPosition(fb.scrollDelayed);
                     adapter.oldTurn = pos;
                     fb.scrollDelayed = null;
+                    fb.scrollCentered = false;
                 }
             }
         }
