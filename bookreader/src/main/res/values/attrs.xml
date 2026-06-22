@@ -11,8 +11,4 @@
 
     <attr name="side_nav_bar" format="reference" />
 
-    <string-array name="viewmode_value" translatable="false">
-        <item>PAGING</item>
-        <item>CONTINUOUS</item>
-    </string-array>
 </resources>

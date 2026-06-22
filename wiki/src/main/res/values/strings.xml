@@ -12,8 +12,6 @@
     <string name="wiki_loading">Загрузка…</string>
     <string name="wiki_not_found">Ничего не найдено</string>
     <string name="wiki_not_found_hint">Попробуйте изменить запрос</string>
-    <string name="wiki_error">Произошла ошибка</string>
-    <string name="wiki_retry">Повторить</string>
 
     <!-- История -->
     <string name="wiki_history_title">История поиска</string>
