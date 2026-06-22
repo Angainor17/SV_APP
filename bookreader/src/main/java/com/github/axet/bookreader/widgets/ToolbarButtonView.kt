@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.Keep
@@ -35,10 +34,10 @@ open class ToolbarButtonView @JvmOverloads constructor(
     open fun create() {
         image = AppCompatImageButton(context)
         image.setColorFilter(ThemeUtils.getThemeColor(context, com.github.axet.androidlibrary.R.attr.colorAccent))
-        addView(image, LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER))
+        addView(image, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
 
         text = TextView(ContextThemeWrapper(context, R.style.toolbar_bottom_icon_text)) // отсутствуют отступы
-        val lp = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
+        val lp = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL)
         lp.bottomMargin = ThemeUtils.dp2px(context, 7f).toInt()
         addView(text, lp)
     }

@@ -103,7 +103,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     @Throws(BookReadingException::class)
     override fun detectLanguageAndEncoding(book: AbstractBook) {}
 
-    override fun readCover(file: ZLFile): ZLImage? {
+    override fun readCover(file: ZLFile): ZLImage {
         val view = DjvuView(file)
         view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
         val bm = Bitmap.createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
@@ -122,7 +122,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     override fun readModel(model: BookModel) {
         val m = DjvuTextModel(BookUtil.fileByBook(model.Book))
         model.setBookTextModel(m)
-        val bookmarks = m.doc.getBookmarks() ?: return
+        val bookmarks = m.doc.bookmarks ?: return
         loadTOC(0, 0, bookmarks, model.TOCTree)
     }
 
@@ -145,7 +145,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 break
             } else {
                 val t = TOCTree(tree)
-                t.setText(tt)
+                t.text = tt
                 t.setReference(null, b.page)
                 last = t
                 i++
@@ -156,9 +156,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     }
 
     class DjvuLibre(fd: FileDescriptor) : LibDjvu(fd) {
-        private val cache = SparseArray<LibDjvu.Page>()
+        private val cache = SparseArray<Page>()
 
-        override fun getPageInfo(index: Int): LibDjvu.Page {
+        override fun getPageInfo(index: Int): Page {
             var p = cache.get(index)
             if (p == null) {
                 p = super.getPageInfo(index)
@@ -208,7 +208,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         var end: SelectionPage? = null
         val map = SparseArray<SelectionPage>()
 
-        constructor(doc: DjvuLibre, page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point) {
+        constructor(doc: DjvuLibre, page: Page, point: Point) {
             this.doc = doc
             val p = open(page)
             val convertedPoint = toPage(p.info!!, page.w, page.h, point)
@@ -231,7 +231,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             this.end!!.index = this.end!!.text!!.text.size
         }
 
-        fun open(page: Plugin.View.Selection.Page): SelectionPage {
+        fun open(page: Page): SelectionPage {
             val pp = open(page.page)
             pp.w = page.w
             pp.h = page.h
@@ -270,7 +270,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return false
         }
 
-        internal fun selectWord(pp: SelectionPage, point: Plugin.View.Selection.Point) {
+        internal fun selectWord(pp: SelectionPage, point: Point) {
             val b = pp.find(point)
             if (b == -1) return
             val startPage = SelectionPage(pp)
@@ -290,7 +290,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             this.end = endPage
         }
 
-        override fun setStart(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point) {
+        override fun setStart(page: Page, point: Point) {
             val pp = open(page)
             val convertedPoint = toPage(pp.info!!, page.w, page.h, point)
             val b = pp.find(convertedPoint)
@@ -299,7 +299,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             start = pp
         }
 
-        override fun setEnd(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point) {
+        override fun setEnd(page: Page, point: Point) {
             val pp = open(page)
             val convertedPoint = toPage(pp.info!!, page.w, page.h, point)
             val b = pp.find(convertedPoint)
@@ -322,7 +322,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return b.getText()
         }
 
-        override fun getBoundsAll(page: Plugin.View.Selection.Page): Array<Rect>? {
+        override fun getBoundsAll(page: Page): Array<Rect> {
             val pp = open(page)
             val rr = arrayOfNulls<Rect>(pp.text!!.bounds.size)
             for (i in rr.indices) {
@@ -332,8 +332,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return rr as Array<Rect>
         }
 
-        override fun getBounds(p: Plugin.View.Selection.Page): Plugin.View.Selection.Bounds? {
-            val bounds = Plugin.View.Selection.Bounds()
+        override fun getBounds(p: Page): Bounds {
+            val bounds = Bounds()
             val b = SelectionBounds(p)
             bounds.reverse = b.reverse
             bounds.start = b.first
@@ -348,7 +348,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return bounds
         }
 
-        override fun inBetween(page: Plugin.View.Selection.Page, start: Plugin.View.Selection.Point, end: Plugin.View.Selection.Point): Boolean? {
+        override fun inBetween(page: Page, start: Point, end: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.s.page < page.page && page.page < b.e.page) return true
             val p1 = toPage(b.page!!.info!!, page.w, page.h, start)
@@ -361,7 +361,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return i1 <= b.ss && b.ss <= i2 || i1 <= b.ll && b.ll <= i2
         }
 
-        override fun isValid(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Boolean {
+        override fun isValid(page: Page, point: Point): Boolean {
             val pp = open(page)
             val convertedPoint = toPage(pp.info!!, page.w, page.h, point)
             return pp.find(convertedPoint) != -1
@@ -372,7 +372,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return b.s.page <= page && page <= b.e.page
         }
 
-        override fun isAbove(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Boolean? {
+        override fun isAbove(page: Page, point: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.s.page < page.page) return true
             val convertedPoint = toPage(b.page!!.info!!, page.w, page.h, point)
@@ -381,7 +381,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return b.ss < index || b.ll < index
         }
 
-        override fun isBelow(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Boolean? {
+        override fun isBelow(page: Page, point: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.e.page > page.page) return true
             val convertedPoint = toPage(b.page!!.info!!, page.w, page.h, point)
@@ -406,7 +406,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             var last: Boolean = false
             var reverse: Boolean = false
 
-            constructor(p: Plugin.View.Selection.Page) : this(p.page) {
+            constructor(p: Page) : this(p.page) {
                 end?.w = p.w
                 end?.h = p.h
                 start?.w = p.w
@@ -538,8 +538,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return pp
         }
 
-        override fun getBounds(page: Plugin.View.Selection.Page): Plugin.View.Search.Bounds? {
-            val bounds = Plugin.View.Search.Bounds()
+        override fun getBounds(page: Plugin.View.Selection.Page): Bounds? {
+            val bounds = Bounds()
             val p = pages.get(page.page) ?: return null
             val rr = ArrayList<Rect>()
             for (r in p.rr) {
@@ -710,7 +710,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return s
         }
 
-        override fun search(text: String): Plugin.View.Search? {
+        override fun search(text: String): Search? {
             val s = DjvuSearch(doc, text)
             for (i in 0 until doc.pagesCount) {
                 if (s.hasText(i)) return s

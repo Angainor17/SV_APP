@@ -138,7 +138,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 break
             } else {
                 val t = TOCTree(tree)
-                t.setText(tt)
+                t.text = tt
                 t.setReference(null, b.page)
                 last = t
                 i++

@@ -35,7 +35,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
     private val searchs = ReflowMap<FBReaderView.SearchView>()
 
     init {
-        ZLApplication = object : ZLAndroidWidget.ZLApplicationInstance() {
+        ZLApplication = object : ZLApplicationInstance() {
             override fun Instance(): ZLApplication = fb.app
         }
         isFocusable = true

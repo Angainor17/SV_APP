@@ -57,8 +57,6 @@ open class BookmarksDialog(context: Context) : AlertDialog.Builder(context) {
         return dialog
     }
 
-    override fun show(): AlertDialog = super.show()
-
     open fun onSelected(b: Storage.Bookmark) {}
     open fun onSelected(book: Storage.Book, bm: Storage.Bookmark) {}
     open fun onSave(book: Storage.Book, bm: Storage.Bookmark) {}

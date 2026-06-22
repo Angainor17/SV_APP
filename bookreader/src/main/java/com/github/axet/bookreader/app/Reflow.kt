@@ -72,12 +72,12 @@ class Reflow(
     /**
      * Возвращает левый отступ.
      */
-    fun getLeftMargin(): Int = custom.getLeftMargin()
+    fun getLeftMargin(): Int = custom.leftMargin
 
     /**
      * Возвращает правый отступ.
      */
-    fun getRightMargin(): Int = custom.getRightMargin()
+    fun getRightMargin(): Int = custom.rightMargin
 
     /**
      * Сбрасывает состояние reflow.
@@ -119,7 +119,7 @@ class Reflow(
         k2 = K2PdfOpt()
         val d: DisplayMetrics = context.resources.displayMetrics
         k2!!.create(rw, h, d.densityDpi)
-        k2!!.setFontSize(old)
+        k2!!.fontSize = old
     }
 
     /**
