@@ -86,13 +86,13 @@ fun ReaderTopBar(
                 onDismissRequest = { showMenu = false },
             ) {
                 // View mode
+                val viewModeText = if (state.viewMode.name == "PAGING") {
+                    stringResource(R.string.sv_view_mode_continuous)
+                } else {
+                    stringResource(R.string.sv_view_mode_paging)
+                }
                 DropdownMenuItem(
-                    text = {
-                        Text(
-                            if (state.viewMode.name == "PAGING") stringResource(R.string.view_mode_continuous)
-                            else stringResource(R.string.view_mode_paging)
-                        )
-                    },
+                    text = { Text(viewModeText) },
                     onClick = {
                         onAction(ReaderActions.ToggleViewMode)
                         showMenu = false
@@ -100,8 +100,13 @@ fun ReaderTopBar(
                 )
 
                 // Reflow (for PDF)
+                val reflowText = if (state.isReflow) {
+                    stringResource(R.string.sv_original_layout)
+                } else {
+                    stringResource(R.string.sv_reflow_text)
+                }
                 DropdownMenuItem(
-                    text = { Text(if (state.isReflow) stringResource(R.string.original_layout) else stringResource(R.string.reflow_text)) },
+                    text = { Text(reflowText) },
                     onClick = {
                         onAction(ReaderActions.ToggleReflow)
                         showMenu = false
@@ -110,7 +115,7 @@ fun ReaderTopBar(
 
                 // Settings
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.menu_settings)) },
+                    text = { Text(stringResource(R.string.sv_menu_settings)) },
                     onClick = {
                         onAction(ReaderActions.NavigateToSettings)
                         showMenu = false

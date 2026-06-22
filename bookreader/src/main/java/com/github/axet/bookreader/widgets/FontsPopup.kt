@@ -63,7 +63,7 @@ open class FontsPopup(context: Context, private val ttf: TTFManager) : PopupWind
             setFont(fonts.ff[position].name)
         }
         fontsFrame = fontsizePopup.findViewById(R.id.fonts_frame)
-        fontsText.text = context.getString(R.string.add_more_fonts_to, TTFManager.USER_FONTS.toString())
+        fontsText.text = context.getString(R.string.sv_add_more_fonts_to, TTFManager.USER_FONTS.toString())
         val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         if (Build.VERSION.SDK_INT >= 30) {
             fontsBrowse.visibility = View.VISIBLE
@@ -83,7 +83,7 @@ open class FontsPopup(context: Context, private val ttf: TTFManager) : PopupWind
             updatePath()
         } else {
             if (!PermissionHelper.hasStoragePermissions(context, false))
-                fontsText.text = context.getString(R.string.add_more_fonts_to, ttf.appFonts.toString())
+                fontsText.text = context.getString(R.string.sv_add_more_fonts_to, ttf.appFonts.toString())
         }
         fontsList = fontsizePopup.findViewById(R.id.fonts_list)
         fontsList.layoutManager = LinearLayoutManager(context)
@@ -102,7 +102,7 @@ open class FontsPopup(context: Context, private val ttf: TTFManager) : PopupWind
             uri = ttf.appFonts?.toString() ?: ""
         else
             uri = Storage.getDisplayName(context, uri.toUri())
-        fontsText.text = context.getString(R.string.add_more_fonts_to, uri)
+        fontsText.text = context.getString(R.string.sv_add_more_fonts_to, uri)
     }
 
     open fun setFont(str: String) {}

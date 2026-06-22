@@ -177,7 +177,7 @@ open class BookmarksDialog(context: Context) : AlertDialog.Builder(context) {
                         }
                         R.id.action_delete -> {
                             AlertDialog.Builder(context)
-                                .setTitle(R.string.delete_bookmark)
+                                .setTitle(R.string.sv_delete_bookmark)
                                 .setMessage(com.github.axet.androidlibrary.R.string.are_you_sure)
                                 .setPositiveButton(android.R.string.ok) { _, _ ->
                                     if (t.parent == root) {

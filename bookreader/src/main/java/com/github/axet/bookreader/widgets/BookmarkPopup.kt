@@ -90,10 +90,11 @@ open class BookmarkPopup(
         w = PopupWindow()
         val trash = ImageView(context).apply {
             setImageResource(com.github.axet.androidlibrary.R.drawable.ic_close_black_24dp)
-            setColorFilter(ThemeUtils.getThemeColor(context, com.github.axet.androidlibrary.R.attr.colorAccent))
+            // Используем стандартный цвет для иконки (красный для удаления)
+            setColorFilter(0xFFFF5722.toInt()) // Deep Orange 500
             setOnClickListener {
                 AlertDialog.Builder(context)
-                    .setTitle(R.string.delete_bookmark)
+                    .setTitle(R.string.sv_delete_bookmark)
                     .setMessage(com.github.axet.androidlibrary.R.string.are_you_sure)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         onDelete(l)
