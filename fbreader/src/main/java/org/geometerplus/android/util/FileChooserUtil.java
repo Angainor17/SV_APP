@@ -38,22 +38,6 @@ public abstract class FileChooserUtil {
     private FileChooserUtil() {
     }
 
-    public static void runFolderListDialog(
-            Activity activity,
-            int requestCode,
-            String title,
-            String fileChooserTitle,
-            List<String> initialValue,
-            boolean chooseWritableDirsOnly
-    ) {
-        final Intent intent = new Intent(activity, FolderListDialogActivity.class);
-        intent.putExtra(FolderListDialogActivity.Key.ACTIVITY_TITLE, title);
-        intent.putExtra(FolderListDialogActivity.Key.CHOOSER_TITLE, fileChooserTitle);
-        intent.putExtra(FolderListDialogActivity.Key.FOLDER_LIST, new ArrayList<String>(initialValue));
-        intent.putExtra(FolderListDialogActivity.Key.WRITABLE_FOLDERS_ONLY, chooseWritableDirsOnly);
-        activity.startActivityForResult(intent, requestCode);
-    }
-
     public static void runFileChooser(
             Activity activity,
             int requestCode,
@@ -109,10 +93,6 @@ public abstract class FileChooserUtil {
             paths.add(f.getAbsolutePath());
         }
         return paths;
-    }
-
-    public static List<String> pathListFromData(Intent data) {
-        return data.getStringArrayListExtra(FolderListDialogActivity.Key.FOLDER_LIST);
     }
 
     private static HashMap<String, String> textResources(String title) {

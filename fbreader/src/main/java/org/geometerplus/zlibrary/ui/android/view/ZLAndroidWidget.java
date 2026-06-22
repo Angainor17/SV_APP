@@ -29,7 +29,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-import org.geometerplus.android.fbreader.FBReader;
 import org.geometerplus.fbreader.Paths;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.application.ZLKeyBindings;
@@ -106,12 +105,7 @@ public class ZLAndroidWidget extends MainView implements ZLViewWidget, View.OnLo
 
     @Override
     protected void onDraw(final Canvas canvas) {
-        final Context context = getContext();
-        if (context instanceof FBReader) {
-            ((FBReader) context).createWakeLock();
-        } else {
-            System.err.println("A surprise: view's context is not an FBReader");
-        }
+        // WakeLock handling removed - FBReader activity deleted
         super.onDraw(canvas);
 
 //		final int w = getWidth();

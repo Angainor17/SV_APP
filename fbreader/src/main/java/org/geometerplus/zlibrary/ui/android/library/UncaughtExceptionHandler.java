@@ -27,7 +27,6 @@ import android.net.Uri;
 import android.os.Process;
 
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
-import org.geometerplus.zlibrary.ui.android.error.BugReportActivity;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -45,6 +44,9 @@ public class UncaughtExceptionHandler implements java.lang.Thread.UncaughtExcept
         exception.printStackTrace(new PrintWriter(stackTrace));
         System.err.println(stackTrace);
 
+        // Log the crash and try to restart the app
+        android.util.Log.e("UncaughtExceptionHandler", "Crash: " + exception.getMessage(), exception);
+
         Intent intent = new Intent(
                 FBReaderIntents.Action.CRASH,
                 new Uri.Builder().scheme(exception.getClass().getSimpleName()).build()
@@ -53,9 +55,8 @@ public class UncaughtExceptionHandler implements java.lang.Thread.UncaughtExcept
         try {
             myContext.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            intent = new Intent(myContext, BugReportActivity.class);
-            intent.putExtra(BugReportActivity.STACKTRACE, stackTrace.toString());
-            myContext.startActivity(intent);
+            // No crash handler available, just log
+            android.util.Log.e("UncaughtExceptionHandler", "No crash handler found", e);
         }
 
         if (myContext instanceof Activity) {
