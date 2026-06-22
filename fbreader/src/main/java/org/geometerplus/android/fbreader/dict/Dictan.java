@@ -29,11 +29,11 @@ import com.github.johnpersano.supertoasts.SuperActivityToast;
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.OnClickWrapper;
 
-import org.geometerplus.android.fbreader.FBReaderMainActivity;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 final class Dictan extends DictionaryUtil.PackageInfo {
     private static final int MAX_LENGTH_FOR_TOAST = 180;
+    private static final int REQUEST_DICTIONARY = 100;
 
     Dictan(String id, String title) {
         super(id, title);
@@ -50,7 +50,7 @@ final class Dictan extends DictionaryUtil.PackageInfo {
         }
     }
 
-    private static void showError(final FBReaderMainActivity fbreader, int code, Intent data) {
+    private static void showError(final Activity fbreader, int code, Intent data) {
         final ZLResource resource = ZLResource.resource("dictanErrors");
         String message;
         switch (code) {
@@ -87,7 +87,7 @@ final class Dictan extends DictionaryUtil.PackageInfo {
         intent.putExtra("article.mode", 20);
         intent.putExtra("article.text.size.max", MAX_LENGTH_FOR_TOAST);
         try {
-            fbreader.startActivityForResult(intent, FBReaderMainActivity.REQUEST_DICTIONARY);
+            fbreader.startActivityForResult(intent, REQUEST_DICTIONARY);
             fbreader.overridePendingTransition(0, 0);
             if (outliner != null) {
                 outliner.run();
@@ -97,14 +97,14 @@ final class Dictan extends DictionaryUtil.PackageInfo {
         }
     }
 
-    void onActivityResult(final FBReaderMainActivity fbreader, int resultCode, final Intent data) {
+    @Override
+    void onActivityResult(Activity fbreader, int resultCode, final Intent data) {
         if (data == null) {
-            fbreader.hideDictionarySelection();
             return;
         }
 
         final int errorCode = data.getIntExtra("error.code", -1);
-        if (resultCode != FBReaderMainActivity.RESULT_OK || errorCode != -1) {
+        if (resultCode != Activity.RESULT_OK || errorCode != -1) {
             showError(fbreader, errorCode, data);
             return;
         }

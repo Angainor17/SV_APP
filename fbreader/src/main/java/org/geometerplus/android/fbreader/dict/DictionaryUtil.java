@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 
-import org.geometerplus.android.fbreader.FBReaderMainActivity;
 import org.geometerplus.android.util.PackageUtil;
 import org.geometerplus.fbreader.fbreader.DurationEnum;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
@@ -181,7 +180,7 @@ public abstract class DictionaryUtil {
         });
     }
 
-    public static void onActivityResult(final FBReaderMainActivity fbreader, int resultCode, final Intent data) {
+    public static void onActivityResult(final Activity fbreader, int resultCode, final Intent data) {
         getDictionaryInfo("dictan").onActivityResult(fbreader, resultCode, data);
     }
 
@@ -234,7 +233,7 @@ public abstract class DictionaryUtil {
             }
         }
 
-        void onActivityResult(FBReaderMainActivity fbreader, int resultCode, final Intent data) {
+        void onActivityResult(Activity fbreader, int resultCode, final Intent data) {
             // does nothing; implement in subclasses
         }
 
