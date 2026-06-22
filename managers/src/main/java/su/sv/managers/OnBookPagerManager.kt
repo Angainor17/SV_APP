@@ -21,14 +21,14 @@ class OnBookPagerManager @Inject constructor(
         context: Context,
 
         text: String,
-        title: String,
-        author: String,
+        title: String?,
+        author: String?,
         page: Int,
     ) {
         val text = createMisspellText(
             text = text,
-            title = title,
-            author = author,
+            title = title ?: "",
+            author = author ?: "",
             page = page,
         )
         copyTextToClipboard(
@@ -44,14 +44,14 @@ class OnBookPagerManager @Inject constructor(
         context: Context,
 
         text: String,
-        title: String,
-        author: String,
+        title: String?,
+        author: String?,
         page: Int,
     ) {
         val text = createQuestionText(
             text = text,
-            title = title,
-            author = author,
+            title = title ?: "",
+            author = author ?: "",
             page = page,
         )
         copyTextToClipboard(
