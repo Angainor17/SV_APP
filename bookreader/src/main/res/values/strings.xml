@@ -28,4 +28,8 @@
     <string name="pref_volume_summary">Использовать кнопки громкости для перелистывания страниц</string>
     <string name="bookmark_edit">Редактировать</string>
     <string name="ignore_embedded_fonts">Игнорировать встроенные в книгу шрифты</string>
+
+    <!-- Reflow (PDF) -->
+    <string name="reflow_text">Адаптировать текст</string>
+    <string name="original_layout">Оригинальный макет</string>
 </resources>

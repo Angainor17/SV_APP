@@ -89,8 +89,8 @@ fun ReaderTopBar(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            if (state.viewMode.name == "PAGING") "Continuous mode"
-                            else "Paging mode"
+                            if (state.viewMode.name == "PAGING") stringResource(R.string.view_mode_continuous)
+                            else stringResource(R.string.view_mode_paging)
                         )
                     },
                     onClick = {
@@ -101,7 +101,7 @@ fun ReaderTopBar(
 
                 // Reflow (for PDF)
                 DropdownMenuItem(
-                    text = { Text(if (state.isReflow) "Original layout" else "Reflow text") },
+                    text = { Text(if (state.isReflow) stringResource(R.string.original_layout) else stringResource(R.string.reflow_text)) },
                     onClick = {
                         onAction(ReaderActions.ToggleReflow)
                         showMenu = false
