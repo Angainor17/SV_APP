@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.widgets.FBReaderView
+import com.github.axet.bookreader.widgets.PagerWidget
+import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
 
 /**
  * Compose диалог списка закладок
@@ -95,10 +97,21 @@ fun BookmarksComposeDialog(
                                     .clickable {
                                         onDismiss()
                                         fbReaderView?.apply {
-                                            gotoPosition(bookmark.start)
-                                            // Принудительное обновление для постраничного режима
-                                            widget?.reset()
-                                            widget?.repaint()
+                                            // Для постраничного режима игнорируем offset (как в TOC)
+                                            val position = if (widget is PagerWidget) {
+                                                ZLTextFixedPosition(
+                                                    bookmark.start.paragraphIndex,
+                                                    0,
+                                                    0
+                                                )
+                                            } else {
+                                                bookmark.start
+                                            }
+                                            gotoPosition(position)
+                                            if (widget is PagerWidget) {
+                                                widget?.reset()
+                                                widget?.repaint()
+                                            }
                                         }
                                     }
                             ) {
