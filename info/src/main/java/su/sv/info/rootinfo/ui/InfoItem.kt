@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,40 +14,53 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.info.R
 import su.sv.info.rootinfo.model.UiLinkItem
 
+/**
+ * Элемент списка ссылок
+ *
+ * @param item данные ссылки
+ */
 @Composable
 fun InfoItem(item: UiLinkItem) {
     val context = LocalContext.current
+    val dimensions = LocalAppDimensions.current
 
     Row(
         modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .clickable { openLink(context, item.url) }
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .height(80.dp)
-            .fillMaxWidth(),
+            .padding(horizontal = dimensions.screenPaddingHorizontal)
+            .padding(vertical = dimensions.itemSpacingSmall)
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple()
+            ) { openLink(context, item.url) }
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .height(dimensions.listItemHeight)
+            .fillMaxWidth()
+            .padding(horizontal = dimensions.itemSpacingLarge),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(item.logo),
             modifier = Modifier
-                .padding(
-                    start = 8.dp,
-                )
-                .size(40.dp),
+                .size(dimensions.iconSizeLarge),
             alignment = Alignment.Center,
             contentDescription = stringResource(R.string.resource_logo_content_description),
             contentScale = ContentScale.Crop,
@@ -54,10 +68,9 @@ fun InfoItem(item: UiLinkItem) {
 
         Text(
             text = item.text,
-            modifier = Modifier.padding(
-                start = 6.dp,
-                end = 6.dp,
-            )
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = dimensions.itemSpacingMedium)
         )
     }
 }
@@ -70,13 +83,19 @@ private fun openLink(context: Context, url: String) {
     }
 }
 
-@Preview
+// ============================================================
+// Previews
+// ============================================================
+
+@Preview(showBackground = true)
 @Composable
 fun InfoItemPreview() {
-    val item = UiLinkItem(
-        text = "YouTube канал Академия Смыслов Lobbyo",
-        url = "https://www.youtube.com/channel/UCCWUurfuoWhXkFpjNZkLc-A",
-        logo = R.drawable.ic_vk,
-    )
-    InfoItem(item)
+    SVAPPThemeLightPreview {
+        val item = UiLinkItem(
+            text = "YouTube канал Академия Смыслов Lobbyo",
+            url = "https://www.youtube.com/channel/UCCWUurfuoWhXkFpjNZkLc-A",
+            logo = R.drawable.ic_vk,
+        )
+        InfoItem(item)
+    }
 }

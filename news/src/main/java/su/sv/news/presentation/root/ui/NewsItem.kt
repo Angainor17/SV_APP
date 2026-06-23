@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
@@ -15,12 +16,12 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -32,26 +33,42 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
-import su.sv.commonui.theme.NewItemBorderStroke
+import su.sv.commonui.theme.CardStrokeDark
+import su.sv.commonui.theme.CardStrokeLight
+import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.commonui.ui.ExpandingText
 import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
 import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiNewsMedia
 
+/**
+ * Карточка новости
+ *
+ * @param item данные новости
+ * @param onItemClick обработчик клика на медиа-контент
+ */
 @Composable
 fun NewsItem(
     item: UiNewsItem,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+    val isDarkTheme = MaterialTheme.colorScheme.background.red < 0.5f
+    val strokeColor = if (isDarkTheme) CardStrokeDark else CardStrokeLight
+
     Card(
-        modifier = Modifier.padding(horizontal = 8.dp),
-        border = BorderStroke(1.dp, NewItemBorderStroke),
+        modifier = Modifier.padding(
+            horizontal = dimensions.screenPaddingHorizontal / 2,
+            vertical = dimensions.cardPaddingOuter
+        ),
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(dimensions.borderWidthStandard, strokeColor),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             val hasText = item.description.isNotBlank()
             Logo(
@@ -65,9 +82,9 @@ fun NewsItem(
                         minimizedMaxLines = 4,
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         modifier = Modifier.padding(
-                            start = 8.dp,
-                            end = 8.dp,
-                            top = 8.dp,
+                            start = dimensions.cardContentPaddingHorizontal,
+                            end = dimensions.cardContentPaddingHorizontal,
+                            top = dimensions.cardContentPaddingHorizontal,
                         ),
                     )
                 }
@@ -76,15 +93,15 @@ fun NewsItem(
             Text(
                 text = item.dateFormatted,
                 textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = 8.dp,
-                        bottom = 8.dp,
-                        end = 8.dp,
-                        top = if (hasText) 4.dp else 0.dp,
+                        start = dimensions.cardContentPaddingHorizontal,
+                        end = dimensions.cardContentPaddingHorizontal,
+                        bottom = dimensions.cardContentPaddingHorizontal,
+                        top = if (hasText) dimensions.itemSpacingSmall else 0.dp,
                     ),
             )
         }
@@ -157,7 +174,10 @@ private fun SingleVideo(
                 .defaultMinSize(minHeight = 200.dp)
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
-                .clickable {
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple()
+                ) {
                     video?.let { onVideoClick(it) }
                 },
             model = ImageRequest.Builder(LocalContext.current)
@@ -176,7 +196,10 @@ private fun SingleVideo(
             Image(
                 modifier = Modifier
                     .size(50.dp)
-                    .background(Color.LightGray.copy(alpha = 0.6f), shape = CircleShape),
+                    .background(
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                        shape = CircleShape
+                    ),
                 imageVector = ImageVector.vectorResource(R.drawable.ic_play_button),
                 contentDescription = stringResource(R.string.news_item_play_content_description),
             )
@@ -195,41 +218,16 @@ private fun MultiImage(
     )
 }
 
+// ============================================================
+// Previews
+// ============================================================
+
 @Composable
 @Preview(
     showBackground = true,
     backgroundColor = 0xFFFFFFFF,
 )
 fun SingleVideoPreview() {
-    val item = UiNewsItem(
-        id = "id",
-        dateFormatted = "2 февраля",
-        description = "В. И. Ленин",
-        images = listOf(
-
-        ),
-        videos = listOf(
-            UiNewsMedia.ItemVideo(
-                id = "1",
-                image = "https://picsum.photos/300/300",
-                link = "link"
-            )
-        ),
-        allMedia = listOf()
-    )
-    SVAPPTheme {
-        NewsItem(item) {
-
-        }
-    }
-}
-
-@Composable
-@Preview(
-    showBackground = true,
-    backgroundColor = 0xFFFFFFFF,
-)
-fun BookItemPreview() {
     val item = UiNewsItem(
         id = "id",
         dateFormatted = "2 февраля",
@@ -244,9 +242,53 @@ fun BookItemPreview() {
         ),
         allMedia = listOf()
     )
-    SVAPPTheme {
-        NewsItem(item) {
+    SVAPPThemeLightPreview {
+        NewsItem(item) {}
+    }
+}
 
-        }
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF1C1B1F,
+)
+fun SingleVideoPreviewDark() {
+    val item = UiNewsItem(
+        id = "id",
+        dateFormatted = "2 февраля",
+        description = "В. И. Ленин",
+        images = listOf(),
+        videos = listOf(
+            UiNewsMedia.ItemVideo(
+                id = "1",
+                image = "https://picsum.photos/300/300",
+                link = "link"
+            )
+        ),
+        allMedia = listOf()
+    )
+    SVAPPTheme(themeMode = su.sv.commonui.theme.ThemeMode.DARK) {
+        NewsItem(item) {}
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun NewsItemPreview() {
+    val item = UiNewsItem(
+        id = "id",
+        dateFormatted = "2 февраля",
+        description = "Текст новости с достаточно длинным описанием для проверки отображения",
+        images = listOf(
+            UiNewsMedia.ItemImage("https://picsum.photos/300/300")
+        ),
+        videos = listOf(),
+        allMedia = listOf()
+    )
+    SVAPPThemeLightPreview {
+        NewsItem(item) {}
     }
 }

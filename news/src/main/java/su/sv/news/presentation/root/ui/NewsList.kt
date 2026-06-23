@@ -9,20 +9,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.ui.components.AppLoadingIndicator
 import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiRootNewsState
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
 
+/**
+ * Список новостей с поддержкой Pull-to-Refresh и пагинации
+ *
+ * @param lazyPagingItems данные для отображения
+ * @param state состояние экрана
+ * @param actions обработчик действий
+ */
 @Composable
 fun NewsList(
     lazyPagingItems: LazyPagingItems<UiNewsItem>,
@@ -30,6 +39,7 @@ fun NewsList(
     actions: RootNewsActionsHandler,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
+    val dimensions = LocalAppDimensions.current
 
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -40,10 +50,9 @@ fun NewsList(
         state = pullToRefreshState,
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
             contentPadding = PaddingValues(
-                bottom = 12.dp,
+                bottom = dimensions.itemSpacingLarge
             )
         ) {
             items(
@@ -72,7 +81,9 @@ private fun MessagePlaceholder() {
         Modifier
             .fillMaxWidth()
             .height(48.dp)
+            .padding(horizontal = LocalAppDimensions.current.screenPaddingHorizontal),
+        contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        AppLoadingIndicator()
     }
 }

@@ -38,16 +38,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
-import su.sv.commonui.ui.FullScreenError
-import su.sv.commonui.ui.FullScreenLoading
+import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.ui.OneTimeEffect
+import su.sv.commonui.ui.components.FullScreenError
+import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.wiki.R
 import su.sv.wiki.presentation.article.ArticleScreen
 import su.sv.wiki.presentation.favorites.FavoritesScreen
@@ -75,6 +75,7 @@ fun RootWiki(
     val context = LocalContext.current
     val stackNavigation = LocalStackNavigation.current
     val focusManager = LocalFocusManager.current
+    val dimensions = LocalAppDimensions.current
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -135,7 +136,7 @@ fun RootWiki(
                             focusManager.clearFocus()
                             stackNavigation.forward(FavoritesScreen())
                         },
-                        modifier = Modifier.padding(end = 8.dp),
+                        modifier = Modifier.padding(end = dimensions.screenPaddingHorizontal / 2),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
@@ -201,9 +202,9 @@ fun RootWiki(
                 }
 
                 is UiWikiState.Error -> {
-                    FullScreenError {
-                        viewModel.onAction(WikiActions.OnRetryClick)
-                    }
+                    FullScreenError(
+                        onRetry = { viewModel.onAction(WikiActions.OnRetryClick) }
+                    )
                 }
             }
         }
@@ -258,6 +259,8 @@ private fun HandleEffects(
  */
 @Composable
 private fun NotFoundContent(modifier: Modifier = Modifier) {
+    val dimensions = LocalAppDimensions.current
+
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -266,8 +269,9 @@ private fun NotFoundContent(modifier: Modifier = Modifier) {
             Text(
                 text = stringResource(R.string.wiki_not_found),
                 style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensions.itemSpacingMedium))
             Text(
                 text = stringResource(R.string.wiki_not_found_hint),
                 style = MaterialTheme.typography.bodyMedium,

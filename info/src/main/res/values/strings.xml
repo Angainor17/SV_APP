@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="info_toolbar_title">Информация</string>
     <string name="resource_logo_content_description">Логотип ресурса</string>
 
 </resources>

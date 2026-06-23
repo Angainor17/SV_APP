@@ -10,17 +10,26 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.info.rootinfo.model.UiInfoState
 import su.sv.info.rootinfo.viewmodel.RootInfoActions
 import su.sv.info.rootinfo.viewmodel.RootInfoActionsHandler
 
+/**
+ * Контент информационного экрана
+ *
+ * @param state состояние с данными
+ * @param actionsHandler обработчик действий
+ * @param modifier модификатор
+ */
 @Composable
 fun InfoContent(
     state: UiInfoState.Content,
-    actionsHandler: RootInfoActionsHandler
+    actionsHandler: RootInfoActionsHandler,
+    modifier: Modifier = Modifier
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
+    val dimensions = LocalAppDimensions.current
 
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -30,10 +39,10 @@ fun InfoContent(
         state = pullToRefreshState,
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier,
+            verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
+            modifier = modifier,
             contentPadding = PaddingValues(
-                bottom = 12.dp,
+                bottom = dimensions.itemSpacingLarge
             )
         ) {
             items(state.items.size) {

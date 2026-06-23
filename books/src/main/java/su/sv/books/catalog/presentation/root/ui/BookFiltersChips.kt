@@ -25,11 +25,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import su.sv.books.catalog.domain.model.BookFilter
 import su.sv.books.catalog.presentation.root.model.UiBookFilter
-import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.SVAPPThemeLightPreview
 
 /**
  * Горизонтальный список chip-фильтров
- * @param resetScrollKey Ключ для сброса скролла в начало (изменяется при клике на чип)
+ *
+ * @param filters список фильтров
+ * @param onFilterClick обработчик клика на фильтр
+ * @param isVisible видимость списка
+ * @param resetScrollKey ключ для сброса скролла в начало
  */
 @Composable
 fun BookFiltersChips(
@@ -40,6 +45,7 @@ fun BookFiltersChips(
     resetScrollKey: Any? = null,
 ) {
     val scrollState = rememberLazyListState()
+    val dimensions = LocalAppDimensions.current
 
     // Сбрасываем скролл только при изменении resetScrollKey (клик на чип)
     LaunchedEffect(resetScrollKey) {
@@ -52,8 +58,8 @@ fun BookFiltersChips(
         LazyRow(
             modifier = modifier.fillMaxWidth(),
             state = scrollState,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
+            contentPadding = PaddingValues(horizontal = dimensions.screenPaddingHorizontal / 2),
         ) {
             // Сначала выбранные фильтры (кроме "Все")
             val selectedFilters = filters.filter {
@@ -106,6 +112,8 @@ private fun BookFilterChip(
     filter: UiBookFilter,
     onClick: () -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     FilterChip(
         selected = filter.isSelected,
         onClick = onClick,
@@ -113,11 +121,13 @@ private fun BookFilterChip(
         label = {
             Text(
                 text = filter.displayName,
+                style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         },
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = dimensions.itemSpacingSmall),
+        shape = MaterialTheme.shapes.small,
         border = FilterChipDefaults.filterChipBorder(
             enabled = filter.isAvailable,
             selected = filter.isSelected,
@@ -125,8 +135,8 @@ private fun BookFilterChip(
             selectedBorderColor = MaterialTheme.colorScheme.primary,
             disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
             disabledSelectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-            borderWidth = 1.dp,
-            selectedBorderWidth = 1.dp,
+            borderWidth = dimensions.borderWidthStandard,
+            selectedBorderWidth = dimensions.borderWidthStandard,
         ),
         colors = FilterChipDefaults.filterChipColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
@@ -142,12 +152,15 @@ private fun SelectedFilterChip(
     filter: UiBookFilter,
     onClick: () -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     FilterChip(
         selected = true,
         onClick = onClick,
         label = {
             Text(
                 text = filter.displayName,
+                style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -156,17 +169,19 @@ private fun SelectedFilterChip(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(dimensions.iconSizeSmall),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         },
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(vertical = dimensions.itemSpacingSmall),
+        shape = MaterialTheme.shapes.small,
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = true,
             borderColor = MaterialTheme.colorScheme.outlineVariant,
             selectedBorderColor = MaterialTheme.colorScheme.primary,
-            borderWidth = 1.dp,
-            selectedBorderWidth = 1.dp,
+            borderWidth = dimensions.borderWidthStandard,
+            selectedBorderWidth = dimensions.borderWidthStandard,
         ),
         colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -174,12 +189,14 @@ private fun SelectedFilterChip(
     )
 }
 
-//region Previews
+// ============================================================
+// Previews
+// ============================================================
 
 @Preview(showBackground = true)
 @Composable
 private fun BookFilterChipPreview() {
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(16.dp)
@@ -211,7 +228,7 @@ private fun BookFilterChipPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SelectedFilterChipPreview() {
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(16.dp)
@@ -233,7 +250,7 @@ private fun SelectedFilterChipPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun BookFiltersChipsPreview() {
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         val filters = listOf(
             UiBookFilter(filter = BookFilter.All, displayName = "Все", count = 34, isSelected = true, isAvailable = true),
             UiBookFilter(filter = BookFilter.Category("Свободное Время"), displayName = "Свободное Время", count = 29, isSelected = false, isAvailable = true),
@@ -247,5 +264,3 @@ private fun BookFiltersChipsPreview() {
         )
     }
 }
-
-//endregion

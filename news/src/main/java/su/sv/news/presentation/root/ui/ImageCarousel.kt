@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,12 +14,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -31,13 +33,21 @@ import androidx.compose.ui.unit.lerp
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
-import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
 import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiNewsMedia
 import kotlin.math.absoluteValue
 
+/**
+ * Карусель изображений/видео
+ *
+ * @param modifier модификатор
+ * @param item новость с медиа-контентом
+ * @param onItemClick обработчик клика на медиа
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageCarousel(
@@ -47,6 +57,7 @@ fun ImageCarousel(
 ) {
     val allMedia = item.allMedia
     val pagerState = rememberPagerState { allMedia.size }
+    val dimensions = LocalAppDimensions.current
 
     Column(
         modifier
@@ -56,11 +67,11 @@ fun ImageCarousel(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
-            pageSpacing = 10.dp,
-            contentPadding = PaddingValues(horizontal = 20.dp),
+            pageSpacing = dimensions.itemSpacingMedium,
+            contentPadding = PaddingValues(horizontal = dimensions.screenPaddingHorizontal + dimensions.itemSpacingSmall),
         ) { page ->
-            val item = allMedia[page]
-            val isVideo = item is UiNewsMedia.ItemVideo
+            val mediaItem = allMedia[page]
+            val isVideo = mediaItem is UiNewsMedia.ItemVideo
 
             Box(
                 contentAlignment = Alignment.Center
@@ -70,7 +81,7 @@ fun ImageCarousel(
 
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(item.image)
+                        .data(mediaItem.image)
                         .build(),
                     contentDescription = "",
                     modifier = Modifier
@@ -82,7 +93,10 @@ fun ImageCarousel(
                         )
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = 180.dp)
-                        .clickable { onItemClick.invoke(item) }
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple()
+                        ) { onItemClick.invoke(mediaItem) }
                         .graphicsLayer {
                             val pageOffset =
                                 (pagerState.currentPage - page + pagerState.currentPageOffsetFraction).absoluteValue
@@ -108,7 +122,10 @@ fun ImageCarousel(
                     Image(
                         modifier = Modifier
                             .size(50.dp)
-                            .background(Color.LightGray.copy(alpha = 0.6f), shape = CircleShape),
+                            .background(
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                                shape = CircleShape
+                            ),
                         imageVector = ImageVector.vectorResource(R.drawable.ic_play_button),
                         contentDescription = stringResource(R.string.news_item_play_content_description),
                     )
@@ -117,6 +134,10 @@ fun ImageCarousel(
         }
     }
 }
+
+// ============================================================
+// Previews
+// ============================================================
 
 @Composable
 @Preview(
@@ -142,7 +163,7 @@ fun ImageCarouselPreview() {
         allMedia = listOf(video)
     )
 
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         ImageCarousel(
             item = item,
         ) {}

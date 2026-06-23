@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -25,18 +26,32 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
-import su.sv.commonui.ui.FullScreenError
-import su.sv.commonui.ui.FullScreenLoading
+import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.ui.OneTimeEffect
+import su.sv.commonui.ui.components.AppToolbarWithThemeToggle
+import su.sv.commonui.ui.components.FullScreenError
+import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.news.R
 import su.sv.news.presentation.root.RootNewsViewModel
 import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
 
+/**
+ * Главный экран новостей
+ *
+ * @param viewModel ViewModel экрана
+ * @param onThemeToggle обработчик переключения темы
+ * @param currentThemeMode текущий режим темы
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
+fun RootNews(
+    viewModel: RootNewsViewModel = hiltViewModel(),
+    onThemeToggle: () -> Unit = {},
+    currentThemeMode: ThemeMode = ThemeMode.LIGHT
+) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems()
@@ -45,38 +60,49 @@ fun RootNews(viewModel: RootNewsViewModel = hiltViewModel()) {
     HandleEffects(viewModel, snackbarHostState)
 
     Scaffold(
+        topBar = {
+            AppToolbarWithThemeToggle(
+                title = stringResource(R.string.news_toolbar_title),
+                currentThemeMode = currentThemeMode,
+                onThemeToggle = { onThemeToggle() }
+            )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-    ) { contentPadding ->
+    ) { _ ->
         val hasItems = lazyPagingItems.itemSnapshotList.isNotEmpty()
-        when {
-            loadState == LoadState.Loading && !hasItems -> {
-                FullScreenLoading()
-            }
 
-            loadState is LoadState.Error && !hasItems -> {
-                FullScreenError {
-                    lazyPagingItems.refresh()
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            when (loadState) {
+                LoadState.Loading if !hasItems -> {
+                    FullScreenLoading()
                 }
-            }
-
-            else -> {
-                val state = viewModel.state.collectAsStateWithLifecycle()
-                val stateValue = state.value
-
-                if (stateValue.isRefreshing) {
-                    viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
-                }
-
-                if (hasItems) {
-                    NewsList(
-                        lazyPagingItems = lazyPagingItems,
-                        actions = viewModel,
-                        state = stateValue,
+                is LoadState.Error if !hasItems -> {
+                    FullScreenError(
+                        onRetry = { lazyPagingItems.refresh() }
                     )
-                } else {
-                    NoNews()
+                }
+
+                else -> {
+                    val state = viewModel.state.collectAsStateWithLifecycle()
+                    val stateValue = state.value
+
+                    if (stateValue.isRefreshing) {
+                        viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
+                    }
+
+                    if (hasItems) {
+                        NewsList(
+                            lazyPagingItems = lazyPagingItems,
+                            actions = viewModel,
+                            state = stateValue,
+                        )
+                    } else {
+                        NoNews()
+                    }
                 }
             }
         }

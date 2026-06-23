@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -19,42 +20,48 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
-import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.SVAPPThemeLightPreview
+import su.sv.commonui.ui.components.AppLoadingIndicator
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 
+/**
+ * Карточка книги в каталоге
+ *
+ * @param item данные книги
+ * @param actions обработчик действий
+ */
 @Composable
 fun BookItem(item: UiBook, actions: RootBooksActions) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
+            .clickable(
+                interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() },
+                indication = ripple()
+            ) {
                 actions.onAction(RootBookActions.OnBookClick(item))
             },
     ) {
@@ -86,15 +93,19 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
 
 @Composable
 private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions) {
-    Button(
+    val dimensions = LocalAppDimensions.current
+
+    androidx.compose.material3.Button(
         onClick = {
             when (item.downloadState) {
                 UIBookState.DOWNLOADED -> {
                     actions.onAction(RootBookActions.OnOpenDownloadedBook(item))
                 }
+
                 UIBookState.AVAILABLE_TO_DOWNLOAD -> {
                     actions.onAction(RootBookActions.OnDownloadBookClick(item))
                 }
+
                 UIBookState.DOWNLOADING -> {
                     // Ничего не делаем при клике во время загрузки
                 }
@@ -102,14 +113,14 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
         },
         contentPadding = PaddingValues(all = 3.dp),
         shape = CircleShape,
-        border = BorderStroke(1.dp, Color.Gray),
-        colors = ButtonDefaults.buttonColors(
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             contentColor = MaterialTheme.colorScheme.tertiaryContainer,
         ),
         modifier = Modifier
             .align(Alignment.TopEnd)
-            .padding(top = 12.dp, end = 12.dp)
+            .padding(top = dimensions.itemSpacingMedium, end = dimensions.itemSpacingMedium)
             .size(42.dp),
     ) {
         when (item.downloadState) {
@@ -134,11 +145,10 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
             }
 
             UIBookState.DOWNLOADING -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(26.dp),
+                AppLoadingIndicator(
+                    size = 26.dp,
                     strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = Color.Magenta,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
             }
         }
@@ -147,25 +157,30 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
 
 @Composable
 private fun InfoFooter(item: UiBook) {
+    val dimensions = LocalAppDimensions.current
+
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
             .background(MaterialTheme.colorScheme.tertiaryContainer)
-            .padding(all = 4.dp)
+            .padding(all = dimensions.cardPaddingInner)
     ) {
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(dimensions.itemSpacingSmall))
+
         Text(
             text = item.title,
-            fontSize = 17.sp,
+            style = MaterialTheme.typography.titleMedium,
             maxLines = 2,
             minLines = 2,
             overflow = TextOverflow.Ellipsis,
             color = MaterialTheme.colorScheme.onTertiary,
-            fontWeight = FontWeight.Bold,
         )
-        Spacer(Modifier.width(4.dp))
+
+        Spacer(Modifier.width(dimensions.itemSpacingSmall))
+
         Text(
             text = item.author,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onTertiary,
             minLines = 2,
             maxLines = 2,
@@ -177,12 +192,17 @@ private fun InfoFooter(item: UiBook) {
         ) {
             Text(
                 text = item.category,
+                style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onTertiary,
             )
         }
     }
 }
+
+// ============================================================
+// Previews
+// ============================================================
 
 @Composable
 @Preview(
@@ -202,7 +222,9 @@ fun InfoFooterPreview() {
         downloadState = UIBookState.DOWNLOADED,
         fileUri = null,
     )
-    InfoFooter(item)
+    SVAPPThemeLightPreview {
+        InfoFooter(item)
+    }
 }
 
 @Composable
@@ -223,12 +245,10 @@ fun BookItemPreview() {
         downloadUrl = "link",
         fileNameWithExt = "1.pdf",
         category = "Свободное время",
-
         downloadState = UIBookState.DOWNLOADING,
         fileUri = null,
     )
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         BookItem(item, actions)
     }
 }
-

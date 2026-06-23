@@ -21,8 +21,12 @@ dependencies {
 
     // Модули-common
     implementation(project(":commonarchitecture"))
+    implementation(project(":commonui"))
 
     implementation(libs.androidx.core.ktx)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
 
     // Logging
     implementation(libs.timber)

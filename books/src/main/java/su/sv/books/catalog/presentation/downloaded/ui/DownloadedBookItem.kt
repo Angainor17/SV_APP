@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,19 +21,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
-import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.SVAPPThemeLightPreview
 
 /**
  * Карточка скачанной книги для отображения в списке
+ *
+ * @param book данные книги
+ * @param onReadClick обработчик клика на кнопку "Читать"
+ * @param modifier модификатор
  */
 @Composable
 fun DownloadedBookItem(
@@ -43,12 +44,17 @@ fun DownloadedBookItem(
     onReadClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer) // Непрозрачный бледно-голубой
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(
+                horizontal = dimensions.itemSpacingMedium,
+                vertical = dimensions.itemSpacingMedium
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Обложка книги
@@ -57,24 +63,23 @@ fun DownloadedBookItem(
             modifier = Modifier.size(width = 80.dp, height = 120.dp)
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(dimensions.itemSpacingMedium))
 
         // Информация о книге
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingSmall)
         ) {
-            // Название без ограничения по строкам
+            // Название
             Text(
                 text = book.title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
 
             Text(
                 text = book.author,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -82,7 +87,7 @@ fun DownloadedBookItem(
 
             Text(
                 text = book.category,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -96,22 +101,22 @@ fun DownloadedBookItem(
                         book.currentPage,
                         book.totalPages
                     ),
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(dimensions.itemSpacingSmall))
 
             // Кнопка "Читать"
-            Button(
+            TextButton(
                 onClick = onReadClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(R.string.books_downloaded_read_button))
+                Text(
+                    text = stringResource(R.string.books_downloaded_read_button),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     }
@@ -123,7 +128,7 @@ private fun BookCover(
     modifier: Modifier = Modifier,
 ) {
     AsyncImage(
-        modifier = modifier.clip(RoundedCornerShape(8.dp)),
+        modifier = modifier.clip(MaterialTheme.shapes.small),
         model = ImageRequest.Builder(LocalContext.current)
             .data(coverUrl)
             .build(),
@@ -132,12 +137,14 @@ private fun BookCover(
     )
 }
 
-//region Previews
+// ============================================================
+// Previews
+// ============================================================
 
 @Preview(showBackground = true)
 @Composable
 private fun DownloadedBookItemPreview() {
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -173,5 +180,3 @@ private fun DownloadedBookItemPreview() {
         }
     }
 }
-
-//endregion

@@ -10,4 +10,22 @@
     <string name="common_expand_text_show_more">Показать ещё</string>
     <string name="common_expand_text_show_less">Скрыть</string>
 
+    <string name="common_navigate_back">Назад</string>
+
+    <!-- ДИАЛОГИ -->
+    <string name="common_dialog_confirm">ОК</string>
+    <string name="common_dialog_cancel">Отмена</string>
+    <string name="common_dialog_ok">ОК</string>
+    <string name="common_dialog_delete_title">Удалить?</string>
+    <string name="common_dialog_delete_message">Вы уверены, что хотите удалить \"%1$s\"?</string>
+    <string name="common_dialog_delete">Удалить</string>
+
+    <!-- ТЕМА -->
+    <string name="theme_mode_light">Светлая тема</string>
+    <string name="theme_mode_dark">Тёмная тема</string>
+    <string name="theme_mode_system">Системная тема</string>
+    <string name="theme_switch_to_light">Переключить на светлую тему</string>
+    <string name="theme_switch_to_dark">Переключить на тёмную тему</string>
+    <string name="theme_switch_to_system">Переключить на системную тему</string>
+
 </resources>
