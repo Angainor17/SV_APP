@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -105,11 +106,12 @@ fun NoteItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .padding(horizontal = 12.dp, vertical = 4.dp)
     ) {
         // Красный фон удаления (под карточкой)
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.matchParentSize(),
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.errorContainer
         ) {
