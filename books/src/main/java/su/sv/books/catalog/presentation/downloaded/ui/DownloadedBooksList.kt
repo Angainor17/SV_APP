@@ -1,36 +1,45 @@
 package su.sv.books.catalog.presentation.downloaded.ui
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
+import kotlin.math.roundToInt
 
 /**
- * Список скачанных книг с поддержкой свайпа для удаления
+ * Список скачанных книг с поддержкой свайпа для удаления.
+ *
+ * Особенности реализации:
+ * - Максимальное смещение свайпа ограничено 30% ширины экрана
+ * - Красный фон отображается на всю ширину карточки
+ * - После отмены удаления свайп продолжает работать
+ * - Подсказка свайпа для первого элемента
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadedBooksList(
     books: List<UiDownloadedBook>,
@@ -43,10 +52,6 @@ fun DownloadedBooksList(
 ) {
     val listState = rememberLazyListState()
     var hintAnimationPlayed by remember { mutableStateOf(false) }
-    val density = LocalDensity.current
-
-    // Максимальное смещение свайпа - 30% от ширины экрана (примерно 120dp)
-    val maxSwipeDistance = with(density) { 120.dp.toPx() }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -58,83 +63,132 @@ fun DownloadedBooksList(
             items = books,
             key = { it.id }
         ) { book ->
-            val updatedOnDeleteRequest by rememberUpdatedState(onDeleteRequest)
-            val updatedOnSwipeHintShown by rememberUpdatedState(onSwipeHintShown)
-
-            var currentOffset by remember { mutableFloatStateOf(0f) }
-
-            val dismissState = rememberSwipeToDismissBoxState(
-                initialValue = SwipeToDismissBoxValue.Settled,
-                confirmValueChange = { dismissValue ->
-                    if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                        updatedOnDeleteRequest(book)
-                        true
-                    } else {
-                        false
-                    }
-                },
-                positionalThreshold = { totalDistance ->
-                    // Свайп срабатывает при смещении более 30%
-                    totalDistance * 0.3f
-                },
-            )
-
-            // Сбрасываем состояние при изменении resetKey
-            LaunchedEffect(resetKey) {
-                dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-            }
-
-            // Анимация подсказки для первой книги
             val isFirstItem = books.indexOf(book) == 0
             val shouldShowHint = showSwipeHint && isFirstItem && !hintAnimationPlayed
 
-            if (shouldShowHint) {
-                LaunchedEffect(Unit) {
-                    // Показываем небольшое смещение влево (фон немного выглядывает)
-                    dismissState.snapTo(SwipeToDismissBoxValue.EndToStart)
-                    kotlinx.coroutines.delay(400)
-                    // Возвращаем обратно
-                    dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-                    kotlinx.coroutines.delay(200)
-                    // Повторяем для наглядности
-                    dismissState.snapTo(SwipeToDismissBoxValue.EndToStart)
-                    kotlinx.coroutines.delay(400)
-                    dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+            SwipeableBookItem(
+                book = book,
+                onReadClick = { onReadClick(book) },
+                onDeleteRequest = { onDeleteRequest(book) },
+                showHint = shouldShowHint,
+                onHintShown = {
                     hintAnimationPlayed = true
-                    updatedOnSwipeHintShown()
+                    onSwipeHintShown()
+                },
+                resetKey = resetKey,
+            )
+        }
+    }
+}
+
+/**
+ * Элемент книги с поддержкой свайпа
+ */
+@Composable
+private fun SwipeableBookItem(
+    book: UiDownloadedBook,
+    onReadClick: () -> Unit,
+    onDeleteRequest: () -> Unit,
+    showHint: Boolean,
+    onHintShown: () -> Unit,
+    resetKey: Any?,
+) {
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+
+    // Максимальное смещение - 30% от ширины экрана
+    val maxSwipeDistance = with(density) {
+        (configuration.screenWidthDp.dp.toPx() * 0.3f)
+    }
+
+    // Порог срабатывания - 25% от ширины (должен быть меньше максимального)
+    val triggerDistance = with(density) {
+        (configuration.screenWidthDp.dp.toPx() * 0.25f)
+    }
+
+    // Состояние свайпа - сбрасывается при изменении resetKey или book.id
+    var offsetX by remember(book.id, resetKey) { mutableFloatStateOf(0f) }
+    var isDismissed by remember(book.id, resetKey) { mutableStateOf(false) }
+
+    // Анимация подсказки для первого элемента
+    if (showHint) {
+        LaunchedEffect(Unit) {
+            delay(300)
+            // Показываем небольшое смещение влево дважды
+            repeat(2) {
+                offsetX = -triggerDistance * 0.8f
+                delay(400)
+                offsetX = 0f
+                delay(200)
+            }
+            onHintShown()
+        }
+    }
+
+    // Анимация возвращения или dismissal
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = if (isDismissed) -maxSwipeDistance else offsetX,
+        animationSpec = SpringSpec(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "swipe_animation"
+    )
+
+    // Обработка dismissal - вызываем onDeleteRequest после анимации
+    LaunchedEffect(isDismissed) {
+        if (isDismissed) {
+            delay(200) // Небольшая задержка для анимации
+            onDeleteRequest()
+            // Сбрасываем состояние после вызова onDeleteRequest
+            // (диалог покажется и пользователь может отменить)
+            isDismissed = false
+            offsetX = 0f
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        // Фон удаления (красный на всю ширину)
+        DeleteSwipeBackground(
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Карточка книги со смещением
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(animatedOffsetX.roundToInt(), 0) }
+                .fillMaxWidth()
+                .pointerInput(book.id, resetKey, maxSwipeDistance, triggerDistance) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            if (offsetX < -triggerDistance) {
+                                // Достгли порога - триггерим удаление
+                                isDismissed = true
+                            } else {
+                                // Не достигли порога - возвращаем обратно
+                                offsetX = 0f
+                            }
+                        },
+                        onDragCancel = {
+                            // При отмене возвращаем на место
+                            offsetX = 0f
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            // Ограничиваем свайп: только влево и не дальше maxSwipeDistance
+                            val newOffset = offsetX + dragAmount
+                            offsetX = newOffset.coerceIn(-maxSwipeDistance, 0f)
+                        }
+                    )
                 }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-            ) {
-                // Фон с иконкой удаления (бледно-красный)
-                DeleteSwipeBackground(
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                // Карточка книги поверх фона
-                SwipeToDismissBox(
-                    state = dismissState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .animateContentSize(),
-                    enableDismissFromStartToEnd = false,
-                    enableDismissFromEndToStart = true,
-                    backgroundContent = {
-                        // Пустой фон, так как реальный фон под карточкой
-                        Box(modifier = Modifier.fillMaxSize())
-                    },
-                    content = {
-                        DownloadedBookItem(
-                            book = book,
-                            onReadClick = { onReadClick(book) },
-                        )
-                    }
-                )
-            }
+        ) {
+            DownloadedBookItem(
+                book = book,
+                onReadClick = onReadClick,
+            )
         }
     }
 }

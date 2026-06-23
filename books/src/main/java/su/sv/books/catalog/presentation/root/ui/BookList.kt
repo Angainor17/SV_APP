@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -140,6 +141,17 @@ private fun BookListTopBar(
             )
         },
         actions = {
+            // Иконка заметок
+            IconButton(
+                onClick = { actions.onAction(RootBookActions.OnToolbarBookmarksClick) }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Bookmark,
+                    contentDescription = stringResource(R.string.books_bookmarks_content_description),
+                )
+            }
+
+            // Иконка скачанных книг
             if (hasDownloadedBooks) {
                 IconButton(
                     onClick = { actions.onAction(RootBookActions.OnToolbarBooksClick) }) {

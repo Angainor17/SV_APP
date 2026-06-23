@@ -24,6 +24,9 @@ sealed class RootBookActions {
     /** Нажатие на иконку книг в тулбаре */
     object OnToolbarBooksClick : RootBookActions()
 
+    /** Нажатие на иконку заметок в тулбаре */
+    object OnToolbarBookmarksClick : RootBookActions()
+
     /** Нажатие на иконку скачанной книги (открытие читалки) */
     data class OnOpenDownloadedBook(val book: UiBook) : RootBookActions()
 

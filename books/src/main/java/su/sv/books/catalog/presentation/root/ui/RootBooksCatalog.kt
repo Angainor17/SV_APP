@@ -28,6 +28,7 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
 import su.sv.books.R
+import su.sv.books.catalog.presentation.bookmarks.nav.BookmarksScreen
 import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.books.catalog.presentation.downloaded.ui.DownloadedBooksScreen
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
@@ -110,6 +111,10 @@ private fun HandleEffects(
         when (effect) {
             BooksListOneTimeEffect.OpenStoredBooksList -> {
                 stackNavigation.forward(DownloadedBooksScreen())
+            }
+
+            BooksListOneTimeEffect.OpenBookmarks -> {
+                stackNavigation.forward(BookmarksScreen())
             }
 
             is BooksListOneTimeEffect.OpenBook -> {
