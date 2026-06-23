@@ -31,27 +31,64 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
+import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.ThemeMode
 import su.sv.info.rootinfo.ui.RootInfo
 import su.sv.main.R
 import su.sv.main.Screens
 import su.sv.main.badge.BadgeViewModel
 import su.sv.main.badge.NewBadge
 import su.sv.main.res.BooksVector
+import su.sv.managers.theme.ThemeViewModel
 import su.sv.news.presentation.root.ui.RootNews
 import su.sv.wiki.root.RootWiki
 
+/**
+ * Главный экран с нижней навигацией
+ *
+ * Управляет темой приложения и навигацией между основными разделами.
+ *
+ * @param themeViewModel ViewModel для управления темой
+ * @param badgeViewModel ViewModel для бейджей
+ */
 @Composable
 internal fun BottomNavigationBar(
+    themeViewModel: ThemeViewModel = hiltViewModel(),
     badgeViewModel: BadgeViewModel = hiltViewModel(),
 ) {
-    val navController = rememberNavController()
+    // Состояние темы
+    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
+
+    // Состояние бейджа Wiki
     val showWikiBadge by badgeViewModel.showWikiBadge.collectAsStateWithLifecycle()
 
-    // Отслеживаем текущий маршрут для правильного выделения в bottom navigation
+    SVAPPTheme(
+        themeMode = themeConfig.themeMode,
+        useDynamicColors = themeConfig.useDynamicColors
+    ) {
+        BottomNavContent(
+            showWikiBadge = showWikiBadge,
+            onWikiBadgeClick = { badgeViewModel.markWikiAsVisited() },
+            onThemeToggle = { themeViewModel.toggleTheme() },
+            currentThemeMode = themeConfig.themeMode
+        )
+    }
+}
+
+@Composable
+private fun BottomNavContent(
+    showWikiBadge: Boolean,
+    onWikiBadgeClick: () -> Unit,
+    onThemeToggle: () -> Unit,
+    currentThemeMode: ThemeMode
+) {
+    val navController = rememberNavController()
+
+    // Отслеживаем текущий маршрут
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Определяем индекс текущего элемента на основе маршрута
+    // Определяем индекс текущего элемента
     val navigationSelectedItem = remember(currentRoute) {
         when (currentRoute) {
             Screens.News.route -> 0
@@ -83,7 +120,7 @@ internal fun BottomNavigationBar(
                             onClick = {
                                 // Скрываем бейдж при клике на Wiki
                                 if (navigationItem.route == Screens.Wiki.route && showWikiBadge) {
-                                    badgeViewModel.markWikiAsVisited()
+                                    onWikiBadgeClick()
                                 }
                                 navController.navigate(navigationItem.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
@@ -98,7 +135,12 @@ internal fun BottomNavigationBar(
             }
         },
     ) { paddingValues ->
-        BottomNavHost(navController, paddingValues)
+        BottomNavHost(
+            navController = navController,
+            paddingValues = paddingValues,
+            onThemeToggle = onThemeToggle,
+            currentThemeMode = currentThemeMode
+        )
     }
 }
 
@@ -127,7 +169,9 @@ private fun NavigationIcon(
 @Composable
 private fun BottomNavHost(
     navController: NavHostController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onThemeToggle: () -> Unit,
+    currentThemeMode: ThemeMode
 ) {
     NavHost(
         navController = navController,
@@ -137,7 +181,10 @@ private fun BottomNavHost(
         ),
     ) {
         composable(Screens.News.route) {
-            RootNews()
+            RootNews(
+                onThemeToggle = onThemeToggle,
+                currentThemeMode = currentThemeMode
+            )
         }
         composable(Screens.Books.route) {
             RootBooksCatalog()

@@ -1,7 +1,6 @@
 package su.sv.books.catalog.presentation.detail.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -75,10 +74,8 @@ fun BookDetailUi(
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { contentPadding ->
-        Box(
-            modifier = Modifier.padding(contentPadding)
-        ) {
+    ) { _ ->
+        Box {
             when (val value = state.value) {
                 is UiBookDetailState.Content -> {
                     BookDetailInfoUi(

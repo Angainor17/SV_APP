@@ -8,8 +8,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,8 @@ fun ReaderTopBar(
                 text = state.book.info.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         navigationIcon = {
@@ -45,6 +49,7 @@ fun ReaderTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         },
@@ -54,6 +59,7 @@ fun ReaderTopBar(
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(R.drawable.ic_toc_white_24dp),
                     contentDescription = "Table of Contents",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -62,6 +68,7 @@ fun ReaderTopBar(
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(R.drawable.ic_bookmark_white_24dp),
                     contentDescription = "Bookmarks",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -70,6 +77,7 @@ fun ReaderTopBar(
                 Icon(
                     painter = androidx.compose.ui.res.painterResource(R.drawable.ic_format_size_white_24dp),
                     contentDescription = "Font Settings",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -78,6 +86,7 @@ fun ReaderTopBar(
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "More",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -92,7 +101,12 @@ fun ReaderTopBar(
                     stringResource(R.string.sv_view_mode_paging)
                 }
                 DropdownMenuItem(
-                    text = { Text(viewModeText) },
+                    text = {
+                        Text(
+                            text = viewModeText,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
                     onClick = {
                         onAction(ReaderActions.ToggleViewMode)
                         showMenu = false
@@ -106,7 +120,12 @@ fun ReaderTopBar(
                     stringResource(R.string.sv_reflow_text)
                 }
                 DropdownMenuItem(
-                    text = { Text(reflowText) },
+                    text = {
+                        Text(
+                            text = reflowText,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
                     onClick = {
                         onAction(ReaderActions.ToggleReflow)
                         showMenu = false
@@ -115,7 +134,12 @@ fun ReaderTopBar(
 
                 // Settings
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.sv_menu_settings)) },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.sv_menu_settings),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
                     onClick = {
                         onAction(ReaderActions.NavigateToSettings)
                         showMenu = false
@@ -123,5 +147,11 @@ fun ReaderTopBar(
                 )
             }
         },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+        )
     )
 }

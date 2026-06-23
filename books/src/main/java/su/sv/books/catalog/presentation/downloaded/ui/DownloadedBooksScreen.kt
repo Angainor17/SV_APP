@@ -4,20 +4,13 @@ import android.os.Parcelable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,8 +28,10 @@ import su.sv.books.catalog.presentation.downloaded.actions.DownloadedBookActions
 import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
 import su.sv.books.catalog.presentation.downloaded.viewmodel.DownloadedBooksViewModel
-import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
+import su.sv.commonui.ui.components.AppAlertDialog
+import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.commonui.ui.components.FullScreenLoading
 
 /**
  * Экран "Ваши книги" (Modo Screen)
@@ -46,7 +41,6 @@ class DownloadedBooksScreen(
     override val screenKey: ScreenKey = generateScreenKey(),
 ) : Screen, Parcelable {
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content(modifier: Modifier) {
         val viewModel: DownloadedBooksViewModel = hiltViewModel()
@@ -64,7 +58,6 @@ class DownloadedBooksScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DownloadedBooksContent(
     state: UiDownloadedBooksState,
@@ -75,25 +68,14 @@ private fun DownloadedBooksContent(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(stringResource(R.string.books_downloaded_title))
-                },
-                navigationIcon = {
-                    IconButton(onClick = { onAction(DownloadedBookActions.OnBackClick) }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.books_back_content_description)
-                        )
-                    }
-                },
+            AppToolbarWithBack(
+                title = stringResource(R.string.books_downloaded_title),
+                onBackClick = { onAction(DownloadedBookActions.OnBackClick) }
             )
         },
-    ) { contentPadding ->
+    ) { _ ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
+            modifier = Modifier.fillMaxSize()
         ) {
             when (state) {
                 is UiDownloadedBooksState.Loading -> {
@@ -124,10 +106,13 @@ private fun DownloadedBooksContent(
 
     // Диалог подтверждения удаления
     if (deleteDialogState.isVisible && deleteDialogState.book != null) {
-        DeleteConfirmDialog(
-            bookTitle = deleteDialogState.book.title,
-            onConfirm = { onAction(DownloadedBookActions.OnDeleteConfirm) },
+        AppAlertDialog(
+            title = stringResource(R.string.books_downloaded_delete_dialog_title),
+            text = stringResource(R.string.books_downloaded_delete_dialog_message, deleteDialogState.book.title),
             onDismiss = { onAction(DownloadedBookActions.OnDeleteCancel) },
+            onConfirm = { onAction(DownloadedBookActions.OnDeleteConfirm) },
+            confirmText = stringResource(R.string.books_downloaded_delete_dialog_yes),
+            dismissText = stringResource(R.string.books_downloaded_delete_dialog_no)
         )
     }
 }
@@ -136,39 +121,16 @@ private fun DownloadedBooksContent(
 private fun EmptyBooksState() {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = androidx.compose.ui.Alignment.Center,
+        contentAlignment = Alignment.Center,
     ) {
         Column {
-            Text(stringResource(R.string.books_downloaded_empty_title))
+            Text(
+                text = stringResource(R.string.books_downloaded_empty_title),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
-}
-
-@Composable
-private fun DeleteConfirmDialog(
-    bookTitle: String,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(stringResource(R.string.books_downloaded_delete_dialog_title))
-        },
-        text = {
-            Text(stringResource(R.string.books_downloaded_delete_dialog_message, bookTitle))
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.books_downloaded_delete_dialog_yes))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.books_downloaded_delete_dialog_no))
-            }
-        },
-    )
 }
 
 @Composable

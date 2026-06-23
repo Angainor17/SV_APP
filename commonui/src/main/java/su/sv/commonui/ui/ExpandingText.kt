@@ -47,7 +47,7 @@ fun ExpandingText(
             content = LinkifyContent(text),
             style = TextStyle.Default.copy(
                 fontSize = fontSize,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onTertiary,
             ),
             maxLines = if (isExpanded) Int.MAX_VALUE else minimizedMaxLines,
             onTextLayout = { textLayoutResultState.value = it },
@@ -63,7 +63,7 @@ fun ExpandingText(
             Text(
                 text = labelText,
                 fontSize = fontSize,
-                color = MaterialTheme.colorScheme.surfaceBright,
+                color = MaterialTheme.colorScheme.onTertiary,
                 modifier = modifier.clickable {
                     isExpanded = !isExpanded
                 },

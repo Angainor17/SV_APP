@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="books_toolbar_title">Книги</string>
     <string name="books_empty_list_title">Список книг пуст</string>
     <string name="books_item_image_content_description">Обложка книги</string>
 

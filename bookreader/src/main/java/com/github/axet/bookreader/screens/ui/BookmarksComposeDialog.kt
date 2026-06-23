@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,18 +20,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.PagerWidget
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
+import su.sv.commonui.theme.LocalAppDimensions
 
 /**
  * Compose диалог списка закладок
@@ -42,6 +44,8 @@ fun BookmarksComposeDialog(
     onDismiss: () -> Unit,
     onDelete: (Storage.Bookmark) -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     // Локальный список для анимации удаления
     val bookmarksState = remember { mutableStateListOf<Storage.Bookmark>() }
 
@@ -73,7 +77,7 @@ fun BookmarksComposeDialog(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp)
+                                .padding(vertical = dimensions.itemSpacingMedium)
                                 .animateContentSize(
                                     animationSpec = spring(
                                         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -87,14 +91,17 @@ fun BookmarksComposeDialog(
                                 text = stringResource(R.string.sv_bookmark_page_prefix) + " ${bookmark.start.paragraphIndex + 1}",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(end = 8.dp)
+                                modifier = Modifier.padding(end = dimensions.itemSpacingMedium)
                             )
 
                             // Текст закладки (кликабельный)
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .clickable {
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = ripple()
+                                    ) {
                                         onDismiss()
                                         fbReaderView?.apply {
                                             // Игнорируем offset, открываем страницу с закладкой
@@ -117,7 +124,8 @@ fun BookmarksComposeDialog(
                             ) {
                                 Text(
                                     text = bookmark.text.take(100) + if (bookmark.text.length > 100) "..." else "",
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 if (!bookmark.name.isNullOrBlank()) {
                                     Text(
@@ -136,7 +144,7 @@ fun BookmarksComposeDialog(
                                     // Вызываем callback для удаления из данных
                                     onDelete(bookmark)
                                 },
-                                modifier = Modifier.padding(start = 4.dp)
+                                modifier = Modifier.padding(start = dimensions.itemSpacingSmall)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
@@ -146,7 +154,7 @@ fun BookmarksComposeDialog(
                             }
                         }
 
-                        HorizontalDivider(modifier = Modifier.padding(top = 4.dp))
+                        HorizontalDivider(modifier = Modifier.padding(top = dimensions.itemSpacingSmall))
                     }
                 }
             },

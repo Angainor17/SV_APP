@@ -82,7 +82,12 @@
       "Bash(./gradlew :wiki:compileDebugKotlin --no-daemon)",
       "Bash(python3 -m json.tool)",
       "Bash(./gradlew app:dependencies --configuration releaseRuntimeClasspath)",
-      "Bash(./gradlew :app:assembleDebug --dry-run)"
+      "Bash(./gradlew :app:assembleDebug --dry-run)",
+      "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin :main:compileDebugKotlin :news:compileDebugKotlin --no-daemon)",
+      "Bash(./gradlew :books:compileDebugKotlin :commonui:compileDebugKotlin --no-daemon)",
+      "Bash(./gradlew :commonui:compileDebugKotlin --no-daemon)",
+      "Bash(./gradlew :commonui:compileDebugKotlin --no-daemon --info)",
+      "Bash(./gradlew :books:compileDebugKotlin --no-daemon --info)"
     ]
   }
 }

@@ -5,9 +5,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -37,10 +48,15 @@ import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions.OnBookStateHandle
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
-import su.sv.commonui.ui.FullScreenError
-import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
+import su.sv.commonui.ui.components.AppToolbar
+import su.sv.commonui.ui.components.FullScreenError
+import su.sv.commonui.ui.components.FullScreenLoading
 
+/**
+ * Главный экран каталога книг
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RootBooksCatalog(
@@ -49,6 +65,7 @@ fun RootBooksCatalog(
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var scrollEffect by remember { mutableStateOf<BooksListOneTimeEffect.ScrollToTop?>(null) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     HandleEffects(viewModel, snackbarHostState) { effect ->
         when (effect) {
@@ -59,34 +76,94 @@ fun RootBooksCatalog(
         }
     }
 
-    when (state.value) {
-        is UiRootBooksState.Content -> {
-            BookList(
-                actions = viewModel,
-                state = state.value as UiRootBooksState.Content,
-                snackbarHostState = snackbarHostState,
-                scrollEffect = scrollEffect,
-            )
-            // Сбрасываем эффект после обработки
-            LaunchedEffect(scrollEffect) {
-                scrollEffect = null
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            when (val currentState = state.value) {
+                is UiRootBooksState.Content -> {
+                    BooksCatalogTopBar(
+                        scrollBehavior = scrollBehavior,
+                        actions = viewModel,
+                        hasDownloadedBooks = currentState.hasDownloadedBooks,
+                    )
+                }
+                else -> {
+                    AppToolbar(
+                        title = stringResource(R.string.books_toolbar_title),
+                        scrollBehavior = scrollBehavior,
+                    )
+                }
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
+    ) { contentPadding ->
+        when (state.value) {
+            is UiRootBooksState.Content -> {
+                BookList(
+                    actions = viewModel,
+                    state = state.value as UiRootBooksState.Content,
+                    scrollEffect = scrollEffect,
+                    contentPadding = contentPadding,
+                )
+                // Сбрасываем эффект после обработки
+                LaunchedEffect(scrollEffect) {
+                    scrollEffect = null
+                }
+            }
 
-        UiRootBooksState.EmptyState -> {
-            NoBooks()
-        }
+            UiRootBooksState.EmptyState -> {
+                NoBooks()
+            }
 
-        UiRootBooksState.Loading -> {
-            FullScreenLoading()
-        }
+            UiRootBooksState.Loading -> {
+                FullScreenLoading()
+            }
 
-        is UiRootBooksState.Failure -> {
-            FullScreenError {
-                viewModel.onAction(RootBookActions.OnRetryClick)
+            is UiRootBooksState.Failure -> {
+                FullScreenError(
+                    onRetry = { viewModel.onAction(RootBookActions.OnRetryClick) }
+                )
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BooksCatalogTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    actions: RootBooksActions,
+    hasDownloadedBooks: Boolean,
+) {
+    AppToolbar(
+        title = stringResource(R.string.books_title),
+        scrollBehavior = scrollBehavior,
+        actions = {
+            // Иконка заметок (закладки)
+            IconButton(
+                onClick = { actions.onAction(RootBookActions.OnToolbarBookmarksClick) }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Bookmark,
+                    contentDescription = stringResource(R.string.books_bookmarks_content_description),
+                )
+            }
+
+            // Иконка скачанных книг
+            if (hasDownloadedBooks) {
+                IconButton(
+                    onClick = { actions.onAction(RootBookActions.OnToolbarBooksClick) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Download,
+                        contentDescription = stringResource(R.string.books_menu_action_content_description),
+                    )
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -170,7 +247,11 @@ fun NoBooks() {
         contentAlignment = Alignment.Center,
     ) {
         Column(modifier = Modifier.wrapContentSize()) {
-            Text(stringResource(R.string.books_empty_list_title))
+            Text(
+                text = stringResource(R.string.books_empty_list_title),
+                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }

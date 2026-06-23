@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.wiki.R
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -42,6 +44,7 @@ fun WikiSearchBar(
     debounceMillis: Long = 1500L,
 ) {
     var searchText by remember { mutableStateOf("") }
+    val dimensions = LocalAppDimensions.current
 
     // Debounce поиск
     LaunchedEffect(searchText) {
@@ -58,10 +61,16 @@ fun WikiSearchBar(
             onQueryChanged(newText)
         },
         label = {
-            Text(stringResource(R.string.wiki_search_label))
+            Text(
+                text = stringResource(R.string.wiki_search_label),
+                style = MaterialTheme.typography.bodyMedium
+            )
         },
         placeholder = {
-            Text(stringResource(R.string.wiki_search_placeholder))
+            Text(
+                text = stringResource(R.string.wiki_search_placeholder),
+                style = MaterialTheme.typography.bodyMedium
+            )
         },
         singleLine = true,
         trailingIcon = {
@@ -74,19 +83,26 @@ fun WikiSearchBar(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.wiki_search_clear),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         },
+        shape = MaterialTheme.shapes.small,
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp),
+            .padding(
+                start = dimensions.screenPaddingHorizontal,
+                end = dimensions.itemSpacingMedium,
+                top = 0.dp,
+                bottom = dimensions.itemSpacingLarge
+            ),
     )
 }
 
-// ============================================
+// ============================================================
 // Preview
-// ============================================
+// ============================================================
 
 @Composable
 @Preview(
@@ -94,7 +110,7 @@ fun WikiSearchBar(
     backgroundColor = 0xFFFFFFFF,
 )
 fun WikiSearchBarPreview() {
-    SVAPPTheme {
+    SVAPPThemeLightPreview {
         WikiSearchBar(
             onSearch = {},
             onQueryChanged = {},
