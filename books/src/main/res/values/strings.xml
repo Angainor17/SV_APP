@@ -6,6 +6,7 @@
 
     <string name="books_download_description">Файл скачан</string>
     <string name="books_download_snack_error">Ошибка загрузки файла</string>
+    <string name="books_error_loading">Ошибка загрузки</string>
 
     <string name="books_download_status_content_description">Статус скачивания книги</string>
     <string name="books_read">Читать</string>
@@ -13,6 +14,7 @@
 
     <string name="books_title">Книги</string>
     <string name="books_menu_action_content_description">Скачанные книги</string>
+    <string name="books_bookmarks_content_description">Заметки</string>
 
     <!-- Downloaded Books Screen -->
     <string name="books_downloaded_title">Ваши книги</string>
@@ -25,5 +27,18 @@
     <string name="books_downloaded_delete_dialog_yes">Да</string>
     <string name="books_downloaded_delete_dialog_no">Нет</string>
     <string name="books_back_content_description">Назад</string>
+
+    <!-- Bookmarks Screen -->
+    <string name="bookmarks_title">Заметки</string>
+    <string name="bookmarks_empty_title">Нет заметок</string>
+    <string name="bookmarks_toggle_view_mode">Сменить вид</string>
+    <string name="bookmarks_go_to">Перейти</string>
+    <string name="bookmarks_share">Поделиться</string>
+    <string name="bookmarks_page">стр. %1$d</string>
+    <string name="bookmarks_notes_count">%1$d заметок</string>
+    <string name="bookmarks_close_book">Закрыть</string>
+    <string name="bookmarks_delete_dialog_title">Удалить заметку?</string>
+    <string name="bookmarks_delete_dialog_yes">Да</string>
+    <string name="bookmarks_delete_dialog_no">Нет</string>
 
 </resources>

@@ -2,6 +2,7 @@ package su.sv.books.catalog.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,6 +10,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import su.sv.books.catalog.data.api.BooksApi
+import su.sv.books.catalog.data.repo.BookmarksRepositoryImpl
+import su.sv.books.catalog.domain.repository.BookmarksRepository
 import javax.inject.Singleton
 
 @Module
@@ -30,4 +33,15 @@ internal class BooksApiModule {
     ): SharedPreferences {
         return context.getSharedPreferences("books_prefs", Context.MODE_PRIVATE)
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+internal abstract class BookmarksModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindBookmarksRepository(
+        impl: BookmarksRepositoryImpl
+    ): BookmarksRepository
 }
