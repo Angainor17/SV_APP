@@ -6,9 +6,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -150,11 +152,12 @@ private fun SwipeableBookItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .padding(horizontal = 8.dp)
     ) {
-        // Фон удаления (красный на всю ширину)
+        // Фон удаления (красный на всю ширину и высоту карточки)
         DeleteSwipeBackground(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.matchParentSize()
         )
 
         // Карточка книги со смещением
