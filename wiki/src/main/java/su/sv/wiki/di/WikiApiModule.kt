@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import su.sv.commonarchitecture.mock.MockInterceptor
 import su.sv.wiki.data.api.WikiApi
 import su.sv.wiki.data.repository.WikiRepositoryImpl
 import su.sv.wiki.domain.repository.WikiRepository
@@ -38,11 +39,14 @@ internal interface WikiApiModule {
         @Provides
         @Singleton
         @WikiRetrofit
-        fun provideWikiOkHttpClient(): OkHttpClient {
+        fun provideWikiOkHttpClient(
+            mockInterceptor: MockInterceptor
+        ): OkHttpClient {
             return OkHttpClient.Builder()
                 .connectTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .readTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .writeTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .addInterceptor(mockInterceptor)
                 .build()
         }
 

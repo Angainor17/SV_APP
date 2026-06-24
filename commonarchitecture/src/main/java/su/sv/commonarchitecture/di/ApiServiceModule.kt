@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import su.sv.commonarchitecture.mock.MockInterceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -21,9 +22,12 @@ class ApiServiceModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(
+        mockInterceptor: MockInterceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder().apply {
             setTimeouts()
+            addInterceptor(mockInterceptor)
         }.build()
     }
 
