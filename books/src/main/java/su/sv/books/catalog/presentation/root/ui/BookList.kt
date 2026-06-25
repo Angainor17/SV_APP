@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -85,13 +86,13 @@ fun BookList(
                 contentPadding = PaddingValues(
                     start = dimensions.screenPaddingHorizontal / 2,
                     end = dimensions.screenPaddingHorizontal / 2,
-                    bottom = dimensions.itemSpacingLarge
                 ),
             ) {
-                state.filteredBooks.forEach { book ->
-                    item(key = book.id) {
-                        BookItem(book, actions)
-                    }
+                items(
+                    items = state.filteredBooks,
+                    key = { it.id }
+                ) { book ->
+                    BookItem(book, actions)
                 }
             }
         }

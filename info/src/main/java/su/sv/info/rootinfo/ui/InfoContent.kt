@@ -1,10 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package su.sv.info.rootinfo.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -20,18 +20,20 @@ import su.sv.info.rootinfo.viewmodel.RootInfoActionsHandler
  *
  * @param state состояние с данными
  * @param actionsHandler обработчик действий
- * @param modifier модификатор
+ * @param contentPadding отступы от Scaffold
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoContent(
     state: UiInfoState.Content,
     actionsHandler: RootInfoActionsHandler,
-    modifier: Modifier = Modifier
+    contentPadding: PaddingValues,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     val dimensions = LocalAppDimensions.current
 
     PullToRefreshBox(
+        modifier = Modifier.fillMaxSize(),
         isRefreshing = state.isRefreshing,
         onRefresh = {
             actionsHandler.onAction(RootInfoActions.OnSwipeRefresh)
@@ -39,14 +41,15 @@ fun InfoContent(
         state = pullToRefreshState,
     ) {
         LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
-            modifier = modifier,
-            contentPadding = PaddingValues(
-                bottom = dimensions.itemSpacingLarge
-            )
+            contentPadding = contentPadding,
         ) {
-            items(state.items.size) {
-                InfoItem(state.items[it])
+            items(
+                items = state.items,
+                key = { it.url }
+            ) { item ->
+                InfoItem(item)
             }
         }
     }
