@@ -82,6 +82,7 @@ fun RootBooksCatalog(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             when (val currentState = state.value) {
                 is UiRootBooksState.Content -> {
