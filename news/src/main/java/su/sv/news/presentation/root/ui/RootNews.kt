@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,6 +63,7 @@ fun RootNews(
         topBar = {
             AppToolbarWithThemeToggle(
                 title = stringResource(R.string.news_toolbar_title),
+                windowInsets = WindowInsets(0.dp),
                 currentThemeMode = currentThemeMode,
                 onThemeToggle = { onThemeToggle() }
             )
@@ -76,11 +79,13 @@ fun RootNews(
             loadState is LoadState.Loading && !hasItems -> {
                 FullScreenLoading()
             }
+
             loadState is LoadState.Error && !hasItems -> {
                 FullScreenError(
                     onRetry = { lazyPagingItems.refresh() }
                 )
             }
+
             hasItems -> {
                 val state = viewModel.state.collectAsStateWithLifecycle()
                 val stateValue = state.value
@@ -96,6 +101,7 @@ fun RootNews(
                     contentPadding = contentPadding,
                 )
             }
+
             else -> {
                 NoNews()
             }

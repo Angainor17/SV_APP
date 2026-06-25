@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import su.sv.commonui.R
 import su.sv.commonui.theme.ThemeMode
 
@@ -36,6 +35,7 @@ import su.sv.commonui.theme.ThemeMode
 fun AppToolbar(
     title: String,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     navigationIcon: @Composable (() -> Unit)? = null,
     onNavigationClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
@@ -73,7 +73,7 @@ fun AppToolbar(
             actionIconContentColor = MaterialTheme.colorScheme.onSurface
         ),
         scrollBehavior = scrollBehavior,
-        windowInsets = WindowInsets(0.dp)
+        windowInsets = windowInsets,
     )
 }
 
@@ -119,6 +119,7 @@ fun AppToolbarWithThemeToggle(
     currentThemeMode: ThemeMode,
     onThemeToggle: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     navigationIcon: @Composable (() -> Unit)? = null,
     onNavigationClick: (() -> Unit)? = null,
     additionalActions: @Composable RowScope.() -> Unit = {}
@@ -127,7 +128,8 @@ fun AppToolbarWithThemeToggle(
         title = title,
         modifier = modifier,
         navigationIcon = navigationIcon,
-        onNavigationClick = onNavigationClick
+        onNavigationClick = onNavigationClick,
+        windowInsets = windowInsets,
     ) {
         additionalActions()
         ThemeToggleIcon(
@@ -146,8 +148,9 @@ fun AppToolbarWithThemeToggle(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppToolbarSimple(
+    modifier: Modifier = Modifier,
     title: String,
-    modifier: Modifier = Modifier
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
 ) {
     TopAppBar(
         title = {
@@ -164,6 +167,6 @@ fun AppToolbarSimple(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
         ),
-        windowInsets = WindowInsets(0.dp)
+        windowInsets = windowInsets,
     )
 }
