@@ -65,7 +65,10 @@
 | `DownloadedBookItem.kt` | ✅ Выполнено |
 | `DeleteSwipeBackground.kt` | ✅ Выполнено |
 | `BookDetailUi.kt` | ✅ Выполнено |
+| `BookDetailScreen.kt` | ✅ Тема на уровне Screen |
 | `BookmarksScreen.kt` | ✅ Выполнено |
+| `BookmarksContent.kt` | ✅ Тема на уровне Screen |
+| `DownloadedBooksScreen.kt` | ✅ Тема на уровне Screen |
 
 ### 3.3 Модуль Wiki (Приоритет: Средний) ✅
 
@@ -73,6 +76,7 @@
 
 | Файл | Статус |
 |------|--------|
+| `RootWiki.kt` | ✅ Тема на уровне корневого экрана |
 | `ArticleScreen.kt` | ✅ Выполнено |
 | `ArticleScreenContent.kt` | ✅ Выполнено |
 | `WikiSearchBar.kt` | ✅ Выполнено |
@@ -91,33 +95,46 @@
 | `InfoItem.kt` | ✅ Выполнено |
 | `InfoContent.kt` | ✅ Выполнено |
 
-### 3.5 Модуль BookReader (Приоритет: Низкий)
+### 3.5 Модуль BookReader (Приоритет: Низкий) ✅
 
 **Примечание:** Читалка книг имеет собственную стилистику, определяемую настройками книги. Миграция ограничена общими элементами UI.
 
-**Файлы для обновления:**
+**Файлы обновлены:**
 
-| Файл | Изменения |
-|------|-----------|
-| `ReaderTopBar.kt` | Использовать `AppToolbar` |
-| `BookmarksComposeDialog.kt` | Использовать `AppAlertDialog` |
-| `BookmarkBottomSheet.kt` | Использовать цвета темы |
+| Файл | Статус |
+|------|--------|
+| `ReaderScreen.kt` | ✅ Тема на уровне Screen |
+| `ReaderSettingsScreen.kt` | ✅ Тема на уровне Screen |
+| `ReaderTopBar.kt` | ✅ Выполнено |
+| `BookmarksComposeDialog.kt` | ✅ Выполнено |
 
 ---
 
-## Этап 4: Очистка legacy кода
+## Этап 4: Очистка legacy кода 🔄
 
 ### 4.1 Удаление deprecated API
 
 После завершения миграции всех экранов:
 
-1. Удалить deprecated версию `SVAPPTheme(darkTheme: Boolean)`
-2. Удалить старые цветовые константы (Purple80, Grey80 и т.д.)
-3. Удалить старый `FullScreenError.kt` из `commonui/ui/`
-4. Удалить старый `FullScreenLoading.kt` из `commonui/ui/`
-5. Удалить старый `LoadingIndicator.kt` из `commonui/ui/`
+- [ ] Удалить deprecated версию `SVAPPTheme(darkTheme: Boolean)`
+- [ ] Удалить старые цветовые константы (Purple80, Grey80 и т.д.)
+- [ ] Удалить старый `FullScreenError.kt` из `commonui/ui/`
+- [ ] Удалить старый `FullScreenLoading.kt` из `commonui/ui/`
+- [ ] Удалить старый `LoadingIndicator.kt` из `commonui/ui/`
 
-### 4.2 Обновление CLAUDE.md модулей
+### 4.2 Удаление legacy network кода ✅
+
+Из модуля `fbreader` удалены неиспользуемые сетевые классы:
+- `org.geometerplus.fbreader.network.*` — OPDS каталоги, Atom feed, RSS
+- `org.geometerplus.fbreader.network.atom.*` — Atom парсеры
+- `org.geometerplus.fbreader.network.opds.*` — OPDS парсеры
+- `org.geometerplus.fbreader.network.urlInfo.*` — URL информация
+- `org.geometerplus.fbreader.network.tree.*` — Деревья навигации
+- `org.geometerplus.fbreader.network.authentication.*` — Аутентификация
+
+Удалено ~10 000 строк кода и 141 файл.
+
+### 4.3 Обновление CLAUDE.md модулей ✅
 
 Обновить документацию в `commonui/CLAUDE.md`:
 - Добавить описание новых компонентов
@@ -143,17 +160,16 @@
 
 ## Оценка времени
 
-| Этап | Оценка |
+| Этап | Статус |
 |------|--------|
 | Этап 1: Инфраструктура | ✅ Выполнено |
 | Этап 2: Общие компоненты | ✅ Выполнено |
-| Этап 3.1: News | 2-3 часа |
-| Этап 3.2: Books | 4-5 часов |
-| Этап 3.3: Wiki | 2-3 часа |
-| Этап 3.4: Info | 1-2 часа |
-| Этап 3.5: BookReader | 2-3 часа |
-| Этап 4: Очистка | 1-2 часа |
-| **Итого** | ~15-20 часов |
+| Этап 3.1: News | ✅ Выполнено |
+| Этап 3.2: Books | ✅ Выполнено |
+| Этап 3.3: Wiki | ✅ Выполнено |
+| Этап 3.4: Info | ✅ Выполнено |
+| Этап 3.5: BookReader | ✅ Выполнено |
+| Этап 4: Очистка | 🔄 В процессе |
 
 ---
 
@@ -169,8 +185,8 @@
 
 ## Следующие шаги
 
-1. Начать с модуля News (наиболее используемый)
-2. Провести миграцию Books
-3. Продолжить с Wiki и Info
-4. Завершить BookReader
-5. Очистить legacy код
+1. ~~Начать с модуля News (наиболее используемый)~~ ✅ Выполнено
+2. ~~Провести миграцию Books~~ ✅ Выполнено
+3. ~~Продолжить с Wiki и Info~~ ✅ Выполнено
+4. ~~Завершить BookReader~~ ✅ Выполнено
+5. Очистить legacy код (в процессе)

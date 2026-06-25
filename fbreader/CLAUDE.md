@@ -34,17 +34,13 @@ fbreader/
 │   ├── fb2/        # FB2 формат
 │   └── oeb/        # EPUB/OEB формат
 ├── library/        # Библиотека книг
-├── network/        # Сетевые функции
-│   ├── opds/       # OPDS каталоги
-│   ├── atom/       # Atom feed
-│   ├── rss/        # RSS feed
-│   ├── sync/       # Синхронизация
-│   └── authentication/
 ├── sort/           # Сортировка
 ├── tips/           # Подсказки
 ├── tree/           # Деревья навигации
 └── util/           # Утилиты
 ```
+
+> **Примечание:** Пакет `network/` удалён (см. раздел "Удалённый сетевой функционал")
 
 ### org.geometerplus.zlibrary.core
 Кроссплатформенное ядро:
@@ -198,6 +194,39 @@ fbreader/src/main/
 
 Модуль использует:
 - `util` — утилиты
+
+---
+
+## Удалённый сетевой функционал (Legacy Network)
+
+> **Дата удаления:** 2026-06-25
+> **Причина:** Сетевые функции (OPDS каталоги, Atom feed, RSS) не используются в приложении. Книги загружаются через модуль `books`.
+
+### Удалённые пакеты
+
+| Пакет | Описание | Файлов | Строк кода |
+|-------|----------|--------|------------|
+| `org.geometerplus.fbreader.network` | Основные сетевые классы | ~40 | ~5000 |
+| `org.geometerplus.fbreader.network.atom` | Atom feed парсеры | ~15 | ~1500 |
+| `org.geometerplus.fbreader.network.opds` | OPDS каталоги | ~20 | ~2500 |
+| `org.geometerplus.fbreader.network.urlInfo` | URL информация | ~6 | ~500 |
+| `org.geometerplus.fbreader.network.tree` | Деревья навигации | ~12 | ~1000 |
+| `org.geometerplus.fbreader.network.authentication` | Аутентификация | ~3 | ~400 |
+
+**Итого:** ~10 000 строк кода, 141 файл.
+
+### Что было удалено
+
+- `NetworkLibrary.java` — управление сетевыми каталогами
+- `NetworkBookItem.java` — элемент книги из каталога
+- `NetworkCatalogItem.java` — элемент каталога
+- `OPDSNetworkLink.java` — OPDS ссылка
+- `ATOMFeedHandler.kt` — обработчик Atom feed
+- `BookDownloaderInterface.aidl` — AIDL интерфейс для скачивания
+
+### Оставшийся функционал
+
+Скачивание книг реализовано в модуле `books` через системный `DownloadManager`.
 
 ---
 

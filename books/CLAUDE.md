@@ -162,9 +162,56 @@ books/src/main/java/su/sv/books/catalog/
     │   ├── viewmodel/RootBooksCatalogViewModel.kt
     │   ├── ui/BookList.kt
     │   └── ...
-    └── detail/
-        ├── viewmodel/BookDetailViewModel.kt
-        ├── ui/BookDetailUi.kt
-        ├── nav/BookDetailScreen.kt
-        └── ...
+    ├── detail/
+    │   ├── viewmodel/BookDetailViewModel.kt
+    │   ├── ui/BookDetailUi.kt
+    │   ├── nav/BookDetailScreen.kt
+    │   └── ...
+    ├── bookmarks/
+    │   ├── nav/BookmarksScreen.kt
+    │   ├── ui/BookmarksScreen.kt
+    │   └── viewmodel/BookmarksViewModel.kt
+    └── downloaded/
+        ├── ui/DownloadedBooksScreen.kt
+        └── viewmodel/DownloadedBooksViewModel.kt
+```
+
+---
+
+## Дизайн-система
+
+Все экраны модуля применяют дизайн-систему:
+
+### Применение темы на Modo Screen
+
+```kotlin
+@Composable
+override fun Content(modifier: Modifier) {
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
+
+    SVAPPTheme(
+        themeMode = themeConfig.themeMode,
+        useDynamicColors = themeConfig.useDynamicColors
+    ) {
+        // Контент экрана
+    }
+}
+```
+
+### Экраны с применённой темой
+
+| Экран | Файл |
+|-------|------|
+| Закладки | `bookmarks/nav/BookmarksScreen.kt` |
+| Детали книги | `detail/nav/BookDetailScreen.kt` |
+| Скачанные книги | `downloaded/ui/DownloadedBooksScreen.kt` |
+
+### Зависимости
+
+Для работы темы требуется зависимость от модуля `managers`:
+
+```kotlin
+// build.gradle.kts
+implementation(project(":managers"))
 ```
