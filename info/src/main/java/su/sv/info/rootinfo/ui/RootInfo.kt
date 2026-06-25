@@ -1,10 +1,12 @@
 package su.sv.info.rootinfo.ui
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import su.sv.commonui.ui.components.AppToolbarSimple
@@ -27,7 +29,8 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppToolbarSimple(
-                title = stringResource(R.string.info_toolbar_title)
+                title = stringResource(R.string.info_toolbar_title),
+                windowInsets = WindowInsets(0.dp),
             )
         }
     ) { contentPadding ->

@@ -3,6 +3,7 @@ package su.sv.books.catalog.presentation.root.ui
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -72,7 +74,9 @@ fun RootBooksCatalog(
             is BooksListOneTimeEffect.ScrollToTop -> {
                 scrollEffect = effect
             }
-            else -> { /* другие эффекты обрабатываются в HandleEffects */ }
+
+            else -> { /* другие эффекты обрабатываются в HandleEffects */
+            }
         }
     }
 
@@ -87,9 +91,11 @@ fun RootBooksCatalog(
                         hasDownloadedBooks = currentState.hasDownloadedBooks,
                     )
                 }
+
                 else -> {
                     AppToolbar(
                         title = stringResource(R.string.books_toolbar_title),
+                        windowInsets = WindowInsets(0.dp),
                         scrollBehavior = scrollBehavior,
                     )
                 }
@@ -139,6 +145,7 @@ private fun BooksCatalogTopBar(
 ) {
     AppToolbar(
         title = stringResource(R.string.books_title),
+        windowInsets = WindowInsets(0.dp),
         scrollBehavior = scrollBehavior,
         actions = {
             // Иконка заметок (закладки)
