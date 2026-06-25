@@ -2,17 +2,12 @@ package su.sv.books.catalog.presentation.detail.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -30,6 +25,7 @@ import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
 import su.sv.books.catalog.presentation.detail.viewmodel.BookDetailViewModel
 import su.sv.commonui.ui.OneTimeEffect
+import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.models.ui.book.UiBook
 
 @ExperimentalMaterial3Api
@@ -53,24 +49,12 @@ fun BookDetailUi(
     )
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier.statusBarsPadding(),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = uiBook.title,
-                        maxLines = 1,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            stackNavigation.back()
-                        }
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "backIcon")
-                    }
-                },
+            AppToolbarWithBack(
+                title = uiBook.title,
+                onBackClick = { stackNavigation.back() }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },

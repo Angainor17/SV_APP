@@ -11,15 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -32,10 +28,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
+import su.sv.commonui.theme.ThemeMode
+import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.managers.theme.ThemeViewModel
 
 /**
  * Контент экрана настроек читалки
@@ -47,13 +48,15 @@ fun ReaderSettingsContent(
 ) {
     val context = LocalContext.current
     val stackNavigation = LocalStackNavigation.current
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
 
-    // Получаем SharedPreferences
+    // Получаем SharedPreferences для остальных настроек
     val shared = remember {
         android.preference.PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    // Состояния настроек
+    // Состояния настроек (кроме темы - она через ThemeViewModel)
     var viewMode by remember {
         mutableStateOf(
             shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "PAGING") ?: "PAGING"
@@ -68,11 +71,8 @@ fun ReaderSettingsContent(
     var rotate by remember {
         mutableStateOf(shared.getBoolean(BookApplication.PREFERENCE_ROTATE, false))
     }
-    var theme by remember {
-        mutableStateOf(shared.getString(BookApplication.PREFERENCE_THEME, "") ?: "")
-    }
 
-    // Слушатель изменений
+    // Слушатель изменений (без темы)
     val listener = remember {
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             when (key) {
@@ -84,8 +84,6 @@ fun ReaderSettingsContent(
                     screenLock = sharedPreferences.getString(key, "0") ?: "0"
                 BookApplication.PREFERENCE_ROTATE ->
                     rotate = sharedPreferences.getBoolean(key, false)
-                BookApplication.PREFERENCE_THEME ->
-                    theme = sharedPreferences.getString(key, "") ?: ""
             }
         }
     }
@@ -98,17 +96,11 @@ fun ReaderSettingsContent(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.sv_menu_settings)) },
-                navigationIcon = {
-                    IconButton(onClick = { stackNavigation.back() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                        )
-                    }
-                },
+            AppToolbarWithBack(
+                title = stringResource(R.string.sv_menu_settings),
+                onBackClick = { stackNavigation.back() }
             )
         },
         modifier = modifier,
@@ -153,20 +145,14 @@ fun ReaderSettingsContent(
                 },
             )
 
-            // Тема (упрощённая версия)
+            // Тема (через ThemeViewModel)
             SettingsItem(
                 title = stringResource(R.string.sv_pref_theme_title),
-                subtitle = when (theme) {
-                    "Theme_Dark" -> stringResource(R.string.sv_theme_dark)
-                    "Theme_Light" -> stringResource(R.string.sv_theme_light)
-                    else -> stringResource(R.string.sv_theme_system)
+                subtitle = when (themeConfig.themeMode) {
+                    ThemeMode.DARK -> stringResource(R.string.sv_theme_dark)
+                    ThemeMode.LIGHT -> stringResource(R.string.sv_theme_light)
                 },
-                onClick = {
-                    val themes = listOf("", "Theme_Dark", "Theme_Light")
-                    val currentIndex = themes.indexOf(theme)
-                    val nextIndex = (currentIndex + 1) % themes.size
-                    shared.edit { putString(BookApplication.PREFERENCE_THEME, themes[nextIndex]) }
-                },
+                onClick = { themeViewModel.toggleTheme() },
             )
 
             // TODO: Добавить настройки:

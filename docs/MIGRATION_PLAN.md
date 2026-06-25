@@ -43,64 +43,53 @@
 
 ## Этап 3: Миграция экранов
 
-### 3.1 Модуль News (Приоритет: Высокий)
+### 3.1 Модуль News (Приоритет: Высокий) ✅
 
-**Файлы для обновления:**
+**Файлы обновлены:**
 
-| Файл | Изменения |
-|------|-----------|
-| `NewsItem.kt` | Заменить `Card` на `AppCard`, использовать `MaterialTheme.colorScheme` |
-| `NewsList.kt` | Использовать `AppSwipeRefresh`, стандартные отступы |
-| `ImageCarousel.kt` | Использовать цвета из темы |
+| Файл | Статус |
+|------|--------|
+| `NewsItem.kt` | ✅ Выполнено |
+| `NewsList.kt` | ✅ Выполнено |
+| `ImageCarousel.kt` | ✅ Выполнено |
 
-**Шаги:**
-1. Обновить импорты на новые компоненты
-2. Заменить хардкод цветов на `MaterialTheme.colorScheme`
-3. Использовать `LocalAppDimensions` для отступов
-4. Протестировать в светлой/тёмной теме
+### 3.2 Модуль Books (Приоритет: Высокий) ✅
 
-### 3.2 Модуль Books (Приоритет: Высокий)
+**Файлы обновлены:**
 
-**Файлы для обновления:**
+| Файл | Статус |
+|------|--------|
+| `RootBooksCatalog.kt` | ✅ Выполнено |
+| `BookItem.kt` | ✅ Выполнено |
+| `BookFiltersChips.kt` | ✅ Выполнено |
+| `DownloadedBookItem.kt` | ✅ Выполнено |
+| `DeleteSwipeBackground.kt` | ✅ Выполнено |
+| `BookDetailUi.kt` | ✅ Выполнено |
+| `BookmarksScreen.kt` | ✅ Выполнено |
 
-| Файл | Изменения |
-|------|-----------|
-| `RootBooksCatalog.kt` | Добавить тулбар, использовать состояния из темы |
-| `BookItem.kt` | Заменить на `AppCard`, использовать цвета темы |
-| `BookFiltersChips.kt` | Использовать цвета из темы |
-| `DownloadedBookItem.kt` | Заменить на `AppCard`, использовать цвета темы |
-| `DeleteSwipeBackground.kt` | Использовать `MaterialTheme.colorScheme.danger` |
-| `BookDetailUi.kt` | Использовать `AppButton`, цвета темы |
-| `BookmarksScreen.kt` | Использовать общие компоненты |
+### 3.3 Модуль Wiki (Приоритет: Средний) ✅
 
-**Шаги:**
-1. Обновить Preview-функции для использования нового API темы
-2. Заменить `SVAPPTheme(darkTheme = ...)` на `SVAPPTheme(themeMode = ...)`
-3. Использовать `AppCard` для карточек книг
-4. Использовать функциональные цвета из темы
+**Файлы обновлены:**
 
-### 3.3 Модуль Wiki (Приоритет: Средний)
+| Файл | Статус |
+|------|--------|
+| `ArticleScreen.kt` | ✅ Выполнено |
+| `ArticleScreenContent.kt` | ✅ Выполнено |
+| `WikiSearchBar.kt` | ✅ Выполнено |
+| `FavoritesScreen.kt` | ✅ Выполнено |
+| `FavoritesScreenContent.kt` | ✅ Выполнено |
+| `HistoryList.kt` | ✅ Выполнено |
+| `SearchSuggestions.kt` | ✅ Выполнено |
 
-**Файлы для обновления:**
+### 3.4 Модуль Info (Приоритет: Низкий) ✅
 
-| Файл | Изменения |
-|------|-----------|
-| `ArticleScreen.kt` | Добавить тулбар с кнопкой назад |
-| `ArticleContent.kt` | Использовать цвета темы |
-| `WikiSearchBar.kt` | Использовать `MaterialTheme.colorScheme` |
-| `FavoritesScreen.kt` | Использовать общие компоненты |
-| `HistoryList.kt` | Использовать `AppCard` |
-| `SearchSuggestions.kt` | Использовать цвета темы |
+**Файлы обновлены:**
 
-### 3.4 Модуль Info (Приоритет: Низкий)
-
-**Файлы для обновления:**
-
-| Файл | Изменения |
-|------|-----------|
-| `RootInfo.kt` | Добавить тулбар |
-| `InfoItem.kt` | Использовать `AppCard` |
-| `InfoContent.kt` | Использовать цвета темы |
+| Файл | Статус |
+|------|--------|
+| `RootInfo.kt` | ✅ Выполнено |
+| `InfoItem.kt` | ✅ Выполнено |
+| `InfoContent.kt` | ✅ Выполнено |
 
 ### 3.5 Модуль BookReader (Приоритет: Низкий)
 
