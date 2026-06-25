@@ -7,4 +7,10 @@
     <dimen name="buttontoast_x_padding">12dp</dimen>
     <dimen name="cardtoast_margin">4dp</dimen>
 
+    <!-- AmbilWarna color picker dialog -->
+    <dimen name="ambilwarna_spacer">12dp</dimen>
+    <dimen name="ambilwarna_hueWidth">30dp</dimen>
+    <dimen name="ambilwarna_hsvHeight">240dp</dimen>
+    <dimen name="ambilwarna_hsvWidth">240dp</dimen>
+
 </resources>

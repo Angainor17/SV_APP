@@ -10,7 +10,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/androidFileChooser" />
             <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/bookreader" />
@@ -23,7 +22,6 @@
             <option value="$PROJECT_DIR$/managers" />
             <option value="$PROJECT_DIR$/models" />
             <option value="$PROJECT_DIR$/news" />
-            <option value="$PROJECT_DIR$/superToasts" />
             <option value="$PROJECT_DIR$/util" />
             <option value="$PROJECT_DIR$/wiki" />
           </set>
