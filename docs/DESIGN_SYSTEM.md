@@ -484,7 +484,7 @@ fun ThemeToggleIcon(
 
 ### Чек-лист
 
-1. ✅ Обернуть контент в `SVAPPTheme`
+1. ✅ Обернуть контент в `SVAPPTheme` с `ThemeViewModel`
 2. ✅ Использовать `AppDimensions` для отступов
 3. ✅ Использовать `MaterialTheme.colorScheme` для цветов
 4. ✅ Использовать `MaterialTheme.typography` для текста
@@ -492,37 +492,80 @@ fun ThemeToggleIcon(
 6. ✅ Использовать общие компоненты из `commonui/ui`
 7. ✅ Добавить PullToRefresh для списков
 8. ✅ Использовать ripple для кликабельных элементов
+9. ✅ Добавить `contentWindowInsets = WindowInsets.statusBars` в Scaffold
 
-### Структура экрана
+### Структура Modo Screen
+
+Для Modo Screen тема применяется на уровне экрана с использованием `ThemeViewModel`:
 
 ```kotlin
+@Parcelize
+class NewScreen : Screen, Parcelable {
+
+    @Composable
+    override fun Content(modifier: Modifier) {
+        val themeViewModel: ThemeViewModel = hiltViewModel()
+        val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
+
+        SVAPPTheme(
+            themeMode = themeConfig.themeMode,
+            useDynamicColors = themeConfig.useDynamicColors
+        ) {
+            NewContent(modifier = modifier)
+        }
+    }
+}
+
 @Composable
-fun NewScreen(
-    viewModel: NewViewModel = hiltViewModel()
+private fun NewContent(
+    viewModel: NewViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    
-    SVAPPTheme {
-        Scaffold(
-            topBar = {
-                AppToolbar(
-                    title = "Заголовок",
-                    actions = {
-                        ThemeToggleIcon(...)
-                    }
-                )
-            }
-        ) { padding ->
-            when (state) {
-                is State.Loading -> FullScreenLoading()
-                is State.Error -> FullScreenError { viewModel.retry() }
-                is State.Content -> ContentList(state.items)
-                is State.Empty -> EmptyState("Нет данных")
-            }
+
+    Scaffold(
+        contentWindowInsets = WindowInsets.statusBars,
+        topBar = {
+            AppToolbar(
+                title = "Заголовок",
+                actions = {
+                    ThemeToggleIcon(...)
+                }
+            )
+        }
+    ) { padding ->
+        when (state) {
+            is State.Loading -> FullScreenLoading()
+            is State.Error -> FullScreenError { viewModel.retry() }
+            is State.Content -> ContentList(state.items)
+            is State.Empty -> EmptyState("Нет данных")
         }
     }
 }
 ```
+
+### Структура корневого экрана
+
+Для корневых экранов (например, `RootWiki`, `RootNews`) тема применяется аналогично:
+
+```kotlin
+@Composable
+fun RootFeature(viewModel: RootFeatureViewModel = hiltViewModel()) {
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
+
+    SVAPPTheme(
+        themeMode = themeConfig.themeMode,
+        useDynamicColors = themeConfig.useDynamicColors
+    ) {
+        // Контент
+    }
+}
+```
+
+### Примечание о дочерних экранах
+
+Если корневой экран применяет тему, то дочерние экраны (открываемые через `stackNavigation.forward()`) **не должны** применять тему повторно. Это позволяет избежать двойного обёртывания.
 
 ---
 

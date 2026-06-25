@@ -14,9 +14,30 @@
 ## Навигация
 
 Используется библиотека **Modo** (`com.github.terrakok.modo`):
-- `RootWiki` — главный экран (точка входа)
+- `RootWiki` — главный экран (точка входа), применяет тему
 - `ArticleScreen` — экран статьи
 - `FavoritesScreen` — экран избранного
+
+### Применение темы
+
+Тема применяется на уровне корневого экрана `RootWiki`:
+
+```kotlin
+@Composable
+fun RootWiki(viewModel: RootWikiViewModel = hiltViewModel()) {
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
+
+    SVAPPTheme(
+        themeMode = themeConfig.themeMode,
+        useDynamicColors = themeConfig.useDynamicColors
+    ) {
+        // Контент
+    }
+}
+```
+
+Дочерние экраны (`ArticleScreen`, `FavoritesScreen`) **не применяют** тему отдельно, так как она уже применена на уровне корневого экрана.
 
 ## Архитектура
 
@@ -148,9 +169,11 @@ sealed class UiWikiState {
 ## Правила разработки
 
 - **Строковые ресурсы**: Все строки выносить в `strings.xml`
-- **MVI паттерн**: Actions → ViewModel → State/Efffects
+- **MVI паттерн**: Actions → ViewModel → State/Effects
 - **Кэширование**: Статьи кэшируются автоматически
 - **Клавиатура**: Скрывается при кликах вне поля ввода
+- **Статус-бар**: Использовать `WindowInsets.statusBars` в Scaffold для корректного отображения
+- **Тема**: Применяется на уровне `RootWiki`, дочерние экраны не применяют тему отдельно
 
 ## Используемые библиотеки
 
