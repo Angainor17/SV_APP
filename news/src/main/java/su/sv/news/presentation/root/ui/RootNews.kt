@@ -60,6 +60,7 @@ fun RootNews(
     HandleEffects(viewModel, snackbarHostState)
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             AppToolbarWithThemeToggle(
                 title = stringResource(R.string.news_toolbar_title),

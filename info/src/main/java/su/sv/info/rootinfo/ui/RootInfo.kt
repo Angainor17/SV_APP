@@ -27,6 +27,7 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             AppToolbarSimple(
                 title = stringResource(R.string.info_toolbar_title),
