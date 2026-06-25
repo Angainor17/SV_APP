@@ -33,14 +33,11 @@ fbreader/
 ├── formats/        # Обработчики форматов
 │   ├── fb2/        # FB2 формат
 │   └── oeb/        # EPUB/OEB формат
-├── library/        # Библиотека книг
-├── sort/           # Сортировка
-├── tips/           # Подсказки
-├── tree/           # Деревья навигации
-└── util/           # Утилиты
+├── sort/           # Сортировка (TitledEntity)
+└── util/           # Утилиты (TextSnippet)
 ```
 
-> **Примечание:** Пакет `network/` удалён (см. раздел "Удалённый сетевой функционал")
+> **Примечание:** Пакеты `library/`, `tree/` удалены (см. раздел "Удалённый функционал")
 
 ### org.geometerplus.zlibrary.core
 Кроссплатформенное ядро:
@@ -51,27 +48,31 @@ zlibrary/core/
 ├── drm/            # DRM защита
 ├── filesystem/     # Файловая система
 ├── filetypes/      # Типы файлов
+├── fonts/          # Шрифты
 ├── image/          # Работа с изображениями
 ├── language/       # Языки
 ├── library/        # Библиотечные функции
-├── money/          # Валюты
-├── network/        # Сеть
 ├── options/        # Опции/настройки
 ├── resources/      # Ресурсы
 ├── tree/           # Деревья
 ├── util/           # Утилиты
 ├── xml/            # XML парсинг
-└── constants/      # Константы
+└── view/           # Представления
 ```
+
+> **Примечание:** Пакеты `money/`, `network/` удалены
 
 ### org.geometerplus.zlibrary.ui.android
 Android-специфичный UI:
 
 ```
 zlibrary/ui/android/
-├── views/          # Кастомные View (ZLAndroidWidget, MainView)
-└── resources/      # Android ресурсы
+├── view/           # Кастомные View (ZLAndroidWidget, MainView)
+├── image/          # Загрузка изображений
+└── library/        # Android библиотека
 ```
+
+> **Примечание:** Пакет `network/` удалён
 
 ### org.geometerplus.zlibrary.text
 Текстовый движок:
@@ -215,14 +216,33 @@ fbreader/src/main/
 
 **Итого:** ~10 000 строк кода, 141 файл.
 
+---
+
+## Удалённый неиспользуемый код (2026-06-25)
+
+> **Причина:** Код не используется в приложении и создаёт лишнюю сложность.
+
+### Удалённые пакеты
+
+| Пакет | Описание | Файлов |
+|-------|----------|--------|
+| `org.geometerplus.fbreader.library` | Деревья библиотеки (авторы, серии, теги) | 23 |
+| `org.geometerplus.android.fbreader.covers` | Кэш обложек | 3 |
+| `org.geometerplus.fbreader.tree` | Базовое дерево навигации | 1 |
+| `org.geometerplus.zlibrary.core.network` | Сетевые утилиты | 10 |
+| `org.geometerplus.zlibrary.ui.android.network` | Android сетевые утилиты | 1 |
+| `org.geometerplus.zlibrary.core.money` | Работа с валютой | 2 |
+| `org.geometerplus.fbreader.fbreader.options.EInkOptions` | Опции E-Ink экранов | 1 |
+
+**Итого:** ~41 файл, ~3000 строк кода.
+
 ### Что было удалено
 
-- `NetworkLibrary.java` — управление сетевыми каталогами
-- `NetworkBookItem.java` — элемент книги из каталога
-- `NetworkCatalogItem.java` — элемент каталога
-- `OPDSNetworkLink.java` — OPDS ссылка
-- `ATOMFeedHandler.kt` — обработчик Atom feed
-- `BookDownloaderInterface.aidl` — AIDL интерфейс для скачивания
+- `LibraryTree.java`, `AuthorTree.java`, `BookTree.java` и др. — дерево библиотеки
+- `CoverCache.java`, `CoverManager.java` — кэш обложек
+- `FBTree.java` — базовый класс дерева
+- `ZLNetworkManager.java`, `ZLNetworkRequest.java` — сетевой менеджер
+- `Money.java`, `MoneyException.kt` — работа с валютой
 
 ### Оставшийся функционал
 

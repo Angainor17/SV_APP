@@ -39,10 +39,8 @@ include(":news")
 include(":info")
 include(":models")
 include(":bookreader")
-// ambilWarna и dragSortListview перенесены в fbreader
+// ambilWarna, dragSortListview, superToasts и androidFileChooser перенесены в fbreader
 include(":util")
-include(":superToasts")
-include(":androidFileChooser")
 include(":fbreader")
 include(":managers")
 include(":api")

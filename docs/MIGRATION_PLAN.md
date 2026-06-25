@@ -134,7 +134,24 @@
 
 Удалено ~10 000 строк кода и 141 файл.
 
-### 4.3 Обновление CLAUDE.md модулей ✅
+### 4.3 Удаление неиспользуемого кода ✅
+
+**fbreader (38 файлов):**
+- `org.geometerplus.fbreader.library.*` — деревья библиотеки (23 файла)
+- `org.geometerplus.android.fbreader.covers.*` — кэш обложек (3 файла)
+- `org.geometerplus.fbreader.tree.FBTree` — базовое дерево (1 файл)
+- `org.geometerplus.zlibrary.core.network.*` — сетевые утилиты (10 файлов)
+- `org.geometerplus.zlibrary.ui.android.network.*` — Android сетевые утилиты (1 файл)
+- `org.geometerplus.zlibrary.core.money.*` — работа с валютой (2 файла)
+- `EInkOptions.kt` — опции E-Ink (1 файл)
+
+**bookreader (3 файла):**
+- `ic_toc_black_24dp.xml`, `ic_expand_more_black_24dp.xml` — неиспользуемые drawable
+- `ActivityExt.kt` — неиспользуемое расширение
+
+Удалено ~3000 строк кода.
+
+### 4.4 Обновление CLAUDE.md модулей ✅
 
 Обновить документацию в `commonui/CLAUDE.md`:
 - Добавить описание новых компонентов
