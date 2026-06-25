@@ -1,11 +1,9 @@
 package su.sv.info.rootinfo.ui
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,12 +31,12 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
             )
         }
     ) { contentPadding ->
-        when (state.value) {
+        when (val currentState = state.value) {
             is UiInfoState.Content -> {
                 InfoContent(
                     actionsHandler = viewModel,
-                    state = state.value as UiInfoState.Content,
-                    modifier = Modifier.padding(contentPadding)
+                    state = currentState,
+                    contentPadding = contentPadding,
                 )
             }
 

@@ -1,6 +1,5 @@
 package su.sv.news.presentation.root.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,6 @@ import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
  * @param currentThemeMode текущий режим темы
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RootNews(
     viewModel: RootNewsViewModel = hiltViewModel(),
@@ -70,40 +68,36 @@ fun RootNews(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-    ) { _ ->
+    ) { contentPadding ->
         val hasItems = lazyPagingItems.itemSnapshotList.isNotEmpty()
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            when (loadState) {
-                LoadState.Loading if !hasItems -> {
-                    FullScreenLoading()
-                }
-                is LoadState.Error if !hasItems -> {
-                    FullScreenError(
-                        onRetry = { lazyPagingItems.refresh() }
-                    )
+        // Оптимизация: упрощённая логика состояний для избежания вложенных when
+        when {
+            loadState is LoadState.Loading && !hasItems -> {
+                FullScreenLoading()
+            }
+            loadState is LoadState.Error && !hasItems -> {
+                FullScreenError(
+                    onRetry = { lazyPagingItems.refresh() }
+                )
+            }
+            hasItems -> {
+                val state = viewModel.state.collectAsStateWithLifecycle()
+                val stateValue = state.value
+
+                if (stateValue.isRefreshing) {
+                    viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
                 }
 
-                else -> {
-                    val state = viewModel.state.collectAsStateWithLifecycle()
-                    val stateValue = state.value
-
-                    if (stateValue.isRefreshing) {
-                        viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
-                    }
-
-                    if (hasItems) {
-                        NewsList(
-                            lazyPagingItems = lazyPagingItems,
-                            actions = viewModel,
-                            state = stateValue,
-                        )
-                    } else {
-                        NoNews()
-                    }
-                }
+                NewsList(
+                    lazyPagingItems = lazyPagingItems,
+                    actions = viewModel,
+                    state = stateValue,
+                    contentPadding = contentPadding,
+                )
+            }
+            else -> {
+                NoNews()
             }
         }
     }
@@ -147,7 +141,7 @@ private fun Context.openVideo(item: UiNewsMedia.ItemVideo) {
 }
 
 @Composable
-fun NoNews() {
+private fun NoNews() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

@@ -5,6 +5,7 @@ package su.sv.news.presentation.root.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,17 +32,20 @@ import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
  * @param lazyPagingItems данные для отображения
  * @param state состояние экрана
  * @param actions обработчик действий
+ * @param contentPadding отступы от Scaffold
  */
 @Composable
 fun NewsList(
     lazyPagingItems: LazyPagingItems<UiNewsItem>,
     state: UiRootNewsState,
     actions: RootNewsActionsHandler,
+    contentPadding: PaddingValues,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     val dimensions = LocalAppDimensions.current
 
     PullToRefreshBox(
+        modifier = Modifier.fillMaxSize(),
         isRefreshing = state.isRefreshing,
         onRefresh = {
             lazyPagingItems.refresh()
@@ -50,26 +54,23 @@ fun NewsList(
         state = pullToRefreshState,
     ) {
         LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
-            contentPadding = PaddingValues(
-                bottom = dimensions.itemSpacingLarge
-            )
+            contentPadding = contentPadding,
         ) {
             items(
                 count = lazyPagingItems.itemCount,
                 key = lazyPagingItems.itemKey { it.id },
+                contentType = { "news_item" }
             ) { index ->
-                val item = lazyPagingItems[index]
-                if (item != null) {
+                lazyPagingItems[index]?.let { item ->
                     NewsItem(
                         item = item,
                         onItemClick = {
                             actions.onAction(RootNewsActions.OnNewsMediaClick(it))
                         }
                     )
-                } else {
-                    MessagePlaceholder()
-                }
+                } ?: MessagePlaceholder()
             }
         }
     }
