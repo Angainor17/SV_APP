@@ -16,5 +16,5 @@ object MockConfig {
      * true = используются мок-данные, сетевые запросы не выполняются
      * false = выполняются реальные сетевые запросы
      */
-    const val IS_MOCK_ENABLED = true
+    const val IS_MOCK_ENABLED = false
 }

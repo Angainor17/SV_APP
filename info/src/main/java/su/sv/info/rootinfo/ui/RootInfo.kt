@@ -1,9 +1,11 @@
 package su.sv.info.rootinfo.ui
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,12 +21,12 @@ import su.sv.info.rootinfo.viewmodel.RootInfoActions
  * Информационный экран
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppToolbarSimple(
                 title = stringResource(R.string.info_toolbar_title)
@@ -36,7 +38,7 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
                 InfoContent(
                     actionsHandler = viewModel,
                     state = state.value as UiInfoState.Content,
-//                    modifier = Modifier.padding(contentPadding)
+                    modifier = Modifier.padding(contentPadding)
                 )
             }
 

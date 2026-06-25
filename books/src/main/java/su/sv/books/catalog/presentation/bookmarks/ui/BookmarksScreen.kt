@@ -4,14 +4,10 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.ViewAgenda
@@ -20,16 +16,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -42,10 +34,13 @@ import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarksState
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksAction
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksEffect
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksViewModel
+import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
+import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.commonui.ui.components.FullScreenEmpty
 import timber.log.Timber
 
 /**
@@ -64,7 +59,10 @@ fun BookmarksScreen(
         else -> NotesViewMode.LIST
     }
 
+    val dimensions = LocalAppDimensions.current
+
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BookmarksTopBar(
                 viewMode = currentViewMode,
@@ -79,7 +77,10 @@ fun BookmarksScreen(
         ) {
             when (val currentState = state) {
                 is UiBookmarksState.Loading -> FullScreenLoading()
-                is UiBookmarksState.Empty -> EmptyNotesState()
+                is UiBookmarksState.Empty -> FullScreenEmpty(
+                    title = stringResource(R.string.bookmarks_empty_title),
+                    icon = Icons.AutoMirrored.Filled.MenuBook
+                )
                 is UiBookmarksState.NotesList -> NotesListContent(
                     notes = currentState.notes,
                     onNoteClick = { viewModel.onAction(BookmarksAction.OnNoteClick(it)) },
@@ -121,7 +122,6 @@ fun BookmarksScreen(
 /**
  * Тулбар экрана заметок
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookmarksTopBar(
     viewMode: NotesViewMode,
@@ -129,18 +129,9 @@ fun BookmarksTopBar(
     onBackClick: () -> Unit,
     onToggleViewMode: () -> Unit,
 ) {
-    TopAppBar(
-        title = {
-            Text(stringResource(R.string.bookmarks_title))
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.books_back_content_description)
-                )
-            }
-        },
+    AppToolbarWithBack(
+        title = stringResource(R.string.bookmarks_title),
+        onBackClick = onBackClick,
         actions = {
             if (showViewModeToggle) {
                 IconButton(onClick = onToggleViewMode) {
@@ -150,38 +141,13 @@ fun BookmarksTopBar(
                         } else {
                             Icons.AutoMirrored.Filled.ViewList
                         },
-                        contentDescription = stringResource(R.string.bookmarks_toggle_view_mode)
+                        contentDescription = stringResource(R.string.bookmarks_toggle_view_mode),
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         }
     )
-}
-
-/**
- * Пустое состояние заметок
- */
-@Composable
-fun EmptyNotesState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.bookmarks_empty_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
 }
 
 /**
@@ -194,9 +160,11 @@ fun NotesListContent(
     onDeleteRequest: (UiBookmarkNote) -> Unit,
     onShareClick: (UiBookmarkNote) -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
     ) {
         items(items = notes, key = { it.id }) { note ->
             NoteItem(
@@ -218,9 +186,11 @@ fun BooksListContent(
     books: List<UiBookWithNotes>,
     onBookClick: (String) -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
     ) {
         items(items = books, key = { it.bookId }) { book ->
             BookWithNotesItem(
@@ -242,6 +212,8 @@ fun BookNotesContent(
     onDeleteRequest: (UiBookmarkNote) -> Unit,
     onShareClick: (UiBookmarkNote) -> Unit,
 ) {
+    val dimensions = LocalAppDimensions.current
+
     Column(modifier = Modifier.fillMaxSize()) {
         // Компактная карточка книги
         CompactBookCard(book = book)
@@ -249,7 +221,7 @@ fun BookNotesContent(
         // Список заметок
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
         ) {
             items(items = notes, key = { it.id }) { note ->
                 NoteItem(
@@ -298,14 +270,6 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
 }
 
 //region Previews
-
-@Preview(showBackground = true)
-@Composable
-private fun EmptyNotesStatePreview() {
-    SVAPPTheme {
-        EmptyNotesState()
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

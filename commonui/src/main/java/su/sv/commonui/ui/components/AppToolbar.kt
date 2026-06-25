@@ -3,6 +3,7 @@ package su.sv.commonui.ui.components
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,7 +73,7 @@ fun AppToolbar(
             actionIconContentColor = MaterialTheme.colorScheme.onSurface
         ),
         scrollBehavior = scrollBehavior,
-        windowInsets = WindowInsets(0)
+        windowInsets = WindowInsets.statusBars
     )
 }
 
@@ -163,6 +164,6 @@ fun AppToolbarSimple(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
         ),
-        windowInsets = WindowInsets(0)
+        windowInsets = WindowInsets.statusBars
     )
 }

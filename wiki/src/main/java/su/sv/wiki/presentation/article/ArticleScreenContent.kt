@@ -7,35 +7,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.FullScreenLoading
+import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.wiki.R
 import su.sv.wiki.presentation.root.ui.ArticleContent
 
@@ -51,6 +50,7 @@ fun ArticleScreenContent(
     val stackNavigation = LocalStackNavigation.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val dimensions = LocalAppDimensions.current
 
     // Загружаем статью при первом отображении
     LaunchedEffect(articleTitle) {
@@ -58,6 +58,7 @@ fun ArticleScreenContent(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             when (val currentState = state) {
                 is ArticleState.Content -> {
@@ -74,19 +75,9 @@ fun ArticleScreenContent(
                     )
                 }
                 else -> {
-                    CenterAlignedTopAppBar(
-                        title = { Text(stringResource(R.string.wiki_loading)) },
-                        navigationIcon = {
-                            IconButton(onClick = { stackNavigation.back() }) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = stringResource(R.string.wiki_back),
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                        ),
+                    AppToolbarWithBack(
+                        title = stringResource(R.string.wiki_loading),
+                        onBackClick = { stackNavigation.back() }
                     )
                 }
             }
@@ -111,7 +102,7 @@ fun ArticleScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(16.dp),
+                        .padding(dimensions.screenPaddingHorizontal),
                 )
             }
             is ArticleState.NotFound -> {
@@ -133,7 +124,6 @@ fun ArticleScreenContent(
 /**
  * TopAppBar для экрана статьи
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArticleTopAppBar(
     title: String,
@@ -143,21 +133,9 @@ private fun ArticleTopAppBar(
     onFavoriteClick: () -> Unit,
     onExternalLinkClick: (String) -> Unit,
 ) {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = title,
-                maxLines = 1,
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.wiki_back),
-                )
-            }
-        },
+    AppToolbarWithBack(
+        title = title,
+        onBackClick = onBackClick,
         actions = {
             // Кнопка избранного
             IconButton(onClick = onFavoriteClick) {
@@ -168,7 +146,7 @@ private fun ArticleTopAppBar(
                     } else {
                         stringResource(R.string.wiki_add_favorite)
                     },
-                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                 )
             }
             // Кнопка открытия в браузере
@@ -177,14 +155,11 @@ private fun ArticleTopAppBar(
                     Icon(
                         painter = painterResource(R.drawable.ic_open_in_new),
                         contentDescription = stringResource(R.string.wiki_open_in_browser),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        }
     )
 }
 
@@ -193,15 +168,17 @@ private fun ArticleTopAppBar(
  */
 @Composable
 private fun NotFoundContent(modifier: Modifier = Modifier) {
+    val dimensions = LocalAppDimensions.current
+
     Column(
-        modifier = modifier.padding(16.dp),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        modifier = modifier.padding(dimensions.screenPaddingHorizontal),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(R.string.wiki_not_found),
             style = MaterialTheme.typography.headlineSmall,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(dimensions.itemSpacingMedium))
         Text(
             text = stringResource(R.string.wiki_not_found_hint),
             style = MaterialTheme.typography.bodyMedium,
