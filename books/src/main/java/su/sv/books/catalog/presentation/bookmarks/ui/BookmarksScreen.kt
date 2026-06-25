@@ -4,7 +4,10 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -48,7 +51,7 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookmarksScreen(
+fun BookmarksContent(
     viewModel: BookmarksViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -59,10 +62,9 @@ fun BookmarksScreen(
         else -> NotesViewMode.LIST
     }
 
-    val dimensions = LocalAppDimensions.current
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             BookmarksTopBar(
                 viewMode = currentViewMode,
@@ -71,9 +73,11 @@ fun BookmarksScreen(
                 onToggleViewMode = { viewModel.onAction(BookmarksAction.OnToggleViewMode) },
             )
         }
-    ) { _ ->
+    ) { paddingValues ->
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             when (val currentState = state) {
                 is UiBookmarksState.Loading -> FullScreenLoading()

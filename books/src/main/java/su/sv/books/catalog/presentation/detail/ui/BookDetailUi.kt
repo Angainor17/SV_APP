@@ -1,6 +1,8 @@
 package su.sv.books.catalog.presentation.detail.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -49,6 +51,7 @@ fun BookDetailUi(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets.statusBars,
         modifier = modifier,
         topBar = {
             AppToolbarWithBack(

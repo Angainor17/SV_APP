@@ -3,7 +3,9 @@ package su.sv.books.catalog.presentation.downloaded.ui
 import android.os.Parcelable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,10 +30,12 @@ import su.sv.books.catalog.presentation.downloaded.actions.DownloadedBookActions
 import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
 import su.sv.books.catalog.presentation.downloaded.viewmodel.DownloadedBooksViewModel
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.ui.components.FullScreenLoading
+import su.sv.managers.theme.ThemeViewModel
 
 /**
  * Экран "Ваши книги" (Modo Screen)
@@ -46,15 +50,22 @@ class DownloadedBooksScreen(
         val viewModel: DownloadedBooksViewModel = hiltViewModel()
         val state by viewModel.state.collectAsStateWithLifecycle()
         val deleteDialogState by viewModel.deleteDialogState.collectAsState()
+        val themeViewModel: ThemeViewModel = hiltViewModel()
+        val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
 
-        DownloadedBooksContent(
-            state = state,
-            deleteDialogState = deleteDialogState,
-            onAction = viewModel::onAction,
-            modifier = modifier,
-        )
+        SVAPPTheme(
+            themeMode = themeConfig.themeMode,
+            useDynamicColors = themeConfig.useDynamicColors
+        ) {
+            DownloadedBooksContent(
+                state = state,
+                deleteDialogState = deleteDialogState,
+                onAction = viewModel::onAction,
+                modifier = modifier,
+            )
 
-        HandleEffects(viewModel)
+            HandleEffects(viewModel)
+        }
     }
 }
 
@@ -67,6 +78,7 @@ private fun DownloadedBooksContent(
 ) {
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             AppToolbarWithBack(
                 title = stringResource(R.string.books_downloaded_title),
