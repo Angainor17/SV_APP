@@ -50,18 +50,6 @@ open class BookApplication : MainApplication() {
         const val PREFERENCE_FONTS_FOLDER: String = "fonts_folder"
 
         /**
-         * Получить BookApplication из контекста.
-         * @deprecated Используйте BookReaderInitializer.getTTFManager() напрямую
-         */
-        @Deprecated(
-            message = "Use BookReaderInitializer.getTTFManager() directly",
-            replaceWith = ReplaceWith("BookReaderInitializer.getTTFManager()")
-        )
-        fun from(context: Context): BookApplication? {
-            return MainApplication.from(context) as? BookApplication?
-        }
-
-        /**
          * Получить тему для текущих настроек
          */
         fun getTheme(context: Context, light: Int, dark: Int): Int {

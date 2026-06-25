@@ -62,7 +62,6 @@ public class FBView extends ZLTextView {
     public static final int SCROLLBAR_SHOW_AS_FOOTER_OLD_STYLE = 4;
     private final FBReaderApp myReader;
     private final ViewOptions myViewOptions;
-    private final BookElementManager myBookElementManager;
     public Footer myFooter;
     private int myStartY;
     private boolean myIsBrightnessAdjustmentInProgress;
@@ -73,7 +72,6 @@ public class FBView extends ZLTextView {
         super(reader);
         myReader = reader;
         myViewOptions = reader.ViewOptions;
-        myBookElementManager = new BookElementManager(this);
     }
 
     public void setModel(ZLTextModel model) {
@@ -552,7 +550,7 @@ public class FBView extends ZLTextView {
 
     @Override
     protected ExtensionElementManager getExtensionManager() {
-        return myBookElementManager;
+        return null;
     }
 
     public abstract class Footer implements FooterArea {

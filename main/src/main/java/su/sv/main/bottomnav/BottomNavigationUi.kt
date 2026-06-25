@@ -31,7 +31,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
-import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.ThemeMode
 import su.sv.info.rootinfo.ui.RootInfo
 import su.sv.main.R
@@ -62,17 +61,12 @@ internal fun BottomNavigationBar(
     // Состояние бейджа Wiki
     val showWikiBadge by badgeViewModel.showWikiBadge.collectAsStateWithLifecycle()
 
-    SVAPPTheme(
-        themeMode = themeConfig.themeMode,
-        useDynamicColors = themeConfig.useDynamicColors
-    ) {
-        BottomNavContent(
-            showWikiBadge = showWikiBadge,
-            onWikiBadgeClick = { badgeViewModel.markWikiAsVisited() },
-            onThemeToggle = { themeViewModel.toggleTheme() },
-            currentThemeMode = themeConfig.themeMode
-        )
-    }
+    BottomNavContent(
+        showWikiBadge = showWikiBadge,
+        onWikiBadgeClick = { badgeViewModel.markWikiAsVisited() },
+        onThemeToggle = { themeViewModel.toggleTheme() },
+        currentThemeMode = themeConfig.themeMode
+    )
 }
 
 @Composable

@@ -524,9 +524,6 @@ public class FBReaderApp extends ZLApplication {
             case library:
                 runAction(ActionCode.SHOW_LIBRARY);
                 break;
-            case networkLibrary:
-                runAction(ActionCode.SHOW_NETWORK_LIBRARY);
-                break;
             case previousBook:
                 openBook(Collection.getRecentBook(1), null, null, null);
                 break;

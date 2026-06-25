@@ -40,8 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:contentDescription="@string/panel_transplate"
-                android:tooltipText="@string/panel_transplate"
+                android:contentDescription="@string/panel_translate"
+                android:tooltipText="@string/panel_translate"
                 android:src="@drawable/popup_translate" />
 
             <ImageView
