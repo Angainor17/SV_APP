@@ -44,14 +44,7 @@ dependencies {
 
     // Модули-фичи
     api(project(":util"))
-    // dragSortListview и ambilWarna перенесены в этот модуль
-    api(project(":androidFileChooser"))
-    api(project(":superToasts"))
 
-//    api("com.github.axet.fbreader:ambilwarna:1.0") // compile project(":ambilWarna")
-//    api( "com.github.axet.fbreader:androidfilechooser:5.0" )// compile project(":androidFileChooser")
-//    api( "com.github.axet.fbreader:dragsortlistview:0.6.1") // compile project(":dragSortListview")
-//    api( "com.github.axet.fbreader:supertoasts:1.3.4") // compile project(":superToasts")
     api("com.github.axet:pdfparse-lib:1.0")
     api("com.googlecode.json-simple:json-simple:1.1.1") {
         exclude(group = "junit")
@@ -62,7 +55,6 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.material)
-//    implementation(libs.androidx.preference)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
