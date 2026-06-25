@@ -1,6 +1,5 @@
 <resources>
     <string name="sv_menu_settings">Настройки</string>
-    <string name="sv_theme_system">Системная</string>
     <string name="sv_theme_dark">Тёмная</string>
     <string name="sv_theme_light">Светлая</string>
 

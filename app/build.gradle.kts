@@ -85,6 +85,7 @@ dependencies {
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
+    implementation(project(":managers"))
 
     // Logging
     implementation(libs.timber)
@@ -110,6 +111,7 @@ dependencies {
 
     // DI
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.threetenabp)

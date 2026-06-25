@@ -79,7 +79,6 @@ interface ApiMethods {
     int GET_TAP_ACTION_BY_COORDINATES = 933;
 
     // for format plugins
-    int GET_MAIN_MENU_CONTENT = 1001;
     int GET_RESOURCE_STRING = 1002;
     int GET_BITMAP = 1003;
 }

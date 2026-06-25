@@ -3,7 +3,6 @@ package su.sv.commonui.ui.components
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import su.sv.commonui.R
 import su.sv.commonui.theme.ThemeMode
 
@@ -73,7 +73,7 @@ fun AppToolbar(
             actionIconContentColor = MaterialTheme.colorScheme.onSurface
         ),
         scrollBehavior = scrollBehavior,
-        windowInsets = WindowInsets.statusBars
+        windowInsets = WindowInsets(0.dp)
     )
 }
 
@@ -164,6 +164,6 @@ fun AppToolbarSimple(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
         ),
-        windowInsets = WindowInsets.statusBars
+        windowInsets = WindowInsets(0.dp)
     )
 }

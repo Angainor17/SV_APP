@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.Modo.rememberRootScreen
 import com.github.terrakok.modo.RootScreen
@@ -13,7 +16,9 @@ import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import dagger.hilt.android.AndroidEntryPoint
 import su.sv.commonarchitecture.presentation.base.BaseActivity
+import su.sv.commonui.theme.SVAPPTheme
 import su.sv.main.bottomnav.BottomNavScreen
+import su.sv.managers.theme.ThemeViewModel
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -25,15 +30,23 @@ class MainActivity : BaseActivity() {
         enableEdgeToEdge()
 
         setContent {
-            // Remember root screen using rememberSeaveable under the hood.
-            val rootScreen = rememberRootScreen {
-                DefaultStackScreen(
-                    StackNavModel(
-                        BottomNavScreen()
+            val themeViewModel: ThemeViewModel = hiltViewModel()
+            val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
+
+            SVAPPTheme(
+                themeMode = themeConfig.themeMode,
+                useDynamicColors = themeConfig.useDynamicColors
+            ) {
+                // Remember root screen using rememberSaveable under the hood.
+                val rootScreen = rememberRootScreen {
+                    DefaultStackScreen(
+                        StackNavModel(
+                            BottomNavScreen()
+                        )
                     )
-                )
+                }
+                rootScreen.Content(modifier = Modifier.fillMaxSize())
             }
-            rootScreen.Content(modifier = Modifier.fillMaxSize())
         }
     }
 

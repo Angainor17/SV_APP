@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import org.geometerplus.android.fbreader.MenuData;
 import org.geometerplus.fbreader.book.Author;
 import org.geometerplus.fbreader.book.Book;
 import org.geometerplus.fbreader.book.BookUtil;
@@ -292,8 +291,6 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
                     return ApiObject.envelopeIntegerList(getParagraphWordIndices(
                             ((ApiObject.Integer) parameters[0]).Value
                     ));
-                case GET_MAIN_MENU_CONTENT:
-                    return ApiObject.envelopeSerializableList(getMainMenuContent());
                 default:
                     return Collections.<ApiObject>singletonList(unsupportedMethodError(method));
             }
@@ -645,25 +642,6 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
 
     public void setTapZoneAction(String name, int h, int v, boolean singleTap, String action) {
         TapZoneMap.zoneMap(name).setActionForZone(h, v, singleTap, action);
-    }
-
-    private void setMenuTitles(List<MenuNode> nodes, ZLResource menuResource) {
-        for (MenuNode n : nodes) {
-            n.OptionalTitle = menuResource.getResource(n.Code).getValue();
-            if (n instanceof MenuNode.Submenu) {
-                setMenuTitles(((MenuNode.Submenu) n).Children, menuResource);
-            }
-        }
-    }
-
-    public List<MenuNode> getMainMenuContent() {
-        final List<MenuNode> nodes = MenuData.topLevelNodes();
-        final List<MenuNode> copies = new ArrayList<MenuNode>(nodes.size());
-        for (MenuNode n : nodes) {
-            copies.add(n.clone());
-        }
-        setMenuTitles(copies, ZLResource.resource("menu"));
-        return copies;
     }
 
     public String getResourceString(String... keys) {

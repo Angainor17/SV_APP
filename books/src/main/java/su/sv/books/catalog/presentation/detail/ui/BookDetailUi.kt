@@ -1,7 +1,6 @@
 package su.sv.books.catalog.presentation.detail.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -50,7 +49,7 @@ fun BookDetailUi(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.statusBarsPadding(),
+        modifier = modifier,
         topBar = {
             AppToolbarWithBack(
                 title = uiBook.title,

@@ -515,10 +515,6 @@ public class ApiClientImplementation implements ServiceConnection, Api, ApiMetho
         });
     }
 
-    public List<MenuNode> getMainMenuContent() throws ApiException {
-        return requestSerializableList(GET_MAIN_MENU_CONTENT, EMPTY_PARAMETERS);
-    }
-
     public String getResourceString(String... keys) throws ApiException {
         return requestString(GET_RESOURCE_STRING, envelope(keys));
     }
