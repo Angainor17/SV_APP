@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import su.sv.books.catalog.domain.DeleteBookUseCase
 import su.sv.books.catalog.domain.GetDownloadedBooksUseCase
 import su.sv.books.catalog.presentation.downloaded.actions.DownloadedBookActions
@@ -77,8 +79,16 @@ class DownloadedBooksViewModel @Inject constructor(
     }
 
     private fun loadBooks() {
+        // Сразу показываем Loading - UI уже готов
+        _state.value = UiDownloadedBooksState.Loading
+
         viewModelScope.launch {
-            getDownloadedBooksUseCase.execute().fold(
+            // Тяжёлые операции на IO dispatcher
+            val result = withContext(Dispatchers.IO) {
+                getDownloadedBooksUseCase.execute()
+            }
+
+            result.fold(
                 onSuccess = { books ->
                     val uiBooks = uiMapper.mapToUi(books)
                     _state.value = if (uiBooks.isEmpty()) {

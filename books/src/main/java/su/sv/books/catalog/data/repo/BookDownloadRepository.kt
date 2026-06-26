@@ -253,13 +253,31 @@ class BookDownloadRepository @Inject constructor(
     }
 
     /**
-     * Проверяет доступность URI
+     * Проверяет доступность URI без открытия stream (быстро)
      */
     private fun checkUriAccessible(uri: Uri): Boolean {
         return try {
-            context.contentResolver.openInputStream(uri)?.use { stream ->
-                stream.available() >= 0
-            } ?: false
+            // Проверяем только наличие URI в MediaStore, без открытия stream
+            // Это значительно быстрее чем openInputStream
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val projection = arrayOf(android.provider.MediaStore.Downloads._ID)
+                val selection = "${android.provider.MediaStore.Downloads._ID} = ?"
+                val id = android.content.ContentUris.parseId(uri)
+                val selectionArgs = arrayOf(id.toString())
+
+                context.contentResolver.query(
+                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null
+                )?.use { cursor ->
+                    cursor.count > 0
+                } ?: false
+            } else {
+                // Для старых Android просто проверяем что URI не null
+                uri != null
+            }
         } catch (e: Exception) {
             Timber.w(e, "URI not accessible: $uri")
             false
