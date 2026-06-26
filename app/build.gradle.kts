@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.tracer)
+    id("kotlin-parcelize")
 }
 
 android {

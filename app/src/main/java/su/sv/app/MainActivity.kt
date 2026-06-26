@@ -11,7 +11,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.Modo.rememberRootScreen
 import com.github.terrakok.modo.RootScreen
-import com.github.terrakok.modo.stack.DefaultStackScreen
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +38,7 @@ class MainActivity : BaseActivity() {
             ) {
                 // Remember root screen using rememberSaveable under the hood.
                 val rootScreen = rememberRootScreen {
-                    DefaultStackScreen(
+                    AppStackScreen(
                         StackNavModel(
                             BottomNavScreen()
                         )
