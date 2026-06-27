@@ -57,6 +57,16 @@ sealed class ReaderActions {
      */
     object ToggleReflow : ReaderActions()
 
+    /**
+     * Отметить что подсказки зон касания были показаны
+     */
+    object MarkControlsHintShown : ReaderActions()
+
+    /**
+     * Установить состояние fullscreen режима
+     */
+    data class SetFullscreen(val isFullscreen: Boolean) : ReaderActions()
+
     // === Диалоги ===
 
     /**

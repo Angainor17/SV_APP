@@ -207,6 +207,9 @@ class WikiRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addToHistory(title: String) {
+        // Удаляем существующий дубликат перед вставкой (по title)
+        historyDao.deleteHistoryByTitle(title)
+
         val entity = HistoryEntity(
             title = title,
             searchedAt = System.currentTimeMillis(),

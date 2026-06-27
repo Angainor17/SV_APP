@@ -28,9 +28,12 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * Поле поиска статей с debounce
  *
- * @param onSearch callback при поиске (вызывается через 1.5 сек после прекращения ввода)
+ * @param onSearch callback при поиске (вызывается через debounce только если suggestions не отображаются)
  * @param onQueryChanged callback при изменении текста (для подсказок)
  * @param onClearClick callback при нажатии на крестик (для скрытия клавиатуры)
+ * @param isSuggestionsVisible true если подсказки отображаются под полем поиска
+ * @param selectedSuggestion текст выбранной подсказки для помещения в поле ввода
+ * @param onSuggestionApplied callback после помещения suggestion в поле (для сброса)
  * @param minQueryLength минимальная длина запроса для поиска (по умолчанию 3)
  * @param debounceMillis задержка в миллисекундах (по умолчанию 1500)
  */
@@ -40,15 +43,27 @@ fun WikiSearchBar(
     onQueryChanged: (String) -> Unit,
     onClearClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isSuggestionsVisible: Boolean = false,
+    selectedSuggestion: String? = null,
+    onSuggestionApplied: () -> Unit = {},
     minQueryLength: Int = 3,
     debounceMillis: Long = 1500L,
 ) {
     var searchText by remember { mutableStateOf("") }
     val dimensions = LocalAppDimensions.current
 
-    // Debounce поиск
-    LaunchedEffect(searchText) {
-        if (searchText.length >= minQueryLength) {
+    // При выборе suggestion - помещаем текст в поле ввода
+    LaunchedEffect(selectedSuggestion) {
+        if (selectedSuggestion != null && selectedSuggestion != searchText) {
+            searchText = selectedSuggestion
+            onQueryChanged(selectedSuggestion)
+            onSuggestionApplied()
+        }
+    }
+
+    // Debounce поиск - только если suggestions НЕ отображаются
+    LaunchedEffect(searchText, isSuggestionsVisible) {
+        if (searchText.length >= minQueryLength && !isSuggestionsVisible) {
             delay(debounceMillis.milliseconds)
             onSearch(searchText)
         }
@@ -115,6 +130,23 @@ fun WikiSearchBarPreview() {
             onSearch = {},
             onQueryChanged = {},
             onClearClick = {},
+            isSuggestionsVisible = false,
+        )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF,
+)
+fun WikiSearchBarWithSuggestionsPreview() {
+    SVAPPThemeLightPreview {
+        WikiSearchBar(
+            onSearch = {},
+            onQueryChanged = {},
+            onClearClick = {},
+            isSuggestionsVisible = true,
         )
     }
 }

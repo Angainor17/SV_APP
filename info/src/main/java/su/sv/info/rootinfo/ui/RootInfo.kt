@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,14 +27,17 @@ import su.sv.info.rootinfo.viewmodel.RootInfoActions
 @Composable
 fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             AppToolbarSimple(
                 title = stringResource(R.string.info_toolbar_title),
                 windowInsets = WindowInsets(0.dp),
+                scrollBehavior = scrollBehavior,
             )
         }
     ) { contentPadding ->

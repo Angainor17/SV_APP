@@ -73,6 +73,7 @@ fun RootWiki(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsState(initial = emptyList())
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val selectedSuggestion by viewModel.selectedSuggestion.collectAsStateWithLifecycle()
     val hasFavorites by viewModel.hasFavorites.collectAsState(initial = false)
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -117,6 +118,11 @@ fun RootWiki(
                     onClearClick = {
                         focusManager.clearFocus()
                     },
+                    isSuggestionsVisible = suggestions.isNotEmpty(),
+                    selectedSuggestion = selectedSuggestion,
+                    onSuggestionApplied = {
+                        viewModel.onAction(WikiActions.OnSuggestionApplied)
+                    },
                     modifier = Modifier.weight(1f),
                 )
 
@@ -152,14 +158,16 @@ fun RootWiki(
                 }
             }
 
-            // Подсказки поиска
-            SearchSuggestions(
-                suggestions = suggestions,
-                onSuggestionClick = { title ->
-                    focusManager.clearFocus()
-                    viewModel.onAction(WikiActions.OnSuggestionClick(title))
-                },
-            )
+            // Подсказки поиска - показываем только в Initial состоянии
+            if (state is UiWikiState.Initial) {
+                SearchSuggestions(
+                    suggestions = suggestions,
+                    onSuggestionClick = { title ->
+                        focusManager.clearFocus()
+                        viewModel.onAction(WikiActions.OnSuggestionClick(title))
+                    },
+                )
+            }
 
             // Контент в зависимости от состояния
             when (val currentState = state) {

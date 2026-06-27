@@ -20,6 +20,7 @@
         android:gravity="center_horizontal"
         android:paddingTop="4dp"
         android:singleLine="true"
+        android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <SeekBar
@@ -41,7 +42,8 @@
             android:id="@+id/navigation_ok"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.45" />
+            android:layout_weight="0.45"
+            android:textColor="@color/white" />
 
         <View
             android:layout_width="0dp"
@@ -52,6 +54,7 @@
             android:id="@+id/navigation_cancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.45" />
+            android:layout_weight="0.45"
+            android:textColor="@color/white" />
     </LinearLayout>
 </org.geometerplus.android.fbreader.NavigationWindow>

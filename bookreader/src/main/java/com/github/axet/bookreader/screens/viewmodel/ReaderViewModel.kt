@@ -75,6 +75,8 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.ToggleFullscreen -> toggleFullscreen()
             ReaderActions.ToggleViewMode -> toggleViewMode()
             ReaderActions.ToggleReflow -> toggleReflow()
+            ReaderActions.MarkControlsHintShown -> markControlsHintShown()
+            is ReaderActions.SetFullscreen -> setFullscreen(action.isFullscreen)
 
             // Диалоги
             ReaderActions.ToggleToc -> toggleToc()
@@ -262,6 +264,26 @@ class ReaderViewModel @Inject constructor(
         val currentState = _state.value as? ReaderState.Content ?: return
         fbReaderView?.setReflow(!fbReaderView!!.isReflow)
         _state.value = currentState.copy(isReflow = !currentState.isReflow)
+    }
+
+    /**
+     * Отметить что подсказки зон касания были показаны
+     */
+    private fun markControlsHintShown() {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        if (!currentState.hasShownControlsHint) {
+            _state.value = currentState.copy(hasShownControlsHint = true)
+        }
+    }
+
+    /**
+     * Установить состояние fullscreen режима (вызывается из FBReaderView listener)
+     */
+    private fun setFullscreen(isFullscreen: Boolean) {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        if (currentState.isFullscreen != isFullscreen) {
+            _state.value = currentState.copy(isFullscreen = isFullscreen)
+        }
     }
 
     // ==================== Диалоги ====================

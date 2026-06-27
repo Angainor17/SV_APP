@@ -642,7 +642,40 @@ public class FBReaderView extends RelativeLayout {
         app.addAction(ActionCode.SHOW_MENU, new FBAction(app) {
             @Override
             protected void run(Object... params) {
-                a.sendBroadcast(new Intent(ACTION_MENU));
+                // Toggle fullscreen mode
+                if (toggleFullscreen()) {
+                    // Notify listener about fullscreen change
+                    if (listener != null) {
+                        listener.onFullscreenToggle(true);
+                    }
+                } else {
+                    if (listener != null) {
+                        listener.onFullscreenToggle(false);
+                    }
+                }
+            }
+
+            private boolean toggleFullscreen() {
+                if (w != null) {
+                    boolean isFullscreen = (w.getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
+                    if (isFullscreen) {
+                        w.getDecorView().setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+                        return false; // now not fullscreen
+                    } else {
+                        w.getDecorView().setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                        return true; // now fullscreen
+                    }
+                }
+                return false;
             }
         });
         app.addAction(ActionCode.SHOW_NAVIGATION, new FBAction(app) {
@@ -1325,6 +1358,18 @@ public class FBReaderView extends RelativeLayout {
         showControls(this, areas);
     }
 
+    /**
+     * Exit fullscreen mode - restore normal system UI visibility
+     */
+    public void exitFullscreen() {
+        if (w != null) {
+            w.getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -1407,6 +1452,8 @@ public class FBReaderView extends RelativeLayout {
         void ttsStatus(boolean speaking);
 
         void onEditBookmark(Storage.Bookmark bookmark);
+
+        void onFullscreenToggle(boolean isFullscreen);
     }
 
     public static class ZLTextIndexPosition extends com.github.axet.bookreader.widgets.ZLTextIndexPosition {
@@ -2125,6 +2172,8 @@ public class FBReaderView extends RelativeLayout {
 
         @Override
         public TOCTree getCurrentTOCElement() {
+            if (Model == null)
+                return null;
             if (pluginview != null)
                 return pluginview.getCurrentTOCElement(Model.TOCTree);
             else

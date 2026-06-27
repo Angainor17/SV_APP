@@ -109,6 +109,8 @@ fun AppToolbarWithBack(
  * @param currentThemeMode текущий режим темы
  * @param onThemeToggle обработчик переключения темы
  * @param modifier модификатор
+ * @param windowInsets insets для тулбара
+ * @param scrollBehavior поведение скролла тулбара (для скрытия при скролле)
  * @param navigationIcon иконка навигации
  * @param onNavigationClick обработчик клика на навигационную иконку
  * @param additionalActions дополнительные действия перед переключателем темы
@@ -121,6 +123,7 @@ fun AppToolbarWithThemeToggle(
     onThemeToggle: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     onNavigationClick: (() -> Unit)? = null,
     additionalActions: @Composable RowScope.() -> Unit = {}
@@ -131,6 +134,7 @@ fun AppToolbarWithThemeToggle(
         navigationIcon = navigationIcon,
         onNavigationClick = onNavigationClick,
         windowInsets = windowInsets,
+        scrollBehavior = scrollBehavior,
     ) {
         additionalActions()
         ThemeToggleIcon(
@@ -145,6 +149,8 @@ fun AppToolbarWithThemeToggle(
  *
  * @param title заголовок
  * @param modifier модификатор
+ * @param windowInsets insets для тулбара
+ * @param scrollBehavior поведение скролла тулбара (для скрытия при скролле)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,6 +158,7 @@ fun AppToolbarSimple(
     modifier: Modifier = Modifier,
     title: String,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     TopAppBar(
         title = {
@@ -170,5 +177,6 @@ fun AppToolbarSimple(
             titleContentColor = MaterialTheme.colorScheme.onSurface
         ),
         windowInsets = windowInsets,
+        scrollBehavior = scrollBehavior,
     )
 }

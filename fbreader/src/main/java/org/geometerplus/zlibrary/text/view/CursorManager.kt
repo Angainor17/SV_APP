@@ -24,7 +24,7 @@ import org.geometerplus.zlibrary.text.model.ZLTextModel
 
 internal class CursorManager(
     private val myModel: ZLTextModel,
-    @JvmField val ExtensionManager: ExtensionElementManager
+    @JvmField val ExtensionManager: ExtensionElementManager?
 ) : LruCache<Int, ZLTextParagraphCursor>(200) {
 
     override fun create(index: Int): ZLTextParagraphCursor {

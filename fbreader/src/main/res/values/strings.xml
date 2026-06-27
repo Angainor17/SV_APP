@@ -8,4 +8,8 @@
     <string name="panel_question">Задать вопрос</string>
     <string name="panel_misspell">Опечатка</string>
     <string name="panel_close">Закрыть</string>
+
+    <!-- Navigation panel buttons -->
+    <string name="navigation_ok">ОК</string>
+    <string name="navigation_cancel">Отмена</string>
 </resources>
