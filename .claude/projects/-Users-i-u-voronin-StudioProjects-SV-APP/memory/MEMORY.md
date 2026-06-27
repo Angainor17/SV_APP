@@ -8,3 +8,4 @@
 - [BookReader Post-Migration Fixes](bookreader-post-migration-fixes.md) — исправление 8 багов после миграции, включая улучшенный поиск файлов на Android 10+
 - [Books Screen Tasks Plan](books-screen-tasks-plan.md) — план реализации 3 задач на экране "Книги": chip-фильтры, экран "Ваши книги", открытие скачанной книги
 - [Books Features Implementation](books-features-implementation.md) — документация по реализованным фичам: фильтры, скачанные книги, навигация
+- [Toolbars Reader Navigation Task](toolbars-reader-navigation-task.md) — тулбары экранов, навигация в читалке, оглавление книги

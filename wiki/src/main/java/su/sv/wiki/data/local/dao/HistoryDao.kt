@@ -32,6 +32,12 @@ interface HistoryDao {
     suspend fun insertHistory(history: HistoryEntity)
 
     /**
+     * Удалить запись из истории по названию (для избежания дубликатов)
+     */
+    @Query("DELETE FROM history WHERE title = :title")
+    suspend fun deleteHistoryByTitle(title: String)
+
+    /**
      * Удалить запись из истории
      */
     @Query("DELETE FROM history WHERE id = :id")

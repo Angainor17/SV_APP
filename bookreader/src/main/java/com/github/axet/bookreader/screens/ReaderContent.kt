@@ -21,8 +21,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
@@ -37,6 +43,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -103,6 +110,8 @@ fun ReaderContent(
     DisposableEffect(Unit) {
         onDispose {
             viewModel.savePosition()
+            // Выходим из fullscreen режима при закрытии экрана
+            fbReaderView?.exitFullscreen()
             // НЕ вызываем closeBook() - книга должна оставаться открытой
             // closeBook() вызовется в ViewModel.onCleared() при уничтожении ViewModel
         }
@@ -225,6 +234,10 @@ fun ReaderContent(
                                     override fun onEditBookmark(bookmark: com.github.axet.bookreader.app.Storage.Bookmark) {
                                         viewModel.onAction(ReaderActions.EditBookmark(bookmark))
                                     }
+
+                                    override fun onFullscreenToggle(isFullscreen: Boolean) {
+                                        viewModel.onAction(ReaderActions.SetFullscreen(isFullscreen))
+                                    }
                                 }
 
                                 if (context is Activity) {
@@ -263,6 +276,15 @@ fun ReaderContent(
                                     if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
                                     else FBReaderView.Widgets.PAGING
                                 )
+
+                                // Показываем подсказки зон касания при первом открытии
+                                // Делаем это в update, когда view уже имеет размер
+                                if (!currentState.hasShownControlsHint && view.width > 0) {
+                                    view.postDelayed({
+                                        view.showControls()
+                                        viewModel.onAction(ReaderActions.MarkControlsHintShown)
+                                    }, 300)
+                                }
                             }
                         }
                     )
@@ -282,7 +304,7 @@ fun ReaderContent(
 }
 
 /**
- * Compose диалог содержания (TOC)
+ * Compose диалог содержания (TOC) с вложенной иерархией
  */
 @Composable
 private fun TocComposeDialog(
@@ -290,14 +312,17 @@ private fun TocComposeDialog(
     onDismiss: () -> Unit,
     onNavigate: (org.geometerplus.zlibrary.text.view.ZLTextPosition) -> Unit,
 ) {
-    // Собираем TOC элементы
+    // Собираем TOC элементы с информацией о дочерних элементах
     val tocItems = remember(fbReaderView) {
-        val items = mutableListOf<TocItem>()
+        val items = mutableListOf<ExpandableTocItem>()
         fbReaderView?.app?.Model?.TOCTree?.let { tree ->
-            collectTocItems(tree, items, 0)
+            collectExpandableTocItems(tree, items, 0)
         }
         items
     }
+
+    // Состояние раскрытия для каждого элемента
+    val expandedStates = remember { mutableStateListOf<String>() }
 
     if (tocItems.isEmpty()) {
         AlertDialog(
@@ -316,14 +341,18 @@ private fun TocComposeDialog(
             title = { Text(stringResource(R.string.sv_toc_title)) },
             text = {
                 LazyColumn {
-                    items(tocItems) { item ->
-                        Text(
-                            text = item.title,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigate(item.position) }
-                                .padding(vertical = 12.dp, horizontal = 8.dp),
-                            fontWeight = if (item.level == 0) FontWeight.Bold else FontWeight.Normal
+                    items(tocItems, key = { it.id }) { item ->
+                        TocItemRow(
+                            item = item,
+                            isExpanded = expandedStates.contains(item.id),
+                            onToggleExpand = {
+                                if (expandedStates.contains(item.id)) {
+                                    expandedStates.remove(item.id)
+                                } else {
+                                    expandedStates.add(item.id)
+                                }
+                            },
+                            onNavigate = onNavigate
                         )
                     }
                 }
@@ -334,6 +363,89 @@ private fun TocComposeDialog(
                 }
             }
         )
+    }
+}
+
+/**
+ * Элемент оглавления с возможностью раскрытия
+ */
+@Composable
+private fun TocItemRow(
+    item: ExpandableTocItem,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit,
+    onNavigate: (org.geometerplus.zlibrary.text.view.ZLTextPosition) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onNavigate(item.position) }
+            .padding(
+                vertical = 12.dp,
+                horizontal = 8.dp + (item.level * 16).dp
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Иконка главы
+        Icon(
+            imageVector = Icons.Default.List,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+
+        // Заголовок главы
+        Text(
+            text = item.title,
+            fontWeight = if (item.level == 0) FontWeight.Bold else FontWeight.Normal,
+            modifier = Modifier.weight(1f)
+        )
+
+        // Иконка раскрытия/закрытия для элементов с дочерними
+        if (item.hasChildren) {
+            IconButton(onClick = onToggleExpand) {
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (isExpanded) "Скрыть" else "Раскрыть",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Модель элемента оглавления с поддержкой раскрытия
+ */
+private data class ExpandableTocItem(
+    val id: String,
+    val title: String,
+    val position: org.geometerplus.zlibrary.text.view.ZLTextPosition,
+    val level: Int = 0,
+    val hasChildren: Boolean = false,
+)
+
+private fun collectExpandableTocItems(
+    tree: org.geometerplus.fbreader.bookmodel.TOCTree,
+    items: MutableList<ExpandableTocItem>,
+    level: Int
+) {
+    for (child in tree.subtrees()) {
+        val text = child.text
+        val ref = child.reference
+        if (text != null && ref != null) {
+            val hasChildren = child.subtrees().iterator().hasNext()
+            items.add(
+                ExpandableTocItem(
+                    id = "${level}_${ref.ParagraphIndex}_${text.hashCode()}",
+                    title = text,
+                    position = ZLTextFixedPosition(ref.ParagraphIndex, 0, 0),
+                    level = level,
+                    hasChildren = hasChildren
+                )
+            )
+        }
+        collectExpandableTocItems(child, items, level + 1)
     }
 }
 

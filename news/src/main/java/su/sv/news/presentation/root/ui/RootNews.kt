@@ -13,11 +13,13 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,6 +55,7 @@ fun RootNews(
     currentThemeMode: ThemeMode = ThemeMode.LIGHT
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems()
     val loadState = lazyPagingItems.loadState.refresh
@@ -60,12 +63,14 @@ fun RootNews(
     HandleEffects(viewModel, snackbarHostState)
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             AppToolbarWithThemeToggle(
                 title = stringResource(R.string.news_toolbar_title),
                 windowInsets = WindowInsets(0.dp),
                 currentThemeMode = currentThemeMode,
+                scrollBehavior = scrollBehavior,
                 onThemeToggle = { onThemeToggle() }
             )
         },

@@ -54,6 +54,10 @@ class RootWikiViewModel @Inject constructor(
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions: StateFlow<List<String>> = _suggestions.asStateFlow()
 
+    /** Выбранная подсказка для помещения в поле поиска */
+    private val _selectedSuggestion = MutableStateFlow<String?>(null)
+    val selectedSuggestion: StateFlow<String?> = _selectedSuggestion.asStateFlow()
+
     /** История поиска */
     val history: Flow<List<String>> = getHistoryUseCase()
 
@@ -79,6 +83,7 @@ class RootWikiViewModel @Inject constructor(
             is WikiActions.OnCloseArticle -> onCloseArticle()
             is WikiActions.OnSearchQueryChanged -> onSearchQueryChanged(action.query)
             is WikiActions.OnSuggestionClick -> onSuggestionClick(action.title)
+            is WikiActions.OnSuggestionApplied -> onSuggestionApplied()
         }
     }
 
@@ -100,8 +105,13 @@ class RootWikiViewModel @Inject constructor(
 
     private fun onSuggestionClick(title: String) {
         _suggestions.value = emptyList()
+        _selectedSuggestion.value = title  // Помещаем текст в поле поиска
         currentQuery = title
         loadArticle(title)
+    }
+
+    private fun onSuggestionApplied() {
+        _selectedSuggestion.value = null  // Сбрасываем после применения
     }
 
     private fun onSearch(query: String) {

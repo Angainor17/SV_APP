@@ -14,6 +14,9 @@ sealed class WikiActions {
     /** Нажатие на подсказку */
     data class OnSuggestionClick(val title: String) : WikiActions()
 
+    /** Сброс выбранной подсказки */
+    object OnSuggestionApplied : WikiActions()
+
     /** Нажатие на ссылку в тексте статьи */
     data class OnLinkClick(val title: String) : WikiActions()
 
