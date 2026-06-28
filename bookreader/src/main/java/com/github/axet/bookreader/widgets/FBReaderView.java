@@ -801,12 +801,16 @@ public class FBReaderView extends RelativeLayout {
                 } else {
                     if (book.info.bookmarks == null)
                         book.info.bookmarks = new Storage.Bookmarks();
+                    Storage.Bookmark bm;
                     if (selection != null) {
-                        book.info.bookmarks.add(new Storage.Bookmark(selection.selection.getText(), selection.selection.getStart(), selection.selection.getEnd()));
+                        bm = new Storage.Bookmark(selection.selection.getText(), selection.selection.getStart(), selection.selection.getEnd());
                     } else {
                         TextSnippet snippet = app.BookTextView.getSelectedSnippet();
-                        book.info.bookmarks.add(new Storage.Bookmark(snippet.getText(), snippet.getStart(), snippet.getEnd()));
+                        bm = new Storage.Bookmark(snippet.getText(), snippet.getStart(), snippet.getEnd());
                     }
+                    // Сохраняем coverUrl книги в закладке на момент создания
+                    bm.coverUrl = book.info.coverUrl;
+                    book.info.bookmarks.add(bm);
                     bookmarksUpdate();
                     if (listener != null)
                         listener.onBookmarksUpdate();

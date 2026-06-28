@@ -76,6 +76,7 @@ import timber.log.Timber
 @Composable
 fun ReaderContent(
     bookUri: Uri,
+    bookCoverUrl: String?,
     bookmarkPosition: BookmarkPosition?,
     onNavigateBack: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
@@ -101,7 +102,7 @@ fun ReaderContent(
                     ZLTextFixedPosition(pos.endParagraph, pos.endElement, pos.endChar)
                 )
             }
-            viewModel.onAction(ReaderActions.LoadBook(bookUri, position))
+            viewModel.onAction(ReaderActions.LoadBook(bookUri, position, bookCoverUrl))
         }
     }
 

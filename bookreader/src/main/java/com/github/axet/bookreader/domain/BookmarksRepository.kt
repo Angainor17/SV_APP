@@ -72,15 +72,19 @@ class BookmarksRepository @Inject constructor(
 
                 // Сканируем JSON файлы напрямую из хранилища
                 val jsonFiles = listJsonFiles()
+                Timber.d("Found ${jsonFiles.size} JSON files in storage")
 
                 for (jsonFile in jsonFiles) {
                     try {
                         val bookNotes = loadNotesFromJsonUri(jsonFile.uri, jsonFile.bookId)
+                        Timber.d("Book ${jsonFile.bookId}: found ${bookNotes.size} notes")
                         notes.addAll(bookNotes)
                     } catch (e: Exception) {
                         Timber.e(e, "Error loading bookmarks from: ${jsonFile.uri}")
                     }
                 }
+
+                Timber.d("Total notes loaded: ${notes.size}")
 
                 if (sortByDateAscending) {
                     notes.sortedBy { it.createdAt }
@@ -122,12 +126,17 @@ class BookmarksRepository @Inject constructor(
                         if (notes.isNotEmpty()) {
                             // Получаем информацию о книге из JSON
                             val json = readJsonFromUri(jsonFile.uri)
+
+                            // Получаем coverUrl из JSON или из первой заметки
+                            val coverUrl = json?.optString("coverUrl", null)
+                                ?: notes.firstOrNull()?.bookCoverPath
+
                             booksWithNotes.add(
                                 BookWithNotesData(
                                     bookId = jsonFile.bookId,
                                     bookTitle = json?.optString("title") ?: "Неизвестная книга",
                                     bookAuthor = json?.optString("authors") ?: "",
-                                    bookCoverPath = null, // Обложка может быть недоступна для удалённых книг
+                                    bookCoverPath = coverUrl,
                                     notesCount = notes.size,
                                     lastNoteDate = notes.maxOf { it.createdAt }
                                 )
@@ -198,9 +207,17 @@ class BookmarksRepository @Inject constructor(
         val storageUri = storage.storagePath
         val scheme = storageUri?.scheme
 
+        Timber.d("listJsonFiles: storageUri=$storageUri, scheme=$scheme")
+
+        if (storageUri == null) {
+            Timber.w("storagePath is null, cannot list JSON files")
+            return files
+        }
+
         try {
             when (scheme) {
                 ContentResolver.SCHEME_CONTENT -> {
+                    Timber.d("Listing JSON files using SAF")
                     val contentResolver = context.contentResolver
                     val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
                         storageUri,
@@ -218,27 +235,35 @@ class BookmarksRepository @Inject constructor(
                                 if (bookId.length == Storage.MD5_SIZE) {
                                     val uri = DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
                                     files.add(JsonFileInfo(uri, bookId))
+                                    Timber.d("Found JSON file: $name, bookId=$bookId")
                                 }
                             }
                         }
                     }
                 }
                 ContentResolver.SCHEME_FILE -> {
+                    Timber.d("Listing JSON files using File scheme")
                     val dir = File(storageUri.path!!)
+                    Timber.d("Directory: ${dir.absolutePath}, exists=${dir.exists()}")
                     dir.listFiles()?.forEach { file ->
                         if (file.extension == "json") {
                             val bookId = file.nameWithoutExtension
                             if (bookId.length == Storage.MD5_SIZE) {
                                 files.add(JsonFileInfo(Uri.fromFile(file), bookId))
+                                Timber.d("Found JSON file: ${file.name}, bookId=$bookId")
                             }
                         }
                     }
+                }
+                else -> {
+                    Timber.w("Unknown storage scheme: $scheme")
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error listing JSON files")
         }
 
+        Timber.d("listJsonFiles: found ${files.size} JSON files")
         return files
     }
 
@@ -291,29 +316,34 @@ class BookmarksRepository @Inject constructor(
 
         try {
             val json = readJsonFromUri(uri) ?: return notes
-            val bookmarksArray = json.optJSONArray("bookmarks") ?: return notes
+            val bookmarksArray = json.optJSONArray("bookmarks")
+
+            Timber.d("Loading notes for book $bookId: bookmarksArray=${bookmarksArray?.length() ?: "null"}")
+
+            if (bookmarksArray == null || bookmarksArray.length() == 0) {
+                return notes
+            }
 
             val bookTitle = json.optString("title", "Неизвестная книга")
             val bookAuthor = json.optString("authors", "")
+
+            // СНАЧАЛА получаем URI файла книги для навигации и поиска обложки
+            // Если не сохранён в JSON - ищем файл по MD5 в хранилище
+            val bookFileUri = json.optString("bookFileUri", null) ?: findBookFileUri(bookId)
 
             // Получаем coverUrl из JSON (сохранённый при загрузке книги)
             // Если не сохранён - ищем обложку по URI файла книги или MD5
             var coverPath = json.optString("coverUrl", null)
             if (coverPath == null) {
-                // Пытаемся найти обложку по URI файла книги
-                val bookFileUriStr = json.optString("bookFileUri", null)
-                if (bookFileUriStr != null) {
-                    coverPath = findCoverByBookUri(bookFileUriStr)
+                // Пытаемся найти обложку по URI файла книги (используя CacheImagesAdapter.cacheUri)
+                if (bookFileUri != null) {
+                    coverPath = findCoverByBookUri(bookFileUri)
                 }
-                // Если не нашли - ищем по MD5
+                // Если не нашли - ищем по MD5 (альтернативный способ)
                 if (coverPath == null) {
                     coverPath = findCoverForBook(bookId)
                 }
             }
-
-            // Получаем URI файла книги для навигации
-            // Если не сохранён в JSON - ищем файл по MD5 в хранилище
-            val bookFileUri = json.optString("bookFileUri", null) ?: findBookFileUri(bookId)
 
             for (i in 0 until bookmarksArray.length()) {
                 try {
@@ -324,13 +354,16 @@ class BookmarksRepository @Inject constructor(
                     val startArray = bookmarkJson.optJSONArray("start")
                     val endArray = bookmarkJson.optJSONArray("end")
 
+                    // Обложка из закладки (сохранённая при создании), или fallback на обложку книги
+                    val noteCoverPath = bookmarkJson.optString("coverUrl", null) ?: coverPath
+
                     notes.add(
                         BookmarkData(
                             id = "${bookId}_${bookmarkJson.optLong("last")}",
                             bookId = bookId,
                             bookTitle = bookTitle,
                             bookAuthor = bookAuthor,
-                            bookCoverPath = coverPath,
+                            bookCoverPath = noteCoverPath,
                             bookFileUri = bookFileUri,
                             text = text,
                             name = bookmarkJson.optString("name").takeIf { it.isNotEmpty() },
@@ -368,7 +401,6 @@ class BookmarksRepository @Inject constructor(
                 Timber.d("Found cover by bookUri: ${coverFile.absolutePath}")
                 return coverFile.absolutePath
             }
-            Timber.d("Cover file not found for bookUri: $bookUri")
             null
         } catch (e: Exception) {
             Timber.e(e, "Error finding cover by bookUri: $bookUri")
@@ -511,3 +543,5 @@ class BookmarksRepository @Inject constructor(
         return (paragraphIndex / 30) + 1
     }
 }
+
+

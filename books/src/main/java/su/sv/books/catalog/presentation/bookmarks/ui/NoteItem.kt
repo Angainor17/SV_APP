@@ -36,14 +36,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote
 import su.sv.commonui.theme.SVAPPTheme
@@ -182,6 +189,7 @@ private fun NoteItemContent(
         if (showBookInfo) {
             NoteBookInfo(
                 bookTitle = note.bookTitle,
+                bookCoverUrl = note.bookCoverUrl,
                 page = note.page
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -210,13 +218,23 @@ private fun NoteItemContent(
 @Composable
 private fun NoteBookInfo(
     bookTitle: String,
+    bookCoverUrl: String,
     page: Int,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Обложка книги
+        BookCoverSmall(
+            coverUrl = bookCoverUrl,
+            modifier = Modifier
+                .size(32.dp, 48.dp)
+                .clip(RoundedCornerShape(4.dp))
+        )
+
+        // Название книги
         Text(
             text = bookTitle,
             style = MaterialTheme.typography.titleSmall,
@@ -225,12 +243,54 @@ private fun NoteBookInfo(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
+
+        // Страница
         Text(
             text = stringResource(R.string.bookmarks_page, page),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
+}
+
+/**
+ * Маленькая обложка книги для заметки
+ */
+@Composable
+private fun BookCoverSmall(
+    coverUrl: String,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+
+    // Преобразуем путь в Uri если это локальный файл
+    val imageModel = remember(coverUrl) {
+        if (coverUrl.isNotBlank()) {
+            // Если это локальный путь к файлу, преобразуем в Uri
+            if (coverUrl.startsWith("/") || coverUrl.startsWith("file://")) {
+                try {
+                    java.io.File(coverUrl).toUri()
+                } catch (e: Exception) {
+                    coverUrl
+                }
+            } else {
+                coverUrl
+            }
+        } else {
+            null
+        }
+    }
+
+    AsyncImage(
+        model = ImageRequest.Builder(context)
+            .data(imageModel)
+            .build(),
+        placeholder = painterResource(R.drawable.ic_book_placeholder),
+        error = painterResource(R.drawable.ic_book_placeholder),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+    )
 }
 
 /**

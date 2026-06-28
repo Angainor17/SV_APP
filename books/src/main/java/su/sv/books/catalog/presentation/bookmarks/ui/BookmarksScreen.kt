@@ -31,8 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.screens.BookmarkPosition
 import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
-import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.stack.back
+import com.github.terrakok.modo.stack.forward
 import su.sv.books.R
 import su.sv.books.catalog.presentation.bookmarks.model.NotesViewMode
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookWithNotes
@@ -272,11 +272,12 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                         endChar = note.endChar
                     )
 
-                    Timber.d("Opening reader at position: paragraph=${note.startParagraph}, uri=$bookUri")
+                    Timber.d("Opening reader at position: paragraph=${note.startParagraph}, uri=$bookUri, coverUrl=${note.bookCoverUrl}")
 
                     stackNavigation.forward(
                         ReaderScreen(
                             bookUri = Uri.parse(bookUri),
+                            bookCoverUrl = note.bookCoverUrl,
                             bookmarkPosition = position
                         )
                     )
