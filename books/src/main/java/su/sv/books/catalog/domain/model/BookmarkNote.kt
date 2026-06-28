@@ -9,6 +9,7 @@ data class BookmarkNote(
     val bookTitle: String,           // Название книги
     val bookAuthor: String,          // Автор книги
     val bookCoverUrl: String,        // URL обложки книги
+    val bookFileUri: String?,        // URI файла книги для навигации
     val text: String,                // Текст заметки
     val name: String?,               // Название заметки (опционально)
     val page: Int,                   // Номер страницы

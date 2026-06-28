@@ -15,6 +15,7 @@ class UiBookmarkMapper @Inject constructor() {
             bookTitle = domain.bookTitle,
             bookAuthor = domain.bookAuthor,
             bookCoverUrl = domain.bookCoverUrl,
+            bookFileUri = domain.bookFileUri,
             text = domain.text,
             name = domain.name,
             page = domain.page,

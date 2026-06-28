@@ -1,6 +1,7 @@
 package su.sv.books.catalog.presentation.bookmarks.ui
 
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +28,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.axet.bookreader.screens.BookmarkPosition
+import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.forward
 import com.github.terrakok.modo.stack.back
 import su.sv.books.R
 import su.sv.books.catalog.presentation.bookmarks.model.NotesViewMode
@@ -254,8 +258,37 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                 stackNavigation.back()
             }
             is BookmarksEffect.OpenReader -> {
-                // TODO: Открыть читалку на позиции заметки
-                Timber.d("Open reader at position: ${effect.note.startParagraph}")
+                val note = effect.note
+                val bookUri = note.bookFileUri
+
+                if (bookUri != null) {
+                    // Создаём параметры позиции для навигации к заметке
+                    val position = BookmarkPosition(
+                        startParagraph = note.startParagraph,
+                        startElement = note.startElement,
+                        startChar = note.startChar,
+                        endParagraph = note.endParagraph,
+                        endElement = note.endElement,
+                        endChar = note.endChar
+                    )
+
+                    Timber.d("Opening reader at position: paragraph=${note.startParagraph}, uri=$bookUri")
+
+                    stackNavigation.forward(
+                        ReaderScreen(
+                            bookUri = Uri.parse(bookUri),
+                            bookmarkPosition = position
+                        )
+                    )
+                } else {
+                    Timber.w("Cannot open reader: bookFileUri is null for note ${note.id}")
+                    // Показываем сообщение что книга не найдена
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(su.sv.books.R.string.bookmarks_book_not_found),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
             is BookmarksEffect.ShareNote -> {
                 val sendIntent = Intent().apply {

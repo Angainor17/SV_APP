@@ -1090,6 +1090,8 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         public ZLTextPosition position;
         public String authors;
         public String title;
+        public String coverUrl; // путь к обложке книги
+        public String bookFileUri; // URI файла книги для навигации
         public Map<String, ZLPaintContext.ScalingType> scales = new HashMap<>(); // individual scales
         public FBView.ImageFitting scale; // all images
         public Integer fontsize; // FBView size or Reflow / 100
@@ -1106,6 +1108,8 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 position = new ZLTextFixedPosition(info.position);
             authors = info.authors;
             title = info.title;
+            coverUrl = info.coverUrl;
+            bookFileUri = info.bookFileUri;
             scale = info.scale;
             scales = new HashMap<>(info.scales);
             fontsize = info.fontsize;
@@ -1157,6 +1161,8 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             authors = o.optString("authors", null);
             title = o.optString("title", null);
             position = loadPosition(o.optJSONArray("position"));
+            coverUrl = o.optString("coverUrl", null);
+            bookFileUri = o.optString("bookFileUri", null);
             String scale = o.optString("scale");
             if (scale != null && !scale.isEmpty())
                 this.scale = FBView.ImageFitting.valueOf(scale);
@@ -1189,6 +1195,10 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             o.put("last", last);
             o.put("authors", authors);
             o.put("title", title);
+            if (coverUrl != null)
+                o.put("coverUrl", coverUrl);
+            if (bookFileUri != null)
+                o.put("bookFileUri", bookFileUri);
             JSONArray p = savePosition(position);
             if (p != null)
                 o.put("position", p);
