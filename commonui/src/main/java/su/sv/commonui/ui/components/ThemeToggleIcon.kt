@@ -32,13 +32,13 @@ fun ThemeToggleIcon(
     val dimensions = LocalAppDimensions.current
 
     val iconRes = when (currentMode) {
-        ThemeMode.LIGHT -> R.drawable.ic_theme_light
-        ThemeMode.DARK -> R.drawable.ic_theme_dark
+        ThemeMode.LIGHT -> R.drawable.ic_theme_dark   // При светлой теме показываем луну (переключит на тёмную)
+        ThemeMode.DARK -> R.drawable.ic_theme_light   // При тёмной теме показываем солнце (переключит на светлую)
     }
 
     val contentDescription = when (currentMode) {
-        ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
-        ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
+        ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)   // Переключить на тёмную
+        ThemeMode.DARK -> stringResource(R.string.theme_mode_light)   // Переключить на светлую
     }
 
     IconButton(
@@ -56,6 +56,7 @@ fun ThemeToggleIcon(
 
 /**
  * Иконка режима темы (без клика)
+ * Показывает иконку следующего режима при переключении
  *
  * @param mode режим темы
  * @param modifier модификатор
@@ -67,14 +68,15 @@ fun ThemeModeIcon(
 ) {
     val dimensions = LocalAppDimensions.current
 
+    // Показываем иконку противоположного режима
     val iconRes = when (mode) {
-        ThemeMode.LIGHT -> R.drawable.ic_theme_light
-        ThemeMode.DARK -> R.drawable.ic_theme_dark
+        ThemeMode.LIGHT -> R.drawable.ic_theme_dark   // При светлой теме показываем луну
+        ThemeMode.DARK -> R.drawable.ic_theme_light   // При тёмной теме показываем солнце
     }
 
     val contentDescription = when (mode) {
-        ThemeMode.LIGHT -> stringResource(R.string.theme_mode_light)
-        ThemeMode.DARK -> stringResource(R.string.theme_mode_dark)
+        ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)
+        ThemeMode.DARK -> stringResource(R.string.theme_mode_light)
     }
 
     Icon(

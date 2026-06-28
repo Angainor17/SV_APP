@@ -30,12 +30,16 @@ data class BookmarkPosition(
  *
  * @param bookUri URI файла книги
  * @param bookCoverUrl URL обложки книги (из API/модуля books) для сохранения в заметках
+ * @param bookTitle Название книги (из API) для сохранения в заметках вместо метаданных файла
+ * @param bookAuthor Автор книги (из API) для сохранения в заметках вместо метаданных файла
  * @param bookmarkPosition Позиция заметки для навигации (опционально)
  */
 @Parcelize
 class ReaderScreen(
     val bookUri: Uri,
     val bookCoverUrl: String? = null,
+    val bookTitle: String? = null,
+    val bookAuthor: String? = null,
     val bookmarkPosition: BookmarkPosition? = null,
     override val screenKey: ScreenKey = generateScreenKey(),
 ) : Screen, Parcelable {
@@ -47,6 +51,8 @@ class ReaderScreen(
         ReaderContent(
             bookUri = bookUri,
             bookCoverUrl = bookCoverUrl,
+            bookTitle = bookTitle,
+            bookAuthor = bookAuthor,
             bookmarkPosition = bookmarkPosition,
             onNavigateBack = {
                 stackNavigation.back()

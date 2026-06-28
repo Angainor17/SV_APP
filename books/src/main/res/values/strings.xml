@@ -34,6 +34,7 @@
     <string name="bookmarks_empty_title">Нет заметок</string>
     <string name="bookmarks_toggle_view_mode">Сменить вид</string>
     <string name="bookmarks_go_to">Перейти</string>
+    <string name="bookmarks_go_to_book">К книге</string>
     <string name="bookmarks_share">Поделиться</string>
     <string name="bookmarks_page">стр. %1$d</string>
     <string name="bookmarks_close_book">Закрыть</string>

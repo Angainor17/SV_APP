@@ -24,9 +24,9 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,7 +61,8 @@ import kotlin.math.roundToInt
  *
  * @param note Данные заметки
  * @param showBookInfo Показывать информацию о книге
- * @param onClick Callback при нажатии на заметку
+ * @param onClick Callback при нажатии на "Перейти" (открыть книгу)
+ * @param onBookClick Callback при нажатии на "К книге" (если книга удалена)
  * @param onDeleteRequest Callback при запросе удаления
  * @param onShareClick Callback при нажатии на кнопку "Поделиться"
  */
@@ -70,6 +71,7 @@ fun NoteItem(
     note: UiBookmarkNote,
     showBookInfo: Boolean,
     onClick: () -> Unit,
+    onBookClick: () -> Unit,
     onDeleteRequest: () -> Unit,
     onShareClick: () -> Unit,
 ) {
@@ -165,7 +167,9 @@ fun NoteItem(
             NoteItemContent(
                 note = note,
                 showBookInfo = showBookInfo,
+                hasBookFile = note.bookFileUri != null,
                 onClick = onClick,
+                onBookClick = onBookClick,
                 onShareClick = onShareClick
             )
         }
@@ -179,7 +183,9 @@ fun NoteItem(
 private fun NoteItemContent(
     note: UiBookmarkNote,
     showBookInfo: Boolean,
+    hasBookFile: Boolean,
     onClick: () -> Unit,
+    onBookClick: () -> Unit,
     onShareClick: () -> Unit,
 ) {
     Column(
@@ -204,9 +210,11 @@ private fun NoteItemContent(
 
         Spacer(modifier = Modifier.weight(1f, fill = false))
 
-        // Нижняя строка: кнопка "Перейти" слева, "Поделиться" справа
+        // Нижняя строка: кнопка "Перейти" или "К книге", "Поделиться" справа
         NoteItemActions(
+            hasBookFile = hasBookFile,
             onClick = onClick,
+            onBookClick = onBookClick,
             onShareClick = onShareClick
         )
     }
@@ -298,7 +306,9 @@ private fun BookCoverSmall(
  */
 @Composable
 private fun NoteItemActions(
+    hasBookFile: Boolean,
     onClick: () -> Unit,
+    onBookClick: () -> Unit,
     onShareClick: () -> Unit,
 ) {
     Row(
@@ -306,8 +316,15 @@ private fun NoteItemActions(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = onClick) {
-            Text(stringResource(R.string.bookmarks_go_to))
+        // Показываем "Перейти" если книга есть, "К книге" если книга удалена
+        if (hasBookFile) {
+            OutlinedButton(onClick = onClick) {
+                Text(stringResource(R.string.bookmarks_go_to))
+            }
+        } else {
+            OutlinedButton(onClick = onBookClick) {
+                Text(stringResource(R.string.bookmarks_go_to_book))
+            }
         }
 
         IconButton(onClick = onShareClick) {
@@ -347,6 +364,7 @@ private fun NoteItemPreview() {
             ),
             showBookInfo = true,
             onClick = {},
+            onBookClick = {},
             onDeleteRequest = {},
             onShareClick = {}
         )
@@ -378,6 +396,7 @@ private fun NoteItemWithoutBookInfoPreview() {
             ),
             showBookInfo = false,
             onClick = {},
+            onBookClick = {},
             onDeleteRequest = {},
             onShareClick = {}
         )

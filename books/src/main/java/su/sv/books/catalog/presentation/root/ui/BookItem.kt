@@ -113,10 +113,10 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
         },
         contentPadding = PaddingValues(all = 3.dp),
         shape = CircleShape,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.tertiaryContainer,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
         modifier = Modifier
             .align(Alignment.TopEnd)
@@ -148,7 +148,7 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
                 AppLoadingIndicator(
                     size = 26.dp,
                     strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

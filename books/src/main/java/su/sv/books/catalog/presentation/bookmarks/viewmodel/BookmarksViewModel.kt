@@ -14,6 +14,7 @@ import su.sv.books.catalog.domain.DeleteNoteUseCase
 import su.sv.books.catalog.domain.GetAllNotesUseCase
 import su.sv.books.catalog.domain.GetBooksWithNotesUseCase
 import su.sv.books.catalog.domain.GetNotesForBookUseCase
+import su.sv.books.catalog.presentation.bookmarks.data.BookmarksViewModePrefsRepository
 import su.sv.books.catalog.presentation.bookmarks.mapper.UiBookmarkMapper
 import su.sv.books.catalog.presentation.bookmarks.model.DeleteNoteDialogState
 import su.sv.books.catalog.presentation.bookmarks.model.NotesViewMode
@@ -30,6 +31,7 @@ class BookmarksViewModel @Inject constructor(
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val mapper: UiBookmarkMapper,
     private val resourcesRepository: ResourcesRepository,
+    private val viewModePrefsRepository: BookmarksViewModePrefsRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<UiBookmarksState>(UiBookmarksState.Loading)
@@ -44,6 +46,11 @@ class BookmarksViewModel @Inject constructor(
     private var currentViewMode: NotesViewMode = NotesViewMode.LIST
 
     init {
+        // Загружаем сохранённый режим просмотра
+        currentViewMode = when (viewModePrefsRepository.getViewMode()) {
+            BookmarksViewModePrefsRepository.MODE_BY_BOOK -> NotesViewMode.BY_BOOK
+            else -> NotesViewMode.LIST
+        }
         loadNotes()
     }
 
@@ -63,6 +70,10 @@ class BookmarksViewModel @Inject constructor(
 
             is BookmarksAction.OnNoteClick -> {
                 _effect.trySend(BookmarksEffect.OpenReader(action.note))
+            }
+
+            is BookmarksAction.OnBookCardClick -> {
+                _effect.trySend(BookmarksEffect.OpenBookCard(action.note))
             }
 
             is BookmarksAction.OnDeleteNoteRequest -> {
@@ -172,6 +183,13 @@ class BookmarksViewModel @Inject constructor(
             NotesViewMode.BY_BOOK -> NotesViewMode.LIST
         }
 
+        // Сохраняем режим в SharedPreferences
+        val modeString = when (currentViewMode) {
+            NotesViewMode.LIST -> BookmarksViewModePrefsRepository.MODE_LIST
+            NotesViewMode.BY_BOOK -> BookmarksViewModePrefsRepository.MODE_BY_BOOK
+        }
+        viewModePrefsRepository.saveViewMode(modeString)
+
         when (currentViewMode) {
             NotesViewMode.LIST -> loadNotes()
             NotesViewMode.BY_BOOK -> loadBooks()
@@ -250,6 +268,7 @@ sealed class BookmarksAction {
     object OnToggleViewMode : BookmarksAction()
     object OnRetryClick : BookmarksAction()
     data class OnNoteClick(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
+    data class OnBookCardClick(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
     data class OnDeleteNoteRequest(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
     object OnDeleteNoteConfirm : BookmarksAction()
     object OnDeleteNoteCancel : BookmarksAction()
@@ -263,6 +282,7 @@ sealed class BookmarksAction {
 sealed class BookmarksEffect {
     object NavigateBack : BookmarksEffect()
     data class OpenReader(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksEffect()
+    data class OpenBookCard(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksEffect()
     data class ShareNote(val text: String) : BookmarksEffect()
     data class ShowError(val message: String) : BookmarksEffect()
 }

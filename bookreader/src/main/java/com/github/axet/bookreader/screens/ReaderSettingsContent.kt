@@ -28,15 +28,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookApplication
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
-import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.ui.components.AppToolbarWithBack
-import su.sv.managers.theme.ThemeViewModel
 
 /**
  * Контент экрана настроек читалки
@@ -48,10 +44,8 @@ fun ReaderSettingsContent(
 ) {
     val context = LocalContext.current
     val stackNavigation = LocalStackNavigation.current
-    val themeViewModel: ThemeViewModel = hiltViewModel()
-    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
 
-    // Получаем SharedPreferences для остальных настроек
+    // Получаем SharedPreferences для настроек
     val shared = remember {
         android.preference.PreferenceManager.getDefaultSharedPreferences(context)
     }
@@ -143,16 +137,6 @@ fun ReaderSettingsContent(
                 onCheckedChange = { checked ->
                     shared.edit { putBoolean(BookApplication.PREFERENCE_ROTATE, checked) }
                 },
-            )
-
-            // Тема (через ThemeViewModel)
-            SettingsItem(
-                title = stringResource(R.string.sv_pref_theme_title),
-                subtitle = when (themeConfig.themeMode) {
-                    ThemeMode.DARK -> stringResource(R.string.sv_theme_dark)
-                    ThemeMode.LIGHT -> stringResource(R.string.sv_theme_light)
-                },
-                onClick = { themeViewModel.toggleTheme() },
             )
 
             // TODO: Добавить настройки:
