@@ -106,7 +106,10 @@ private fun HandleEffects(
                 val uri = effect.book.fileUri
                 if (uri != null) {
                     stackNavigation.forward(
-                        ReaderScreen(bookUri = uri)
+                        ReaderScreen(
+                            bookUri = uri,
+                            bookCoverUrl = effect.book.image
+                        )
                     )
                 }
             }

@@ -60,7 +60,7 @@ class ReaderViewModel @Inject constructor(
     fun onAction(action: ReaderActions) {
         when (action) {
             // Загрузка книги
-            is ReaderActions.LoadBook -> loadBook(action.uri, action.position)
+            is ReaderActions.LoadBook -> loadBook(action.uri, action.position, action.bookCoverUrl)
 
             // Сохранение позиции
             ReaderActions.SavePosition -> savePosition()
@@ -106,7 +106,7 @@ class ReaderViewModel @Inject constructor(
 
     // ==================== Загрузка книги ====================
 
-    private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?) {
+    private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?, bookCoverUrl: String?) {
         viewModelScope.launch {
             _state.value = ReaderState.Loading
 
@@ -142,6 +142,11 @@ class ReaderViewModel @Inject constructor(
 
                 // Загружаем информацию о книге
                 currentBook = storage.load(uri)
+
+                // Сохраняем URL обложки из API если передан
+                if (bookCoverUrl != null) {
+                    currentBook?.info?.coverUrl = bookCoverUrl
+                }
 
                 // Открываем файл книги
                 currentFBook = storage.read(currentBook)
@@ -181,6 +186,8 @@ class ReaderViewModel @Inject constructor(
         if (book == null || fbook == null) return
 
         try {
+            var needSave = false
+
             // Создаём файл обложки только если её нет
             if (book.info?.coverUrl == null) {
                 val coverFile = Storage.coverFile(context, book)
@@ -189,6 +196,7 @@ class ReaderViewModel @Inject constructor(
                 }
                 if (coverFile?.exists() == true) {
                     book.info?.coverUrl = coverFile.absolutePath
+                    needSave = true
                     Timber.d("Cover created: ${coverFile.absolutePath}")
                 }
             }
@@ -196,8 +204,14 @@ class ReaderViewModel @Inject constructor(
             // Всегда сохраняем bookFileUri если он не установлен
             if (book.info?.bookFileUri == null && book.url != null) {
                 book.info?.bookFileUri = book.url.toString()
-                storage.save(book)
+                needSave = true
                 Timber.d("bookFileUri saved: ${book.url}")
+            }
+
+            // Сохраняем если что-то изменилось
+            if (needSave) {
+                storage.save(book)
+                Timber.d("Book info saved with coverUrl=${book.info?.coverUrl}, bookFileUri=${book.info?.bookFileUri}")
             }
         } catch (e: Exception) {
             Timber.e(e, "Failed to create cover or save bookFileUri")
@@ -431,6 +445,10 @@ class ReaderViewModel @Inject constructor(
 
     private fun addBookmark(bookmark: Storage.Bookmark) {
         val book = currentBook ?: return
+
+        // Сохраняем coverUrl книги в закладке на момент создания
+        bookmark.coverUrl = book.info?.coverUrl
+
         book.info.bookmarks.add(bookmark)
         storage.save(book)
         fbReaderView?.bookmarksUpdate()

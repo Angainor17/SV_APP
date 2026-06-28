@@ -14,10 +14,14 @@ sealed class ReaderActions {
 
     /**
      * Загрузить книгу
+     * @param uri URI файла книги
+     * @param position Позиция для навигации (опционально)
+     * @param bookCoverUrl URL обложки книги (из API) для сохранения в заметках
      */
     data class LoadBook(
         val uri: Uri,
-        val position: FBReaderView.ZLTextIndexPosition? = null
+        val position: FBReaderView.ZLTextIndexPosition? = null,
+        val bookCoverUrl: String? = null
     ) : ReaderActions()
 
     /**
