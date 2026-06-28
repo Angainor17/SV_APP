@@ -11,18 +11,30 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
+
+/**
+ * Параметры позиции в книге для навигации к заметке
+ */
+@Parcelize
+data class BookmarkPosition(
+    val startParagraph: Int,
+    val startElement: Int,
+    val startChar: Int,
+    val endParagraph: Int,
+    val endElement: Int,
+    val endChar: Int,
+) : Parcelable
 
 /**
  * Экран чтения книги (Modo Screen)
  *
  * @param bookUri URI файла книги
- * @param position Начальная позиция в книге (опционально)
+ * @param bookmarkPosition Позиция заметки для навигации (опционально)
  */
 @Parcelize
 class ReaderScreen(
-    val bookUri: @RawValue Uri,
-    val position: @RawValue Parcelable? = null,
+    val bookUri: Uri,
+    val bookmarkPosition: BookmarkPosition? = null,
     override val screenKey: ScreenKey = generateScreenKey(),
 ) : Screen, Parcelable {
 
@@ -32,7 +44,7 @@ class ReaderScreen(
 
         ReaderContent(
             bookUri = bookUri,
-            initialPosition = position,
+            bookmarkPosition = bookmarkPosition,
             onNavigateBack = {
                 stackNavigation.back()
             },

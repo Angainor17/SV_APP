@@ -36,10 +36,18 @@
     <string name="bookmarks_go_to">Перейти</string>
     <string name="bookmarks_share">Поделиться</string>
     <string name="bookmarks_page">стр. %1$d</string>
-    <string name="bookmarks_notes_count">%1$d заметок</string>
     <string name="bookmarks_close_book">Закрыть</string>
     <string name="bookmarks_delete_dialog_title">Удалить заметку?</string>
     <string name="bookmarks_delete_dialog_yes">Да</string>
     <string name="bookmarks_delete_dialog_no">Нет</string>
+    <string name="bookmarks_book_not_found">Книга не найдена или перемещена</string>
+
+    <!-- Plurals for notes count -->
+    <plurals name="bookmarks_notes_count">
+        <item quantity="one">%1$d заметка</item>
+        <item quantity="few">%1$d заметки</item>
+        <item quantity="many">%1$d заметок</item>
+        <item quantity="other">%1$d заметок</item>
+    </plurals>
 
 </resources>

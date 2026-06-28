@@ -15,6 +15,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,11 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookWithNotes
 import su.sv.commonui.theme.SVAPPTheme
+import kotlin.math.abs
 
 /**
  * Элемент книги с заметками в режиме отображения "по книгам"
@@ -84,9 +87,29 @@ fun BookCover(
     coverUrl: String,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+
+    // Преобразуем путь в Uri если это локальный файл
+    val imageModel = remember(coverUrl) {
+        if (coverUrl.isNotBlank()) {
+            // Если это локальный путь к файлу, преобразуем в Uri
+            if (coverUrl.startsWith("/") || coverUrl.startsWith("file://")) {
+                try {
+                    java.io.File(coverUrl).toUri()
+                } catch (e: Exception) {
+                    coverUrl
+                }
+            } else {
+                coverUrl
+            }
+        } else {
+            null
+        }
+    }
+
     AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(coverUrl)
+        model = ImageRequest.Builder(context)
+            .data(imageModel)
             .build(),
         placeholder = painterResource(R.drawable.ic_book_placeholder),
         error = painterResource(R.drawable.ic_book_placeholder),
@@ -106,6 +129,8 @@ private fun BookInfo(
     notesCount: Int,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+
     Column(modifier = modifier) {
         Text(
             text = title,
@@ -122,7 +147,11 @@ private fun BookInfo(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = stringResource(R.string.bookmarks_notes_count, notesCount),
+            text = context.resources.getQuantityString(
+                R.plurals.bookmarks_notes_count,
+                abs(notesCount),
+                notesCount
+            ),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary
         )

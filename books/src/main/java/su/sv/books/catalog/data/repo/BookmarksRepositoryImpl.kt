@@ -44,6 +44,7 @@ class BookmarksRepositoryImpl @Inject constructor(
         bookTitle = bookTitle,
         bookAuthor = bookAuthor,
         bookCoverUrl = bookCoverPath ?: "",
+        bookFileUri = bookFileUri,
         text = text,
         name = name,
         page = page,

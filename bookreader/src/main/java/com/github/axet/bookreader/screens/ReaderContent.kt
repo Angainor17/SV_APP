@@ -8,7 +8,6 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
-import android.os.Parcelable
 import android.view.View
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -77,7 +76,7 @@ import timber.log.Timber
 @Composable
 fun ReaderContent(
     bookUri: Uri,
-    initialPosition: Parcelable?,
+    bookmarkPosition: BookmarkPosition?,
     onNavigateBack: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -95,7 +94,13 @@ fun ReaderContent(
     LaunchedEffect(bookUri) {
         // Проверяем, что книга ещё не загружена в ViewModel
         if (viewModel.getCurrentBook() == null) {
-            val position = initialPosition as? FBReaderView.ZLTextIndexPosition
+            // Создаём позицию из BookmarkPosition если она есть
+            val position = bookmarkPosition?.let { pos ->
+                FBReaderView.ZLTextIndexPosition(
+                    ZLTextFixedPosition(pos.startParagraph, pos.startElement, pos.startChar),
+                    ZLTextFixedPosition(pos.endParagraph, pos.endElement, pos.endChar)
+                )
+            }
             viewModel.onAction(ReaderActions.LoadBook(bookUri, position))
         }
     }
@@ -259,6 +264,16 @@ fun ReaderContent(
                                             if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
                                             else FBReaderView.Widgets.PAGING
                                         )
+
+                                        // Применяем сохранённую позицию (из заметки)
+                                        val savedPos = viewModel.getSavedPosition()
+                                        if (savedPos != null) {
+                                            Timber.d("Applying saved position from bookmark: $savedPos")
+                                            gotoPosition(savedPos)
+                                            // Сбрасываем savedPosition чтобы при следующем открытии использовалась сохранённая в файле
+                                            viewModel.clearSavedPosition()
+                                        }
+
                                         isLoaded = true
                                         Timber.d("Book loaded successfully")
                                     } catch (e: Exception) {

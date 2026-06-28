@@ -13,6 +13,7 @@ data class UiBookmarkNote(
     val bookTitle: String,
     val bookAuthor: String,
     val bookCoverUrl: String,
+    val bookFileUri: String?,          // URI файла книги для навигации
     val text: String,
     val name: String?,
     val page: Int,

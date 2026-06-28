@@ -110,6 +110,12 @@ class ReaderViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = ReaderState.Loading
 
+            // Сохраняем переданную позицию для применения после загрузки книги
+            if (position != null) {
+                savedPosition = position
+                Timber.d("Saved initial position from bookmark: $position")
+            }
+
             try {
                 // Проверяем доступность файла
                 val inputStream = try {
@@ -140,6 +146,9 @@ class ReaderViewModel @Inject constructor(
                 // Открываем файл книги
                 currentFBook = storage.read(currentBook)
 
+                // Создаём обложку если её нет
+                ensureCoverCreated(currentBook, currentFBook)
+
                 // Обновляем состояние
                 val currentState = ReaderState.Content(
                     book = currentBook!!,
@@ -149,7 +158,7 @@ class ReaderViewModel @Inject constructor(
                 )
                 _state.value = currentState
 
-                Timber.d("Book loaded: ${currentBook?.info?.title}")
+                Timber.d("Book loaded: ${currentBook?.info?.title}, savedPosition=$savedPosition")
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load book")
                 val errorMessage = when {
@@ -162,6 +171,36 @@ class ReaderViewModel @Inject constructor(
                 }
                 _state.value = ReaderState.Error(errorMessage)
             }
+        }
+    }
+
+    /**
+     * Создаёт обложку книги если её нет и сохраняет путь в book.info.coverUrl и bookFileUri
+     */
+    private fun ensureCoverCreated(book: Storage.Book?, fbook: Storage.FBook?) {
+        if (book == null || fbook == null) return
+
+        try {
+            // Создаём файл обложки только если её нет
+            if (book.info?.coverUrl == null) {
+                val coverFile = Storage.coverFile(context, book)
+                if (coverFile != null && !coverFile.exists()) {
+                    storage.createCover(fbook, coverFile)
+                }
+                if (coverFile?.exists() == true) {
+                    book.info?.coverUrl = coverFile.absolutePath
+                    Timber.d("Cover created: ${coverFile.absolutePath}")
+                }
+            }
+
+            // Всегда сохраняем bookFileUri если он не установлен
+            if (book.info?.bookFileUri == null && book.url != null) {
+                book.info?.bookFileUri = book.url.toString()
+                storage.save(book)
+                Timber.d("bookFileUri saved: ${book.url}")
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to create cover or save bookFileUri")
         }
     }
 
@@ -218,6 +257,13 @@ class ReaderViewModel @Inject constructor(
      * Получить сохранённую позицию для восстановления при пересоздании FBReaderView
      */
     fun getSavedPosition(): FBReaderView.ZLTextIndexPosition? = savedPosition
+
+    /**
+     * Сбросить сохранённую позицию после применения
+     */
+    fun clearSavedPosition() {
+        savedPosition = null
+    }
 
     // ==================== Навигация ====================
 

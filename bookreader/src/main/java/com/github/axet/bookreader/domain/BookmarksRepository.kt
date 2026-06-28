@@ -25,6 +25,7 @@ data class BookmarkData(
     val bookTitle: String,
     val bookAuthor: String,
     val bookCoverPath: String?,
+    val bookFileUri: String?,         // URI файла книги для навигации
     val text: String,
     val name: String?,
     val page: Int,
@@ -294,8 +295,12 @@ class BookmarksRepository @Inject constructor(
             val bookTitle = json.optString("title", "Неизвестная книга")
             val bookAuthor = json.optString("authors", "")
 
-            // Ищем обложку в кэше
-            val coverPath = findCoverForBook(bookId)
+            // Получаем coverUrl из JSON (сохранённый при загрузке книги)
+            val coverPath = json.optString("coverUrl", null) ?: findCoverForBook(bookId)
+
+            // Получаем URI файла книги для навигации
+            // Если не сохранён в JSON - ищем файл по MD5 в хранилище
+            val bookFileUri = json.optString("bookFileUri", null) ?: findBookFileUri(bookId)
 
             for (i in 0 until bookmarksArray.length()) {
                 try {
@@ -313,6 +318,7 @@ class BookmarksRepository @Inject constructor(
                             bookTitle = bookTitle,
                             bookAuthor = bookAuthor,
                             bookCoverPath = coverPath,
+                            bookFileUri = bookFileUri,
                             text = text,
                             name = bookmarkJson.optString("name").takeIf { it.isNotEmpty() },
                             page = calculatePageNumber(startArray?.optInt(0) ?: 0),
@@ -398,6 +404,55 @@ class BookmarksRepository @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Error writing JSON to URI: $uri")
             throw e
+        }
+    }
+
+    /**
+     * Найти URI файла книги по MD5 (bookId)
+     * Ищет файл {md5}.{ext} в хранилище
+     */
+    fun findBookFileUri(bookId: String): String? {
+        val storageUri = storage.storagePath ?: return null
+        val scheme = storageUri.scheme
+
+        return try {
+            when (scheme) {
+                ContentResolver.SCHEME_CONTENT -> {
+                    val contentResolver = context.contentResolver
+                    val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+                        storageUri,
+                        DocumentsContract.getTreeDocumentId(storageUri)
+                    )
+                    val cursor = contentResolver.query(childrenUri, null, null, null, null)
+                    cursor?.use {
+                        while (it.moveToNext()) {
+                            val name = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                            // Ищем файл который начинается с bookId (MD5) и не является JSON
+                            if (name.startsWith(bookId) && !name.endsWith(".json")) {
+                                val id = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
+                                val uri = DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
+                                Timber.d("Found book file: $name for bookId: $bookId")
+                                return uri.toString()
+                            }
+                        }
+                    }
+                    null
+                }
+                ContentResolver.SCHEME_FILE -> {
+                    val dir = File(storageUri.path!!)
+                    dir.listFiles()?.forEach { file ->
+                        if (file.name.startsWith(bookId) && file.extension != "json") {
+                            Timber.d("Found book file: ${file.name} for bookId: $bookId")
+                            return Uri.fromFile(file).toString()
+                        }
+                    }
+                    null
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error finding book file for bookId: $bookId")
+            null
         }
     }
 
