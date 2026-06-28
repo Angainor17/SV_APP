@@ -9,6 +9,9 @@ import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.view.View
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,6 +80,8 @@ import timber.log.Timber
 fun ReaderContent(
     bookUri: Uri,
     bookCoverUrl: String?,
+    bookTitle: String?,
+    bookAuthor: String?,
     bookmarkPosition: BookmarkPosition?,
     onNavigateBack: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
@@ -102,7 +107,7 @@ fun ReaderContent(
                     ZLTextFixedPosition(pos.endParagraph, pos.endElement, pos.endChar)
                 )
             }
-            viewModel.onAction(ReaderActions.LoadBook(bookUri, position, bookCoverUrl))
+            viewModel.onAction(ReaderActions.LoadBook(bookUri, position, bookCoverUrl, bookTitle, bookAuthor))
         }
     }
 
@@ -340,6 +345,21 @@ private fun TocComposeDialog(
     // Состояние раскрытия для каждого элемента
     val expandedStates = remember { mutableStateListOf<String>() }
 
+    // Функция для проверки видимости элемента
+    fun isItemVisible(item: ExpandableTocItem): Boolean {
+        // Элементы уровня 0 всегда видимы
+        if (item.parentId == null) return true
+        // Проверяем все родительские цепочки
+        var currentParentId: String? = item.parentId
+        while (currentParentId != null) {
+            if (!expandedStates.contains(currentParentId)) return false
+            // Находим parentId родителя
+            val parentItem = tocItems.find { it.id == currentParentId }
+            currentParentId = parentItem?.parentId
+        }
+        return true
+    }
+
     if (tocItems.isEmpty()) {
         AlertDialog(
             onDismissRequest = onDismiss,
@@ -358,18 +378,25 @@ private fun TocComposeDialog(
             text = {
                 LazyColumn {
                     items(tocItems, key = { it.id }) { item ->
-                        TocItemRow(
-                            item = item,
-                            isExpanded = expandedStates.contains(item.id),
-                            onToggleExpand = {
-                                if (expandedStates.contains(item.id)) {
-                                    expandedStates.remove(item.id)
-                                } else {
-                                    expandedStates.add(item.id)
-                                }
-                            },
-                            onNavigate = onNavigate
-                        )
+                        // Анимированное появление/исчезновение
+                        AnimatedVisibility(
+                            visible = isItemVisible(item),
+                            enter = expandVertically(),
+                            exit = shrinkVertically()
+                        ) {
+                            TocItemRow(
+                                item = item,
+                                isExpanded = expandedStates.contains(item.id),
+                                onToggleExpand = {
+                                    if (expandedStates.contains(item.id)) {
+                                        expandedStates.remove(item.id)
+                                    } else {
+                                        expandedStates.add(item.id)
+                                    }
+                                },
+                                onNavigate = onNavigate
+                            )
+                        }
                     }
                 }
             },
@@ -439,29 +466,37 @@ private data class ExpandableTocItem(
     val position: org.geometerplus.zlibrary.text.view.ZLTextPosition,
     val level: Int = 0,
     val hasChildren: Boolean = false,
+    val parentId: String? = null,  // ID родительского элемента
 )
 
 private fun collectExpandableTocItems(
     tree: org.geometerplus.fbreader.bookmodel.TOCTree,
     items: MutableList<ExpandableTocItem>,
-    level: Int
+    level: Int,
+    parentId: String? = null
 ) {
     for (child in tree.subtrees()) {
         val text = child.text
         val ref = child.reference
         if (text != null && ref != null) {
             val hasChildren = child.subtrees().iterator().hasNext()
+            val itemId = "${level}_${ref.ParagraphIndex}_${text.hashCode()}"
             items.add(
                 ExpandableTocItem(
-                    id = "${level}_${ref.ParagraphIndex}_${text.hashCode()}",
+                    id = itemId,
                     title = text,
                     position = ZLTextFixedPosition(ref.ParagraphIndex, 0, 0),
                     level = level,
-                    hasChildren = hasChildren
+                    hasChildren = hasChildren,
+                    parentId = parentId
                 )
             )
+            // Рекурсивно собираем дочерние элементы с текущим parentId
+            collectExpandableTocItems(child, items, level + 1, itemId)
+        } else {
+            // Если нет текста/рефа, продолжаем обход с тем же parentId
+            collectExpandableTocItems(child, items, level, parentId)
         }
-        collectExpandableTocItems(child, items, level + 1)
     }
 }
 

@@ -86,6 +86,7 @@ fun BookList(
                 contentPadding = PaddingValues(
                     start = dimensions.screenPaddingHorizontal / 2,
                     end = dimensions.screenPaddingHorizontal / 2,
+                    bottom = 16.dp,
                 ),
             ) {
                 items(

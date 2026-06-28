@@ -60,7 +60,7 @@ class ReaderViewModel @Inject constructor(
     fun onAction(action: ReaderActions) {
         when (action) {
             // Загрузка книги
-            is ReaderActions.LoadBook -> loadBook(action.uri, action.position, action.bookCoverUrl)
+            is ReaderActions.LoadBook -> loadBook(action.uri, action.position, action.bookCoverUrl, action.bookTitle, action.bookAuthor)
 
             // Сохранение позиции
             ReaderActions.SavePosition -> savePosition()
@@ -106,7 +106,7 @@ class ReaderViewModel @Inject constructor(
 
     // ==================== Загрузка книги ====================
 
-    private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?, bookCoverUrl: String?) {
+    private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?, bookCoverUrl: String?, bookTitle: String?, bookAuthor: String?) {
         viewModelScope.launch {
             _state.value = ReaderState.Loading
 
@@ -146,6 +146,14 @@ class ReaderViewModel @Inject constructor(
                 // Сохраняем URL обложки из API если передан
                 if (bookCoverUrl != null) {
                     currentBook?.info?.coverUrl = bookCoverUrl
+                }
+
+                // Сохраняем название и автора из API если переданы (перезаписываем метаданные файла)
+                if (bookTitle != null) {
+                    currentBook?.info?.title = bookTitle
+                }
+                if (bookAuthor != null) {
+                    currentBook?.info?.authors = bookAuthor
                 }
 
                 // Открываем файл книги

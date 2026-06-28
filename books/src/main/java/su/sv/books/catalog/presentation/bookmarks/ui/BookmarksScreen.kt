@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.screens.BookmarkPosition
@@ -41,6 +43,7 @@ import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarksState
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksAction
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksEffect
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksViewModel
+import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.FullScreenError
@@ -48,6 +51,7 @@ import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.ui.components.FullScreenEmpty
+import su.sv.models.ui.book.UiBook
 import timber.log.Timber
 
 /**
@@ -92,6 +96,7 @@ fun BookmarksContent(
                 is UiBookmarksState.NotesList -> NotesListContent(
                     notes = currentState.notes,
                     onNoteClick = { viewModel.onAction(BookmarksAction.OnNoteClick(it)) },
+                    onBookClick = { viewModel.onAction(BookmarksAction.OnBookCardClick(it)) },
                     onDeleteRequest = { viewModel.onAction(BookmarksAction.OnDeleteNoteRequest(it)) },
                     onShareClick = { viewModel.onAction(BookmarksAction.OnShareNote(it)) },
                 )
@@ -103,6 +108,7 @@ fun BookmarksContent(
                     book = currentState.book,
                     notes = currentState.notes,
                     onNoteClick = { viewModel.onAction(BookmarksAction.OnNoteClick(it)) },
+                    onBookCardClick = { viewModel.onAction(BookmarksAction.OnBookCardClick(it)) },
                     onDeleteRequest = { viewModel.onAction(BookmarksAction.OnDeleteNoteRequest(it)) },
                     onShareClick = { viewModel.onAction(BookmarksAction.OnShareNote(it)) },
                 )
@@ -165,6 +171,7 @@ fun BookmarksTopBar(
 fun NotesListContent(
     notes: List<UiBookmarkNote>,
     onNoteClick: (UiBookmarkNote) -> Unit,
+    onBookClick: (UiBookmarkNote) -> Unit,
     onDeleteRequest: (UiBookmarkNote) -> Unit,
     onShareClick: (UiBookmarkNote) -> Unit,
 ) {
@@ -173,12 +180,14 @@ fun NotesListContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
+        contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         items(items = notes, key = { it.id }) { note ->
             NoteItem(
                 note = note,
                 showBookInfo = true,
                 onClick = { onNoteClick(note) },
+                onBookClick = { onBookClick(note) },
                 onDeleteRequest = { onDeleteRequest(note) },
                 onShareClick = { onShareClick(note) },
             )
@@ -199,6 +208,7 @@ fun BooksListContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
+        contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         items(items = books, key = { it.bookId }) { book ->
             BookWithNotesItem(
@@ -217,6 +227,7 @@ fun BookNotesContent(
     book: UiBookWithNotes,
     notes: List<UiBookmarkNote>,
     onNoteClick: (UiBookmarkNote) -> Unit,
+    onBookCardClick: (UiBookmarkNote) -> Unit,
     onDeleteRequest: (UiBookmarkNote) -> Unit,
     onShareClick: (UiBookmarkNote) -> Unit,
 ) {
@@ -230,12 +241,14 @@ fun BookNotesContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
+            contentPadding = PaddingValues(bottom = 16.dp),
         ) {
             items(items = notes, key = { it.id }) { note ->
                 NoteItem(
                     note = note,
                     showBookInfo = false,
                     onClick = { onNoteClick(note) },
+                    onBookClick = { onBookCardClick(note) },
                     onDeleteRequest = { onDeleteRequest(note) },
                     onShareClick = { onShareClick(note) },
                 )
@@ -278,6 +291,8 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                         ReaderScreen(
                             bookUri = Uri.parse(bookUri),
                             bookCoverUrl = note.bookCoverUrl,
+                            bookTitle = note.bookTitle,
+                            bookAuthor = note.bookAuthor,
                             bookmarkPosition = position
                         )
                     )
@@ -299,6 +314,23 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                 }
                 val shareIntent = Intent.createChooser(sendIntent, null)
                 context.startActivity(shareIntent)
+            }
+            is BookmarksEffect.OpenBookCard -> {
+                // Переход на карточку книги (когда файл книги удалён)
+                val note = effect.note
+                val uiBook = UiBook(
+                    id = note.bookId,  // Используем bookId из заметки
+                    title = note.bookTitle,
+                    author = note.bookAuthor,
+                    description = "",
+                    image = note.bookCoverUrl,
+                    downloadUrl = "",
+                    fileNameWithExt = "",
+                    category = "",
+                    downloadState = su.sv.models.ui.book.UIBookState.AVAILABLE_TO_DOWNLOAD,
+                    fileUri = null
+                )
+                stackNavigation.forward(BookDetailScreen(uiBook = uiBook))
             }
             is BookmarksEffect.ShowError -> {
                 Timber.e("Error: ${effect.message}")

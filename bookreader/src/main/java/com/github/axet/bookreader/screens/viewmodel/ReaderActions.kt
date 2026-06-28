@@ -17,11 +17,15 @@ sealed class ReaderActions {
      * @param uri URI файла книги
      * @param position Позиция для навигации (опционально)
      * @param bookCoverUrl URL обложки книги (из API) для сохранения в заметках
+     * @param bookTitle Название книги (из API) для сохранения в заметках вместо метаданных файла
+     * @param bookAuthor Автор книги (из API) для сохранения в заметках вместо метаданных файла
      */
     data class LoadBook(
         val uri: Uri,
         val position: FBReaderView.ZLTextIndexPosition? = null,
-        val bookCoverUrl: String? = null
+        val bookCoverUrl: String? = null,
+        val bookTitle: String? = null,
+        val bookAuthor: String? = null
     ) : ReaderActions()
 
     /**

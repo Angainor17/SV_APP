@@ -216,7 +216,9 @@ private fun HandleEffects(
                     stackNavigation.forward(
                         ReaderScreen(
                             bookUri = uri,
-                            bookCoverUrl = effect.book.image
+                            bookCoverUrl = effect.book.image,
+                            bookTitle = effect.book.title,
+                            bookAuthor = effect.book.author
                         )
                     )
                 }
