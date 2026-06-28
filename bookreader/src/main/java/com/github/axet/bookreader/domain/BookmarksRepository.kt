@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
+import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.app.Storage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -296,7 +297,19 @@ class BookmarksRepository @Inject constructor(
             val bookAuthor = json.optString("authors", "")
 
             // Получаем coverUrl из JSON (сохранённый при загрузке книги)
-            val coverPath = json.optString("coverUrl", null) ?: findCoverForBook(bookId)
+            // Если не сохранён - ищем обложку по URI файла книги или MD5
+            var coverPath = json.optString("coverUrl", null)
+            if (coverPath == null) {
+                // Пытаемся найти обложку по URI файла книги
+                val bookFileUriStr = json.optString("bookFileUri", null)
+                if (bookFileUriStr != null) {
+                    coverPath = findCoverByBookUri(bookFileUriStr)
+                }
+                // Если не нашли - ищем по MD5
+                if (coverPath == null) {
+                    coverPath = findCoverForBook(bookId)
+                }
+            }
 
             // Получаем URI файла книги для навигации
             // Если не сохранён в JSON - ищем файл по MD5 в хранилище
@@ -343,21 +356,59 @@ class BookmarksRepository @Inject constructor(
     }
 
     /**
+     * Найти обложку книги по URI файла книги
+     * Использует CacheImagesAdapter.cacheUri для поиска в кэше
+     */
+    private fun findCoverByBookUri(bookUri: String): String? {
+        return try {
+            val uri = Uri.parse(bookUri)
+            // CacheImagesAdapter.cacheUri генерирует файл обложки на основе URI книги
+            val coverFile = CacheImagesAdapter.cacheUri(context, uri)
+            if (coverFile.exists()) {
+                Timber.d("Found cover by bookUri: ${coverFile.absolutePath}")
+                return coverFile.absolutePath
+            }
+            Timber.d("Cover file not found for bookUri: $bookUri")
+            null
+        } catch (e: Exception) {
+            Timber.e(e, "Error finding cover by bookUri: $bookUri")
+            null
+        }
+    }
+
+    /**
      * Найти обложку книги в кэше по MD5
+     * Использует Storage.coverFile для поиска в правильном месте
      */
     private fun findCoverForBook(bookId: String): String? {
         return try {
-            // Обложки кэшируются в externalCacheDir
+            // Обложки кэшируются через CacheImagesAdapter.cacheUri
+            // Ищем файл обложки в externalCacheDir с именем содержащим bookId
             val cacheDir = context.externalCacheDir ?: context.cacheDir
             if (cacheDir != null && cacheDir.exists()) {
-                // Ищем файл с именем, содержащим bookId (MD5)
                 cacheDir.listFiles()?.forEach { file ->
+                    // Имя файла обложки содержит MD5 книги
                     if (file.name.contains(bookId) &&
                         (file.extension == "png" || file.extension == "jpg" || file.extension == "jpeg")) {
+                        Timber.d("Found cover for book $bookId: ${file.absolutePath}")
                         return file.absolutePath
                     }
                 }
             }
+
+            // Также ищем в filesDir (другое возможное место кэша)
+            val filesDir = context.filesDir
+            if (filesDir.exists()) {
+                filesDir.listFiles()?.forEach { file ->
+                    if (file.name.contains(bookId) &&
+                        (file.extension == "png" || file.extension == "jpg" || file.extension == "jpeg")) {
+                        Timber.d("Found cover for book $bookId in filesDir: ${file.absolutePath}")
+                        return file.absolutePath
+                    }
+                }
+            }
+
+            Timber.d("No cover found for book $bookId")
             null
         } catch (e: Exception) {
             Timber.e(e, "Error finding cover for book: $bookId")
