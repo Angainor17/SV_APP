@@ -5,8 +5,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
+import su.sv.wiki.domain.model.WikiArticle
 import su.sv.wiki.domain.usecase.ClearFavoritesUseCase
-import su.sv.wiki.domain.usecase.GetFavoriteTitlesUseCase
+import su.sv.wiki.domain.usecase.GetFavoritesUseCase
 import javax.inject.Inject
 
 /**
@@ -14,12 +15,12 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    getFavoriteTitlesUseCase: GetFavoriteTitlesUseCase,
+    getFavoritesUseCase: GetFavoritesUseCase,
     private val clearFavoritesUseCase: ClearFavoritesUseCase,
 ) : BaseViewModel() {
 
-    /** Список названий избранных статей */
-    val favorites: Flow<List<String>> = getFavoriteTitlesUseCase.execute()
+    /** Список избранных статей с контентом */
+    val favorites: Flow<List<WikiArticle>> = getFavoritesUseCase.invoke()
 
     /**
      * Очистить всё избранное

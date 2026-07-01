@@ -67,7 +67,7 @@ fun ArticleView(
                         } else {
                             stringResource(R.string.wiki_add_favorite)
                         },
-                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else Color.Gray,
+                        tint = if (isFavorite) Color(0xFFE53935) else Color.Gray, // Красный для избранного
                     )
                 }
             }
@@ -79,6 +79,7 @@ fun ArticleView(
                 content = article.content,
                 links = article.links,
                 externalLinks = article.externalLinks,
+                imageUrl = article.imageUrl,
                 onLinkClick = onLinkClick,
                 onExternalLinkClick = onExternalLinkClick,
             )
@@ -115,6 +116,7 @@ fun ArticleViewPreview() {
                     ),
                 ),
                 articleUrl = "https://svremya.su/wiki/Государство_и_революция",
+                imageUrl = null,
             ),
             isFavorite = true,
             onLinkClick = {},
@@ -138,6 +140,7 @@ fun ArticleViewNotFavoritePreview() {
                 links = emptyList(),
                 externalLinks = emptyList(),
                 articleUrl = "",
+                imageUrl = null,
             ),
             isFavorite = false,
             onLinkClick = {},

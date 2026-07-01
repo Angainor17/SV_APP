@@ -9,6 +9,7 @@ data class UiWikiArticle(
     val links: List<UiWikiLink>,
     val externalLinks: List<UiExternalLink>,
     val articleUrl: String = "",   // URL статьи на сайте
+    val imageUrl: String? = null,  // URL картинки из статьи (если есть)
 )
 
 /**

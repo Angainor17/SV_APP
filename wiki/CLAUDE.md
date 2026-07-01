@@ -5,9 +5,9 @@
 ## Обзор
 
 Модуль `wiki` предоставляет функционал:
-- Поиск статей с автодополнением
-- Просмотр статей с кликабельными ссылками
-- Избранное (сохранение статей)
+- Поиск статей с автодополнением (регистронезависимый, поиск по всему заголовку)
+- Просмотр статей с кликабельными ссылками и изображениями
+- Избранное (сохранение статей с картинками)
 - История просмотра
 - Кэширование статей для офлайн-доступа
 
@@ -75,7 +75,7 @@ wiki/src/main/java/su/sv/wiki/
 │       ├── mapper/                # Мапперы
 │       ├── model/                 # UI модели
 │       ├── ui/                    # UI компоненты
-│       │   ├── ArticleContent.kt  # Контент статьи с ссылками
+│       │   ├── ArticleContent.kt  # Контент статьи с ссылками и картинкой
 │       │   ├── ArticleView.kt     # Карточка статьи
 │       │   ├── HistoryList.kt     # Список истории
 │       │   ├── SearchSuggestions.kt
@@ -114,32 +114,54 @@ class ArticleScreen(private val title: String) : Screen
 class FavoritesScreen : Screen
 ```
 
+## Изображения статей
+
+Изображения извлекаются из HTML-контента статьи:
+- **extimg контейнеры** — специфический формат svremya.su (ссылка на JPG/PNG в div с class="extimg")
+- **img теги** — стандартные HTML изображения
+
+Изображения отображаются:
+- На экране статьи (с placeholder и ограничением высоты 300dp)
+- В списке избранного (превью 80x80dp с placeholder)
+- Загрузка через **Coil 3** (`SubcomposeAsyncImage`)
+
+URL картинки сохраняется в базе данных явно в полях `imageUrl`.
+
+## Поиск
+
+Используется API `search` с `srwhat=title`:
+- Регистронезависимый поиск ("карл" найдёт "Маркс, Карл")
+- Поиск по всему заголовку, не только по началу
+- Минимальная длина запроса — 2 символа
+
 ## Кэширование статей
 
 Статьи автоматически кэшируются при первом просмотре:
 1. При запросе статьи сначала проверяется локальный кэш
 2. Если статьи нет в кэше — загружается из сети
-3. После успешной загрузки статья сохраняется в кэш
+3. После успешной загрузки статья сохраняется в кэш (включая imageUrl)
 
 Это позволяет открывать статьи из истории/избранного без сетевых запросов.
 
 ## База данных (Room)
 
 **Таблицы:**
-- `article_cache` — кэш статей (контент, ссылки, URL)
-- `favorites` — избранные статьи
+- `article_cache` — кэш статей (контент, ссылки, URL, imageUrl)
+- `favorites` — избранные статьи (контент, ссылки, URL, imageUrl)
 - `history` — история поиска (только заголовки)
 
 **Версия БД:** 2
+
+При миграции используется `fallbackToDestructiveMigration()` — данные пересоздаются.
 
 ## API
 
 Базовый URL: `https://svremya.su/`
 
 **Методы:**
-- `search()` — поиск статей
+- `search()` — поиск статей по заголовкам (srwhat=title)
 - `getPage()` — получение статьи по заголовку
-- `openSearch()` — подсказки для поиска
+- `openSearch()` — устаревший метод (не используется)
 
 ## Модели
 
@@ -148,10 +170,23 @@ class FavoritesScreen : Screen
 data class WikiArticle(
     val title: String,
     val pageId: Int,
-    val content: String,           // HTML контент
+    val content: String,           // HTML контент (без блока картинки)
     val links: List<WikiLink>,     // Внутренние ссылки
     val externalLinks: List<WikiExternalLink>, // Внешние ссылки
     val articleUrl: String,        // URL на сайте
+    val imageUrl: String?,         // URL картинки
+)
+```
+
+### UiWikiArticle (UI)
+```kotlin
+data class UiWikiArticle(
+    val title: String,
+    val content: String,
+    val links: List<UiWikiLink>,
+    val externalLinks: List<UiExternalLink>,
+    val articleUrl: String,
+    val imageUrl: String?,         // URL картинки
 )
 ```
 
@@ -166,14 +201,31 @@ sealed class UiWikiState {
 }
 ```
 
+## UI особенности
+
+### Иконка избранного
+- Красный цвет `#E53935` (Material Red 600) для активного состояния
+- `FavoriteBorder` для неактивного состояния
+
+### Карточка избранного
+- Фон: `surfaceContainerHigh`
+- Elevation: `2.dp`
+- Превью картинки: 80x80dp с placeholder
+
+### Картинка статьи
+- Ограничение высоты: `heightIn(max = 300.dp)`
+- Placeholder: `CircularProgressIndicator` 32dp
+- Скругление: `MaterialTheme.shapes.medium`
+
 ## Правила разработки
 
 - **Строковые ресурсы**: Все строки выносить в `strings.xml`
 - **MVI паттерн**: Actions → ViewModel → State/Effects
-- **Кэширование**: Статьи кэшируются автоматически
+- **Кэширование**: Статьи кэшируются автоматически с imageUrl
 - **Клавиатура**: Скрывается при кликах вне поля ввода
 - **Статус-бар**: Использовать `WindowInsets.statusBars` в Scaffold для корректного отображения
 - **Тема**: Применяется на уровне `RootWiki`, дочерние экраны не применяют тему отдельно
+- **Изображения**: Coil 3 с placeholder через `SubcomposeAsyncImage`
 
 ## Используемые библиотеки
 
@@ -181,4 +233,5 @@ sealed class UiWikiState {
 - **Hilt** — DI
 - **Room** — локальная база данных
 - **Retrofit** — API клиент
+- **Coil 3** — загрузка изображений
 - **Timber** — логирование
