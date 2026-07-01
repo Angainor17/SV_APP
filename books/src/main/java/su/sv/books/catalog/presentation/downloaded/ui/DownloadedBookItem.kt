@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -109,12 +108,13 @@ fun DownloadedBookItem(
             Spacer(modifier = Modifier.height(dimensions.itemSpacingSmall))
 
             // Кнопка "Читать"
-            OutlinedButton(
+            TextButton(
                 onClick = onReadClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.books_downloaded_read_button)
+                    text = stringResource(R.string.books_downloaded_read_button),
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }
