@@ -293,22 +293,114 @@ class BookDownloadRepository @Inject constructor(
 
     /**
      * Удаляет скачанный файл книги
+     * На Android 10+ файлы из Downloads нужно удалять через DownloadManager.remove()
      * @param uri URI файла для удаления
-     * @return true если удаление успешно, иначе false
+     * @return Result.success если удаление успешно, Result.failure с сообщением если нет
      */
-    fun deleteBook(uri: Uri): Boolean {
+    fun deleteBook(uri: Uri): Result<Boolean> {
+        Timber.d("Attempting to delete book: $uri, scheme=${uri.scheme}")
+
         return try {
-            val deletedRows = context.contentResolver.delete(uri, null, null)
-            val success = deletedRows > 0
-            if (success) {
-                Timber.d("Book deleted successfully: $uri")
-            } else {
-                Timber.w("Book deletion returned 0 rows: $uri")
+            // 1. Пытаемся найти downloadId через DownloadManager.Query()
+            val downloadId = findDownloadIdByUri(uri)
+
+            if (downloadId != null && downloadId > 0) {
+                // Удаляем через DownloadManager.remove() - это правильный способ для Android 10+
+                val removed = downloadManager.remove(downloadId)
+                Timber.d("DownloadManager.remove($downloadId) returned $removed")
+                if (removed > 0) {
+                    Timber.d("Book deleted successfully via DownloadManager: $uri")
+                    return Result.success(true)
+                }
             }
-            success
+
+            // 2. Если DownloadManager не помог, пытаемся через ContentResolver
+            if (uri.scheme == "content") {
+                try {
+                    val deletedRows = context.contentResolver.delete(uri, null, null)
+                    Timber.d("ContentResolver.delete() returned $deletedRows rows")
+                    if (deletedRows > 0) {
+                        Timber.d("Book deleted successfully via ContentResolver: $uri")
+                        return Result.success(true)
+                    }
+                } catch (e: SecurityException) {
+                    Timber.w(e, "SecurityException - cannot delete via ContentResolver (Scoped Storage)")
+                }
+            }
+
+            // 3. Если не удалось - возвращаем ошибку с понятным сообщением
+            Timber.w("Failed to delete book: $uri - Scoped Storage restriction")
+            Result.failure(Exception("Не удалось удалить файл. На Android 10+ приложение не может удалять файлы из папки Downloads, загруженные через систему."))
         } catch (e: Exception) {
             Timber.e(e, "Error deleting book: $uri")
-            false
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Найти ID загрузки в DownloadManager по URI
+     */
+    private fun findDownloadIdByUri(uri: Uri): Long? {
+        return try {
+            val query = DownloadManager.Query()
+            query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL)
+
+            val cursor = downloadManager.query(query) ?: return null
+
+            cursor.use {
+                val idColumn = it.getColumnIndex(DownloadManager.COLUMN_ID)
+                val localUriColumn = it.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+                val titleColumn = it.getColumnIndex(DownloadManager.COLUMN_TITLE)
+
+                while (it.moveToNext()) {
+                    val id = if (idColumn >= 0) it.getLong(idColumn) else -1
+                    val localUri = if (localUriColumn >= 0) it.getString(localUriColumn) else null
+                    val title = if (titleColumn >= 0) it.getString(titleColumn) else null
+
+                    // Проверяем совпадение по URI или по имени файла в URI
+                    if (uri.toString() == localUri || uri.toString().contains(localUri ?: "") || localUri?.contains(uri.toString()) == true) {
+                        Timber.d("Found downloadId=$id for uri=$uri (localUri=$localUri)")
+                        return id
+                    }
+
+                    // Проверяем совпадение по пути файла
+                    val uriPath = uri.path ?: uri.toString()
+                    if (localUri != null && localUri.contains(uriPath.substringAfterLast("/"))) {
+                        Timber.d("Found downloadId=$id by filename match (localUri=$localUri)")
+                        return id
+                    }
+                }
+            }
+
+            Timber.d("No downloadId found for uri=$uri")
+            null
+        } catch (e: Exception) {
+            Timber.e(e, "Error finding downloadId for uri=$uri")
+            null
+        }
+    }
+
+    /**
+     * Получить имя файла из URI
+     */
+    private fun getFileNameFromUri(uri: Uri): String? {
+        return try {
+            when (uri.scheme) {
+                "file" -> uri.path?.substringAfterLast("/")
+                "content" -> {
+                    val cursor = context.contentResolver.query(uri, null, null, null, null)
+                    cursor?.use {
+                        if (it.moveToFirst()) {
+                            val nameIndex = it.getColumnIndex(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+                            if (nameIndex >= 0) it.getString(nameIndex) else null
+                        } else null
+                    }
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting file name from URI: $uri")
+            null
         }
     }
 }

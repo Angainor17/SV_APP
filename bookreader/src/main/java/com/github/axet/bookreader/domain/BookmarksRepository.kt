@@ -327,17 +327,16 @@ class BookmarksRepository @Inject constructor(
             val bookTitle = json.optString("title", "Неизвестная книга")
             val bookAuthor = json.optString("authors", "")
 
-            // СНАЧАЛА получаем URI файла книги для навигации и поиска обложки
-            // Если не сохранён в JSON - ищем файл по MD5 в хранилище
-            val bookFileUri = json.optString("bookFileUri", null) ?: findBookFileUri(bookId)
+            // URI файла книги из JSON (на уровне книги) - fallback если в закладке не сохранён
+            val bookFileUriFromBook = json.optString("bookFileUri", null) ?: findBookFileUri(bookId)
 
             // Получаем coverUrl из JSON (сохранённый при загрузке книги)
             // Если не сохранён - ищем обложку по URI файла книги или MD5
             var coverPath = json.optString("coverUrl", null)
             if (coverPath == null) {
                 // Пытаемся найти обложку по URI файла книги (используя CacheImagesAdapter.cacheUri)
-                if (bookFileUri != null) {
-                    coverPath = findCoverByBookUri(bookFileUri)
+                if (bookFileUriFromBook != null) {
+                    coverPath = findCoverByBookUri(bookFileUriFromBook)
                 }
                 // Если не нашли - ищем по MD5 (альтернативный способ)
                 if (coverPath == null) {
@@ -357,6 +356,9 @@ class BookmarksRepository @Inject constructor(
                     // Обложка из закладки (сохранённая при создании), или fallback на обложку книги
                     val noteCoverPath = bookmarkJson.optString("coverUrl", null) ?: coverPath
 
+                    // URI файла книги из закладки (сохранённый при создании), или fallback на URI книги
+                    val noteBookFileUri = bookmarkJson.optString("bookFileUri", null) ?: bookFileUriFromBook
+
                     notes.add(
                         BookmarkData(
                             id = "${bookId}_${bookmarkJson.optLong("last")}",
@@ -364,7 +366,7 @@ class BookmarksRepository @Inject constructor(
                             bookTitle = bookTitle,
                             bookAuthor = bookAuthor,
                             bookCoverPath = noteCoverPath,
-                            bookFileUri = bookFileUri,
+                            bookFileUri = noteBookFileUri,
                             text = text,
                             name = bookmarkJson.optString("name").takeIf { it.isNotEmpty() },
                             page = calculatePageNumber(startArray?.optInt(0) ?: 0),

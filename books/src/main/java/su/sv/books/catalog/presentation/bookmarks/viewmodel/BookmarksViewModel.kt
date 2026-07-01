@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import su.sv.books.catalog.domain.CheckBookFileExistsUseCase
 import su.sv.books.catalog.domain.DeleteNoteUseCase
 import su.sv.books.catalog.domain.GetAllNotesUseCase
 import su.sv.books.catalog.domain.GetBooksWithNotesUseCase
@@ -29,6 +30,7 @@ class BookmarksViewModel @Inject constructor(
     private val getNotesForBookUseCase: GetNotesForBookUseCase,
     private val getBooksWithNotesUseCase: GetBooksWithNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val checkBookFileExistsUseCase: CheckBookFileExistsUseCase,
     private val mapper: UiBookmarkMapper,
     private val resourcesRepository: ResourcesRepository,
     private val viewModePrefsRepository: BookmarksViewModePrefsRepository,
@@ -73,7 +75,17 @@ class BookmarksViewModel @Inject constructor(
             }
 
             is BookmarksAction.OnNoteClick -> {
-                _effect.trySend(BookmarksEffect.OpenReader(action.note))
+                // Проверяем существование файла книги
+                val bookFileExists = checkBookFileExistsUseCase.execute(action.note.bookFileUri)
+                Timber.d("Note click: bookFileUri=${action.note.bookFileUri}, exists=$bookFileExists")
+
+                if (bookFileExists) {
+                    // Файл существует - открываем читалку
+                    _effect.trySend(BookmarksEffect.OpenReader(action.note))
+                } else {
+                    // Файл не существует - открываем карточку книги
+                    _effect.trySend(BookmarksEffect.OpenBookCard(action.note))
+                }
             }
 
             is BookmarksAction.OnBookCardClick -> {

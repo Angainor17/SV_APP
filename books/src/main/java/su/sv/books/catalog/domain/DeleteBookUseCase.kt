@@ -15,20 +15,11 @@ class DeleteBookUseCase @Inject constructor(
      * Удалить скачанную книгу
      * Примечание: JSON файл с заметками сохраняется и не удаляется
      * @param uri URI файла для удаления
-     * @return Result.success если удаление успешно, Result.failure при ошибке
+     * @return Result.success если удаление успешно, Result.failure при ошибке с описанием
      */
     fun execute(uri: Uri): Result<Boolean> {
-        return try {
-            // Удаляем только файл книги, но не JSON с заметками
-            // JSON файл остаётся в хранилище и заметки доступны
-            val success = downloadRepository.deleteBook(uri)
-            if (success) {
-                Result.success(true)
-            } else {
-                Result.failure(Exception("Failed to delete book"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        // Удаляем только файл книги, но не JSON с заметками
+        // JSON файл остаётся в хранилище и заметки доступны
+        return downloadRepository.deleteBook(uri)
     }
 }

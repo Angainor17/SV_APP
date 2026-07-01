@@ -457,6 +457,9 @@ class ReaderViewModel @Inject constructor(
         // Сохраняем coverUrl книги в закладке на момент создания
         bookmark.coverUrl = book.info?.coverUrl
 
+        // Сохраняем URI файла книги в закладке для навигации
+        bookmark.bookFileUri = book.url?.toString()
+
         book.info.bookmarks.add(bookmark)
         storage.save(book)
         fbReaderView?.bookmarksUpdate()
