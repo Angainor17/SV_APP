@@ -63,7 +63,7 @@ fun ExpandingText(
             Text(
                 text = labelText,
                 fontSize = fontSize,
-                color = MaterialTheme.colorScheme.onTertiary,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = modifier.clickable {
                     isExpanded = !isExpanded
                 },
