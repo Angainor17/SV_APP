@@ -114,6 +114,37 @@ class ArticleScreen(private val title: String) : Screen
 class FavoritesScreen : Screen
 ```
 
+## Поиск
+
+### API поиска
+Используется MediaWiki API `search` с параметром `srwhat=title`:
+- **Регистронезависимый** — "карл" найдёт "Маркс, Карл"
+- **Поиск по всему заголовку** — не только по началу названия
+- **Минимальная длина запроса** — 2 символа для suggestions, 3 символа для поиска статьи
+
+### Методы поиска
+- `searchArticle(query)` — поиск статьи (возвращает первую найденную)
+- `getSearchSuggestions(query, limit)` — автодополнение (возвращает список заголовков)
+
+### Фильтрация suggestions
+Suggestions не показываются если:
+1. `selectedSuggestion != null` —刚刚 выбрали suggestion и текст в поле
+2. Suggestion совпадает с заголовком **текущей отображаемой статьи**
+
+```kotlin
+val filteredSuggestions = suggestions.filter { suggestion ->
+    suggestion != currentArticleTitle
+}
+```
+
+### Логирование поиска
+Все запросы поиска логируются с тегом `"voronin"` через Timber:
+
+```
+searchArticle: query='ленин', results=2, first='Ленин говорит, содержание'
+getSearchSuggestions: query='карл', results=2, titles=[Каутский, Карл, Маркс, Карл]
+```
+
 ## Изображения статей
 
 Изображения извлекаются из HTML-контента статьи:
@@ -126,13 +157,6 @@ class FavoritesScreen : Screen
 - Загрузка через **Coil 3** (`SubcomposeAsyncImage`)
 
 URL картинки сохраняется в базе данных явно в полях `imageUrl`.
-
-## Поиск
-
-Используется API `search` с `srwhat=title`:
-- Регистронезависимый поиск ("карл" найдёт "Маркс, Карл")
-- Поиск по всему заголовку, не только по началу
-- Минимальная длина запроса — 2 символа
 
 ## Кэширование статей
 
@@ -159,8 +183,8 @@ URL картинки сохраняется в базе данных явно в
 Базовый URL: `https://svremya.su/`
 
 **Методы:**
-- `search()` — поиск статей по заголовкам (srwhat=title)
-- `getPage()` — получение статьи по заголовку
+- `search(query, what="title", limit)` — поиск статей по заголовкам
+- `getPage(title)` — получение статьи по заголовку
 - `openSearch()` — устаревший метод (не используется)
 
 ## Модели
@@ -204,7 +228,8 @@ sealed class UiWikiState {
 ## UI особенности
 
 ### Иконка избранного
-- Красный цвет `#E53935` (Material Red 600) для активного состояния
+- Цвет из темы: `MaterialTheme.colorScheme.favorite`
+- Красный `#E53935` (Material Red 600) для обеих тем
 - `FavoriteBorder` для неактивного состояния
 
 ### Карточка избранного
@@ -217,6 +242,11 @@ sealed class UiWikiState {
 - Placeholder: `CircularProgressIndicator` 32dp
 - Скругление: `MaterialTheme.shapes.medium`
 
+### Подсказки поиска (SearchSuggestions)
+- Анимация: `expandVertically/shrinkVertically`
+- Показываются над контентом
+- Фильтруются (не показывают текущую статью)
+
 ## Правила разработки
 
 - **Строковые ресурсы**: Все строки выносить в `strings.xml`
@@ -226,6 +256,7 @@ sealed class UiWikiState {
 - **Статус-бар**: Использовать `WindowInsets.statusBars` в Scaffold для корректного отображения
 - **Тема**: Применяется на уровне `RootWiki`, дочерние экраны не применяют тему отдельно
 - **Изображения**: Coil 3 с placeholder через `SubcomposeAsyncImage`
+- **Логирование**: Timber с тегом `"voronin"` для запросов поиска
 
 ## Используемые библиотеки
 

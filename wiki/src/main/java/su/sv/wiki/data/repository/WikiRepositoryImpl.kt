@@ -39,10 +39,12 @@ class WikiRepositoryImpl @Inject constructor(
 
     override suspend fun searchArticle(query: String): WikiResult<WikiSearchResult> {
         return try {
-            val response = api.search(query = query)
+            // Используем search с srwhat=title для поиска по заголовкам
+            val response = api.search(query = query, what = "title")
 
             when {
                 !response.isSuccessful -> {
+                    Timber.tag("voronin").d("searchArticle: query='$query', error: code=${response.code()}")
                     WikiResult.Error(
                         message = "Ошибка сети: ${response.code()}",
                         code = response.code().toString(),
@@ -50,11 +52,14 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 response.body()?.query?.search.isNullOrEmpty() -> {
+                    Timber.tag("voronin").d("searchArticle: query='$query', results=0 (NotFound)")
                     WikiResult.NotFound
                 }
 
                 else -> {
-                    val searchItem = response.body()!!.query!!.search!!.first()
+                    val searchResults = response.body()!!.query!!.search!!
+                    val searchItem = searchResults.first()
+                    Timber.tag("voronin").d("searchArticle: query='$query', results=${searchResults.size}, first='${searchItem.title}'")
                     WikiResult.Success(
                         WikiSearchResult(
                             title = searchItem.title.orEmpty(),
@@ -65,7 +70,7 @@ class WikiRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error searching article: $query")
+            Timber.tag("voronin").e(e, "searchArticle: query='$query', exception")
             WikiResult.Error(
                 message = e.message ?: "Неизвестная ошибка",
                 code = "NETWORK_ERROR",
@@ -147,20 +152,26 @@ class WikiRepositoryImpl @Inject constructor(
 
     override suspend fun getSearchSuggestions(query: String, limit: Int): List<WikiSearchSuggestion> {
         return try {
-            if (query.length < 2) return emptyList()
+            if (query.length < 2) {
+                Timber.tag("voronin").d("getSearchSuggestions: query='$query' (too short, skipped)")
+                return emptyList()
+            }
 
             // Используем search с srwhat=title для поиска по заголовкам (не только по началу)
             val response = api.search(query = query, what = "title", limit = limit)
 
             if (!response.isSuccessful || response.body()?.query?.search == null) {
+                Timber.tag("voronin").d("getSearchSuggestions: query='$query', error: not successful or null")
                 return emptyList()
             }
 
-            response.body()!!.query!!.search!!.map { item ->
+            val results = response.body()!!.query!!.search!!.map { item ->
                 WikiSearchSuggestion(title = item.title.orEmpty())
             }
+            Timber.tag("voronin").d("getSearchSuggestions: query='$query', results=${results.size}, titles=${results.map { it.title }}")
+            results
         } catch (e: Exception) {
-            Timber.e(e, "Error getting search suggestions: $query")
+            Timber.tag("voronin").e(e, "getSearchSuggestions: query='$query', exception")
             emptyList()
         }
     }
