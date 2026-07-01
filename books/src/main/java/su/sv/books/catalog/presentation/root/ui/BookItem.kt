@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -41,6 +43,7 @@ import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
+import su.sv.commonui.theme.DarkSurfaceContainerHighest
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.commonui.ui.components.AppLoadingIndicator
@@ -95,7 +98,10 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
 private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions) {
     val dimensions = LocalAppDimensions.current
 
-    androidx.compose.material3.Button(
+    // Более тёмный фон для кнопки скачивания, чтобы быть видимым на светлой обложке
+    val containerColor = DarkSurfaceContainerHighest
+
+    Button(
         onClick = {
             when (item.downloadState) {
                 UIBookState.DOWNLOADED -> {
@@ -114,9 +120,9 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
         contentPadding = PaddingValues(all = 3.dp),
         shape = CircleShape,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            contentColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = containerColor,
         ),
         modifier = Modifier
             .align(Alignment.TopEnd)
