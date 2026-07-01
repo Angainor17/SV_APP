@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +34,7 @@ import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.favorite
 import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.components.AppToolbarWithBack
@@ -151,7 +151,7 @@ private fun ArticleTopAppBar(
                     } else {
                         stringResource(R.string.wiki_add_favorite)
                     },
-                    tint = if (isFavorite) Color(0xFFE53935) else MaterialTheme.colorScheme.onSurface, // Красный для избранного
+                    tint = if (isFavorite) MaterialTheme.colorScheme.favorite else MaterialTheme.colorScheme.onSurface,
                 )
             }
             // Кнопка открытия в браузере

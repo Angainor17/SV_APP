@@ -48,6 +48,7 @@ import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.favorite
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.FullScreenError
 import su.sv.commonui.ui.components.FullScreenLoading
@@ -152,7 +153,7 @@ fun RootWiki(
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = stringResource(R.string.wiki_favorites),
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.favorite,
                         )
                     }
                 }
