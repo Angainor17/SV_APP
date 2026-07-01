@@ -4,7 +4,7 @@
 
 ## Обзор
 
-Модуль `books` отвечает за отображение каталога книг, детальную информацию о книге и скачивание файлов.
+Модуль `books` отвечает за отображение каталога книг, детальную информацию о книге, скачивание файлов и управление заметками.
 
 ## Архитектура
 
@@ -25,12 +25,20 @@ catalog/
 │   ├── GetBooksListUseCase.kt   # Получение списка
 │   ├── DownloadBookUseCase.kt   # Скачивание книги
 │   ├── GetBookUriUseCase.kt     # Получение URI файла
-│   └── model/Book.kt
+│   └── model/
+│       ├── Book.kt              # Модель книги
+│       └── BookmarkNote.kt      # Модель заметки с cleanBookmarkText()
 ├── presentation/
 │   ├── CommonDownloadBookStates.kt
 │   ├── base/BaseBookViewModel.kt
 │   ├── root/                    # Список книг
-│   └── detail/                  # Детали книги
+│   ├── detail/                  # Детали книги
+│   └── bookmarks/               # Заметки
+│       ├── mapper/UiBookmarkMapper.kt  # Маппер с очисткой текста
+│       ├── ui/
+│       │   ├── NoteItem.kt      # Элемент заметки
+│       │   └── BookWithNotesItem.kt
+│       └── viewmodel/BookmarksViewModel.kt
 └── di/BooksApiModule.kt
 ```
 
@@ -104,6 +112,30 @@ data class Book(
 )
 ```
 
+### BookmarkNote
+Доменная модель заметки из книги:
+
+```kotlin
+data class BookmarkNote(
+    val id: String,
+    val bookId: String,
+    val bookTitle: String,
+    val bookAuthor: String,
+    val bookCoverUrl: String,
+    val bookFileUri: String?,
+    val text: String,           // Текст заметки
+    val name: String?,          // Название заметки (опционально)
+    val page: Int,
+    val createdAt: Long,
+    val startParagraph: Int,    // Позиция для навигации
+    val startElement: Int,
+    val startChar: Int,
+    val endParagraph: Int,
+    val endElement: Int,
+    val endChar: Int,
+)
+```
+
 ### UiBookDetailState
 Состояние экрана деталей:
 
@@ -114,6 +146,53 @@ sealed class UiBookDetailState {
     data class Error(val message: String) : UiBookDetailState()
 }
 ```
+
+## Заметки
+
+### Функция очистки текста
+
+FBReader вставляет специальные символы в текст заметок:
+- `U+FFFE` (65534) — маркер переноса слов
+- Управляющие символы
+
+Функция `cleanBookmarkText()` в domain слое очищает текст:
+
+```kotlin
+// BookmarkNote.kt
+fun cleanBookmarkText(text: String): String {
+    return text
+        .replace(Regex("[\\uFFFE\\uFFFF]"), "")  // FBReader markers
+        .replace(Regex("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]"), "")  // Control chars
+        .replace("\r\n", " ")
+        .replace("\n", " ")
+        .replace("\r", " ")
+        .replace(Regex("\\[image]"), "")
+        .replace(Regex("\\[\\d+]"), "")
+        .trim()
+        .replace(Regex("  +"), " ")
+}
+```
+
+### Маппер заметок
+
+Текст очищается при маппинге BookmarkNote → UiBookmarkNote:
+
+```kotlin
+// UiBookmarkMapper.kt
+fun mapNote(domain: BookmarkNote): UiBookmarkNote {
+    return UiBookmarkNote(
+        ...
+        text = cleanBookmarkText(domain.text),  // Очистка в domain слое
+        ...
+    )
+}
+```
+
+### Экран заметок
+
+Два режима отображения:
+- **LIST** — список всех заметок в хронологическом порядке
+- **BY_BOOK** — список книг с количеством заметок
 
 ## Скачивание
 
@@ -151,7 +230,9 @@ books/src/main/java/su/sv/books/catalog/
 │   ├── repo/
 │   └── receivers/
 ├── domain/
-│   ├── model/Book.kt
+│   ├── model/
+│   │   ├── Book.kt
+│   │   └── BookmarkNote.kt     # Модель заметки + cleanBookmarkText()
 │   ├── GetBooksListUseCase.kt
 │   ├── DownloadBookUseCase.kt
 │   └── GetBookUriUseCase.kt
@@ -169,7 +250,12 @@ books/src/main/java/su/sv/books/catalog/
     │   └── ...
     ├── bookmarks/
     │   ├── nav/BookmarksScreen.kt
-    │   ├── ui/BookmarksScreen.kt
+    │   ├── model/UiBookmarkNote.kt
+    │   ├── mapper/UiBookmarkMapper.kt  # Маппер с очисткой текста
+    │   ├── ui/
+    │   │   ├── NoteItem.kt
+    │   │   ├── BookWithNotesItem.kt
+    │   │   └── DeleteNoteDialog.kt
     │   └── viewmodel/BookmarksViewModel.kt
     └── downloaded/
         ├── ui/DownloadedBooksScreen.kt

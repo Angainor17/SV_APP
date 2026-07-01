@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.axet.bookreader.R
+import com.github.axet.bookreader.domain.cleanBookmarkText
 
 /**
  * Цвета для закладок
@@ -102,7 +103,7 @@ fun BookmarkBottomSheet(
 
             // Текст закладки (только для чтения)
             Text(
-                text = bookmarkText,
+                text = cleanBookmarkText(bookmarkText),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,

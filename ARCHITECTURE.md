@@ -497,6 +497,55 @@ formatting:
 
 ---
 
+## Логирование
+
+### Правила логирования
+
+**Все логи приложения должны использовать Timber с тегом "voronin"!**
+
+```kotlin
+// Правильно
+Timber.tag("voronin").d("message: $data")
+Timber.tag("voronin").e(exception, "error message")
+
+// Неправильно
+Timber.d("message")  // без тега
+Log.d("tag", "message")  // устаревший Android Log
+println("message")  // консольный вывод
+```
+
+### Когда использовать
+
+- **Debug**: для отладки и анализа данных
+- **Error**: для ошибок и исключений
+- **Info**: для важных событий (запуск, завершение)
+- **Warning**: для предупреждений
+
+### Примеры
+
+```kotlin
+// В Repository - логирование запросов
+Timber.tag("voronin").d("searchArticle: query='$query', results=$count")
+
+// В UseCase - логирование действий
+Timber.tag("voronin").d("GetItemsUseCase: loading items")
+
+// В ViewModel - логирование state изменений
+Timber.tag("voronin").d("onAction: $action")
+
+// При ошибках
+Timber.tag("voronin").e(e, "Failed to load data")
+```
+
+### Почему "voronin"
+
+Тег "voronin" позволяет:
+- Быстро фильтровать логи в Logcat
+- Отделять логи приложения от системных логов
+- Унифицировать логирование across все модули
+
+---
+
 ## Чек-лист создания нового экрана
 
 1. [ ] Создать структуру папок (`data/`, `domain/`, `presentation/`, `di/`)

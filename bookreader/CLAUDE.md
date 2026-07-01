@@ -70,6 +70,66 @@ Application класс для инициализации:
 class BookApplication : Application()
 ```
 
+## Закладки
+
+### Storage.Bookmark
+
+Java класс для хранения закладок:
+
+```java
+public static class Bookmark {
+    public long last;
+    public String name;
+    public String text;           // Текст закладки (с FBReader markers)
+    public int color;
+    public ZLTextPosition start;
+    public ZLTextPosition end;
+    public String coverUrl;
+    public String bookFileUri;
+}
+```
+
+### Функция очистки текста
+
+FBReader вставляет специальные символы в текст закладок:
+- `U+FFFE` (65534) — маркер переноса слов
+- Управляющие символы
+- Маркеры `[image]`, `[1]`, `[2]`
+
+Функция `cleanBookmarkText()` в domain слое очищает текст:
+
+```kotlin
+// domain/BookmarkTextUtils.kt
+fun cleanBookmarkText(text: String): String {
+    return text
+        .replace(Regex("[\\uFFFE\\uFFFF]"), "")  // FBReader markers
+        .replace(Regex("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]"), "")  // Control chars
+        .replace("\r\n", " ")
+        .replace("\n", " ")
+        .replace("\r", " ")
+        .replace(Regex("\\[image]"), "")
+        .replace(Regex("\\[\\d+]"), "")
+        .trim()
+        .replace(Regex("  +"), " ")
+}
+```
+
+Используется при отображении:
+- `screens/ui/BookmarksComposeDialog.kt` — список закладок
+- `screens/ui/BookmarkBottomSheet.kt` — редактирование закладки
+
+### Диалог закладок
+
+```kotlin
+@Composable
+fun BookmarksComposeDialog(
+    book: Storage.Book?,
+    fbReaderView: FBReaderView?,
+    onDismiss: () -> Unit,
+    onDelete: (Storage.Bookmark) -> Unit,
+)
+```
+
 ## Структура файлов
 
 ```
@@ -79,11 +139,23 @@ bookreader/src/main/java/com/github/axet/bookreader/
 │   ├── FullscreenActivity.kt
 │   ├── SettingsActivity.kt
 │   └── ActivityExt.kt
+├── domain/
+│   ├── BookmarksRepository.kt
+│   └── BookmarkTextUtils.kt     # cleanBookmarkText()
+├── screens/
+│   └── ui/
+│       ├── BookmarksComposeDialog.kt  # Диалог списка закладок
+│       └── BookmarkBottomSheet.kt     # BottomSheet редактирования
 ├── fragments/
 │   ├── ReaderFragment.kt
 │   └── LibraryFragment.kt
+├── widgets/
+│   ├── BookmarkPopup.kt
+│   ├── ZLBookmark.kt
+│   └── ...
 └── app/
     ├── BookApplication.kt
+    ├── Storage.java            # Legacy Java class с Bookmark
     └── PermissionHelper.kt
 ```
 
@@ -95,7 +167,7 @@ bookreader/src/main/java/com/github/axet/bookreader/
 
 ## Миграция на Kotlin
 
-### Статус миграции (обновлено 2026-06-06)
+### Статус миграции (обновлено 2026-07-02)
 
 **Мигрированные файлы:**
 - activities/ (все файлы)
@@ -125,6 +197,9 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - widgets/ZLTextIndexPosition.kt (выделен из FBReaderView.java)
 - widgets/ZLBookmark.kt (выделен из FBReaderView.java)
 - widgets/BrightnessGesture.kt (выделен из FBReaderView.java)
+- domain/BookmarkTextUtils.kt (новый)
+- screens/ui/BookmarksComposeDialog.kt (Compose диалог)
+- screens/ui/BookmarkBottomSheet.kt (Compose bottomSheet)
 
 **Оставшиеся Java файлы (3 файла) - в процессе декомпозиции:**
 - `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки
