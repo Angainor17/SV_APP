@@ -280,6 +280,9 @@ fun ReaderContent(
                                             viewModel.clearSavedPosition()
                                         }
 
+                                        // Обновляем возможность смены шрифта
+                                        viewModel.updateCanChangeFont()
+
                                         isLoaded = true
                                         Timber.d("Book loaded successfully")
                                     } catch (e: Exception) {

@@ -79,6 +79,7 @@ import org.geometerplus.fbreader.util.AutoTextSnippet;
 import org.geometerplus.fbreader.util.TextSnippet;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.application.ZLApplicationWindow;
+import org.geometerplus.zlibrary.core.library.ZLibrary;
 import org.geometerplus.zlibrary.core.options.Config;
 import org.geometerplus.zlibrary.core.options.StringPair;
 import org.geometerplus.zlibrary.core.options.ZLOption;
@@ -1394,16 +1395,42 @@ public class FBReaderView extends RelativeLayout {
         gotoPosition(scrollDelayed);
     }
 
+    /**
+     * Проверяет возможность смены шрифта.
+     * Шрифт можно менять для:
+     * - FB2/EPUB/MOBI (pluginview == null)
+     * - PDF/DJVU в режиме reflow (pluginview != null && pluginview.reflow = true)
+     */
+    public boolean canChangeFont() {
+        if (pluginview == null) {
+            // Текстовые форматы (FB2/EPUB/MOBI) - шрифт можно менять всегда
+            return true;
+        }
+        // PDF/DJVU - шрифт можно менять только в режиме reflow
+        return pluginview.reflow;
+    }
+
     public int getFontsizeFB() {
+        // Возвращаем значение в исходных единицах (без DPI) для UI
+        int dpiValue;
         if (book.info.fontsize != null)
-            return book.info.fontsize;
-        return app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue();
+            dpiValue = book.info.fontsize;
+        else
+            dpiValue = app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue();
+        // Делим на DPI чтобы получить исходное значение
+        return dpiValue * 160 / ZLibrary.Instance().getDisplayDPI();
     }
 
     public void setFontsizeFB(int p) {
-        book.info.fontsize = p;
-        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, p);
+        // Умножаем на DPI чтобы значение было в тех же единицах как FontSizeOption
+        // FontSizeOption создаётся с fontSize * DPI / 160 в ZLTextBaseStyle
+        int dpiScaled = p * ZLibrary.Instance().getDisplayDPI() / 160;
+        book.info.fontsize = dpiScaled;
+        config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, dpiScaled);
+        // Сохраняем позицию перед reset, как в setFontsizeReflow
+        ZLTextPosition scrollDelayed = getPosition();
         resetCaches();
+        gotoPosition(scrollDelayed);
     }
 
     public boolean getIgnoreCssFonts() {
@@ -1412,12 +1439,18 @@ public class FBReaderView extends RelativeLayout {
 
     public void setIgnoreCssFonts(boolean b) {
         config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption, !b);
+        // Сохраняем позицию перед reset
+        ZLTextPosition scrollDelayed = getPosition();
         resetCaches();
+        gotoPosition(scrollDelayed);
     }
 
     public void setFontFB(String f) {
         config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption, f);
+        // Сохраняем позицию перед reset
+        ZLTextPosition scrollDelayed = getPosition();
         resetCaches();
+        gotoPosition(scrollDelayed);
     }
 
     public Float getFontsizeReflow() {

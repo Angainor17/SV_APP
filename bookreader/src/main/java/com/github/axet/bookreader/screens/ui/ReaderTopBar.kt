@@ -72,13 +72,15 @@ fun ReaderTopBar(
                 )
             }
 
-            // Font size
-            IconButton(onClick = { onAction(ReaderActions.ToggleFontSettings) }) {
-                Icon(
-                    painter = androidx.compose.ui.res.painterResource(R.drawable.ic_format_size_white_24dp),
-                    contentDescription = "Font Settings",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+            // Font size - показываем только если шрифт можно менять
+            if (state.canChangeFont) {
+                IconButton(onClick = { onAction(ReaderActions.ToggleFontSettings) }) {
+                    Icon(
+                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_format_size_white_24dp),
+                        contentDescription = "Font Settings",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
 
             // More options menu
