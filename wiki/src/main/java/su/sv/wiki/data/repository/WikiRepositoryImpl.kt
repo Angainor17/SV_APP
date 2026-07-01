@@ -114,8 +114,11 @@ class WikiRepositoryImpl @Inject constructor(
 
                 else -> {
                     val parseData = response.body()!!.parse!!
-                    val htmlContent = parseData.text?.content.orEmpty()
+                    val rawHtmlContent = parseData.text?.content.orEmpty()
                     val articleTitle = parseData.title.orEmpty()
+                    val imageUrl = extractImageUrl(rawHtmlContent)
+                    // Удаляем блок картинки из контента, чтобы URL не отображался как текст
+                    val htmlContent = removeImageBlock(rawHtmlContent, imageUrl)
                     val article = WikiArticle(
                         title = articleTitle,
                         pageId = parseData.pageId ?: 0,
@@ -123,11 +126,12 @@ class WikiRepositoryImpl @Inject constructor(
                         links = parseData.links?.map { it.toDomain() }.orEmpty(),
                         externalLinks = parseExternalLinks(htmlContent),
                         articleUrl = "https://svremya.su/${articleTitle.replace(" ", "_")}",
+                        imageUrl = imageUrl,
                     )
 
                     // Сохраняем в кэш
                     articleCacheDao.insertArticle(article.toCacheEntity(gson))
-                    Timber.d("Article cached: $articleTitle")
+                    Timber.d("Article cached: $articleTitle, imageUrl: $imageUrl")
 
                     WikiResult.Success(article)
                 }
@@ -145,17 +149,15 @@ class WikiRepositoryImpl @Inject constructor(
         return try {
             if (query.length < 2) return emptyList()
 
-            val response = api.openSearch(query = query, limit = limit)
+            // Используем search с srwhat=title для поиска по заголовкам (не только по началу)
+            val response = api.search(query = query, what = "title", limit = limit)
 
-            if (!response.isSuccessful || response.body() == null) {
+            if (!response.isSuccessful || response.body()?.query?.search == null) {
                 return emptyList()
             }
 
-            val body = response.body()!!
-            val titles = body.getOrNull(1) as? List<*> ?: return emptyList()
-
-            titles.mapNotNull { title ->
-                (title as? String)?.let { WikiSearchSuggestion(title = it) }
+            response.body()!!.query!!.search!!.map { item ->
+                WikiSearchSuggestion(title = item.title.orEmpty())
             }
         } catch (e: Exception) {
             Timber.e(e, "Error getting search suggestions: $query")
@@ -257,6 +259,7 @@ class WikiRepositoryImpl @Inject constructor(
             links = links,
             externalLinks = externalLinks,
             articleUrl = this.articleUrl,
+            imageUrl = this.imageUrl,
         )
     }
 
@@ -267,6 +270,7 @@ class WikiRepositoryImpl @Inject constructor(
             links = gson.toJson(this.links),
             externalLinks = gson.toJson(this.externalLinks),
             articleUrl = this.articleUrl,
+            imageUrl = this.imageUrl,
             savedAt = System.currentTimeMillis(),
         )
     }
@@ -296,6 +300,7 @@ class WikiRepositoryImpl @Inject constructor(
             links = links,
             externalLinks = externalLinks,
             articleUrl = this.articleUrl,
+            imageUrl = this.imageUrl,
         )
     }
 
@@ -306,6 +311,7 @@ class WikiRepositoryImpl @Inject constructor(
             links = gson.toJson(this.links),
             externalLinks = gson.toJson(this.externalLinks),
             articleUrl = this.articleUrl,
+            imageUrl = this.imageUrl,
             cachedAt = System.currentTimeMillis(),
         )
     }
@@ -324,5 +330,50 @@ class WikiRepositoryImpl @Inject constructor(
                 text = match.groupValues[2].trim(),
             )
         }.filter { it.text.isNotEmpty() }.toList()
+    }
+
+    /**
+     * Извлекает URL картинки из HTML-контента
+     * Ищет:
+     * 1. Ссылку на JPG/PNG в контейнере extimg (специфика svremya.su)
+     * 2. Тег <img> с src атрибутом
+     */
+    private fun extractImageUrl(html: String): String? {
+        // Сперва ищем ссылку на картинку в контейнере extimg (специфика сайта svremya.su)
+        val extImgRegex = """<div[^>]*class="extimg[^"]*"[^>]*>.*?<a[^>]*href="([^"]+\.(?:jpg|jpeg|png|gif|webp))"[^>]*>""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val extImgMatch = extImgRegex.find(html)
+        if (extImgMatch != null) {
+            return extImgMatch.groupValues[1]
+        }
+
+        // Если не нашли в extimg, ищем обычный тег img с src атрибутом
+        val imgRegex = """<img[^>]*src="([^"]+)"[^>]*>""".toRegex()
+        val imgMatch = imgRegex.find(html)
+
+        if (imgMatch != null) {
+            val src = imgMatch.groupValues[1]
+            // Если это относительный путь, добавляем базовый URL
+            return if (src.startsWith("http")) {
+                src
+            } else if (src.startsWith("/")) {
+                "https://svremya.su$src"
+            } else {
+                "https://svremya.su/$src"
+            }
+        }
+
+        return null
+    }
+
+    /**
+     * Удаляет блок с картинкой из HTML-контента
+     * Чтобы URL картинки не отображался как текст в статье
+     */
+    private fun removeImageBlock(html: String, imageUrl: String?): String {
+        if (imageUrl == null) return html
+
+        // Удаляем весь div с классом extimg, содержащий ссылку на эту картинку
+        val extImgBlockRegex = """<div[^>]*class="extimg[^"]*"[^>]*>.*?</div>""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        return extImgBlockRegex.replace(html, "")
     }
 }

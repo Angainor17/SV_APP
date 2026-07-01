@@ -14,5 +14,6 @@ data class ArticleCacheEntity(
     val links: String,             // JSON строка со списком внутренних ссылок
     val externalLinks: String,     // JSON строка со списком внешних ссылок
     val articleUrl: String,        // URL статьи на сайте
+    val imageUrl: String?,         // URL картинки из статьи (если есть)
     val cachedAt: Long,            // Timestamp кэширования
 )

@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -95,6 +96,7 @@ fun ArticleScreenContent(
                     content = currentState.article.content,
                     links = currentState.article.links,
                     externalLinks = currentState.article.externalLinks,
+                    imageUrl = currentState.article.imageUrl,
                     onLinkClick = { title ->
                         stackNavigation.forward(ArticleScreen(title = title))
                     },
@@ -149,7 +151,7 @@ private fun ArticleTopAppBar(
                     } else {
                         stringResource(R.string.wiki_add_favorite)
                     },
-                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    tint = if (isFavorite) Color(0xFFE53935) else MaterialTheme.colorScheme.onSurface, // Красный для избранного
                 )
             }
             // Кнопка открытия в браузере

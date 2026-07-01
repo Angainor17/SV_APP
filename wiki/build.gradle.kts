@@ -28,6 +28,9 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
 
+    // Image loading
+    implementation(libs.bundles.coil)
+
     // Navigation
     implementation(libs.modo.compose)
 
