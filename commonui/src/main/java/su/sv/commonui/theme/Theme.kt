@@ -155,6 +155,13 @@ val ColorScheme.danger: Color
     @ReadOnlyComposable
     get() = FunctionalDanger
 
+/**
+ * Цвет избранного (красный для обеих тем)
+ */
+val ColorScheme.favorite: Color
+    @ReadOnlyComposable
+    get() = FavoriteColor
+
 // ============================================================
 // COMPOSITION LOCAL
 // ============================================================

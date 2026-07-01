@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.theme.favorite
 import su.sv.wiki.R
 import su.sv.wiki.presentation.root.model.UiExternalLink
 import su.sv.wiki.presentation.root.model.UiWikiArticle
@@ -67,7 +68,7 @@ fun ArticleView(
                         } else {
                             stringResource(R.string.wiki_add_favorite)
                         },
-                        tint = if (isFavorite) Color(0xFFE53935) else Color.Gray, // Красный для избранного
+                        tint = if (isFavorite) MaterialTheme.colorScheme.favorite else Color.Gray, // Красный для избранного
                     )
                 }
             }
