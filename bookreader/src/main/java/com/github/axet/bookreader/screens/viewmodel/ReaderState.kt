@@ -25,6 +25,8 @@ sealed class ReaderState {
         val editingBookmark: Storage.Bookmark? = null,
         val viewMode: ViewMode = ViewMode.PAGING,
         val isReflow: Boolean = false,
+        /** Можно ли менять шрифт (FB2/EPUB/MOBI или PDF в режиме reflow) */
+        val canChangeFont: Boolean = true,
         /** Флаг: были ли показаны подсказки зон касания при открытии книги */
         val hasShownControlsHint: Boolean = false,
     ) : ReaderState()

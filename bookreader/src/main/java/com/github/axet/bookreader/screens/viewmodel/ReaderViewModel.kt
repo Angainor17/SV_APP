@@ -55,6 +55,17 @@ class ReaderViewModel @Inject constructor(
     fun getOnBookPagerManager(): OnBookPagerManager = onBookPagerManager
 
     /**
+     * Обновляет возможность смены шрифта после создания FBReaderView
+     */
+    fun updateCanChangeFont() {
+        val canChange = fbReaderView?.canChangeFont() ?: true
+        val currentState = _state.value as? ReaderState.Content ?: return
+        if (currentState.canChangeFont != canChange) {
+            _state.value = currentState.copy(canChangeFont = canChange)
+        }
+    }
+
+    /**
      * Обработка действий пользователя
      */
     fun onAction(action: ReaderActions) {
@@ -161,6 +172,9 @@ class ReaderViewModel @Inject constructor(
 
                 // Создаём обложку если её нет
                 ensureCoverCreated(currentBook, currentFBook)
+
+                // Определяем возможность смены шрифта после создания FBReaderView
+                // (canChangeFont требует pluginview который создаётся позже)
 
                 // Обновляем состояние
                 val currentState = ReaderState.Content(
@@ -331,7 +345,13 @@ class ReaderViewModel @Inject constructor(
     private fun toggleReflow() {
         val currentState = _state.value as? ReaderState.Content ?: return
         fbReaderView?.setReflow(!fbReaderView!!.isReflow)
-        _state.value = currentState.copy(isReflow = !currentState.isReflow)
+        val newReflow = !currentState.isReflow
+        // При переключении reflow обновляем возможность смены шрифта
+        val canChange = fbReaderView?.canChangeFont() ?: true
+        _state.value = currentState.copy(
+            isReflow = newReflow,
+            canChangeFont = canChange
+        )
     }
 
     /**
