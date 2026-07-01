@@ -166,10 +166,10 @@ class DownloadedBooksViewModel @Inject constructor(
                         }
                     }
                 },
-                onFailure = {
-                    _effect.trySend(DownloadedBookEffect.ShowError(
-                        resourcesRepository.getString(su.sv.books.R.string.books_download_snack_error)
-                    ))
+                onFailure = { error ->
+                    // Показываем конкретное сообщение об ошибке
+                    val errorMessage = error.message ?: resourcesRepository.getString(su.sv.books.R.string.books_download_snack_error)
+                    _effect.trySend(DownloadedBookEffect.ShowError(errorMessage))
                 }
             )
         }

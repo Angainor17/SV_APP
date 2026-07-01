@@ -1282,6 +1282,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         public ZLTextPosition start;
         public ZLTextPosition end;
         public String coverUrl; // обложка книги на момент создания закладки
+        public String bookFileUri; // URI файла книги для навигации
 
         public Bookmark() {
         }
@@ -1294,6 +1295,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             start = b.start;
             end = b.end;
             coverUrl = b.coverUrl;
+            bookFileUri = b.bookFileUri;
         }
 
         public Bookmark(String t, ZLTextPosition s, ZLTextPosition e) {
@@ -1315,6 +1317,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             start = loadPosition(j.optJSONArray("start"));
             end = loadPosition(j.optJSONArray("end"));
             coverUrl = j.optString("coverUrl", null);
+            bookFileUri = j.optString("bookFileUri", null);
         }
 
         public JSONObject save() throws JSONException {
@@ -1332,6 +1335,8 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 j.put("end", e);
             if (coverUrl != null)
                 j.put("coverUrl", coverUrl);
+            if (bookFileUri != null)
+                j.put("bookFileUri", bookFileUri);
             return j;
         }
 
