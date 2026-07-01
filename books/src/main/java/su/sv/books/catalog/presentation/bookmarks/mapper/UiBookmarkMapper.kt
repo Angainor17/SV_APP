@@ -2,6 +2,7 @@ package su.sv.books.catalog.presentation.bookmarks.mapper
 
 import su.sv.books.catalog.domain.model.BookWithNotes
 import su.sv.books.catalog.domain.model.BookmarkNote
+import su.sv.books.catalog.domain.model.cleanBookmarkText
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookWithNotes
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote
 import javax.inject.Inject
@@ -16,7 +17,7 @@ class UiBookmarkMapper @Inject constructor() {
             bookAuthor = domain.bookAuthor,
             bookCoverUrl = domain.bookCoverUrl,
             bookFileUri = domain.bookFileUri,
-            text = domain.text,
+            text = cleanBookmarkText(domain.text), // Очищаем текст от лишних символов
             name = domain.name,
             page = domain.page,
             createdAt = domain.createdAt,

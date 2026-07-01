@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.Storage
+import com.github.axet.bookreader.domain.cleanBookmarkText
 import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.PagerWidget
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
@@ -123,7 +124,7 @@ fun BookmarksComposeDialog(
                                     }
                             ) {
                                 Text(
-                                    text = bookmark.text.take(100) + if (bookmark.text.length > 100) "..." else "",
+                                    text = cleanBookmarkText(bookmark.text).take(100) + if (bookmark.text.length > 100) "..." else "",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
