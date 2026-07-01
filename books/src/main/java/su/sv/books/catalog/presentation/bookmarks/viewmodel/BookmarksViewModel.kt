@@ -51,7 +51,11 @@ class BookmarksViewModel @Inject constructor(
             BookmarksViewModePrefsRepository.MODE_BY_BOOK -> NotesViewMode.BY_BOOK
             else -> NotesViewMode.LIST
         }
-        loadNotes()
+        // Загружаем данные в соответствии с режимом
+        when (currentViewMode) {
+            NotesViewMode.LIST -> loadNotes()
+            NotesViewMode.BY_BOOK -> loadBooks()
+        }
     }
 
     fun onAction(action: BookmarksAction) {
