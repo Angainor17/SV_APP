@@ -159,10 +159,19 @@ fun RootWiki(
                 }
             }
 
-            // Подсказки поиска - показываем только в Initial состоянии
-            if (state is UiWikiState.Initial) {
+            // Подсказки поиска - фильтруем suggestion совпадающую с текущей статьёй
+            val currentArticleTitle = if (state is UiWikiState.Content) {
+                (state as UiWikiState.Content).article.title
+            } else null
+
+            val filteredSuggestions = suggestions.filter { suggestion ->
+                // Не показываем suggestion если она совпадает с заголовком текущей статьи
+                suggestion != currentArticleTitle
+            }
+
+            if (selectedSuggestion == null && filteredSuggestions.isNotEmpty()) {
                 SearchSuggestions(
-                    suggestions = suggestions,
+                    suggestions = filteredSuggestions,
                     onSuggestionClick = { title ->
                         focusManager.clearFocus()
                         viewModel.onAction(WikiActions.OnSuggestionClick(title))
