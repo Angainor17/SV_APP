@@ -42,8 +42,6 @@ public abstract class PopupPanel extends ZLApplication.PopupPanel {
         for (ZLApplication.PopupPanel popup : application.popupPanels()) {
             if (popup instanceof PopupPanel) {
                 ((PopupPanel) popup).removeWindow(activity);
-            } else if (popup instanceof NavigationPopup) {
-                ((NavigationPopup) popup).removeWindow(activity);
             }
         }
     }
@@ -52,8 +50,6 @@ public abstract class PopupPanel extends ZLApplication.PopupPanel {
         final ZLApplication.PopupPanel popup = application.getActivePopup();
         if (popup instanceof PopupPanel) {
             ((PopupPanel) popup).show_();
-        } else if (popup instanceof NavigationPopup) {
-            ((NavigationPopup) popup).show_();
         }
     }
 

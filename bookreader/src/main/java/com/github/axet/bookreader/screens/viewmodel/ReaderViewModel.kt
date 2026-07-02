@@ -93,6 +93,8 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.ToggleToc -> toggleToc()
             ReaderActions.ToggleBookmarks -> toggleBookmarks()
             ReaderActions.ToggleFontSettings -> toggleFontSettings()
+            ReaderActions.ToggleNavigation -> toggleNavigation()
+            is ReaderActions.GoToPage -> goToPage(action.page)
             ReaderActions.HideDialogs -> hideDialogs()
 
             // Закладки
@@ -390,8 +392,34 @@ class ReaderViewModel @Inject constructor(
         _state.value = currentState.copy(
             showToc = false,
             showBookmarks = !currentState.showBookmarks,
-            showFontSettings = false
+            showFontSettings = false,
+            showNavigation = false
         )
+    }
+
+    private fun toggleNavigation() {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        _state.value = currentState.copy(
+            showToc = false,
+            showBookmarks = false,
+            showFontSettings = false,
+            showNavigation = !currentState.showNavigation
+        )
+    }
+
+    private fun goToPage(page: Int) {
+        fbReaderView?.let { view ->
+            val textView = view.app?.getTextView()
+            if (textView != null) {
+                if (page == 1) {
+                    textView.gotoHome()
+                } else {
+                    textView.gotoPage(page)
+                }
+                view.app?.getViewWidget()?.reset()
+                view.app?.getViewWidget()?.repaint()
+            }
+        }
     }
 
     private fun toggleFontSettings() {
@@ -399,7 +427,8 @@ class ReaderViewModel @Inject constructor(
         _state.value = currentState.copy(
             showToc = false,
             showBookmarks = false,
-            showFontSettings = !currentState.showFontSettings
+            showFontSettings = !currentState.showFontSettings,
+            showNavigation = false
         )
     }
 
@@ -410,6 +439,7 @@ class ReaderViewModel @Inject constructor(
             showBookmarks = false,
             showFontSettings = false,
             showBookmarkEdit = false,
+            showNavigation = false,
             editingBookmark = null
         )
     }
