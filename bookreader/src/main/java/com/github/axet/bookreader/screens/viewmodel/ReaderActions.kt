@@ -93,6 +93,16 @@ sealed class ReaderActions {
     object ToggleFontSettings : ReaderActions()
 
     /**
+     * Переключить отображение навигации по страницам
+     */
+    object ToggleNavigation : ReaderActions()
+
+    /**
+     * Перейти к странице
+     */
+    data class GoToPage(val page: Int) : ReaderActions()
+
+    /**
      * Скрыть все диалоги
      */
     object HideDialogs : ReaderActions()

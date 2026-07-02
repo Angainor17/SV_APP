@@ -88,7 +88,8 @@
       "Bash(./gradlew :commonui:compileDebugKotlin --no-daemon)",
       "Bash(./gradlew :commonui:compileDebugKotlin --no-daemon --info)",
       "Bash(./gradlew :books:compileDebugKotlin --no-daemon --info)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(./gradlew :books:compileDebugKotlin --quiet)"
     ]
   }
 }

@@ -64,6 +64,7 @@ import com.github.axet.bookreader.app.BookApplication
 import com.github.axet.bookreader.app.BookReaderInitializer
 import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
+import com.github.axet.bookreader.screens.ui.NavigationComposeDialog
 import com.github.axet.bookreader.screens.ui.ReaderTopBar
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
@@ -71,6 +72,7 @@ import com.github.axet.bookreader.screens.viewmodel.ReaderViewModel
 import com.github.axet.bookreader.widgets.FBReaderView
 import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
+import su.sv.managers.theme.ThemeViewModel
 import timber.log.Timber
 
 /**
@@ -87,8 +89,10 @@ fun ReaderContent(
     onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ReaderViewModel = hiltViewModel(),
+    themeViewModel: ThemeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val view = LocalView.current
 
@@ -178,6 +182,30 @@ fun ReaderContent(
                 )
             }
 
+            // Навигация по страницам
+            if (currentState.showNavigation && fbReaderView != null) {
+                val pagePosition = fbReaderView?.app?.getTextView()?.pagePosition()
+                val currentPage = pagePosition?.Current ?: 1
+                val totalPages = pagePosition?.Total ?: 1
+                val chapterTitle = fbReaderView?.app?.getCurrentTOCElement()?.text
+
+                NavigationComposeDialog(
+                    currentPage = currentPage,
+                    totalPages = totalPages,
+                    chapterTitle = chapterTitle,
+                    onPageChange = { page ->
+                        viewModel.onAction(ReaderActions.GoToPage(page))
+                    },
+                    onConfirm = {
+                        viewModel.savePosition()
+                    },
+                    onCancel = {
+                        // Вернуться к исходной позиции
+                    },
+                    onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) }
+                )
+            }
+
             // Редактирование закладки
             if (currentState.showBookmarkEdit && currentState.editingBookmark != null) {
                 BookmarkBottomSheet(
@@ -248,6 +276,10 @@ fun ReaderContent(
 
                                     override fun onFullscreenToggle(isFullscreen: Boolean) {
                                         viewModel.onAction(ReaderActions.SetFullscreen(isFullscreen))
+                                    }
+
+                                    override fun onNavigationRequest() {
+                                        viewModel.onAction(ReaderActions.ToggleNavigation)
                                     }
                                 }
 

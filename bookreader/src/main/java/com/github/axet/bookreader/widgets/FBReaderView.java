@@ -55,7 +55,6 @@ import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.OnClickWrapper;
 import com.github.johnpersano.supertoasts.util.OnDismissWrapper;
 
-import org.geometerplus.android.fbreader.NavigationPopup;
 import org.geometerplus.android.fbreader.PopupPanel;
 import org.geometerplus.android.fbreader.SelectionPopup;
 import org.geometerplus.android.fbreader.TextSearchPopup;
@@ -220,9 +219,6 @@ public class FBReaderView extends RelativeLayout {
 
         if (app.getPopupById(TextSearchPopup.ID) == null) {
             new TextSearchPopup(app);
-        }
-        if (app.getPopupById(NavigationPopup.ID) == null) {
-            new NavigationPopup(app);
         }
         if (app.getPopupById(SelectionPopup.ID) == null) {
             new SelectionPopup(app) {
@@ -690,7 +686,9 @@ public class FBReaderView extends RelativeLayout {
 
             @Override
             protected void run(Object... params) {
-                ((NavigationPopup) app.getPopupById(NavigationPopup.ID)).runNavigation();
+                if (listener != null) {
+                    listener.onNavigationRequest();
+                }
             }
         });
         app.addAction(ActionCode.SELECTION_SHOW_PANEL, new FBAction(app) {
@@ -921,7 +919,6 @@ public class FBReaderView extends RelativeLayout {
         });
 
         ((PopupPanel) app.getPopupById(TextSearchPopup.ID)).setPanelInfo(a, this);
-        ((NavigationPopup) app.getPopupById(NavigationPopup.ID)).setPanelInfo(a, this);
         ((PopupPanel) app.getPopupById(SelectionPopup.ID)).setPanelInfo(a, this);
     }
 
@@ -1491,6 +1488,8 @@ public class FBReaderView extends RelativeLayout {
         void onEditBookmark(Storage.Bookmark bookmark);
 
         void onFullscreenToggle(boolean isFullscreen);
+
+        void onNavigationRequest();
     }
 
     public static class ZLTextIndexPosition extends com.github.axet.bookreader.widgets.ZLTextIndexPosition {
