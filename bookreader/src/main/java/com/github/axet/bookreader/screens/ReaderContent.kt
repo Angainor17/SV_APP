@@ -66,6 +66,7 @@ import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
 import com.github.axet.bookreader.screens.ui.NavigationComposeDialog
 import com.github.axet.bookreader.screens.ui.ReaderTopBar
+import com.github.axet.bookreader.screens.ui.SelectionComposePanel
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
 import com.github.axet.bookreader.screens.viewmodel.ReaderViewModel
@@ -281,6 +282,15 @@ fun ReaderContent(
                                     override fun onNavigationRequest() {
                                         viewModel.onAction(ReaderActions.ToggleNavigation)
                                     }
+
+                                    override fun onSelectionShow(startY: Int, endY: Int) {
+                                        viewModel.onAction(ReaderActions.ShowSelection(startY, endY))
+                                    }
+
+                                    override fun onSelectionHide() {
+                                        // Вызываем hideSelection напрямую, не через action, чтобы избежать цикла
+                                        viewModel.hideSelection()
+                                    }
                                 }
 
                                 if (context is Activity) {
@@ -328,10 +338,16 @@ fun ReaderContent(
                             // Обновление view при изменении состояния (без пересоздания)
                             if (isLoaded) {
                                 val viewMode = currentState.viewMode
-                                view.setWidget(
-                                    if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
-                                    else FBReaderView.Widgets.PAGING
-                                )
+                                val desiredWidget = if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
+                                else FBReaderView.Widgets.PAGING
+
+                                // Только переключаем widget если он отличается от текущего
+                                // Это предотвращает удаление SelectionView во время touch
+                                val currentWidget = view.getWidgetType()
+                                if (currentWidget != desiredWidget) {
+                                    Timber.d("Switching widget from $currentWidget to $desiredWidget")
+                                    view.setWidget(desiredWidget)
+                                }
 
                                 // Показываем подсказки зон касания при первом открытии
                                 // Делаем это в update, когда view уже имеет размер
@@ -344,6 +360,33 @@ fun ReaderContent(
                             }
                         }
                     )
+
+                    // Панель выделения текста (показывается поверх FBReaderView)
+                    if (currentState.showSelection) {
+                        val showAtBottom = currentState.selectionEndY > currentState.selectionStartY
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    bottom = if (showAtBottom) 50.dp else 0.dp,
+                                    top = if (!showAtBottom) 100.dp else 0.dp
+                                ),
+                            contentAlignment = if (showAtBottom) {
+                                Alignment.BottomCenter
+                            } else {
+                                Alignment.TopCenter
+                            }
+                        ) {
+                            SelectionComposePanel(
+                                onBookmark = { viewModel.onAction(ReaderActions.SelectionBookmark) },
+                                onShare = { viewModel.onAction(ReaderActions.SelectionShare) },
+                                onCopy = { viewModel.onAction(ReaderActions.SelectionCopy) },
+                                onQuestion = { viewModel.onAction(ReaderActions.SelectionQuestion) },
+                                onAlert = { viewModel.onAction(ReaderActions.SelectionAlert) },
+                                onClose = { viewModel.onAction(ReaderActions.HideSelection) }
+                            )
+                        }
+                    }
                 }
             }
         }

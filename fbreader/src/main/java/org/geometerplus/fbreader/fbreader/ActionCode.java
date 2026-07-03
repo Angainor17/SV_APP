@@ -76,7 +76,6 @@ public interface ActionCode {
     String TEL_ABOUT_MISSPELL = "tel_about_misspell";
     String SELECTION_COPY_TO_CLIPBOARD = "selectionCopyToClipboard";
     String SELECTION_SHARE = "selectionShare";
-    String SELECTION_TRANSLATE = "selectionTranslate";
     String SELECTION_BOOKMARK = "selectionBookmark";
 
     String OPEN_VIDEO = "video";

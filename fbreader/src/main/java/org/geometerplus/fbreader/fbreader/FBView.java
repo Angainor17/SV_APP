@@ -248,7 +248,8 @@ public class FBView extends ZLTextView {
             if (soul instanceof ZLTextWordRegionSoul) {
                 switch (myReader.MiscOptions.WordTappingAction.getValue()) {
                     case startSelecting:
-                        myReader.runAction(ActionCode.SELECTION_HIDE_PANEL);
+                        // SELECTION_HIDE_PANEL не вызываем - панель должна оставаться видимой
+                        // При нажатии на маркер для движения, SELECTION_HIDE_PANEL вызывается в onFingerPress
                         initSelection(x, y);
                         final SelectionCursor.Which cursor = findSelectionCursor(x, y);
                         if (cursor != null) {
