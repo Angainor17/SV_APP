@@ -112,6 +112,10 @@ import java.util.TreeMap;
 
 import su.sv.managers.OnBookPagerManager;
 
+// SelectionView refactoring imports
+import com.github.axet.bookreader.widgets.SelectionCallbacks;
+import com.github.axet.bookreader.widgets.HandleType;
+
 public class FBReaderView extends RelativeLayout {
     public static final String ACTION_MENU = FBReaderView.class.getCanonicalName() + ".ACTION_MENU";
 
@@ -1154,21 +1158,30 @@ public class FBReaderView extends RelativeLayout {
         if (selection != null) {
             selectionCloseInternal();
         }
-        selection = new SelectionView(getContext(), (CustomView) app.BookTextView, s) {
+
+        // Создаем callbacks для управления drawer и panel
+        SelectionCallbacks callbacks = new SelectionCallbacks() {
             @Override
-            public void onTouchLock() {
+            public void onDragStart(HandleType handle) {
                 if (drawer != null)
                     drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 app.runAction(ActionCode.SELECTION_HIDE_PANEL);
             }
 
             @Override
-            public void onTouchUnlock() {
+            public void onDragEnd(HandleType handle) {
                 if (drawer != null)
                     drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 app.runAction(ActionCode.SELECTION_SHOW_PANEL);
             }
+
+            @Override
+            public void onBoundsChanged(Rect startBounds, Rect endBounds) {
+                // Bounds changes handled automatically through update()
+            }
         };
+
+        selection = new SelectionView(getContext(), (CustomView) app.BookTextView, s, callbacks);
         addView(selection);
         if (widget instanceof ScrollWidget) {
             ((ScrollWidget) widget).updateOverlays();
