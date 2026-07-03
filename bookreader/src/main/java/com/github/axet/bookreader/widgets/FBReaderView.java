@@ -34,6 +34,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -112,6 +114,8 @@ import java.util.TreeMap;
 
 import su.sv.managers.OnBookPagerManager;
 
+import timber.log.Timber;
+
 // SelectionView refactoring imports
 import com.github.axet.bookreader.widgets.SelectionCallbacks;
 import com.github.axet.bookreader.widgets.HandleType;
@@ -135,6 +139,7 @@ public class FBReaderView extends RelativeLayout {
     SelectionView selection;
     ZLTextPosition scrollDelayed;
     boolean scrollCentered; // центрировать позицию при прокрутке
+    private boolean isFullscreenMode = false; // track fullscreen state
     DrawerLayout drawer;
     Plugin.View.Search search;
     int searchPagePending;
@@ -627,36 +632,68 @@ public class FBReaderView extends RelativeLayout {
         app.addAction(ActionCode.SHOW_MENU, new FBAction(app) {
             @Override
             protected void run(Object... params) {
-                // Toggle fullscreen mode
-                if (toggleFullscreen()) {
-                    // Notify listener about fullscreen change
-                    if (listener != null) {
-                        listener.onFullscreenToggle(true);
-                    }
-                } else {
-                    if (listener != null) {
-                        listener.onFullscreenToggle(false);
-                    }
-                }
+                // Toggle fullscreen mode - listener notification is inside toggleFullscreen()
+                toggleFullscreen();
             }
 
             private boolean toggleFullscreen() {
                 if (w != null) {
-                    boolean isFullscreen = (w.getDecorView().getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0;
-                    if (isFullscreen) {
-                        w.getDecorView().setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+                    // Use modern WindowInsetsController API (Android 11+)
+                    // This avoids flickering during fullscreen transition
+                    WindowInsetsControllerCompat controller =
+                        new WindowInsetsControllerCompat(w, w.getDecorView());
+
+                    // Set window background to match book background to avoid flickering
+                    // Book bgColor may have alpha=0, use wallpaper/paper color instead
+                    int bgColor = app.BookTextView.getBackgroundColor().intValue();
+                    // If alpha is 0, use paper color (light cream)
+                    int bgColorWithAlpha = (bgColor & 0xFF000000) == 0
+                        ? (0xFF << 24) | bgColor  // Force opaque if transparent
+                        : bgColor;  // Keep original if already has alpha
+                    w.getDecorView().setBackgroundColor(bgColorWithAlpha);
+
+                    // Notify listener BEFORE native toggle to sync with Compose
+                    // This ensures Scaffold updates first, then bars hide
+                    Timber.tag("voronin").d("=== Fullscreen Toggle ===");
+                    Timber.tag("voronin").d("Current mode: isFullscreenMode=%s", isFullscreenMode);
+                    Timber.tag("voronin").d("Widget type: %s", widget.getClass().getSimpleName());
+                    Timber.tag("voronin").d("Book bgColor: 0x%08X", bgColor);
+                    Timber.tag("voronin").d("Window bgColor set: 0x%08X", bgColorWithAlpha);
+                    Timber.tag("voronin").d("DecorView size: %dx%d", w.getDecorView().getWidth(), w.getDecorView().getHeight());
+                    Timber.tag("voronin").d("FBReaderView size: %dx%d", getWidth(), getHeight());
+                    if (widget instanceof ScrollWidget) {
+                        ScrollWidget sw = (ScrollWidget) widget;
+                        Timber.tag("voronin").d("ScrollWidget mainAreaHeight: %d", sw.getMainAreaHeight());
+                        Timber.tag("voronin").d("ScrollWidget height: %d", sw.getHeight());
+                    }
+
+                    // Use tracked state instead of unreliable insets check
+                    if (isFullscreenMode) {
+                        // Exit fullscreen - notify first, then show bars
+                        Timber.tag("voronin").d("Action: EXIT fullscreen");
+                        isFullscreenMode = false;
+                        if (listener != null) {
+                            listener.onFullscreenToggle(false);
+                        }
+                        // Delay native toggle slightly to let Compose update first
+                        post(() -> {
+                            controller.show(WindowInsetsCompat.Type.systemBars());
+                        });
                         return false; // now not fullscreen
                     } else {
-                        w.getDecorView().setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                        // Enter fullscreen - notify first, then hide bars
+                        Timber.tag("voronin").d("Action: ENTER fullscreen");
+                        isFullscreenMode = true;
+                        if (listener != null) {
+                            listener.onFullscreenToggle(true);
+                        }
+                        // Delay native toggle slightly to let Compose update first
+                        post(() -> {
+                            controller.hide(WindowInsetsCompat.Type.systemBars());
+                            controller.setSystemBarsBehavior(
+                                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                            );
+                        });
                         return true; // now fullscreen
                     }
                 }
@@ -1350,13 +1387,14 @@ public class FBReaderView extends RelativeLayout {
 
     /**
      * Exit fullscreen mode - restore normal system UI visibility
+     * Uses modern WindowInsetsController API to avoid flickering.
      */
     public void exitFullscreen() {
-        if (w != null) {
-            w.getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        if (w != null && isFullscreenMode) {
+            WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(w, w.getDecorView());
+            controller.show(WindowInsetsCompat.Type.systemBars());
+            isFullscreenMode = false;
         }
     }
 

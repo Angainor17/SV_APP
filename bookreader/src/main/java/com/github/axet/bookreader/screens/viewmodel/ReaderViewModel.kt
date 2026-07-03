@@ -392,8 +392,12 @@ class ReaderViewModel @Inject constructor(
      */
     private fun setFullscreen(isFullscreen: Boolean) {
         val currentState = _state.value as? ReaderState.Content ?: return
+        Timber.tag("voronin").d("=== ViewModel: setFullscreen($isFullscreen) ===")
+        Timber.tag("voronin").d("Previous isFullscreen: ${currentState.isFullscreen}")
+        Timber.tag("voronin").d("New isFullscreen: $isFullscreen")
         if (currentState.isFullscreen != isFullscreen) {
             _state.value = currentState.copy(isFullscreen = isFullscreen)
+            Timber.tag("voronin").d("State updated - Scaffold topBar will be: ${!isFullscreen}")
         }
     }
 
