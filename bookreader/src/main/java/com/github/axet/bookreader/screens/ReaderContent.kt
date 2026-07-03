@@ -231,6 +231,7 @@ fun ReaderContent(
             }
 
             Scaffold(
+                containerColor = MaterialTheme.colorScheme.surface,  // Prevent flickering
                 topBar = {
                     if (!currentState.isFullscreen) {
                         ReaderTopBar(
@@ -276,6 +277,9 @@ fun ReaderContent(
                                     }
 
                                     override fun onFullscreenToggle(isFullscreen: Boolean) {
+                                        Timber.tag("voronin").d("=== ReaderContent: onFullscreenToggle($isFullscreen) ===")
+                                        Timber.tag("voronin").d("Current viewMode: ${currentState.viewMode}")
+                                        Timber.tag("voronin").d("Scaffold topBar visible: ${!currentState.isFullscreen}")
                                         viewModel.onAction(ReaderActions.SetFullscreen(isFullscreen))
                                     }
 
