@@ -22,7 +22,8 @@ import timber.log.Timber
 open class SelectionView(
     context: Context,
     custom: FBReaderView.CustomView,
-    @JvmField val selection: Plugin.View.Selection
+    @JvmField val selection: Plugin.View.Selection,
+    private val callbacks: SelectionCallbacks = EmptySelectionCallbacks()
 ) : FrameLayout(context) {
 
     companion object {
@@ -450,7 +451,8 @@ open class SelectionView(
     private fun startDrag(handle: HandleType, offsetX: Int, offsetY: Int, startX: Int, startY: Int) {
         Timber.d("Starting drag: handle=$handle, offset=($offsetX, $offsetY)")
         _dragState = DragState.Dragging(handle, offsetX, offsetY, startX, startY)
-        onTouchLock()
+        callbacks.onDragStart(handle)
+        onTouchLock() // Legacy callback для drawer lock
     }
 
     /**
@@ -483,10 +485,16 @@ open class SelectionView(
      * Завершает drag операцию.
      */
     private fun endDrag() {
-        val previousState = _dragState
+        val previousState = _dragState as? DragState.Dragging
         Timber.d("Ending drag: previousState=$previousState")
         _dragState = DragState.Idle
-        onTouchUnlock()
+
+        // Вызываем callback с handle типом
+        if (previousState != null) {
+            callbacks.onDragEnd(previousState.handle)
+        }
+
+        onTouchUnlock() // Legacy callback для drawer lock
     }
 
     /**

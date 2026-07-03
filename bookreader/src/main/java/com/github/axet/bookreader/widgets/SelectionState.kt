@@ -4,6 +4,45 @@ import android.graphics.Rect
 import org.geometerplus.zlibrary.core.view.SelectionCursor
 
 /**
+ * Callback interface для событий SelectionView.
+ * Позволяет отделить логику callbacks от View.
+ */
+interface SelectionCallbacks {
+    /**
+     * Вызывается при начале drag операции.
+     * Используется для скрытия панели действий.
+     *
+     * @param handle тип маркера который двигается
+     */
+    fun onDragStart(handle: HandleType)
+
+    /**
+     * Вызывается при завершении drag операции.
+     * Используется для показа панели действий.
+     *
+     * @param handle тип маркера который двигался
+     */
+    fun onDragEnd(handle: HandleType)
+
+    /**
+     * Вызывается при изменении bounds выделения.
+     *
+     * @param startBounds новые bounds начала выделения
+     * @param endBounds новые bounds конца выделения
+     */
+    fun onBoundsChanged(startBounds: Rect, endBounds: Rect)
+}
+
+/**
+ * Пустая реализация callbacks для default behavior.
+ */
+class EmptySelectionCallbacks : SelectionCallbacks {
+    override fun onDragStart(handle: HandleType) {}
+    override fun onDragEnd(handle: HandleType) {}
+    override fun onBoundsChanged(startBounds: Rect, endBounds: Rect) {}
+}
+
+/**
  * Тип маркера выделения.
  */
 enum class HandleType {

@@ -74,7 +74,8 @@ fun BookmarksComposeDialog(
             title = { Text(stringResource(R.string.sv_bookmarks_title)) },
             text = {
                 LazyColumn {
-                    items(bookmarksState, key = { it.start.paragraphIndex.toLong() }) { bookmark ->
+                    // Используем last timestamp как unique key (каждая закладка имеет уникальный timestamp)
+                    items(bookmarksState, key = { it.last }) { bookmark ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
