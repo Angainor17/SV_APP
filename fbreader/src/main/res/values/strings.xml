@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">FBReader</string>
     <string name="panel_bookmark">Закладка</string>
-    <string name="panel_translate">Перевести</string>
     <string name="panel_share">Поделиться</string>
     <string name="panel_copy">Копировать</string>
     <string name="panel_question">Задать вопрос</string>

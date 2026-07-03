@@ -156,6 +156,20 @@ open class SelectionView(
         }
     }
 
+    // === State Management ===
+
+    /**
+     * Текущее состояние drag операции.
+     */
+    private var _dragState: DragState = DragState.Idle
+
+    /**
+     * Публичное состояние drag (immutable).
+     */
+    val dragState: DragState get() = _dragState
+
+    // === Legacy fields (будут удалены после полного refactor) ===
+
     var touch: PageView? = null
     var startRect = HandleRect()
     var endRect = HandleRect()
@@ -334,32 +348,145 @@ open class SelectionView(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        Timber.tag("voronin").d("SelectionView onTouchEvent")
-        if (margin != null) { // не повреждено / не пустое окно
-            var x = event.x.toInt() + left
-            val y = event.y.toInt() + top
-            if (startRect.onTouchEvent(event.action, x, y)) {
-                onTouchLock()
-                x += startRect.touch!!.offx
-                val yAdj = y + startRect.touch!!.offy
-                startRect.onTouchRelease(event)
-                startRect.page!!.setter!!.setStart(x, yAdj)
-                if (startRect.touch == null)
-                    onTouchUnlock()
-                return true
-            }
-            if (endRect.onTouchEvent(event.action, x, y)) {
-                onTouchLock()
-                x += endRect.touch!!.offx
-                val yAdj = y + endRect.touch!!.offy
-                endRect.onTouchRelease(event)
-                endRect.page!!.setter!!.setEnd(x, yAdj)
-                if (endRect.touch == null)
-                    onTouchUnlock()
-                return true
-            }
+        Timber.tag("voronin").d("SelectionView onTouchEvent: action=${event.action}, dragState=$_dragState")
+
+        // Если margin null, выделение повреждено - не обрабатываем
+        if (margin == null) {
+            Timber.d("SelectionView: margin is null, skipping touch")
+            return super.onTouchEvent(event)
         }
-        return super.onTouchEvent(event)
+
+        val x = event.x.toInt() + left
+        val y = event.y.toInt() + top
+
+        return when (event.action) {
+            MotionEvent.ACTION_DOWN -> handleDragStart(x, y)
+            MotionEvent.ACTION_MOVE -> handleDragMove(x, y)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> handleDragEnd(x, y, event.action == MotionEvent.ACTION_CANCEL)
+            else -> super.onTouchEvent(event)
+        }
+    }
+
+    /**
+     * Обрабатывает начало drag - ACTION_DOWN.
+     * Проверяет попадание в маркеры и начинает drag если попал.
+     */
+    private fun handleDragStart(x: Int, y: Int): Boolean {
+        // Проверяем попадание в start маркер (Left)
+        val startHit = checkHandleHit(startRect, x, y, HandleType.LEFT)
+        if (startHit.hit) {
+            startDrag(startHit.handleType!!, startHit.offsetX, startHit.offsetY, x, y)
+            return true
+        }
+
+        // Проверяем попадание в end маркер (Right)
+        val endHit = checkHandleHit(endRect, x, y, HandleType.RIGHT)
+        if (endHit.hit) {
+            startDrag(endHit.handleType!!, endHit.offsetX, endHit.offsetY, x, y)
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Обрабатывает движение drag - ACTION_MOVE.
+     * Обновляет позицию маркера если drag активен.
+     */
+    private fun handleDragMove(x: Int, y: Int): Boolean {
+        val state = _dragState as? DragState.Dragging ?: return false
+
+        // Корректируем координаты с offset
+        val adjustedX = x + state.offsetX
+        val adjustedY = y + state.offsetY
+
+        // Обновляем bounds через setter
+        updateHandlePosition(state.handle, adjustedX, adjustedY)
+
+        return true
+    }
+
+    /**
+     * Обрабатывает завершение drag - ACTION_UP или ACTION_CANCEL.
+     */
+    private fun handleDragEnd(x: Int, y: Int, cancelled: Boolean): Boolean {
+        val state = _dragState as? DragState.Dragging ?: return false
+
+        if (!cancelled) {
+            // Корректируем координаты с offset для финальной позиции
+            val adjustedX = x + state.offsetX
+            val adjustedY = y + state.offsetY
+            updateHandlePosition(state.handle, adjustedX, adjustedY)
+        }
+
+        // Завершаем drag
+        endDrag()
+
+        return true
+    }
+
+    /**
+     * Проверяет попадание touch в маркер.
+     */
+    private fun checkHandleHit(handleRect: HandleRect, x: Int, y: Int, handleType: HandleType): HandleTouchResult {
+        val hotRect = handleRect.rect?.rect ?: return HandleTouchResult.NO_HIT
+        val hotRectRef = handleRect.rect ?: return HandleTouchResult.NO_HIT
+
+        // Проверяем попадание в rect маркера
+        if (hotRect.contains(x, y)) {
+            // Вычисляем offset от touch point до hot point
+            val offsetX = hotRectRef.hotx - x
+            val offsetY = hotRectRef.hoty - y
+            Timber.d("Handle hit: $handleType at ($x, $y), offset ($offsetX, $offsetY)")
+            return HandleTouchResult.hit(handleType, offsetX, offsetY)
+        }
+
+        return HandleTouchResult.NO_HIT
+    }
+
+    /**
+     * Начинает drag операцию.
+     */
+    private fun startDrag(handle: HandleType, offsetX: Int, offsetY: Int, startX: Int, startY: Int) {
+        Timber.d("Starting drag: handle=$handle, offset=($offsetX, $offsetY)")
+        _dragState = DragState.Dragging(handle, offsetX, offsetY, startX, startY)
+        onTouchLock()
+    }
+
+    /**
+     * Обновляет позицию маркера через setter.
+     */
+    private fun updateHandlePosition(handle: HandleType, x: Int, y: Int) {
+        val handleRect = when (handle) {
+            HandleType.LEFT -> startRect
+            HandleType.RIGHT -> endRect
+        }
+
+        val page = handleRect.page
+        val setter = page?.setter
+
+        if (setter == null) {
+            Timber.w("Cannot update handle position: setter is null for handle $handle")
+            return
+        }
+
+        // Вызываем соответствующий setter
+        when (handle) {
+            HandleType.LEFT -> setter.setStart(x, y)
+            HandleType.RIGHT -> setter.setEnd(x, y)
+        }
+
+        Timber.d("Updated handle $handle position to ($x, $y)")
+    }
+
+    /**
+     * Завершает drag операцию.
+     */
+    private fun endDrag() {
+        val previousState = _dragState
+        Timber.d("Ending drag: previousState=$previousState")
+        _dragState = DragState.Idle
+        onTouchUnlock()
     }
 
     /**

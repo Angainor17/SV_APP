@@ -8,8 +8,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -32,7 +30,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.ColorUtils;
@@ -56,7 +53,6 @@ import com.github.johnpersano.supertoasts.util.OnClickWrapper;
 import com.github.johnpersano.supertoasts.util.OnDismissWrapper;
 
 import org.geometerplus.android.fbreader.PopupPanel;
-import org.geometerplus.android.fbreader.SelectionPopup;
 import org.geometerplus.android.fbreader.TextSearchPopup;
 import org.geometerplus.android.fbreader.dict.DictionaryUtil;
 import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
@@ -187,16 +183,6 @@ public class FBReaderView extends RelativeLayout {
         v.start();
     }
 
-    public static Intent translateIntent(String text) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_PROCESS_TEXT);
-        intent.setType(HttpClient.CONTENTTYPE_TEXT);
-        intent.setPackage("com.google.android.apps.translate"); // only known translator
-        intent.putExtra(Intent.EXTRA_PROCESS_TEXT, text);
-        intent.putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true);
-        return intent;
-    }
-
     public static Rect findUnion(List<ZLTextElementArea> areas, Storage.Bookmark bm) {
         Rect union = null;
         for (ZLTextElementArea a : areas) {
@@ -219,21 +205,6 @@ public class FBReaderView extends RelativeLayout {
 
         if (app.getPopupById(TextSearchPopup.ID) == null) {
             new TextSearchPopup(app);
-        }
-        if (app.getPopupById(SelectionPopup.ID) == null) {
-            new SelectionPopup(app) {
-                @Override
-                public void createControlPanel(@NonNull Activity activity, @NonNull RelativeLayout root) {
-                    super.createControlPanel(activity, root);
-                    View t = myWindow.findViewById(org.geometerplus.R.id.selection_panel_translate);
-                    PackageManager packageManager = getContext().getPackageManager();
-                    List<ResolveInfo> rr = packageManager.queryIntentActivities(translateIntent(null), 0);
-                    if (rr.isEmpty())
-                        t.setVisibility(View.GONE);
-                    else
-                        t.setVisibility(View.VISIBLE);
-                }
-            };
         }
 
         config();
@@ -296,6 +267,19 @@ public class FBReaderView extends RelativeLayout {
                 setWidget(new PagerWidget(this));
                 break;
         }
+    }
+
+    /**
+     * Возвращает текущий тип widget.
+     * Используется для проверки перед переключением режима.
+     */
+    public Widgets getWidgetType() {
+        if (widget instanceof ScrollWidget) {
+            return Widgets.CONTINUOUS;
+        } else if (widget instanceof PagerWidget) {
+            return Widgets.PAGING;
+        }
+        return Widgets.PAGING; // default
     }
 
     public void setWidget(ZLViewWidget v) {
@@ -695,16 +679,17 @@ public class FBReaderView extends RelativeLayout {
             @Override
             protected void run(Object... params) {
                 final ZLTextView view = app.getTextView();
-                ((SelectionPopup) app.getPopupById(SelectionPopup.ID)).move(view.getSelectionStartY(), view.getSelectionEndY());
-                app.showPopup(SelectionPopup.ID);
+                if (listener != null) {
+                    listener.onSelectionShow(view.getSelectionStartY(), view.getSelectionEndY());
+                }
             }
         });
         app.addAction(ActionCode.SELECTION_HIDE_PANEL, new FBAction(app) {
             @Override
             protected void run(Object... params) {
-                final FBReaderApp.PopupPanel popup = app.getActivePopup();
-                if (popup != null && popup.getId() == SelectionPopup.ID) {
-                    app.hideActivePopup();
+                // Уведомляем listener о скрытии панели
+                if (listener != null) {
+                    listener.onSelectionHide();
                 }
             }
         });
@@ -765,27 +750,6 @@ public class FBReaderView extends RelativeLayout {
                         ((ScrollWidget) widget).adapter.processClear();
                     });
                 }
-            }
-        });
-        app.addAction(ActionCode.SELECTION_TRANSLATE, new FBAction(app) {
-            @Override
-            protected void run(Object... params) {
-                final String text;
-
-                if (selection != null) {
-                    text = selection.selection.getText();
-                } else {
-                    TextSnippet snippet = app.BookTextView.getSelectedSnippet();
-                    if (snippet == null)
-                        return;
-                    text = snippet.getText();
-                }
-
-                Intent intent = translateIntent(text);
-                getContext().startActivity(intent);
-
-                app.BookTextView.clearSelection();
-                selectionClose();
             }
         });
         app.addAction(ActionCode.SELECTION_BOOKMARK, new FBAction(app) {
@@ -919,7 +883,6 @@ public class FBReaderView extends RelativeLayout {
         });
 
         ((PopupPanel) app.getPopupById(TextSearchPopup.ID)).setPanelInfo(a, this);
-        ((PopupPanel) app.getPopupById(SelectionPopup.ID)).setPanelInfo(a, this);
     }
 
     private void selectionSVAction(CustomAction action) {
@@ -1186,7 +1149,11 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void selectionOpen(Plugin.View.Selection s) {
-        selectionClose();
+        // Закрываем предыдущее выделение без уведомления listener
+        // (мы сразу покажем новое, поэтому SELECTION_HIDE_PANEL не нужен)
+        if (selection != null) {
+            selectionCloseInternal();
+        }
         selection = new SelectionView(getContext(), (CustomView) app.BookTextView, s) {
             @Override
             public void onTouchLock() {
@@ -1212,7 +1179,11 @@ public class FBReaderView extends RelativeLayout {
         app.runAction(ActionCode.SELECTION_SHOW_PANEL);
     }
 
-    public void selectionClose() {
+    /**
+     * Закрывает selection без уведомления listener (без SELECTION_HIDE_PANEL).
+     * Используется внутри selectionOpen() чтобы очистить старый selection перед созданием нового.
+     */
+    private void selectionCloseInternal() {
         if (widget instanceof ScrollWidget)
             ((ScrollWidget) widget).selectionClose();
         if (selection != null) {
@@ -1220,6 +1191,10 @@ public class FBReaderView extends RelativeLayout {
             removeView(selection);
             selection = null;
         }
+    }
+
+    public void selectionClose() {
+        selectionCloseInternal();
         app.runAction(ActionCode.SELECTION_HIDE_PANEL);
     }
 
@@ -1490,6 +1465,10 @@ public class FBReaderView extends RelativeLayout {
         void onFullscreenToggle(boolean isFullscreen);
 
         void onNavigationRequest();
+
+        void onSelectionShow(int startY, int endY);
+
+        void onSelectionHide();
     }
 
     public static class ZLTextIndexPosition extends com.github.axet.bookreader.widgets.ZLTextIndexPosition {

@@ -450,8 +450,22 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
 
             constructor() {
-                val sp = startPage!!
-                val ep = endPage!!
+                // Null safety: selection может быть закрыт во время touch event
+                val sp = startPage
+                val ep = endPage
+                if (sp == null || ep == null) {
+                    // Создаем пустой/invalid bounds
+                    page = openPageNum(0)
+                    ss = 0
+                    ee = 0
+                    cc = 0
+                    ll = 0
+                    s = page
+                    e = page
+                    first = false
+                    last = false
+                    return
+                }
                 if (sp.page > ep.page) {
                     reverse = true
                     s = ep

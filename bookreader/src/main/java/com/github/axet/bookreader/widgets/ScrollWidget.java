@@ -1671,8 +1671,8 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             if (fb.tts != null) {
                 fb.tts.selectionOpen(c, x, y);
             } else {
+                // onFingerReleaseAfterLongPress будет вызван при ACTION_UP через onReleaseCheck
                 fb.app.BookTextView.onFingerLongPress(x, y);
-                fb.app.BookTextView.onFingerReleaseAfterLongPress(x, y);
             }
             v.invalidate();
             adapter.invalidates.add(v.holder);

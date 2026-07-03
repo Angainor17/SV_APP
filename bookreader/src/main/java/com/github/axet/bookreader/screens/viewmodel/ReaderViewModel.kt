@@ -49,6 +49,14 @@ class ReaderViewModel @Inject constructor(
     // Флаг для управления клавишами громкости
     var volumeKeysEnabled: Boolean = true
 
+    // Timestamp последнего показа панели выделения (для debounce)
+    private var lastSelectionShowTime: Long = 0L
+
+    // Минимальное время между show и hide (миллисекунды)
+    private companion object {
+        const val SELECTION_DEBOUNCE_MS = 500L
+    }
+
     /**
      * Получить менеджер для обработки действий с книгой
      */
@@ -96,6 +104,19 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.ToggleNavigation -> toggleNavigation()
             is ReaderActions.GoToPage -> goToPage(action.page)
             ReaderActions.HideDialogs -> hideDialogs()
+
+            // Выделение текста
+            is ReaderActions.ShowSelection -> showSelection(action.startY, action.endY)
+            ReaderActions.HideSelection -> {
+                // Очищаем выделение в FBReaderView
+                // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+                fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_CLEAR)
+            }
+            ReaderActions.SelectionCopy -> selectionCopy()
+            ReaderActions.SelectionShare -> selectionShare()
+            ReaderActions.SelectionBookmark -> selectionBookmark()
+            ReaderActions.SelectionQuestion -> selectionQuestion()
+            ReaderActions.SelectionAlert -> selectionAlert()
 
             // Закладки
             is ReaderActions.EditBookmark -> editBookmark(action.bookmark)
@@ -420,6 +441,71 @@ class ReaderViewModel @Inject constructor(
                 view.app?.getViewWidget()?.repaint()
             }
         }
+    }
+
+    // === Selection methods ===
+
+    private fun showSelection(startY: Int, endY: Int) {
+        Timber.d("showSelection called: startY=$startY, endY=$endY")
+        val currentState = _state.value as? ReaderState.Content ?: return
+        // Не обновляем если панель уже показана с теми же координатами (избегаем мерцания)
+        if (currentState.showSelection &&
+            currentState.selectionStartY == startY &&
+            currentState.selectionEndY == endY) {
+            Timber.d("showSelection: already showing with same coordinates, skipping")
+            return
+        }
+        // Записываем время показа для debounce
+        lastSelectionShowTime = System.currentTimeMillis()
+        _state.value = currentState.copy(
+            showSelection = true,
+            selectionStartY = startY,
+            selectionEndY = endY
+        )
+    }
+
+    fun hideSelection() {
+        Timber.d("hideSelection called")
+        val currentState = _state.value as? ReaderState.Content ?: return
+
+        // Debounce: не скрывать панель если она была показана менее SELECTION_DEBOUNCE_MS назад
+        // Это предотвращает race condition когда hide вызывается сразу после show
+        val timeSinceShow = System.currentTimeMillis() - lastSelectionShowTime
+        if (timeSinceShow < SELECTION_DEBOUNCE_MS) {
+            Timber.d("hideSelection: debounced (shown $timeSinceShow ms ago, minimum $SELECTION_DEBOUNCE_MS)")
+            return
+        }
+
+        _state.value = currentState.copy(
+            showSelection = false
+        )
+        // SELECTION_HIDE_PANEL вызывается автоматически из FBReaderView при SELECTION_CLEAR
+        // Не вызываем SELECTION_CLEAR здесь, чтобы избежать цикла
+    }
+
+    private fun selectionCopy() {
+        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_COPY_TO_CLIPBOARD)
+        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+    }
+
+    private fun selectionShare() {
+        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_SHARE)
+        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+    }
+
+    private fun selectionBookmark() {
+        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_BOOKMARK)
+        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+    }
+
+    private fun selectionQuestion() {
+        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.ASK_QUESTION)
+        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+    }
+
+    private fun selectionAlert() {
+        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.TEL_ABOUT_MISSPELL)
+        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
     }
 
     private fun toggleFontSettings() {

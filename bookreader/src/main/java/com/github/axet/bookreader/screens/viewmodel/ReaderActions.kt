@@ -102,6 +102,43 @@ sealed class ReaderActions {
      */
     data class GoToPage(val page: Int) : ReaderActions()
 
+    // === Выделение текста ===
+
+    /**
+     * Показать панель выделения
+     */
+    data class ShowSelection(val startY: Int, val endY: Int) : ReaderActions()
+
+    /**
+     * Скрыть панель выделения
+     */
+    object HideSelection : ReaderActions()
+
+    /**
+     * Копировать выделенный текст
+     */
+    object SelectionCopy : ReaderActions()
+
+    /**
+     * Поделиться выделенным текстом
+     */
+    object SelectionShare : ReaderActions()
+
+    /**
+     * Создать закладку из выделения
+     */
+    object SelectionBookmark : ReaderActions()
+
+    /**
+     * Задать вопрос по выделению
+     */
+    object SelectionQuestion : ReaderActions()
+
+    /**
+     * Сообщить об опечатке
+     */
+    object SelectionAlert : ReaderActions()
+
     /**
      * Скрыть все диалоги
      */
