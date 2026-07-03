@@ -9,8 +9,12 @@ import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.view.View
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -233,12 +237,26 @@ fun ReaderContent(
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.surface,  // Prevent flickering
                 topBar = {
-                    if (!currentState.isFullscreen) {
+                    // Animated visibility for smooth fullscreen transition
+                    AnimatedVisibility(
+                        visible = !currentState.isFullscreen,
+                        enter = fadeIn(animationSpec = tween(200)),
+                        exit = fadeOut(animationSpec = tween(200))
+                    ) {
                         ReaderTopBar(
                             state = currentState,
                             onAction = { action ->
                                 when (action) {
-                                    ReaderActions.NavigateBack -> onNavigateBack()
+                                    ReaderActions.NavigateBack -> {
+                                        // Если fullscreen - сначала exit fullscreen
+                                        if (currentState.isFullscreen) {
+                                            Timber.tag("voronin").d("NavigateBack in fullscreen - exiting fullscreen first")
+                                            viewModel.onAction(ReaderActions.SetFullscreen(false))
+                                            fbReaderView?.exitFullscreen()
+                                        } else {
+                                            onNavigateBack()
+                                        }
+                                    }
                                     ReaderActions.NavigateToSettings -> onNavigateToSettings()
                                     else -> viewModel.onAction(action)
                                 }
@@ -391,6 +409,13 @@ fun ReaderContent(
                             )
                         }
                     }
+                }
+
+                // BackHandler для system back button
+                BackHandler(enabled = currentState.isFullscreen) {
+                    Timber.tag("voronin").d("System back in fullscreen - exiting fullscreen")
+                    viewModel.onAction(ReaderActions.SetFullscreen(false))
+                    fbReaderView?.exitFullscreen()
                 }
             }
         }
