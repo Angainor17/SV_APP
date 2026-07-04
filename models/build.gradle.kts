@@ -13,5 +13,7 @@ android {
 }
 
 dependencies {
-    // Только базовые зависимости для моделей данных
+    // Compose runtime для @Immutable аннотации
+    implementation(platform(libs.androidx.compose.bom))
+    implementation("androidx.compose.runtime:runtime")
 }

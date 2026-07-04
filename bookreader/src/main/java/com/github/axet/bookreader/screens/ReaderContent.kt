@@ -754,7 +754,10 @@ private fun FontsComposeBottomSheet(
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
-                items(fonts) { font ->
+                items(
+                    items = fonts,
+                    key = { font -> font },
+                ) { font ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

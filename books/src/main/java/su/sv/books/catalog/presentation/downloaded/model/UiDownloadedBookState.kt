@@ -2,11 +2,14 @@ package su.sv.books.catalog.presentation.downloaded.model
 
 import android.net.Uri
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
 /**
  * UI модель скачанной книги для отображения в списке
+ * @Immutable - оптимизация Compose recomposition
  */
+@Immutable
 @Parcelize
 data class UiDownloadedBook(
     val id: String,
@@ -26,6 +29,10 @@ sealed class UiDownloadedBooksState {
 
     object Loading : UiDownloadedBooksState()
 
+    /**
+     * @Immutable - оптимизация Compose recomposition
+     */
+    @Immutable
     data class Content(
         val books: List<UiDownloadedBook>,
         val showSwipeHint: Boolean = false,
@@ -37,7 +44,9 @@ sealed class UiDownloadedBooksState {
 
 /**
  * Состояние диалога удаления
+ * @Immutable - оптимизация Compose recomposition
  */
+@Immutable
 data class DeleteDialogState(
     val book: UiDownloadedBook? = null,
     val isVisible: Boolean = false,

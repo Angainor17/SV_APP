@@ -1,5 +1,7 @@
 package su.sv.wiki.presentation.root.model
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Состояние экрана Wiki
  */
@@ -11,7 +13,11 @@ sealed class UiWikiState {
     /** Загрузка */
     object Loading : UiWikiState()
 
-    /** Контент - статья найдена */
+    /**
+     * Контент - статья найдена
+     * @Immutable - оптимизация Compose recomposition
+     */
+    @Immutable
     data class Content(
         val article: UiWikiArticle,
         val isFavorite: Boolean = false,
