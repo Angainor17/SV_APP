@@ -295,6 +295,13 @@ public class FBReaderView extends RelativeLayout {
         ZLTextPosition pos = null;
         if (widget != null) {
             pos = getPosition();
+            // Сбрасываем zoom перед удалением widget
+            // Zoom в разных режимах не совместим (paging vs scroll имеют разные coordinate systems)
+            Timber.tag("voronin").d("FBReaderView setWidget: resetting zoom before mode switch");
+            setScaleX(1.0f);
+            setScaleY(1.0f);
+            setTranslationX(0f);
+            setTranslationY(0f);
             removeView((View) widget);
         }
         widget = v;
