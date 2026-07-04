@@ -30,6 +30,7 @@ dependencies {
     // Модули-фичи
     implementation(project(":managers"))
     implementation(project(":commonui"))
+    implementation(project(":commonarchitecture"))
     implementation(project(":fbreader")) {
         exclude("org.apache.httpcomponents", "httpmime")
     }

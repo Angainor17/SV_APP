@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.commonui.theme.ThemeConfig
 import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.theme.ThemeRepository
@@ -17,9 +19,12 @@ import javax.inject.Inject
  *
  * Используется на верхнем уровне приложения для предоставления
  * состояния темы всем дочерним экранам.
+ *
+ * Все IO операции (DataStore) выполняются на IO dispatcher.
  */
 @HiltViewModel
 class ThemeViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
     private val themeRepository: ThemeRepository
 ) : ViewModel() {
 
@@ -58,8 +63,11 @@ class ThemeViewModel @Inject constructor(
      */
     fun toggleTheme() {
         viewModelScope.launch {
-            val currentMode = themeConfig.value.themeMode
-            themeRepository.setThemeMode(currentMode.next())
+            // DataStore - IO операция
+            withContext(dispatcherProvider.io) {
+                val currentMode = themeConfig.value.themeMode
+                themeRepository.setThemeMode(currentMode.next())
+            }
         }
     }
 
@@ -68,7 +76,10 @@ class ThemeViewModel @Inject constructor(
      */
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
-            themeRepository.setThemeMode(mode)
+            // DataStore - IO операция
+            withContext(dispatcherProvider.io) {
+                themeRepository.setThemeMode(mode)
+            }
         }
     }
 
@@ -77,7 +88,10 @@ class ThemeViewModel @Inject constructor(
      */
     fun setUseDynamicColors(use: Boolean) {
         viewModelScope.launch {
-            themeRepository.setUseDynamicColors(use)
+            // DataStore - IO операция
+            withContext(dispatcherProvider.io) {
+                themeRepository.setUseDynamicColors(use)
+            }
         }
     }
 }

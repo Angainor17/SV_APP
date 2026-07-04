@@ -10,7 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
+import su.sv.wiki.domain.model.WikiArticle
+import su.sv.wiki.domain.model.WikiExternalLink
+import su.sv.wiki.domain.model.WikiLink
+import su.sv.wiki.domain.repository.WikiResult
 import su.sv.wiki.domain.usecase.AddFavoriteUseCase
 import su.sv.wiki.domain.usecase.AddHistoryUseCase
 import su.sv.wiki.domain.usecase.ClearHistoryUseCase
@@ -30,9 +36,14 @@ import javax.inject.Inject
 
 /**
  * ViewModel экрана Wiki
+ *
+ * Все тяжёлые операции вынесены на соответствующие диспетчеры:
+ * - IO: сетевые запросы, DB операции (через main-safe UseCase)
+ * - Default: маппинг (CPU-intensive)
  */
 @HiltViewModel
 class RootWikiViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
     private val searchArticleUseCase: SearchArticleUseCase,
     private val getArticleUseCase: GetArticleUseCase,
     private val getHistoryUseCase: GetHistoryUseCase,
@@ -90,6 +101,7 @@ class RootWikiViewModel @Inject constructor(
     private fun onSearchQueryChanged(query: String) {
         viewModelScope.launch {
             if (query.length >= 2) {
+                // UseCase уже main-safe
                 val suggestions = getSearchSuggestionsUseCase.execute(query)
                 _suggestions.value = suggestions.map { it.title }
             } else {
@@ -137,14 +149,15 @@ class RootWikiViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = UiWikiState.Loading
 
+            // UseCase уже main-safe (IO dispatcher)
             when (val result = searchArticleUseCase.execute(query)) {
-                is su.sv.wiki.domain.repository.WikiResult.Success -> {
+                is WikiResult.Success -> {
                     loadArticle(result.data.title, addToHistory = true)
                 }
-                is su.sv.wiki.domain.repository.WikiResult.NotFound -> {
+                is WikiResult.NotFound -> {
                     _state.value = UiWikiState.NotFound
                 }
-                is su.sv.wiki.domain.repository.WikiResult.Error -> {
+                is WikiResult.Error -> {
                     _state.value = UiWikiState.Error(result.message)
                 }
             }
@@ -155,24 +168,33 @@ class RootWikiViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = UiWikiState.Loading
 
+            // UseCase уже main-safe (IO dispatcher)
             when (val result = getArticleUseCase.execute(title)) {
-                is su.sv.wiki.domain.repository.WikiResult.Success -> {
+                is WikiResult.Success -> {
                     val article = result.data
+                    // UseCase уже main-safe (IO dispatcher)
                     val isFavorite = isFavoriteUseCase.execute(title)
 
+                    // Маппинг - CPU intensive, на Default dispatcher
+                    val uiArticle = withContext(dispatcherProvider.default) {
+                        mapper.mapToUi(article, isFavorite)
+                    }
+
+                    // UI обновление - на Main
                     _state.value = UiWikiState.Content(
-                        article = mapper.mapToUi(article, isFavorite),
+                        article = uiArticle,
                         isFavorite = isFavorite,
                     )
 
                     if (addToHistory) {
+                        // UseCase уже main-safe (IO dispatcher)
                         addHistoryUseCase.execute(title)
                     }
                 }
-                is su.sv.wiki.domain.repository.WikiResult.NotFound -> {
+                is WikiResult.NotFound -> {
                     _state.value = UiWikiState.NotFound
                 }
-                is su.sv.wiki.domain.repository.WikiResult.Error -> {
+                is WikiResult.Error -> {
                     _state.value = UiWikiState.Error(result.message)
                 }
             }
@@ -183,19 +205,20 @@ class RootWikiViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = _state.value
             if (currentState is UiWikiState.Content) {
+                // UseCase уже main-safe (IO dispatcher)
                 addFavoriteUseCase.execute(
-                    su.sv.wiki.domain.model.WikiArticle(
+                    WikiArticle(
                         title = currentState.article.title,
                         pageId = 0,
                         content = currentState.article.content,
                         links = currentState.article.links.map {
-                            su.sv.wiki.domain.model.WikiLink(
+                            WikiLink(
                                 title = it.targetTitle,
                                 exists = it.exists,
                             )
                         },
                         externalLinks = currentState.article.externalLinks.map {
-                            su.sv.wiki.domain.model.WikiExternalLink(
+                            WikiExternalLink(
                                 text = it.text,
                                 url = it.url,
                             )
@@ -204,6 +227,7 @@ class RootWikiViewModel @Inject constructor(
                     ),
                 )
 
+                // UI обновление - на Main
                 _state.update { state ->
                     if (state is UiWikiState.Content) {
                         state.copy(isFavorite = true)
@@ -221,8 +245,10 @@ class RootWikiViewModel @Inject constructor(
 
     private fun onRemoveFavorite(title: String) {
         viewModelScope.launch {
+            // UseCase уже main-safe (IO dispatcher)
             removeFavoriteUseCase.execute(title)
 
+            // UI обновление - на Main
             _state.update { state ->
                 if (state is UiWikiState.Content) {
                     state.copy(isFavorite = false)
@@ -239,6 +265,7 @@ class RootWikiViewModel @Inject constructor(
 
     private fun onClearHistory() {
         viewModelScope.launch {
+            // UseCase уже main-safe (IO dispatcher)
             clearHistoryUseCase.execute()
         }
     }

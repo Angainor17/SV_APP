@@ -7,7 +7,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
+import su.sv.wiki.domain.model.WikiArticle
+import su.sv.wiki.domain.model.WikiExternalLink
+import su.sv.wiki.domain.model.WikiLink
 import su.sv.wiki.domain.repository.WikiResult
 import su.sv.wiki.domain.usecase.AddFavoriteUseCase
 import su.sv.wiki.domain.usecase.GetArticleUseCase
@@ -18,9 +23,13 @@ import javax.inject.Inject
 
 /**
  * ViewModel экрана статьи
+ * Все тяжёлые операции вынесены на соответствующие диспетчеры:
+ * - IO: сетевые запросы, DB операции
+ * - Default: маппинг (CPU-intensive)
  */
 @HiltViewModel
 class ArticleViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
     private val getArticleUseCase: GetArticleUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
@@ -39,13 +48,22 @@ class ArticleViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = ArticleState.Loading
 
+            // UseCase уже main-safe - выполняют IO на IO dispatcher
             when (val result = getArticleUseCase.execute(title)) {
                 is WikiResult.Success -> {
                     val article = result.data
+
+                    // DB операция - UseCase уже main-safe
                     val isFavorite = isFavoriteUseCase.execute(title)
 
+                    // Маппинг - CPU intensive, выполняем на Default dispatcher
+                    val uiArticle = withContext(dispatcherProvider.default) {
+                        mapper.mapToUi(article, isFavorite)
+                    }
+
+                    // UI обновление - на Main (viewModelScope уже на Main)
                     _state.value = ArticleState.Content(
-                        article = mapper.mapToUi(article, isFavorite),
+                        article = uiArticle,
                         isFavorite = isFavorite,
                     )
                 }
@@ -66,22 +84,23 @@ class ArticleViewModel @Inject constructor(
         val currentState = _state.value
         if (currentState is ArticleState.Content) {
             viewModelScope.launch {
+                // UseCase уже main-safe - выполняют DB на IO dispatcher
                 if (currentState.isFavorite) {
                     removeFavoriteUseCase.execute(currentState.article.title)
                 } else {
                     addFavoriteUseCase.execute(
-                        su.sv.wiki.domain.model.WikiArticle(
+                        WikiArticle(
                             title = currentState.article.title,
                             pageId = 0,
                             content = currentState.article.content,
                             links = currentState.article.links.map {
-                                su.sv.wiki.domain.model.WikiLink(
+                                WikiLink(
                                     title = it.targetTitle,
                                     exists = it.exists,
                                 )
                             },
                             externalLinks = currentState.article.externalLinks.map {
-                                su.sv.wiki.domain.model.WikiExternalLink(
+                                WikiExternalLink(
                                     text = it.text,
                                     url = it.url,
                                 )
@@ -91,6 +110,7 @@ class ArticleViewModel @Inject constructor(
                     )
                 }
 
+                // UI обновление - на Main
                 _state.update { state ->
                     if (state is ArticleState.Content) {
                         state.copy(isFavorite = !state.isFavorite)

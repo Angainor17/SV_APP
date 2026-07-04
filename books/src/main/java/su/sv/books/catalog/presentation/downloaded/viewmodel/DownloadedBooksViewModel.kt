@@ -5,7 +5,6 @@ import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +20,20 @@ import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
 import su.sv.books.catalog.presentation.downloaded.mapper.UiDownloadedBookMapper
 import su.sv.books.catalog.presentation.downloaded.model.DeleteDialogState
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
+import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.commonarchitecture.managers.ResourcesRepository
 import javax.inject.Inject
 
+/**
+ * ViewModel для экрана скачанных книг
+ *
+ * Все тяжёлые операции вынесены на соответствующие диспетчеры:
+ * - IO: файловые операции (получение списка книг, удаление)
+ * - Default: маппинг (CPU-intensive)
+ */
 @HiltViewModel
 class DownloadedBooksViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
     private val getDownloadedBooksUseCase: GetDownloadedBooksUseCase,
     private val deleteBookUseCase: DeleteBookUseCase,
     private val uiMapper: UiDownloadedBookMapper,
@@ -84,13 +92,18 @@ class DownloadedBooksViewModel @Inject constructor(
 
         viewModelScope.launch {
             // Тяжёлые операции на IO dispatcher
-            val result = withContext(Dispatchers.IO) {
+            val result = withContext(dispatcherProvider.io) {
                 getDownloadedBooksUseCase.execute()
             }
 
             result.fold(
                 onSuccess = { books ->
-                    val uiBooks = uiMapper.mapToUi(books)
+                    // Маппинг - CPU intensive, на Default dispatcher
+                    val uiBooks = withContext(dispatcherProvider.default) {
+                        uiMapper.mapToUi(books)
+                    }
+
+                    // UI обновление - на Main (viewModelScope уже на Main)
                     _state.value = if (uiBooks.isEmpty()) {
                         UiDownloadedBooksState.Empty
                     } else {
@@ -150,9 +163,14 @@ class DownloadedBooksViewModel @Inject constructor(
         hideDeleteDialog()
 
         viewModelScope.launch {
-            deleteBookUseCase.execute(bookToDelete.fileUri).fold(
+            // Удаление файла - IO операция
+            val result = withContext(dispatcherProvider.io) {
+                deleteBookUseCase.execute(bookToDelete.fileUri)
+            }
+
+            result.fold(
                 onSuccess = {
-                    // Удаляем книгу из списка
+                    // Удаляем книгу из списка - UI обновление на Main
                     _state.update { state ->
                         if (state is UiDownloadedBooksState.Content) {
                             val updatedBooks = state.books.filter { it.id != bookToDelete.id }

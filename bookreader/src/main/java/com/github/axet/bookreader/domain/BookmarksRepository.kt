@@ -7,9 +7,9 @@ import android.provider.DocumentsContract
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.app.Storage
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import su.sv.commonarchitecture.di.module.DispatcherProvider
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -54,10 +54,13 @@ data class BookWithNotesData(
 /**
  * Репозиторий для работы с заметками
  * Сканирует JSON файлы напрямую, не завися от наличия файлов книг
+ *
+ * Все IO операции выполняются через DispatcherProvider для testability.
  */
 @Singleton
 class BookmarksRepository @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
     private val storage by lazy { Storage(context) }
 
@@ -66,7 +69,7 @@ class BookmarksRepository @Inject constructor(
      * Сканирует JSON файлы напрямую, не завися от наличия файла книги
      */
     suspend fun getAllNotes(sortByDateAscending: Boolean = false): Result<List<BookmarkData>> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcherProvider.io) {
             runCatching {
                 val notes = mutableListOf<BookmarkData>()
 
@@ -99,7 +102,7 @@ class BookmarksRepository @Inject constructor(
      * Получить заметки для конкретной книги
      */
     suspend fun getNotesForBook(bookId: String): Result<List<BookmarkData>> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcherProvider.io) {
             runCatching {
                 val jsonUri = findJsonFileForBook(bookId)
                 if (jsonUri != null) {
@@ -115,7 +118,7 @@ class BookmarksRepository @Inject constructor(
      * Получить список книг с заметками
      */
     suspend fun getBooksWithNotes(): Result<List<BookWithNotesData>> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcherProvider.io) {
             runCatching {
                 val booksWithNotes = mutableListOf<BookWithNotesData>()
                 val jsonFiles = listJsonFiles()
@@ -156,7 +159,7 @@ class BookmarksRepository @Inject constructor(
      * Удалить заметку
      */
     suspend fun deleteNote(noteId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcherProvider.io) {
             runCatching {
                 val parts = noteId.split("_")
                 if (parts.size < 2) {
