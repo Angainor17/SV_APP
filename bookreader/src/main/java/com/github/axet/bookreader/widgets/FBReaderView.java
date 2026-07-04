@@ -285,6 +285,12 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void setWidget(ZLViewWidget v) {
+        // При смене режима (paging ↔ scroll) закрываем выделение полностью
+        // Координаты выделения в разных режимах не совместимы
+        if (selection != null) {
+            Timber.tag("voronin").d("FBReaderView setWidget: closing selection before mode switch");
+            selectionClose();
+        }
         overlaysClose();
         ZLTextPosition pos = null;
         if (widget != null) {
@@ -671,6 +677,8 @@ public class FBReaderView extends RelativeLayout {
                         // Delay native toggle slightly to let Compose update first
                         post(() -> {
                             controller.show(WindowInsetsCompat.Type.systemBars());
+                            // Update selection coordinates after fullscreen change
+                            updateSelectionAfterFullscreenChange();
                         });
                         return false; // now not fullscreen
                     } else {
@@ -686,6 +694,8 @@ public class FBReaderView extends RelativeLayout {
                             controller.setSystemBarsBehavior(
                                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                             );
+                            // Update selection coordinates after fullscreen change
+                            updateSelectionAfterFullscreenChange();
                         });
                         return true; // now fullscreen
                     }
@@ -1239,6 +1249,41 @@ public class FBReaderView extends RelativeLayout {
     public void selectionClose() {
         selectionCloseInternal();
         app.runAction(ActionCode.SELECTION_HIDE_PANEL);
+    }
+
+    /**
+     * Обновляет координаты выделения после смены fullscreen режима.
+     * При fullscreen mainAreaHeight меняется, нужно пересчитать координаты SelectionView.
+     */
+    private void updateSelectionAfterFullscreenChange() {
+        if (selection == null || widget == null) {
+            Timber.tag("voronin").d("updateSelectionAfterFullscreenChange: no selection or widget, skipping");
+            return;
+        }
+
+        Timber.tag("voronin").d("updateSelectionAfterFullscreenChange: updating selection coordinates for fullscreen change");
+
+        // Обновляем clip height для SelectionView
+        if (widget instanceof ScrollWidget) {
+            selection.setClipHeight(((ScrollWidget) widget).getMainAreaHeight());
+        } else if (widget instanceof PagerWidget) {
+            selection.setClipHeight(((PagerWidget) widget).getMainAreaHeight());
+        }
+
+        // Запускаем обновление координат в PagerWidget
+        if (widget instanceof PagerWidget) {
+            ((PagerWidget) widget).updateOverlays();
+        }
+
+        // Обновляем SelectionView
+        if (selection.getChildCount() > 0) {
+            try {
+                selection.update();
+                Timber.tag("voronin").d("updateSelectionAfterFullscreenChange: selection updated successfully");
+            } catch (Exception e) {
+                Timber.tag("voronin").e(e, "updateSelectionAfterFullscreenChange: error updating selection");
+            }
+        }
     }
 
     public void linksClose() {

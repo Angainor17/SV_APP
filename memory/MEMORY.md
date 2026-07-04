@@ -1,0 +1,22 @@
+# Memory Index
+
+- [Wiki Module Task](wiki-module-task.md) — задача по реализации Wiki-модуля для SV APP
+- [Wiki External Links Task](wiki-external-links-task.md) — поддержка внешних ссылок в Wiki-модуле
+- [FBReader Refactoring Plan](fbreader-refactoring-plan.md) — план поэтапного рефакторинга модуля fbreader
+- [FBReader Activity Cleanup](fbreader-activity-cleanup.md) — удаление legacy Activity из fbreader (2026-06-22)
+- [BookReader Bookmarks Feature](bookreader-bookmarks-feature.md) — функционал закладок в bookreader (2026-06-22)
+- [Design System](design-system.md) — дизайн-система SV APP на Jetpack Compose (2026-06-23)
+- [Mock System](mock-system.md) — система моков для сетевых запросов (2026-06-24)
+- [Compose Optimizations](compose-optimizations.md) — оптимизации Jetpack Compose (2026-06-25)
+- [UI Improvements Task List](ui-improvements-task-list.md) — список задач по улучшению UI (2026-06-28)
+- [Selection Panel Refactoring](selection-panel-refactoring.md) — рефакторинг панели выделения текста на Compose (2026-07-02)
+- [Selection View Architecture](selection-view-architecture.md) — архитектура SelectionView для PDF выделения (2026-07-03)
+- [Selection View Refactoring Plan](selection-view-refactoring-plan.md) — план рефакторинга SelectionView (2026-07-03)
+- [Fullscreen Flicker Issue](fullscreen-flicker-issue.md) — проблема мерцания fullscreen в ScrollWidget (2026-07-03, open)
+- [Zoom Mode Issues](zoom-mode-issues.md) — проблемы zoom/pinch режима (2026-07-03, open)
+- [Zoom Scale Research](zoom-scale-research.md) — research zoom via scale approach (2026-07-03)
+- [Zoom Feature TZ](zoom-feature-tz.md) — техническое задание для zoom режима (2026-07-03, ✅ implemented)
+- [Zoom Compose Research](zoom-compose-research.md) — research и implementation zoom (2026-07-04, ✅ done)
+- [Coroutine Optimization](coroutine-optimization.md) — best practices для корутин и DispatcherProvider (2026-07-04, ✅ done)
+- [Book Search & Selection Fix](book-search-selection-fix.md) — исправление выделения и поиск текста в книге (2026-07-04, open)
+- [Timber Logging Rule](timber-logging-rule.md) — правило логирования: всегда Timber.tag("voronin") (2026-07-04)
