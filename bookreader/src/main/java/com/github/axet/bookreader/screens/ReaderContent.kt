@@ -313,6 +313,16 @@ fun ReaderContent(
                                         // Вызываем hideSelection напрямую, не через action, чтобы избежать цикла
                                         viewModel.hideSelection()
                                     }
+
+                                    override fun onZoomChange(scale: Float, pivotX: Float, pivotY: Float) {
+                                        // Zoom is applied directly to FBReaderView via scaleX/Y
+                                        // Optionally notify ViewModel for UI state (zoom indicator)
+                                        Timber.tag("voronin").d("ReaderContent: onZoomChange scale=$scale pivot=$pivotX,$pivotY")
+                                    }
+
+                                    override fun onZoomEnd() {
+                                        Timber.tag("voronin").d("ReaderContent: onZoomEnd")
+                                    }
                                 }
 
                                 if (context is Activity) {
@@ -411,11 +421,17 @@ fun ReaderContent(
                     }
                 }
 
-                // BackHandler для system back button
+                // BackHandler для system back button (fullscreen)
                 BackHandler(enabled = currentState.isFullscreen) {
                     Timber.tag("voronin").d("System back in fullscreen - exiting fullscreen")
                     viewModel.onAction(ReaderActions.SetFullscreen(false))
                     fbReaderView?.exitFullscreen()
+                }
+
+                // BackHandler для zoom mode
+                BackHandler(enabled = currentState.isInZoom) {
+                    Timber.tag("voronin").d("System back in zoom - resetting zoom")
+                    viewModel.onAction(ReaderActions.ZoomReset)
                 }
             }
         }

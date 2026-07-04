@@ -214,4 +214,16 @@ sealed class ReaderActions {
      * Закрыть поиск
      */
     object SearchClose : ReaderActions()
+
+    // === Zoom ===
+
+    /**
+     * Обновить zoom scale
+     */
+    data class ZoomUpdate(val scale: Float, val pivotX: Float, val pivotY: Float) : ReaderActions()
+
+    /**
+     * Сбросить zoom (вернуть к 1.0)
+     */
+    object ZoomReset : ReaderActions()
 }

@@ -135,6 +135,10 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.SearchNext -> searchNext()
             ReaderActions.SearchPrevious -> searchPrevious()
             ReaderActions.SearchClose -> searchClose()
+
+            // Zoom
+            is ReaderActions.ZoomUpdate -> zoomUpdate(action.scale, action.pivotX, action.pivotY)
+            ReaderActions.ZoomReset -> zoomReset()
         }
     }
 
@@ -689,6 +693,37 @@ class ReaderViewModel @Inject constructor(
         } else {
             ViewMode.PAGING
         }
+    }
+
+    // ==================== Zoom ====================
+
+    /**
+     * Обновить zoom scale
+     */
+    private fun zoomUpdate(scale: Float, pivotX: Float, pivotY: Float) {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        _state.value = currentState.copy(
+            zoomScale = scale,
+            zoomPivotX = pivotX,
+            zoomPivotY = pivotY,
+            isInZoom = scale > 1.0f
+        )
+        Timber.tag("voronin").d("ViewModel: zoomUpdate scale=$scale pivot=$pivotX,$pivotY")
+    }
+
+    /**
+     * Сбросить zoom (вернуть к 1.0)
+     */
+    private fun zoomReset() {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        fbReaderView?.resetZoom()
+        _state.value = currentState.copy(
+            zoomScale = 1.0f,
+            zoomPivotX = 0f,
+            zoomPivotY = 0f,
+            isInZoom = false
+        )
+        Timber.tag("voronin").d("ViewModel: zoomReset")
     }
 
     /**
