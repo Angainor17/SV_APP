@@ -136,6 +136,7 @@ public class FBReaderView extends RelativeLayout {
     DrawerLayout drawer;
     Plugin.View.Search search;
     int searchPagePending;
+    private int searchCurrentIndex = 0; // Track current search result index
 
     public FBReaderView(Context context) { // create child view
         super(context);
@@ -1396,6 +1397,113 @@ public class FBReaderView extends RelativeLayout {
             search = null;
         }
         searchPagePending = -1;
+        searchCurrentIndex = 0;
+    }
+
+    /**
+     * Perform search without ProgressDialog, results returned via callback.
+     * @param pattern search query
+     * @param callback callback with (count, currentIndex)
+     */
+    public void performSearch(String pattern, SearchCallback callback) {
+        if (pattern == null || pattern.isEmpty()) {
+            callback.onResult(0, 0);
+            return;
+        }
+
+        app.hideActivePopup();
+        config.setValue(app.MiscOptions.TextSearchPattern, pattern);
+
+        if (pluginview != null) {
+            searchClose();
+            search = pluginview.search(pattern);
+            search.setPage(getPosition().getParagraphIndex());
+            int count = search.getCount();
+            searchCurrentIndex = 0;
+            Timber.tag("voronin").d("performSearch: pattern=%s, count=%d, currentPage=%d", pattern, count, getPosition().getParagraphIndex());
+            if (count > 0) {
+                if (widget instanceof ScrollWidget)
+                    ((ScrollWidget) widget).updateOverlays();
+                if (widget instanceof PagerWidget)
+                    ((PagerWidget) widget).updateOverlaysReset();
+            }
+            callback.onResult(count, searchCurrentIndex);
+        } else {
+            int count = app.getTextView().search(pattern, true, false, false, false);
+            searchCurrentIndex = 0;
+            if (count > 0 && widget instanceof ScrollWidget) {
+                post(() -> reset());
+            }
+            callback.onResult(count, searchCurrentIndex);
+        }
+    }
+
+    /**
+     * Navigate to next search result, results returned via callback.
+     */
+    public void performSearchNext(SearchCallback callback) {
+        hideKeyboard();
+        if (search != null) {
+            int count = search.getCount();
+            int page = search.next();
+            if (page != -1 && searchCurrentIndex < count - 1) {
+                searchCurrentIndex++;
+                post(() -> {
+                    if (widget instanceof ScrollWidget) {
+                        ((ScrollWidget) widget).searchPage(page);
+                    } else if (widget instanceof PagerWidget) {
+                        ((PagerWidget) widget).searchPage(page);
+                        ((PagerWidget) widget).updateOverlaysReset(); // Refresh highlights
+                    }
+                });
+            }
+            callback.onResult(count, searchCurrentIndex);
+        } else {
+            app.BookTextView.findNext();
+            callback.onResult(0, 0);
+        }
+    }
+
+    /**
+     * Navigate to previous search result, results returned via callback.
+     */
+    public void performSearchPrevious(SearchCallback callback) {
+        hideKeyboard();
+        if (search != null) {
+            int count = search.getCount();
+            int page = search.prev();
+            if (page != -1 && searchCurrentIndex > 0) {
+                searchCurrentIndex--;
+                post(() -> {
+                    if (widget instanceof ScrollWidget) {
+                        ((ScrollWidget) widget).searchPage(page);
+                    } else if (widget instanceof PagerWidget) {
+                        ((PagerWidget) widget).searchPage(page);
+                        ((PagerWidget) widget).updateOverlaysReset(); // Refresh highlights
+                    }
+                });
+            }
+            callback.onResult(count, searchCurrentIndex);
+        } else {
+            app.BookTextView.findPrevious();
+            callback.onResult(0, 0);
+        }
+    }
+
+    private void hideKeyboard() {
+        if (getContext() instanceof Activity) {
+            Activity activity = (Activity) getContext();
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager) activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getWindowToken(), 0);
+        }
+    }
+
+    /**
+     * Callback interface for search results.
+     */
+    public interface SearchCallback {
+        void onResult(int count, int currentIndex);
     }
 
     public void overlaysClose() {
@@ -1971,7 +2079,7 @@ public class FBReaderView extends RelativeLayout {
                 v.setLayoutParams(lp);
                 v.setTag(l);
                 if (hh != null && hh.contains(l))
-                    v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | 0x990000);
+                    v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | 0x00AA00); // Green for current match
                 else
                     v.setBackgroundColor(SelectionView.SELECTION_ALPHA << 24 | fb.app.BookTextView.getHighlightingBackgroundColor().intValue());
                 words.add(v);

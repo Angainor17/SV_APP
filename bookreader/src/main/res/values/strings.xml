@@ -3,6 +3,13 @@
     <string name="sv_theme_dark">Тёмная</string>
     <string name="sv_theme_light">Светлая</string>
 
+    <!-- Search -->
+    <string name="search_placeholder">Поиск в книге</string>
+    <string name="search_previous">Предыдущий</string>
+    <string name="search_next">Следующий</string>
+    <string name="search_close">Закрыть поиск</string>
+    <string name="search_no_results">Не найдено</string>
+
     <string name="sv_book_open">Открыть</string>
     <string name="sv_book_delete">Удалить</string>
     <string name="sv_pref_theme_title">Тема приложения</string>

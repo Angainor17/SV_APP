@@ -41,6 +41,8 @@ sealed class ReaderState {
         val zoomPivotY: Float = 0f,
         /** Is currently in zoom mode */
         val isInZoom: Boolean = false,
+        /** Search state */
+        val searchState: SearchState = SearchState(),
     ) : ReaderState()
 
     /**
