@@ -11,4 +11,8 @@
     <!-- Navigation panel buttons -->
     <string name="navigation_ok">ОК</string>
     <string name="navigation_cancel">Отмена</string>
+
+    <!-- Search -->
+    <string name="search">Поиск…</string>
+    <string name="textNotFound">Текст не найден</string>
 </resources>

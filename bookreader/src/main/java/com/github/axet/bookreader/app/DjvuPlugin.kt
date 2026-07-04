@@ -608,9 +608,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun setPage(page: Int) {
             this.initialPage = page
             if (str.isEmpty()) return
+            // Search all pages in the book (no limit)
             for (i in 0 until doc.pagesCount) {
                 all.addAll(search(Plugin.View.Selection.odd(page, i, doc.pagesCount)).rr)
-                if (all.isNotEmpty()) return
             }
         }
     }

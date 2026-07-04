@@ -669,19 +669,90 @@ class ReaderViewModel @Inject constructor(
     // ==================== Поиск ====================
 
     private fun search(query: String) {
-        fbReaderView?.app?.runAction("search", query)
+        val currentState = _state.value as? ReaderState.Content ?: return
+
+        // Update search state - only search if query has at least 2 characters
+        val shouldSearch = query.length >= 2
+        _state.value = currentState.copy(
+            searchState = currentState.searchState.copy(
+                isActive = true,
+                query = query,
+                resultsCount = 0,
+                currentResultIndex = 0,
+                isLoading = shouldSearch
+            )
+        )
+
+        // Perform search only if query has at least 2 characters
+        if (shouldSearch) {
+            fbReaderView?.performSearch(query) { count, index ->
+                // Callback after search completes
+                val state = _state.value as? ReaderState.Content
+                if (state != null) {
+                    _state.value = state.copy(
+                        searchState = state.searchState.copy(
+                            resultsCount = count,
+                            currentResultIndex = index,
+                            isLoading = false
+                        )
+                    )
+                }
+            }
+        }
     }
 
     private fun searchNext() {
-        fbReaderView?.app?.runAction("findNext")
+        fbReaderView?.performSearchNext { count, newIndex ->
+            val state = _state.value as? ReaderState.Content
+            if (state != null) {
+                _state.value = state.copy(
+                    searchState = state.searchState.copy(
+                        resultsCount = count,
+                        currentResultIndex = newIndex,
+                        isLoading = false
+                    )
+                )
+            }
+        }
     }
 
     private fun searchPrevious() {
-        fbReaderView?.app?.runAction("findPrevious")
+        fbReaderView?.performSearchPrevious { count, newIndex ->
+            val state = _state.value as? ReaderState.Content
+            if (state != null) {
+                _state.value = state.copy(
+                    searchState = state.searchState.copy(
+                        resultsCount = count,
+                        currentResultIndex = newIndex,
+                        isLoading = false
+                    )
+                )
+            }
+        }
     }
 
     private fun searchClose() {
+        val currentState = _state.value as? ReaderState.Content ?: return
+
+        _state.value = currentState.copy(
+            searchState = SearchState()
+        )
+
         fbReaderView?.searchClose()
+    }
+
+    /**
+     * Обновить результаты поиска (вызывается из FBReaderView listener)
+     */
+    fun updateSearchResults(count: Int, currentIndex: Int) {
+        val currentState = _state.value as? ReaderState.Content ?: return
+
+        _state.value = currentState.copy(
+            searchState = currentState.searchState.copy(
+                resultsCount = count,
+                currentResultIndex = currentIndex
+            )
+        )
     }
 
     // ==================== Вспомогательные методы ====================

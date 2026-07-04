@@ -433,6 +433,12 @@ fun ReaderContent(
                     Timber.tag("voronin").d("System back in zoom - resetting zoom")
                     viewModel.onAction(ReaderActions.ZoomReset)
                 }
+
+                // BackHandler для search mode
+                BackHandler(enabled = currentState.searchState.isActive) {
+                    Timber.tag("voronin").d("System back in search - closing search")
+                    viewModel.onAction(ReaderActions.SearchClose)
+                }
             }
         }
 
