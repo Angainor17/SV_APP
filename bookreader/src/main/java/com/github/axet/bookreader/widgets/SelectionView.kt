@@ -169,6 +169,43 @@ open class SelectionView(
      */
     val dragState: DragState get() = _dragState
 
+    /**
+     * Видимость handles (маркеров выделения).
+     * При смене страницы в paging mode handles скрыты, но выделение сохраняется.
+     */
+    private var _handlesVisible: Boolean = true
+
+    /**
+     * Публичное состояние видимости handles.
+     */
+    val handlesVisible: Boolean get() = _handlesVisible
+
+    /**
+     * Сохранённые данные выделения для восстановления после смены страницы.
+     */
+    private var _savedSelectionData: SavedSelectionData? = null
+
+    /**
+     * Данные для сохранения выделения при смене страницы.
+     */
+    data class SavedSelectionData(
+        val startRectData: HandleRectData?,
+        val endRectData: HandleRectData?,
+        val marginRect: Rect?,
+    )
+
+    data class HandleRectData(
+        val rectLeft: Int,
+        val rectTop: Int,
+        val rectRight: Int,
+        val rectBottom: Int,
+        val hotX: Int,
+        val hotY: Int,
+        val which: SelectionCursor.Which?,
+        val drawX: Int,
+        val drawY: Int,
+    )
+
     // === Legacy fields (будут удалены после полного refactor) ===
 
     var touch: PageView? = null
@@ -335,7 +372,8 @@ open class SelectionView(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (margin != null) { // не повреждено / не пустое окно
+        // Рисуем handles только если они видны и margin не null
+        if (_handlesVisible && margin != null) {
             drawHandle(canvas, startRect.which!!, startRect)
             drawHandle(canvas, endRect.which!!, endRect)
         }
@@ -504,6 +542,123 @@ open class SelectionView(
         if (selection != null) {
             selection.close()
         }
+    }
+
+    // === Page Change Handling ===
+
+    /**
+     * Скрывает всё выделение (handles + подсвеченный текст) при смене страницы.
+     * Используется в paging mode при свайпе страницы.
+     */
+    fun hideHandles() {
+        if (!_handlesVisible) {
+            Timber.tag("voronin").d("SelectionView hideHandles: already hidden, skipping")
+            return
+        }
+
+        Timber.tag("voronin").d("SelectionView hideHandles: hiding entire selection view for page change")
+        _handlesVisible = false
+
+        // Сохраняем текущие данные для восстановления
+        saveSelectionData()
+
+        // Скрываем весь SelectionView (handles + подсвеченный текст)
+        visibility = INVISIBLE
+
+        Timber.tag("voronin").d("SelectionView hideHandles: visibility set to INVISIBLE")
+    }
+
+    /**
+     * Восстанавливает всё выделение (handles + подсвеченный текст) при возврате на страницу.
+     */
+    fun restoreHandles() {
+        if (_handlesVisible) {
+            Timber.tag("voronin").d("SelectionView restoreHandles: already visible, skipping")
+            return
+        }
+
+        Timber.tag("voronin").d("SelectionView restoreHandles: restoring entire selection view, savedData=${_savedSelectionData != null}")
+        _handlesVisible = true
+
+        // Восстанавливаем данные если есть
+        restoreSelectionData()
+
+        // Показываем весь SelectionView
+        visibility = VISIBLE
+
+        Timber.tag("voronin").d("SelectionView restoreHandles: visibility set to VISIBLE")
+
+        // Обновляем отображение
+        invalidate()
+    }
+
+    /**
+     * Проверяет, есть ли сохранённое выделение.
+     */
+    fun hasSavedSelection(): Boolean = _savedSelectionData != null
+
+    /**
+     * Очищает сохранённые данные выделения.
+     */
+    fun clearSavedSelection() {
+        Timber.tag("voronin").d("SelectionView clearSavedSelection: clearing saved data")
+        _savedSelectionData = null
+    }
+
+    /**
+     * Сохраняет текущие данные выделения.
+     */
+    private fun saveSelectionData() {
+        if (margin == null) {
+            Timber.tag("voronin").w("SelectionView saveSelectionData: margin is null, cannot save")
+            return
+        }
+
+        _savedSelectionData = SavedSelectionData(
+            startRectData = startRect.rect?.let { r ->
+                HandleRectData(
+                    rectLeft = r.rect.left,
+                    rectTop = r.rect.top,
+                    rectRight = r.rect.right,
+                    rectBottom = r.rect.bottom,
+                    hotX = r.hotx,
+                    hotY = r.hoty,
+                    which = startRect.which,
+                    drawX = startRect.draw?.x ?: 0,
+                    drawY = startRect.draw?.y ?: 0,
+                )
+            },
+            endRectData = endRect.rect?.let { r ->
+                HandleRectData(
+                    rectLeft = r.rect.left,
+                    rectTop = r.rect.top,
+                    rectRight = r.rect.right,
+                    rectBottom = r.rect.bottom,
+                    hotX = r.hotx,
+                    hotY = r.hoty,
+                    which = endRect.which,
+                    drawX = endRect.draw?.x ?: 0,
+                    drawY = endRect.draw?.y ?: 0,
+                )
+            },
+            marginRect = Rect(margin),
+        )
+
+        Timber.tag("voronin").d("SelectionView saveSelectionData: saved - margin=${margin}, startWhich=${startRect.which}, endWhich=${endRect.which}")
+    }
+
+    /**
+     * Восстанавливает данные выделения.
+     */
+    private fun restoreSelectionData() {
+        val data = _savedSelectionData ?: return
+
+        // Восстанавливаем margin
+        if (data.marginRect != null) {
+            margin = Rect(data.marginRect)
+        }
+
+        Timber.tag("voronin").d("SelectionView restoreSelectionData: restored - margin=$margin")
     }
 
     /**

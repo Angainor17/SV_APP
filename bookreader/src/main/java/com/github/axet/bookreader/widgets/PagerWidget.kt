@@ -7,12 +7,14 @@ import android.view.MotionEvent
 import android.view.View
 import com.github.axet.bookreader.app.Plugin
 import com.github.axet.bookreader.app.Reflow
+import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.fbreader.fbreader.options.PageTurningOptions
 import org.geometerplus.zlibrary.core.application.ZLApplication
 import org.geometerplus.zlibrary.core.view.ZLViewEnums
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget
+import timber.log.Timber
 
 /**
  * Виджет для постраничного отображения книги.
@@ -219,8 +221,25 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
             }
 
             if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
-                fb.post { fb.selectionClose() }
-                selectionPage = null
+                // Выделение на другой странице - скрыть handles и panel, но сохранить данные
+                Timber.tag("voronin").d(
+                    "PagerWidget: page changed from %s to %s - hiding handles and panel (NOT closing selection)",
+                    selectionPage!!, position
+                )
+                fb.selection?.hideHandles()
+                fb.app.runAction(ActionCode.SELECTION_HIDE_PANEL)
+                // НЕ закрываем выделение полностью!
+                // selectionPage остаётся для возможности восстановления
+            } else if (selectionPage != null && selectionPage!!.samePositionAs(position)) {
+                // Возврат на страницу с выделением - восстановить handles и panel
+                Timber.tag("voronin").d(
+                    "PagerWidget: returned to selection page %s - restoring handles and panel",
+                    position
+                )
+                fb.selection?.restoreHandles()
+                fb.app.runAction(ActionCode.SELECTION_SHOW_PANEL)
+            } else if (selectionPage == null) {
+                Timber.tag("voronin").d("PagerWidget: no selection page, position=%s", position)
             }
         }
     }
@@ -353,12 +372,15 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
         if (fb.pluginview != null) {
             val dst = getPageRect()
             val pos = getPosition()
+            Timber.tag("voronin").d("PagerWidget onLongClick: attempting selection at position=%s, coords=(%d,%d)", pos, x, y)
             val s = fb.pluginview!!.select(pos, getInfo(), dst.width(), dst.height(), x - dst.left, y - dst.top)
             if (s != null) {
+                Timber.tag("voronin").d("PagerWidget onLongClick: selection created successfully at %s", pos)
                 if (fb.tts != null) {
                     fb.tts!!.selectionOpen(s)
                 } else {
                     selectionPage = pos
+                    Timber.tag("voronin").d("PagerWidget onLongClick: selectionPage set to %s", selectionPage!!)
                     fb.selectionOpen(s)
                     val page = fb.pluginview!!.selectPage(pos, getInfo(), dst.width(), dst.height())
                     val run = {
