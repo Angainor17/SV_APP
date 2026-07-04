@@ -115,7 +115,10 @@ fun FavoritesScreenContent(
                     .padding(paddingValues),
                 contentPadding = PaddingValues(16.dp),
             ) {
-                items(favorites) { article ->
+                items(
+                    items = favorites,
+                    key = { article -> article.title },
+                ) { article ->
                     FavoriteItem(
                         article = article,
                         onClick = {

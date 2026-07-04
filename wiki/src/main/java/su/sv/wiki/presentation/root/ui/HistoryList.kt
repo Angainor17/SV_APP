@@ -63,7 +63,10 @@ fun HistoryList(
             EmptyHistory()
         } else {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(history) { title ->
+                items(
+                    items = history,
+                    key = { title -> title },
+                ) { title ->
                     HistoryItem(
                         title = title,
                         onClick = { onItemClick(title) },

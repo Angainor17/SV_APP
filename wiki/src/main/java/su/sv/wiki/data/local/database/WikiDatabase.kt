@@ -18,7 +18,7 @@ import su.sv.wiki.data.local.entity.HistoryEntity
         HistoryEntity::class,
         ArticleCacheEntity::class,
     ],
-    version = 2,
+    version = 3,  // Added indexes for title, savedAt, cachedAt
     exportSchema = false,
 )
 abstract class WikiDatabase : RoomDatabase() {

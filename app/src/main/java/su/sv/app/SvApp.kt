@@ -38,13 +38,13 @@ class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguratio
         return ImageLoader.Builder(context)
             .memoryCache {
                 MemoryCache.Builder()
-                    .maxSizePercent(context, 0.25)
+                    .maxSizePercent(context, 0.25)  // 25% of available memory
                     .build()
             }
             .diskCache {
                 DiskCache.Builder()
                     .directory(context.cacheDir.resolve("image_cache").toOkioPath())
-                    .maxSizePercent(0.1)
+                    .maxSizeBytes(50L * 1024 * 1024)  // 50 MB for book covers
                     .build()
             }
             .build()

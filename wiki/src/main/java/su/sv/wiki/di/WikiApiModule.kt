@@ -1,10 +1,13 @@
 package su.sv.wiki.di
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,6 +28,7 @@ annotation class WikiRetrofit
 
 private const val CONNECTION_TIMEOUT_MS = 20_000L
 private const val WIKI_BASE_URL = "https://svremya.su/"
+private const val CACHE_SIZE_BYTES = 10 * 1024 * 1024L // 10 MB
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -40,12 +44,14 @@ internal interface WikiApiModule {
         @Singleton
         @WikiRetrofit
         fun provideWikiOkHttpClient(
+            @ApplicationContext context: Context,
             mockInterceptor: MockInterceptor
         ): OkHttpClient {
             return OkHttpClient.Builder()
                 .connectTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .readTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .writeTimeout(CONNECTION_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                .cache(Cache(context.cacheDir.resolve("wiki_http_cache"), CACHE_SIZE_BYTES))
                 .addInterceptor(mockInterceptor)
                 .build()
         }

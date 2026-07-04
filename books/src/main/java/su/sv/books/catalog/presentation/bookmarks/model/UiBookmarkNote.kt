@@ -1,11 +1,14 @@
 package su.sv.books.catalog.presentation.bookmarks.model
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
 /**
  * UI модель заметки для отображения в списке
+ * @Immutable - оптимизация Compose recomposition
  */
+@Immutable
 @Parcelize
 data class UiBookmarkNote(
     val id: String,
@@ -36,7 +39,9 @@ data class UiBookmarkNote(
 
 /**
  * UI модель книги с заметками
+ * @Immutable - оптимизация Compose recomposition
  */
+@Immutable
 @Parcelize
 data class UiBookWithNotes(
     val bookId: String,
@@ -61,15 +66,27 @@ sealed class UiBookmarksState {
     object Loading : UiBookmarksState()
     object Empty : UiBookmarksState()
 
+    /**
+     * @Immutable - оптимизация Compose recomposition
+     */
+    @Immutable
     data class NotesList(
         val notes: List<UiBookmarkNote>,
         val viewMode: NotesViewMode = NotesViewMode.LIST,
     ) : UiBookmarksState()
 
+    /**
+     * @Immutable - оптимизация Compose recomposition
+     */
+    @Immutable
     data class BooksList(
         val books: List<UiBookWithNotes>,
     ) : UiBookmarksState()
 
+    /**
+     * @Immutable - оптимизация Compose recomposition
+     */
+    @Immutable
     data class BookNotes(
         val book: UiBookWithNotes,
         val notes: List<UiBookmarkNote>,

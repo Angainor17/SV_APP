@@ -1,11 +1,14 @@
 package su.sv.news.presentation.root.model
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
 /**
  * Отображение информации о новости в списке
+ * @Immutable - оптимизация Compose recomposition
  */
+@Immutable
 @Parcelize
 data class UiNewsItem(
 

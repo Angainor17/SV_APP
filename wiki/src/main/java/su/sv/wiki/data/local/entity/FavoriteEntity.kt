@@ -1,12 +1,20 @@
 package su.sv.wiki.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
  * Entity для хранения избранных статей
+ * @Index on title - оптимизация для SELECT/DELETE WHERE title = :title
+ * @Index on savedAt - оптимизация для ORDER BY savedAt
  */
-@Entity(tableName = "favorites")
+@Entity(
+    tableName = "favorites",
+    indices = [
+        Index(value = ["savedAt"]),
+    ]
+)
 data class FavoriteEntity(
     @PrimaryKey
     val title: String,

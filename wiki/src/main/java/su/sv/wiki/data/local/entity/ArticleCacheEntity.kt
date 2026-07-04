@@ -1,12 +1,19 @@
 package su.sv.wiki.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
  * Entity для кэширования статей
+ * @Index on cachedAt - оптимизация для ORDER BY cachedAt
  */
-@Entity(tableName = "article_cache")
+@Entity(
+    tableName = "article_cache",
+    indices = [
+        Index(value = ["cachedAt"]),
+    ]
+)
 data class ArticleCacheEntity(
     @PrimaryKey
     val title: String,

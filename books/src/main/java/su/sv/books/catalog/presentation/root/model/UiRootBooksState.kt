@@ -1,5 +1,6 @@
 package su.sv.books.catalog.presentation.root.model
 
+import androidx.compose.runtime.Immutable
 import su.sv.models.ui.book.UiBook
 
 /**
@@ -7,6 +8,10 @@ import su.sv.models.ui.book.UiBook
  */
 sealed class UiRootBooksState {
 
+    /**
+     * @Immutable - оптимизация Compose recomposition
+     */
+    @Immutable
     data class Content(
         val books: List<UiBook>,
         val filteredBooks: List<UiBook>,

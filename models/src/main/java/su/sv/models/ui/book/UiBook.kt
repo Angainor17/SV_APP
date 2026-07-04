@@ -2,11 +2,14 @@ package su.sv.models.ui.book
 
 import android.net.Uri
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
 /**
  * Отображение информации о книге в списке
+ * @Immutable - оптимизация Compose recomposition
  */
+@Immutable
 @Parcelize
 data class UiBook(
 
