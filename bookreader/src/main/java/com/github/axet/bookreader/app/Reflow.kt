@@ -109,7 +109,7 @@ class Reflow(
 
     private fun create() {
         val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        var old: Float = shared.getFloat(BookApplication.PREFERENCE_FONTSIZE_REFLOW, BookApplication.PREFERENCE_FONTSIZE_REFLOW_DEFAULT)
+        var old: Float = shared.getFloat(ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW, ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW_DEFAULT)
         if (info.fontsize != null)
             old = info.fontsize!! / 100f
         k2?.let {

@@ -20,7 +20,7 @@ import com.github.axet.androidlibrary.sound.TTS
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.androidlibrary.widgets.Toast
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Plugin
 import com.github.axet.bookreader.app.Reflow
 import com.github.axet.bookreader.app.Storage
@@ -138,7 +138,7 @@ class TTSPopup(val fb: FBReaderView) {
     val tts: TTS = object : TTS(context) {
         override fun getUserLocale(): Locale {
             val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val lang = shared.getString(BookApplication.PREFERENCE_LANGUAGE, "") ?: ""
+            val lang = shared.getString(ReaderPreferences.PREFERENCE_LANGUAGE, "") ?: ""
             return if (lang.isEmpty()) Locale.getDefault() else Locale(lang)
         }
 

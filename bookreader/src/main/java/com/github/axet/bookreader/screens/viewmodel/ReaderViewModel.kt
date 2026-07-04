@@ -7,7 +7,7 @@ import android.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.widgets.FBReaderView
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -357,7 +357,7 @@ class ReaderViewModel @Inject constructor(
 
         // Сохраняем в prefs
         shared.edit {
-            putString(BookApplication.PREFERENCE_VIEW_MODE, newMode.toString())
+            putString(ReaderPreferences.PREFERENCE_VIEW_MODE, newMode.toString())
         }
 
         // Применяем к FBReaderView
@@ -647,22 +647,22 @@ class ReaderViewModel @Inject constructor(
     // ==================== Шрифты ====================
 
     private fun setFontSize(size: Int) {
-        shared.edit { putInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, size) }
+        shared.edit { putInt(ReaderPreferences.PREFERENCE_FONTSIZE_FBREADER, size) }
         fbReaderView?.setFontsizeFB(size)
     }
 
     private fun setReflowFontSize(size: Float) {
-        shared.edit { putFloat(BookApplication.PREFERENCE_FONTSIZE_REFLOW, size) }
+        shared.edit { putFloat(ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW, size) }
         fbReaderView?.setFontsizeReflow(size)
     }
 
     private fun setFontFamily(family: String) {
-        shared.edit { putString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, family) }
+        shared.edit { putString(ReaderPreferences.PREFERENCE_FONTFAMILY_FBREADER, family) }
         fbReaderView?.setFontFB(family)
     }
 
     private fun setIgnoreEmbeddedFonts(ignore: Boolean) {
-        shared.edit { putBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, ignore) }
+        shared.edit { putBoolean(ReaderPreferences.PREFERENCE_IGNORE_EMBEDDED_FONTS, ignore) }
         fbReaderView?.setIgnoreCssFonts(ignore)
     }
 
@@ -758,7 +758,7 @@ class ReaderViewModel @Inject constructor(
     // ==================== Вспомогательные методы ====================
 
     private fun getViewModeFromPrefs(): ViewMode {
-        val mode = shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "") ?: ""
+        val mode = shared.getString(ReaderPreferences.PREFERENCE_VIEW_MODE, "") ?: ""
         return if (mode == FBReaderView.Widgets.CONTINUOUS.toString()) {
             ViewMode.CONTINUOUS
         } else {
