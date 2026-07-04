@@ -891,7 +891,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
 
     public Uri getStoragePath() {
         SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
-        String path = shared.getString(BookApplication.PREFERENCE_STORAGE, null);
+        String path = shared.getString(ReaderPreferences.PREFERENCE_STORAGE, null);
         if (path == null)
             return Uri.fromFile(getLocalStorage());
         else

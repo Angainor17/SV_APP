@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import su.sv.commonui.ui.components.AppToolbarWithBack
@@ -53,30 +53,30 @@ fun ReaderSettingsContent(
     // Состояния настроек (кроме темы - она через ThemeViewModel)
     var viewMode by remember {
         mutableStateOf(
-            shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "PAGING") ?: "PAGING"
+            shared.getString(ReaderPreferences.PREFERENCE_VIEW_MODE, "PAGING") ?: "PAGING"
         )
     }
     var volumeKeys by remember {
-        mutableStateOf(shared.getBoolean(BookApplication.PREFERENCE_VOLUME_KEYS, false))
+        mutableStateOf(shared.getBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, false))
     }
     var screenLock by remember {
-        mutableStateOf(shared.getString(BookApplication.PREFERENCE_SCREENLOCK, "0") ?: "0")
+        mutableStateOf(shared.getString(ReaderPreferences.PREFERENCE_SCREENLOCK, "0") ?: "0")
     }
     var rotate by remember {
-        mutableStateOf(shared.getBoolean(BookApplication.PREFERENCE_ROTATE, false))
+        mutableStateOf(shared.getBoolean(ReaderPreferences.PREFERENCE_ROTATE, false))
     }
 
     // Слушатель изменений (без темы)
     val listener = remember {
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             when (key) {
-                BookApplication.PREFERENCE_VIEW_MODE ->
+                ReaderPreferences.PREFERENCE_VIEW_MODE ->
                     viewMode = sharedPreferences.getString(key, "PAGING") ?: "PAGING"
-                BookApplication.PREFERENCE_VOLUME_KEYS ->
+                ReaderPreferences.PREFERENCE_VOLUME_KEYS ->
                     volumeKeys = sharedPreferences.getBoolean(key, false)
-                BookApplication.PREFERENCE_SCREENLOCK ->
+                ReaderPreferences.PREFERENCE_SCREENLOCK ->
                     screenLock = sharedPreferences.getString(key, "0") ?: "0"
-                BookApplication.PREFERENCE_ROTATE ->
+                ReaderPreferences.PREFERENCE_ROTATE ->
                     rotate = sharedPreferences.getBoolean(key, false)
             }
         }
@@ -115,7 +115,7 @@ fun ReaderSettingsContent(
                 },
                 onClick = {
                     val newMode = if (viewMode == "PAGING") "CONTINUOUS" else "PAGING"
-                    shared.edit { putString(BookApplication.PREFERENCE_VIEW_MODE, newMode) }
+                    shared.edit { putString(ReaderPreferences.PREFERENCE_VIEW_MODE, newMode) }
                 },
             )
 
@@ -125,7 +125,7 @@ fun ReaderSettingsContent(
                 subtitle = stringResource(R.string.sv_pref_volume_summary),
                 checked = volumeKeys,
                 onCheckedChange = { checked ->
-                    shared.edit { putBoolean(BookApplication.PREFERENCE_VOLUME_KEYS, checked) }
+                    shared.edit { putBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, checked) }
                 },
             )
 
@@ -135,7 +135,7 @@ fun ReaderSettingsContent(
                 subtitle = stringResource(R.string.sv_pref_rotate_summary),
                 checked = rotate,
                 onCheckedChange = { checked ->
-                    shared.edit { putBoolean(BookApplication.PREFERENCE_ROTATE, checked) }
+                    shared.edit { putBoolean(ReaderPreferences.PREFERENCE_ROTATE, checked) }
                 },
             )
 

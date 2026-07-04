@@ -64,7 +64,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.BookApplication
+import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.BookReaderInitializer
 import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
@@ -678,7 +678,7 @@ private fun FontsComposeBottomSheet(
     var fontSize by remember {
         mutableFloatStateOf(
             shared.getInt(
-                BookApplication.PREFERENCE_FONTSIZE_FBREADER,
+                ReaderPreferences.PREFERENCE_FONTSIZE_FBREADER,
                 16
             ).toFloat()
         )
@@ -686,7 +686,7 @@ private fun FontsComposeBottomSheet(
     var selectedFont by remember {
         mutableStateOf(
             shared.getString(
-                BookApplication.PREFERENCE_FONTFAMILY_FBREADER,
+                ReaderPreferences.PREFERENCE_FONTFAMILY_FBREADER,
                 "sans-serif"
             ) ?: "sans-serif"
         )
@@ -694,7 +694,7 @@ private fun FontsComposeBottomSheet(
     var ignoreEmbeddedFonts by remember {
         mutableStateOf(
             shared.getBoolean(
-                BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS,
+                ReaderPreferences.PREFERENCE_IGNORE_EMBEDDED_FONTS,
                 false
             )
         )
@@ -879,7 +879,7 @@ private fun VolumeKeysHandler(
 
     val volumeKeysEnabled = remember {
         val shared = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
-        shared.getBoolean(BookApplication.PREFERENCE_VOLUME_KEYS, false)
+        shared.getBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, false)
     }
 
     DisposableEffect(fbReaderView, volumeKeysEnabled) {

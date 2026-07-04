@@ -64,7 +64,7 @@ object BookReaderInitializer {
 
         // Загрузка настроек папки шрифтов
         val shared = PreferenceManager.getDefaultSharedPreferences(context)
-        val fonts: String = shared.getString(BookApplication.PREFERENCE_FONTS_FOLDER, "").orEmpty()
+        val fonts: String = shared.getString(ReaderPreferences.PREFERENCE_FONTS_FOLDER, "").orEmpty()
         if (fonts.isNotEmpty()) {
             try {
                 val uri = fonts.toUri()

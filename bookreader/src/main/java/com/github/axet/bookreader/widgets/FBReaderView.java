@@ -40,7 +40,7 @@ import com.github.axet.androidlibrary.net.HttpClient;
 import com.github.axet.androidlibrary.preferences.AboutPreferenceCompat;
 import com.github.axet.androidlibrary.widgets.ThemeUtils;
 import com.github.axet.bookreader.R;
-import com.github.axet.bookreader.app.BookApplication;
+import com.github.axet.bookreader.app.ReaderPreferences;
 import com.github.axet.bookreader.app.Plugin;
 import com.github.axet.bookreader.app.Reflow;
 import com.github.axet.bookreader.app.Storage;
@@ -222,7 +222,7 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void configWidget(SharedPreferences shared) {
-        String mode = shared.getString(BookApplication.PREFERENCE_VIEW_MODE, "");
+        String mode = shared.getString(ReaderPreferences.PREFERENCE_VIEW_MODE, "");
         setWidget(mode.equals(FBReaderView.Widgets.CONTINUOUS.toString()) ? FBReaderView.Widgets.CONTINUOUS : FBReaderView.Widgets.PAGING);
     }
 
@@ -230,13 +230,13 @@ public class FBReaderView extends RelativeLayout {
         SharedPreferences shared = android.preference.PreferenceManager.getDefaultSharedPreferences(getContext());
         configColorProfile();
 
-        int d = shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue());
+        int d = shared.getInt(ReaderPreferences.PREFERENCE_FONTSIZE_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue());
         config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, d);
 
-        String f = shared.getString(BookApplication.PREFERENCE_FONTFAMILY_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption.getValue());
+        String f = shared.getString(ReaderPreferences.PREFERENCE_FONTFAMILY_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption.getValue());
         config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontFamilyOption, f);
 
-        boolean ignoreCSSFonts = shared.getBoolean(BookApplication.PREFERENCE_IGNORE_EMBEDDED_FONTS, false);
+        boolean ignoreCSSFonts = shared.getBoolean(ReaderPreferences.PREFERENCE_IGNORE_EMBEDDED_FONTS, false);
         config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().UseCSSFontFamilyOption, !ignoreCSSFonts);
 
         config.setValue(app.MiscOptions.AllowScreenBrightnessAdjustment, false);
