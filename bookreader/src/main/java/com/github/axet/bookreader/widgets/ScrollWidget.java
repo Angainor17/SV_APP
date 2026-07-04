@@ -518,7 +518,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             selectionUpdate(view);
         linksUpdate(view);
         bookmarksUpdate(view);
-        if (view.search != null)
+        if (fb.search != null)  // Call searchUpdate if search is active (not just if view.search exists)
             searchUpdate(view);
         if (view.tts != null)
             ttsUpdate(view);

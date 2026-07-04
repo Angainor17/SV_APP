@@ -93,7 +93,10 @@ fun ReaderTopBar(
                     }
                     // If no results and query exists - show nothing (remove "Не найдено")
 
-                    // Navigation buttons - close together, no spacer
+                    // Spacer to push arrows to the right edge
+                    Spacer(modifier = Modifier.weight(1f, fill = true))
+
+                    // Navigation buttons - always at right edge
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(0.dp)
