@@ -33,6 +33,14 @@ sealed class ReaderState {
         val canChangeFont: Boolean = true,
         /** Флаг: были ли показаны подсказки зон касания при открытии книги */
         val hasShownControlsHint: Boolean = false,
+        /** Zoom scale (1.0 = normal, >1.0 = zoomed in) */
+        val zoomScale: Float = 1.0f,
+        /** Zoom pivot X (focus point for zoom) */
+        val zoomPivotX: Float = 0f,
+        /** Zoom pivot Y (focus point for zoom) */
+        val zoomPivotY: Float = 0f,
+        /** Is currently in zoom mode */
+        val isInZoom: Boolean = false,
     ) : ReaderState()
 
     /**

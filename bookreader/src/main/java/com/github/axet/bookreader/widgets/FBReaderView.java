@@ -9,9 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Parcel;
@@ -32,7 +30,6 @@ import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.core.graphics.ColorUtils;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -41,7 +38,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.axet.androidlibrary.net.HttpClient;
 import com.github.axet.androidlibrary.preferences.AboutPreferenceCompat;
-import com.github.axet.androidlibrary.widgets.PinchView;
 import com.github.axet.androidlibrary.widgets.ThemeUtils;
 import com.github.axet.bookreader.R;
 import com.github.axet.bookreader.app.BookApplication;
@@ -113,12 +109,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import su.sv.managers.OnBookPagerManager;
-
 import timber.log.Timber;
 
 // SelectionView refactoring imports
-import com.github.axet.bookreader.widgets.SelectionCallbacks;
-import com.github.axet.bookreader.widgets.HandleType;
 
 public class FBReaderView extends RelativeLayout {
     public static final String ACTION_MENU = FBReaderView.class.getCanonicalName() + ".ACTION_MENU";
@@ -1354,26 +1347,49 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void overlaysClose() {
-        pinchClose();
         selectionClose();
         linksClose();
         bookmarksClose();
         searchClose();
     }
 
-    public boolean isPinch() {
+    /**
+     * Check if currently in zoom mode
+     */
+    public boolean isZoom() {
         if (widget instanceof ScrollWidget)
-            return ((ScrollWidget) widget).gesturesListener.pinch.isPinch();
+            return ((ScrollWidget) widget).gesturesListener.getZoomHandler().isInZoom();
         if (widget instanceof PagerWidget)
-            return ((PagerWidget) widget).pinch.isPinch();
+            return ((PagerWidget) widget).getZoomHandler().isInZoom();
         return false;
     }
 
-    public void pinchClose() {
+    /**
+     * Reset zoom to normal (1.0)
+     */
+    public void resetZoom() {
         if (widget instanceof ScrollWidget)
-            ((ScrollWidget) widget).gesturesListener.pinch.pinchClose();
+            ((ScrollWidget) widget).gesturesListener.getZoomHandler().resetZoom();
         if (widget instanceof PagerWidget)
-            ((PagerWidget) widget).pinch.pinchClose();
+            ((PagerWidget) widget).getZoomHandler().resetZoom();
+    }
+
+    /**
+     * Get current zoom scale
+     */
+    public float getZoomScale() {
+        if (widget instanceof ScrollWidget)
+            return ((ScrollWidget) widget).gesturesListener.getZoomHandler().getCurrentZoom();
+        if (widget instanceof PagerWidget)
+            return ((PagerWidget) widget).getZoomHandler().getCurrentZoom();
+        return 1.0f;
+    }
+
+    /**
+     * Get zoom touch adapter for coordinate adaptation
+     */
+    public ZoomTouchAdapter getZoomTouchAdapter() {
+        return new ZoomTouchAdapter(this);
     }
 
     public void showControls() {
@@ -1404,7 +1420,6 @@ public class FBReaderView extends RelativeLayout {
         ZLTextPosition scrollDelayed = getPosition();
         reset();
         gotoPosition(scrollDelayed);
-        pinchClose();
     }
 
     public boolean isReflow() {
@@ -1520,6 +1535,19 @@ public class FBReaderView extends RelativeLayout {
         void onSelectionShow(int startY, int endY);
 
         void onSelectionHide();
+
+        /**
+         * Called when zoom scale changes.
+         * @param scale The new zoom scale (1.0 = normal, >1.0 = zoomed in)
+         * @param pivotX The X pivot point for zoom
+         * @param pivotY The Y pivot point for zoom
+         */
+        void onZoomChange(float scale, float pivotX, float pivotY);
+
+        /**
+         * Called when zoom mode ends (scale returns to 1.0)
+         */
+        void onZoomEnd();
     }
 
     public static class ZLTextIndexPosition extends com.github.axet.bookreader.widgets.ZLTextIndexPosition {
@@ -1669,64 +1697,6 @@ public class FBReaderView extends RelativeLayout {
     public static class BrightnessGesture extends com.github.axet.bookreader.widgets.BrightnessGesture {
         public BrightnessGesture(FBReaderView view) {
             super(view);
-        }
-    }
-
-    public static class PinchGesture extends com.github.axet.androidlibrary.widgets.PinchGesture {
-        FBReaderView fb;
-
-        public PinchGesture(FBReaderView view) {
-            super(view.getContext());
-            this.fb = view;
-        }
-
-        public boolean isScaleTouch(MotionEvent e) {
-            if (fb.pluginview == null || fb.pluginview.reflow)
-                return false;
-            return super.isScaleTouch(e);
-        }
-
-        public void pinchOpen(int page, Rect v) {
-            Bitmap bm = fb.pluginview.render(v.width(), v.height(), page);
-            pinch = new PinchView(context, v, bm) {
-                public final int clip;
-
-                {
-                    if (fb.widget instanceof ScrollWidget)
-                        clip = ((ScrollWidget) fb.widget).getMainAreaHeight();
-                    else
-                        clip = ((ZLAndroidWidget) fb.widget).getMainAreaHeight();
-                }
-
-                @Override
-                public void pinchClose() {
-                    PinchGesture.this.pinchClose();
-                }
-
-                @Override
-                protected void dispatchDraw(Canvas canvas) {
-                    Rect c = canvas.getClipBounds();
-                    c.bottom = clip - getTop();
-                    canvas.clipRect(c);
-                    super.dispatchDraw(canvas);
-                }
-            };
-            if (fb.pluginview != null) {
-                pinch.image.setColorFilter(fb.pluginview.paint.getColorFilter());
-            } else {
-                int wallpaperColor = (0xff << 24) | fb.app.BookTextView.getBackgroundColor().intValue();
-                if (ColorUtils.calculateLuminance(wallpaperColor) < 0.5f)
-                    pinch.image.setColorFilter(new ColorMatrixColorFilter(Plugin.View.NEGATIVE));
-                else
-                    pinch.image.setColorFilter(null);
-            }
-            fb.addView(pinch, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        }
-
-        public void pinchClose() {
-            if (pinch != null)
-                fb.removeView(pinch);
-            super.pinchClose();
         }
     }
 

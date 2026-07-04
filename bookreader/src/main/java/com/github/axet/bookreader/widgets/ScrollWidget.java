@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.PowerManager;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -310,7 +309,6 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         if (pos < 0 || pos >= adapter.pages.size())
             return;
         smoothScrollToPosition(pos);
-        gesturesListener.pinch.pinchClose();
     }
 
     @Override
@@ -337,7 +335,6 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
     public void draw(Canvas c) {
         if (adapter.size.w != getWidth() || adapter.size.h != getHeight()) { // reset for textbook and reflow mode only
             adapter.reset();
-            gesturesListener.pinch.pinchClose();
         }
         super.draw(c);
         updatePosition();
@@ -1537,40 +1534,77 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
     }
 
-    public class Gestures implements GestureDetector.OnGestureListener {
+    public class Gestures implements GestureDetector.OnGestureListener, ZoomGestureHandler.ZoomListener {
         MotionEvent e;
         int x;
         int y;
         ScrollAdapter.PageView v;
         ScrollAdapter.PageCursor c;
-        FBReaderView.PinchGesture pinch;
         GestureDetectorCompat gestures;
         FBReaderView.BrightnessGesture brightness;
+        ZoomGestureHandler zoomHandler;
 
         Gestures() {
             gestures = new GestureDetectorCompat(fb.getContext(), this);
             brightness = new FBReaderView.BrightnessGesture(fb);
+            zoomHandler = new ZoomGestureHandler(fb.getContext(), this);
+        }
 
-            if (Looper.myLooper() != null) {
-                pinch = new FBReaderView.PinchGesture(fb) {
-                    @Override
-                    public void onScaleBegin(float x, float y) {
-                        ScrollAdapter.PageView v = findView(x, y);
-                        if (v == null)
-                            return;
-                        int pos = v.holder.getAdapterPosition();
-                        if (pos == -1)
-                            return;
-                        ScrollAdapter.PageCursor c = adapter.pages.get(pos);
-                        int page;
-                        if (c.start == null)
-                            page = c.end.getParagraphIndex() - 1;
-                        else
-                            page = c.start.getParagraphIndex();
-                        pinchOpen(page, new Rect(v.getLeft(), v.getTop(), v.getLeft() + v.getWidth(), v.getTop() + v.getHeight()));
-                    }
-                };
+        @Override
+        public void onZoomChange(float scale, float pivotX, float pivotY) {
+            if (fb.listener != null) {
+                fb.listener.onZoomChange(scale, pivotX, pivotY);
             }
+            // Apply zoom to FBReaderView
+            fb.setScaleX(scale);
+            fb.setScaleY(scale);
+            fb.setPivotX(pivotX);
+            fb.setPivotY(pivotY);
+        }
+
+        @Override
+        public void onZoomEnd() {
+            if (fb.listener != null) {
+                fb.listener.onZoomEnd();
+            }
+            // Reset zoom on FBReaderView
+            fb.setScaleX(1.0f);
+            fb.setScaleY(1.0f);
+            fb.setPivotX(0f);
+            fb.setPivotY(0f);
+        }
+
+        @Override
+        public Integer getPageContentWidth() {
+            // Get page content width for fit-width zoom calculation
+            if (fb.pluginview != null && fb.pluginview.current != null) {
+                // Use current.w - the rendered page width on screen (in pixels)
+                // This accounts for actual display size including margins
+                return fb.pluginview.current.w;
+            }
+            // Default: use widget width
+            return getWidth();
+        }
+
+        @Override
+        public int getScreenWidth() {
+            return getWidth();
+        }
+
+        @Override
+        public int getScreenHeight() {
+            return getHeight();
+        }
+
+        @Override
+        public void onPanChange(float offsetX, float offsetY) {
+            // Apply translation offset for pan when zoomed
+            fb.setTranslationX(offsetX);
+            fb.setTranslationY(offsetY);
+        }
+
+        ZoomGestureHandler getZoomHandler() {
+            return zoomHandler;
         }
 
         boolean open(MotionEvent e) {
@@ -1584,8 +1618,10 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
             v = findView(e);
             if (v == null)
                 return false;
-            x = (int) (e.getX() - v.getLeft());
-            y = (int) (e.getY() - v.getTop());
+            // Adapt coordinates for zoom if needed
+            ZoomTouchAdapter zoomAdapter = fb.getZoomTouchAdapter();
+            x = zoomAdapter.adaptX(e.getX(), v);
+            y = zoomAdapter.adaptY(e.getY(), v);
             int pos = v.holder.getAdapterPosition();
             if (pos == -1)
                 return false;
@@ -1714,8 +1750,11 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
 
         public boolean onTouchEvent(MotionEvent e) {
-            if (pinch.onTouchEvent(e))
-                return true;
+            // Process zoom gestures first, but don't intercept (returns false)
+            // Only enable zoom for PDF/DJVU without reflow
+            if (fb.pluginview != null && !fb.pluginview.reflow) {
+                zoomHandler.onTouchEvent(e);
+            }
             onReleaseCheck(e);
             onCancelCheck(e);
             if (brightness.onTouchEvent(e))

@@ -2,7 +2,6 @@ package com.github.axet.bookreader.widgets
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.os.Looper
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -18,10 +17,10 @@ import org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget
 /**
  * Виджет для постраничного отображения книги.
  */
-class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
+class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), ZoomGestureHandler.ZoomListener {
 
-    @JvmField val pinch: FBReaderView.PinchGesture?
     @JvmField val brightness: FBReaderView.BrightnessGesture
+    private val zoomHandler: ZoomGestureHandler
 
     private var x: Int = 0
     private var y: Int = 0
@@ -42,16 +41,49 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
 
         fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byTapAndFlick)
 
-        pinch = if (Looper.myLooper() != null) { // render view only
-            object : FBReaderView.PinchGesture(fb) {
-                override fun onScaleBegin(x: Float, y: Float) {
-                    pinchOpen(fb.pluginview!!.current!!.pageNumber, getPageRect())
-                }
-            }
-        } else null
-
         brightness = FBReaderView.BrightnessGesture(fb)
+        zoomHandler = ZoomGestureHandler(fb.context, this)
     }
+
+    override fun onZoomChange(scale: Float, pivotX: Float, pivotY: Float) {
+        fb.listener?.onZoomChange(scale, pivotX, pivotY)
+        // Apply zoom to FBReaderView
+        fb.scaleX = scale
+        fb.scaleY = scale
+        fb.pivotX = pivotX
+        fb.pivotY = pivotY
+    }
+
+    override fun onZoomEnd() {
+        fb.listener?.onZoomEnd()
+        // Reset zoom on FBReaderView
+        fb.scaleX = 1.0f
+        fb.scaleY = 1.0f
+        fb.pivotX = 0f
+        fb.pivotY = 0f
+    }
+
+    override fun getPageContentWidth(): Int? {
+        // Get page content width for fit-width zoom calculation
+        if (fb.pluginview != null && fb.pluginview!!.current != null) {
+            // Use current.w - the rendered page width on screen (in pixels)
+            return fb.pluginview!!.current!!.w
+        }
+        // Default: use widget width
+        return width
+    }
+
+    override fun getScreenWidth(): Int = width
+
+    override fun getScreenHeight(): Int = height
+
+    override fun onPanChange(offsetX: Float, offsetY: Float) {
+        // Apply translation offset for pan when zoomed
+        fb.translationX = offsetX
+        fb.translationY = offsetY
+    }
+
+    fun getZoomHandler(): ZoomGestureHandler = zoomHandler
 
     /**
      * Возвращает прямоугольник текущей страницы.
@@ -304,9 +336,9 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context) {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         x = event.x.toInt()
         y = event.y.toInt()
+        // Process zoom gestures for PDF/DJVU without reflow
         if (fb.pluginview != null && !fb.pluginview!!.reflow) {
-            if (pinch?.onTouchEvent(event) == true)
-                return true
+            zoomHandler.onTouchEvent(event)
         }
         return super.onTouchEvent(event)
     }
