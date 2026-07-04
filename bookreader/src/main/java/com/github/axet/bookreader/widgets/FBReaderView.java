@@ -50,8 +50,6 @@ import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.OnClickWrapper;
 import com.github.johnpersano.supertoasts.util.OnDismissWrapper;
 
-import org.geometerplus.android.fbreader.PopupPanel;
-import org.geometerplus.android.fbreader.TextSearchPopup;
 import org.geometerplus.android.fbreader.dict.DictionaryUtil;
 import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
 import org.geometerplus.android.util.UIMessageUtil;
@@ -206,10 +204,6 @@ public class FBReaderView extends RelativeLayout {
         app.setWindow(new FBApplicationWindow());
         app.initWindow();
 
-        if (app.getPopupById(TextSearchPopup.ID) == null) {
-            new TextSearchPopup(app);
-        }
-
         config();
 
         app.BookTextView = new CustomView(app);
@@ -220,17 +214,11 @@ public class FBReaderView extends RelativeLayout {
         setWidget(Widgets.PAGING);
     }
 
-    public void configColorProfile(SharedPreferences shared) {
-        if (shared.getString(BookApplication.PREFERENCE_THEME, "").equals(getContext().getString(
-                com.github.axet.androidlibrary.R.string.Theme_Dark))
-        ) {
-            config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.NIGHT);
-        } else {
-            config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.DAY);
-            ColorProfile p = ColorProfile.get(ColorProfile.DAY);
-            config.setValue(p.BackgroundOption, 0xF5E5CC);
-            config.setValue(p.WallpaperOption, "");
-        }
+    public void configColorProfile() {
+        config.setValue(app.ViewOptions.ColorProfileName, ColorProfile.DAY);
+        ColorProfile p = ColorProfile.get(ColorProfile.DAY);
+        config.setValue(p.BackgroundOption, 0xF5E5CC);
+        config.setValue(p.WallpaperOption, "");
     }
 
     public void configWidget(SharedPreferences shared) {
@@ -240,7 +228,7 @@ public class FBReaderView extends RelativeLayout {
 
     public void config() {
         SharedPreferences shared = android.preference.PreferenceManager.getDefaultSharedPreferences(getContext());
-        configColorProfile(shared);
+        configColorProfile();
 
         int d = shared.getInt(BookApplication.PREFERENCE_FONTSIZE_FBREADER, app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption.getValue());
         config.setValue(app.ViewOptions.getTextStyleCollection().getBaseStyle().FontSizeOption, d);
@@ -434,51 +422,6 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public void setActivity(final Activity a, OnBookPagerManager onBookPagerManager) {
-        PopupPanel.removeAllWindows(app, a);
-
-        app.addAction(ActionCode.SEARCH, new FBAction(app) {
-            @Override
-            protected void run(Object... params) {
-                app.hideActivePopup();
-                final String pattern = (String) params[0];
-                final Runnable runnable = () -> {
-                    final TextSearchPopup popup = (TextSearchPopup) app.getPopupById(TextSearchPopup.ID);
-                    popup.initPosition();
-                    config.setValue(app.MiscOptions.TextSearchPattern, pattern);
-                    if (pluginview != null) {
-                        searchClose();
-                        search = pluginview.search(pattern);
-                        search.setPage(getPosition().getParagraphIndex());
-                        a.runOnUiThread(() -> {
-                            if (search.getCount() == 0) {
-                                UIMessageUtil.showErrorMessage(a, "textNotFound");
-                                popup.StartPosition = null;
-                            } else {
-                                if (widget instanceof ScrollWidget)
-                                    ((ScrollWidget) widget).updateOverlays();
-                                if (widget instanceof PagerWidget)
-                                    ((PagerWidget) widget).updateOverlaysReset();
-                                app.showPopup(popup.getId());
-                            }
-                        });
-                        return;
-                    }
-                    if (app.getTextView().search(pattern, true, false, false, false) != 0) {
-                        a.runOnUiThread(() -> {
-                            app.showPopup(popup.getId());
-                            if (widget instanceof ScrollWidget)
-                                reset();
-                        });
-                    } else {
-                        a.runOnUiThread(() -> {
-                            UIMessageUtil.showErrorMessage(a, "textNotFound");
-                            popup.StartPosition = null;
-                        });
-                    }
-                };
-                UIUtil.wait("search", runnable, getContext());
-            }
-        });
 
         app.addAction(ActionCode.DISPLAY_BOOK_POPUP, new FBAction(app) { //  new DisplayBookPopupAction(this, myFBReaderApp))
             @Override
@@ -933,8 +876,6 @@ public class FBReaderView extends RelativeLayout {
                 selectionSVAction(onBookPagerManager::tellAboutMisspell);
             }
         });
-
-        ((PopupPanel) app.getPopupById(TextSearchPopup.ID)).setPanelInfo(a, this);
     }
 
     private void selectionSVAction(CustomAction action) {
