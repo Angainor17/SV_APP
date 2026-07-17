@@ -11,25 +11,25 @@ import androidx.compose.ui.graphics.Color
 // LIGHT THEME COLORS
 // ============================================================
 
-// Primary - основной цвет бренда (Indigo)
-val LightPrimary = Color(0xFF3F51B5)
+// Primary - основной цвет бренда (Brown - сочетается с WarmGray фоном)
+val LightPrimary = Color(0xFF6D4C41)  // Brown 600
 val LightOnPrimary = Color(0xFFFFFFFF)
-val LightPrimaryContainer = Color(0xFFE8E8F0)
-val LightOnPrimaryContainer = Color(0xFF1A1A2E)
+val LightPrimaryContainer = Color(0xFFEFEBE9)  // Brown 50
+val LightOnPrimaryContainer = Color(0xFF3E2723)  // Brown 900
 
-// Secondary - акцентный цвет
-val LightSecondary = Color(0xFF5C6BC0)
+// Secondary - акцентный цвет (Brown 400)
+val LightSecondary = Color(0xFF8D6E63)  // Brown 400
 val LightOnSecondary = Color(0xFFFFFFFF)
-val LightSecondaryContainer = Color(0xFFE8EAF6)
-val LightOnSecondaryContainer = Color(0xFF1A237E)
+val LightSecondaryContainer = Color(0xFFD7CCC8)  // Brown 100
+val LightOnSecondaryContainer = Color(0xFF4E342E)  // Brown 800
 
 // Tertiary - используется для карточек книг
 // ВАЖНО: tertiaryContainer - фон карточки, onTertiary - текст на карточке
 // Согласуется с WarmGray палитрой: карточки темнее фона
-val LightTertiary = Color(0xFF5C6BC0)
-val LightOnTertiary = Color(0xFF1A1A2E)  // Тёмный текст на карточке
+val LightTertiary = Color(0xFF8D6E63)  // Brown 400
+val LightOnTertiary = Color(0xFF3E2723)  // Brown 900 - тёмный текст на карточке
 val LightTertiaryContainer = Color(0xFFE8E0D8)  // WarmGray 100 - тёмнее фона
-val LightOnTertiaryContainer = Color(0xFF1A237E)
+val LightOnTertiaryContainer = Color(0xFF3E2723)  // Brown 900
 
 // ============================================================
 // LIGHT THEME BACKGROUND COLORS
