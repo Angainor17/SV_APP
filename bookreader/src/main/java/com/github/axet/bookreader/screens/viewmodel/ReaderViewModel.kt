@@ -355,6 +355,9 @@ class ReaderViewModel @Inject constructor(
             ViewMode.PAGING
         }
 
+        // Скрываем панель выделения при смене режима просмотра
+        hideSelectionPanel()
+
         // Сохраняем в prefs
         shared.edit {
             putString(ReaderPreferences.PREFERENCE_VIEW_MODE, newMode.toString())
@@ -371,6 +374,10 @@ class ReaderViewModel @Inject constructor(
 
     private fun toggleReflow() {
         val currentState = _state.value as? ReaderState.Content ?: return
+
+        // Скрываем панель выделения при переключении reflow
+        hideSelectionPanel()
+
         fbReaderView?.setReflow(!fbReaderView!!.isReflow)
         val newReflow = !currentState.isReflow
         // При переключении reflow обновляем возможность смены шрифта
@@ -493,27 +500,38 @@ class ReaderViewModel @Inject constructor(
 
     private fun selectionCopy() {
         fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_COPY_TO_CLIPBOARD)
-        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+        hideSelectionPanel()
     }
 
     private fun selectionShare() {
         fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_SHARE)
-        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+        hideSelectionPanel()
     }
 
     private fun selectionBookmark() {
         fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_BOOKMARK)
-        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+        // Скрываем панель выделения после создания закладки
+        hideSelectionPanel()
+    }
+
+    /**
+     * Скрывает панель выделения текста (без debounce)
+     */
+    private fun hideSelectionPanel() {
+        val currentState = _state.value as? ReaderState.Content ?: return
+        _state.value = currentState.copy(showSelection = false)
+        // Очищаем выделение в FBReaderView
+        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_CLEAR)
     }
 
     private fun selectionQuestion() {
         fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.ASK_QUESTION)
-        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+        hideSelectionPanel()
     }
 
     private fun selectionAlert() {
         fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.TEL_ABOUT_MISSPELL)
-        // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
+        hideSelectionPanel()
     }
 
     private fun toggleFontSettings() {

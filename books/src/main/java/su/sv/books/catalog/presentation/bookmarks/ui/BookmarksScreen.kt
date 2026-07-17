@@ -47,10 +47,10 @@ import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.FullScreenError
-import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.ui.components.FullScreenEmpty
+import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.models.ui.book.UiBook
 import timber.log.Timber
 

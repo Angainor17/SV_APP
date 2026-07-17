@@ -25,25 +25,53 @@ val LightOnSecondaryContainer = Color(0xFF1A237E)
 
 // Tertiary - используется для карточек книг
 // ВАЖНО: tertiaryContainer - фон карточки, onTertiary - текст на карточке
+// Согласуется с WarmGray палитрой: карточки темнее фона
 val LightTertiary = Color(0xFF5C6BC0)
 val LightOnTertiary = Color(0xFF1A1A2E)  // Тёмный текст на карточке
-val LightTertiaryContainer = Color(0xFFE8EAF6)  // Светлый фон карточки
+val LightTertiaryContainer = Color(0xFFE8E0D8)  // WarmGray 100 - тёмнее фона
 val LightOnTertiaryContainer = Color(0xFF1A237E)
 
-// Background & Surface
-val LightBackground = Color(0xFFFFFBFE)
-val LightOnBackground = Color(0xFF1C1B1F)  // Основной текст - тёмный
-val LightSurface = Color(0xFFFFFFFF)
-val LightOnSurface = Color(0xFF1C1B1F)  // Текст на surface - тёмный
-val LightSurfaceVariant = Color(0xFFF5F5F5)
-val LightOnSurfaceVariant = Color(0xFF49454F)  // Вторичный текст
-val LightSurfaceDim = Color(0xFFE0E0E0)
-val LightSurfaceBright = Color(0xFFFFFFFF)
-val LightSurfaceContainerLowest = Color(0xFFFFFFFF)
-val LightSurfaceContainerLow = Color(0xFFFAFAFA)
-val LightSurfaceContainer = Color(0xFFF5F5F5)
-val LightSurfaceContainerHigh = Color(0xFFEEEEEE)
-val LightSurfaceContainerHighest = Color(0xFFE0E0E0)
+// ============================================================
+// LIGHT THEME BACKGROUND COLORS
+// Можно менять эти цвета в одном месте для экспериментов
+// ============================================================
+
+/**
+ * Мягкий теплый серый фон для светлой темы.
+ * WarmGray палитра (из background_colors_brown):
+ * - 0xFFF5F0EB (WarmGray 50) — очень светлый теплый (текущий фон)
+ * - 0xFFE8E0D8 (WarmGray 100) — светлый тёплый
+ * - 0xFFDDD3CA (WarmGray 150) — средний тёплый
+ */
+val LightBackgroundBase = Color(0xFFF5F0EB)  // WarmGray 50 - очень светлый теплый фон
+
+/**
+ * Цвет карточек - темнее фона для контраста.
+ * WarmGray палитра (из background_colors_brown):
+ * - 0xFFF5F0EB (WarmGray 50) — фон приложения
+ * - 0xFFE8E0D8 (WarmGray 100) — карточки (текущий)
+ * - 0xFFDDD3CA (WarmGray 150) — промежуточные элементы
+ */
+private val LightCardColor = Color(0xFFE8E0D8)  // WarmGray 100 - карточки темнее фона
+
+// Background & Surface - используют базовый цвет для согласованности
+val LightBackground = LightBackgroundBase  // Фон экранов под списками, bottomNav, тулбары
+val LightOnBackground = Color(0xFF1C1917)  // Основной текст - тёмный (WarmGray 900)
+val LightSurface = LightCardColor  // WarmGray 100 для карточек в списках
+val LightOnSurface = Color(0xFF1C1917)  // Текст на surface - тёмный
+val LightSurfaceVariant = Color(0xFFE8E0D8)  // WarmGray 100
+val LightOnSurfaceVariant = Color(0xFF57534E)  // Вторичный текст (WarmGray 600)
+val LightSurfaceDim = Color(0xFFDDD3CA)  // WarmGray 150
+val LightSurfaceBright = LightCardColor  // WarmGray 100
+
+// SurfaceContainer - система уровней для Material Design 3
+// Используются для разных уровней "возвышения" элементов
+// Иерархия: фон (WarmGray 50) < карточки (WarmGray 100) < промежуточные (WarmGray 150)
+val LightSurfaceContainerLowest = LightCardColor  // WarmGray 100 - для карточек
+val LightSurfaceContainerLow = LightCardColor     // WarmGray 100 - для Card (Material3)
+val LightSurfaceContainer = Color(0xFFDDD3CA)     // WarmGray 150 - промежуточный уровень
+val LightSurfaceContainerHigh = Color(0xFFDDD3CA) // WarmGray 150
+val LightSurfaceContainerHighest = Color(0xFFC9B8A8) // Тёмнее - самый тёмный
 
 // Outline
 val LightOutline = Color(0xFF79747E)
