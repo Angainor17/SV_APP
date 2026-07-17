@@ -22,17 +22,20 @@ import androidx.compose.ui.unit.dp
 import su.sv.commonui.R
 
 /**
- * Полноэкранный индикатор загрузки
+ * Полноэкранный индикатор загрузки с красивой анимацией
+ *
+ * @param style стиль анимации (по умолчанию GRADIENT_ARC)
  */
 @Composable
 fun FullScreenLoading(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    style: LoadingStyle = LoadingStyle.GRADIENT_ARC
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AppLoadingIndicator()
+        AnimatedLoadingIndicator(style = style)
     }
 }
 

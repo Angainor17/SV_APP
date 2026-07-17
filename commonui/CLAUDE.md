@@ -204,7 +204,43 @@ fun ThemeToggleIcon(
 
 ### FullScreenLoading
 
-Полноэкранный индикатор загрузки.
+Полноэкранный индикатор загрузки с красивой анимацией:
+
+```kotlin
+@Composable
+fun FullScreenLoading(
+    modifier: Modifier = Modifier,
+    style: LoadingStyle = LoadingStyle.PULSE_DOTS
+)
+
+enum class LoadingStyle {
+    PULSE_DOTS,      // Три точки с пульсацией
+    DOUBLE_CIRCLE,   // Двойной вращающийся круг
+    PULSE_CIRCLE,    // Пульсирующий круг
+    WAVE_DOTS,       // Волновые точки
+    GRADIENT_ARC     // Градиентная вращающаяся дуга
+}
+```
+
+**Особенности:**
+- Хорошо виден на обеих темах (светлой и тёмной)
+- Использует `primary` цвет из Material3 color scheme
+- `PULSE_DOTS` — рекомендуется как основной стиль
+
+### AnimatedLoadingIndicator
+
+Анимированный индикатор загрузки:
+
+```kotlin
+@Composable
+fun AnimatedLoadingIndicator(
+    style: LoadingStyle = LoadingStyle.PULSE_DOTS,
+    color: Color = MaterialTheme.colorScheme.primary,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    size: Dp = 48.dp,
+    modifier: Modifier = Modifier
+)
+```
 
 ### LoadingIndicator
 
@@ -317,6 +353,7 @@ commonui/src/main/java/su/sv/commonui/
     │   ├── AppCard.kt
     │   ├── AppDialog.kt
     │   ├── AppLoadingIndicator.kt
+    │   ├── AnimatedLoadingIndicator.kt
     │   ├── AppStates.kt
     │   ├── AppSwipeRefresh.kt
     │   ├── AppToolbar.kt
@@ -324,7 +361,6 @@ commonui/src/main/java/su/sv/commonui/
     ├── ButtonWithLoader.kt
     ├── ExpandingText.kt
     ├── FullScreenError.kt
-    ├── FullScreenLoading.kt
     ├── LoadableResultDialog.kt
     ├── LoadingIndicator.kt
     ├── OneTimeEffect.kt

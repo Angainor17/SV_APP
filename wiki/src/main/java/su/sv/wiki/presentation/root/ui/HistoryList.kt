@@ -91,6 +91,9 @@ private fun HistoryItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         androidx.compose.foundation.layout.Row(

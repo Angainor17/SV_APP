@@ -64,8 +64,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.BookReaderInitializer
+import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
 import com.github.axet.bookreader.screens.ui.NavigationComposeDialog
@@ -235,7 +235,7 @@ fun ReaderContent(
             }
 
             Scaffold(
-                containerColor = MaterialTheme.colorScheme.surface,  // Prevent flickering
+                containerColor = MaterialTheme.colorScheme.background,  // Мягкий светло-серый фон
                 topBar = {
                     // Animated visibility for smooth fullscreen transition
                     AnimatedVisibility(

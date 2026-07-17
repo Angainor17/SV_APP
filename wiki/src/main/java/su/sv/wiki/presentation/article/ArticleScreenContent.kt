@@ -36,8 +36,8 @@ import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.favorite
 import su.sv.commonui.ui.FullScreenError
-import su.sv.commonui.ui.FullScreenLoading
 import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.wiki.R
 import su.sv.wiki.presentation.root.ui.ArticleContent
 
