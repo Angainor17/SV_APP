@@ -1,29 +1,53 @@
 pluginManagement {
+    fun useNexus(): Boolean {
+        return File("local.properties")
+            .takeIf { it.exists() }
+            ?.inputStream()
+            ?.use { java.util.Properties().apply { load(it) } }
+            ?.getProperty("useNexus", "true")
+            ?.toBoolean() ?: true
+    }
+
     repositories {
-//        google {
-//            content {
-//                includeGroupByRegex("com\\.android.*")
-//                includeGroupByRegex("com\\.google.*")
-//                includeGroupByRegex("androidx.*")
-//                excludeGroup("ru.ok.tracer")
-//            }
-//        }
-        repositories.maven("https://nexus.vkteam.ru/repository/maven/")
+        if (useNexus()) {
+            maven("https://nexus.vkteam.ru/repository/maven/")
+        } else {
+            google {
+                content {
+                    includeGroupByRegex("""com\.android.*""")
+                    includeGroupByRegex("""com\.google.*""")
+                    includeGroupByRegex("""androidx.*""")
+                    excludeGroup("ru.ok.tracer")
+                }
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
+    fun useNexus(): Boolean {
+        return File("local.properties")
+            .takeIf { it.exists() }
+            ?.inputStream()
+            ?.use { java.util.Properties().apply { load(it) } }
+            ?.getProperty("useNexus", "true")
+            ?.toBoolean() ?: true
+    }
+
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-//        google {
-//            content {
-//                excludeGroup("ru.ok.tracer")
-//            }
-//        }
-        repositories.maven("https://nexus.vkteam.ru/repository/maven/")
-
-//        mavenCentral()
+        if (useNexus()) {
+            maven("https://nexus.vkteam.ru/repository/maven/")
+        } else {
+            google {
+                content {
+                    excludeGroup("ru.ok.tracer")
+                }
+            }
+        }
+        mavenCentral()
     }
 }
 
