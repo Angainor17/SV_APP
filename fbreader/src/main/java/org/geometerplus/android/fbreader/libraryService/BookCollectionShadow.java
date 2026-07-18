@@ -29,6 +29,8 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import androidx.core.content.ContextCompat;
+
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
 import org.geometerplus.fbreader.book.AbstractBookCollection;
 import org.geometerplus.fbreader.book.Author;
@@ -619,8 +621,10 @@ public class BookCollectionShadow extends AbstractBookCollection<Book> implement
         }
 
         if (myContext != null) {
-            myContext.registerReceiver(myReceiver, new IntentFilter(FBReaderIntents.Event.LIBRARY_BOOK));
-            myContext.registerReceiver(myReceiver, new IntentFilter(FBReaderIntents.Event.LIBRARY_BUILD));
+            final IntentFilter bookFilter = new IntentFilter(FBReaderIntents.Event.LIBRARY_BOOK);
+            final IntentFilter buildFilter = new IntentFilter(FBReaderIntents.Event.LIBRARY_BUILD);
+            ContextCompat.registerReceiver(myContext, myReceiver, bookFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
+            ContextCompat.registerReceiver(myContext, myReceiver, buildFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
         }
     }
 

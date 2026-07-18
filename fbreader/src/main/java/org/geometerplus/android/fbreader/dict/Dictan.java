@@ -22,12 +22,6 @@ package org.geometerplus.android.fbreader.dict;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.os.Parcelable;
-import android.view.View;
-
-import com.github.johnpersano.supertoasts.SuperActivityToast;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.OnClickWrapper;
 
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
@@ -73,10 +67,8 @@ final class Dictan extends DictionaryUtil.PackageInfo {
                 break;
         }
 
-        final SuperActivityToast toast = new SuperActivityToast(fbreader, SuperToast.Type.STANDARD);
-        toast.setText("Dictan: " + message);
-        toast.setDuration(DictionaryUtil.ErrorToastDurationOption.getValue().Value);
-        InternalUtil.showToast(toast, fbreader);
+        InternalUtil.showSnackbar(fbreader, "Dictan: " + message,
+                DictionaryUtil.ErrorToastDurationOption.getValue().Value);
     }
 
     @Override
@@ -127,33 +119,25 @@ final class Dictan extends DictionaryUtil.PackageInfo {
             hasExtraData = data.getBooleanExtra("article.resources.contains", false);
         }
 
-        final SuperActivityToast toast;
         if (hasExtraData) {
-            toast = new SuperActivityToast(fbreader, SuperToast.Type.BUTTON);
-            toast.setButtonIcon(
-                    android.R.drawable.ic_menu_more,
-                    ZLResource.resource("toast").getResource("more").getValue()
-            );
-            toast.setOnClickWrapper(new OnClickWrapper("dict", new SuperToast.OnClickListener() {
-                @Override
-                public void onClick(View view, Parcelable token) {
-                    final String word = data.getStringExtra("article.word");
-                    final Intent intent = getActionIntent(word);
-                    try {
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        fbreader.startActivity(intent);
-                        fbreader.overridePendingTransition(0, 0);
-                    } catch (ActivityNotFoundException e) {
-                        // ignore
-                    }
-                }
-            }));
+            final String finalText = text;
+            InternalUtil.showSnackbarWithAction(fbreader, text,
+                    ZLResource.resource("toast").getResource("more").getValue(),
+                    v -> {
+                        final String word = data.getStringExtra("article.word");
+                        final Intent intent = getActionIntent(word);
+                        try {
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            fbreader.startActivity(intent);
+                            fbreader.overridePendingTransition(0, 0);
+                        } catch (ActivityNotFoundException e) {
+                            // ignore
+                        }
+                    });
         } else {
-            toast = new SuperActivityToast(fbreader, SuperToast.Type.STANDARD);
+            InternalUtil.showSnackbar(fbreader, text,
+                    DictionaryUtil.TranslationToastDurationOption.getValue().Value);
         }
-        toast.setText(text);
-        toast.setDuration(DictionaryUtil.TranslationToastDurationOption.getValue().Value);
-        InternalUtil.showToast(toast, fbreader);
     }
 }

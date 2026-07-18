@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 abstract class FilteredEncodingCollection extends EncodingCollection {
@@ -81,7 +82,7 @@ abstract class FilteredEncodingCollection extends EncodingCollection {
             if ("group".equals(localName)) {
                 myCurrentFamilyName = attributes.getValue("name");
             } else if ("encoding".equals(localName)) {
-                final String name = attributes.getValue("name").toLowerCase();
+                final String name = attributes.getValue("name").toLowerCase(Locale.ROOT);
                 final String region = attributes.getValue("region");
                 if (isEncodingSupported(name)) {
                     myCurrentEncoding = new Encoding(
@@ -98,7 +99,7 @@ abstract class FilteredEncodingCollection extends EncodingCollection {
                 }
             } else if ("alias".equals(localName)) {
                 if (myCurrentEncoding != null) {
-                    myEncodingByAlias.put(attributes.getValue("name").toLowerCase(), myCurrentEncoding);
+                    myEncodingByAlias.put(attributes.getValue("name").toLowerCase(Locale.ROOT), myCurrentEncoding);
                 }
             }
         }

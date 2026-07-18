@@ -20,6 +20,7 @@
 package org.geometerplus.fbreader.book;
 
 import java.util.List;
+import java.util.Locale;
 
 public abstract class Filter {
     public abstract boolean matches(AbstractBook book);
@@ -74,7 +75,7 @@ public abstract class Filter {
         public final String Pattern;
 
         public ByPattern(String pattern) {
-            Pattern = pattern != null ? pattern.toLowerCase() : "";
+            Pattern = pattern != null ? pattern.toLowerCase(Locale.ROOT) : "";
         }
 
         public boolean matches(AbstractBook book) {

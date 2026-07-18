@@ -31,6 +31,7 @@ import org.geometerplus.zlibrary.core.util.SystemInfo;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class FB2NativePlugin extends NativeFormatPlugin {
     public FB2NativePlugin(SystemInfo systemInfo) {
@@ -38,7 +39,7 @@ public class FB2NativePlugin extends NativeFormatPlugin {
     }
 
     private static ZLFile getRealFB2File(ZLFile file) {
-        final String name = file.getShortName().toLowerCase();
+        final String name = file.getShortName().toLowerCase(Locale.ROOT);
         if (name.endsWith(".fb2.zip") && file.isArchive()) {
             final List<ZLFile> children = file.children();
             if (children == null) {

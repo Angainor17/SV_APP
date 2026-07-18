@@ -19,9 +19,7 @@
 
 package org.geometerplus.fbreader;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
 
 import org.geometerplus.zlibrary.core.options.ZLStringListOption;
@@ -35,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class Paths {
     public static ZLStringListOption BookPathOption =
@@ -64,15 +63,6 @@ public abstract class Paths {
     }
 
     private static String internalTempDirectoryValue(Context context) {
-        String value = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-            value = getExternalCacheDirPath(context);
-        }
-        return value != null ? value : (mainBookDirectory() + "/.FBReader");
-    }
-
-    @TargetApi(Build.VERSION_CODES.FROYO)
-    private static String getExternalCacheDirPath(Context context) {
         final File d = context != null ? context.getExternalCacheDir() : null;
         if (d != null) {
             d.mkdirs();
@@ -80,7 +70,7 @@ public abstract class Paths {
                 return d.getPath();
             }
         }
-        return null;
+        return mainBookDirectory() + "/.FBReader";
     }
 
     private static void addDirToList(List<String> list, String candidate) {
@@ -153,7 +143,7 @@ public abstract class Paths {
             while ((line = reader.readLine()) != null) {
                 final String[] parts = line.split("\\s+");
                 if (parts.length >= 4 &&
-                        parts[2].toLowerCase().indexOf("fat") >= 0 &&
+                        parts[2].toLowerCase(Locale.ROOT).indexOf("fat") >= 0 &&
                         parts[3].indexOf("rw") >= 0) {
                     final File fsDir = new File(parts[1]);
                     if (fsDir.isDirectory() && fsDir.canWrite()) {
@@ -170,7 +160,7 @@ public abstract class Paths {
         }
 
         for (String dir : dirNames) {
-            if (dir.toLowerCase().indexOf("media") > 0) {
+            if (dir.toLowerCase(Locale.ROOT).indexOf("media") > 0) {
                 return dir;
             }
         }

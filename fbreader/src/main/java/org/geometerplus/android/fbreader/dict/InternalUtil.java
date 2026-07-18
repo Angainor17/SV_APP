@@ -22,8 +22,11 @@ package org.geometerplus.android.fbreader.dict;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.view.View;
 
-import com.github.johnpersano.supertoasts.SuperActivityToast;
+import androidx.annotation.NonNull;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.geometerplus.android.util.PackageUtil;
 
@@ -33,7 +36,6 @@ abstract class InternalUtil {
             return;
         }
 
-        // DictionaryNotInstalledActivity removed - try to open Play Store or action intent
         try {
             final Intent intent = info.getActionIntent("install");
             activity.startActivity(intent);
@@ -51,10 +53,21 @@ abstract class InternalUtil {
         }
     }
 
-    static void showToast(SuperActivityToast toast, final Activity fbreader) {
-        if (toast == null) {
-            return;
+    static void showSnackbar(@NonNull Activity activity, @NonNull String text, int duration) {
+        final View rootView = activity.findViewById(android.R.id.content);
+        if (rootView != null) {
+            Snackbar.make(rootView, text, duration == 0 ? Snackbar.LENGTH_SHORT : Snackbar.LENGTH_LONG)
+                    .show();
         }
-        toast.show();
+    }
+
+    static void showSnackbarWithAction(@NonNull Activity activity, @NonNull String text,
+                                        @NonNull String actionText, @NonNull View.OnClickListener listener) {
+        final View rootView = activity.findViewById(android.R.id.content);
+        if (rootView != null) {
+            Snackbar.make(rootView, text, Snackbar.LENGTH_LONG)
+                    .setAction(actionText, listener)
+                    .show();
+        }
     }
 }

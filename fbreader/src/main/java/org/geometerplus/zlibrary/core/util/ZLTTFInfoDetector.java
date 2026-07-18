@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class ZLTTFInfoDetector {
@@ -80,10 +81,10 @@ public class ZLTTFInfoDetector {
 
                 String family = info.FamilyName;
                 String subfamily = info.SubfamilyName;
-                if (subfamily == null || !STYLES.contains(subfamily.toLowerCase())) {
+                if (subfamily == null || !STYLES.contains(subfamily.toLowerCase(Locale.ROOT))) {
                     final String full =
                             subfamily != null ? family + " " + subfamily : family;
-                    final String lower = full.toLowerCase();
+                    final String lower = full.toLowerCase(Locale.ROOT);
                     family = full;
                     subfamily = "";
                     for (String style : STYLES) {

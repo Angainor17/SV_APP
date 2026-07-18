@@ -20,10 +20,12 @@
 package org.geometerplus.zlibrary.ui.android.image;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import org.geometerplus.zlibrary.core.image.ZLImageProxy;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
@@ -35,7 +37,7 @@ class ZLAndroidImageLoader {
     private final ExecutorService myPool = Executors.newFixedThreadPool(IMAGE_LOADING_THREADS_NUMBER, new MinPriorityThreadFactory());
     private final ExecutorService mySinglePool = Executors.newFixedThreadPool(1, new MinPriorityThreadFactory());
     private final HashMap<String, LinkedList<Runnable>> myOnImageSyncRunnables = new HashMap<String, LinkedList<Runnable>>();
-    private final ImageSynchronizedHandler myImageSynchronizedHandler = new ImageSynchronizedHandler();
+    private final ImageSynchronizedHandler myImageSynchronizedHandler = new ImageSynchronizedHandler(this);
 
     void startImageLoading(final ZLImageProxy.Synchronizer synchronizer, final ZLImageProxy image, Runnable postAction) {
         synchronized (myOnImageSyncRunnables) {
@@ -78,18 +80,28 @@ class ZLAndroidImageLoader {
         }
     }
 
-    ;
+    private static class ImageSynchronizedHandler extends Handler {
+        private final WeakReference<ZLAndroidImageLoader> loaderRef;
 
-    private class ImageSynchronizedHandler extends Handler {
+        ImageSynchronizedHandler(ZLAndroidImageLoader loader) {
+            super(Looper.getMainLooper());
+            loaderRef = new WeakReference<>(loader);
+        }
+
         @Override
         public void handleMessage(Message message) {
             final String imageUrl = (String) message.obj;
+            final ZLAndroidImageLoader loader = loaderRef.get();
+            if (loader == null) return;
+
             final LinkedList<Runnable> runables;
-            synchronized (myOnImageSyncRunnables) {
-                runables = myOnImageSyncRunnables.remove(imageUrl);
+            synchronized (loader.myOnImageSyncRunnables) {
+                runables = loader.myOnImageSyncRunnables.remove(imageUrl);
             }
-            for (Runnable runnable : runables) {
-                runnable.run();
+            if (runables != null) {
+                for (Runnable runnable : runables) {
+                    runnable.run();
+                }
             }
         }
 

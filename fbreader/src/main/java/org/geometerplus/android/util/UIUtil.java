@@ -23,12 +23,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import org.fbreader.util.Pair;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -38,29 +40,45 @@ public abstract class UIUtil {
     private static ProgressDialog ourProgress;
     private static volatile Handler ourProgressHandler;
 
+    private static class ProgressHandler extends Handler {
+        private final WeakReference<Queue<Pair<Runnable, String>>> taskQueueRef;
+        private final WeakReference<Object> monitorRef;
+
+        ProgressHandler(Queue<Pair<Runnable, String>> queue, Object monitor) {
+            super(Looper.getMainLooper());
+            taskQueueRef = new WeakReference<>(queue);
+            monitorRef = new WeakReference<>(monitor);
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            try {
+                final Queue<Pair<Runnable, String>> queue = taskQueueRef.get();
+                final Object monitor = monitorRef.get();
+                if (queue == null || monitor == null) return;
+
+                synchronized (monitor) {
+                    if (queue.isEmpty()) {
+                        ourProgress.dismiss();
+                        ourProgress = null;
+                    } else {
+                        ourProgress.setMessage(queue.peek().Second);
+                    }
+                    monitor.notify();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                ourProgress = null;
+            }
+        }
+    }
+
     private static boolean init() {
         if (ourProgressHandler != null) {
             return true;
         }
         try {
-            ourProgressHandler = new Handler() {
-                public void handleMessage(Message message) {
-                    try {
-                        synchronized (ourMonitor) {
-                            if (ourTaskQueue.isEmpty()) {
-                                ourProgress.dismiss();
-                                ourProgress = null;
-                            } else {
-                                ourProgress.setMessage(ourTaskQueue.peek().Second);
-                            }
-                            ourMonitor.notify();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        ourProgress = null;
-                    }
-                }
-            };
+            ourProgressHandler = new ProgressHandler(ourTaskQueue, ourMonitor);
             return true;
         } catch (Throwable t) {
             t.printStackTrace();

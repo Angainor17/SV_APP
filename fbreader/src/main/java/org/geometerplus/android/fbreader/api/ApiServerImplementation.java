@@ -60,6 +60,7 @@ public class ApiServerImplementation extends ApiInterface.Stub implements Api, A
     public static void sendEvent(ContextWrapper context, String eventType) {
         context.sendBroadcast(
                 new Intent(FBReaderIntents.Action.API_CALLBACK)
+                        .setPackage(context.getPackageName())
                         .putExtra(ApiClientImplementation.EVENT_TYPE, eventType)
         );
     }

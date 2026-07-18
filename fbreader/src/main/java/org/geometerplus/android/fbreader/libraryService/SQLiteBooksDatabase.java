@@ -53,6 +53,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -1591,7 +1592,7 @@ final class SQLiteBooksDatabase extends BooksDatabase {
                 if (Math.abs(index - Math.round(index)) < 0.01) {
                     stringIndex = String.valueOf(Math.round(index));
                 } else {
-                    stringIndex = String.format("%.1f", index);
+                    stringIndex = String.format(Locale.ROOT, "%.1f", index);
                 }
             }
             final BigDecimal bdIndex = SeriesInfo.createIndex(stringIndex);

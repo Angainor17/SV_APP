@@ -31,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TapZoneMap {
@@ -61,7 +62,7 @@ public class TapZoneMap {
         myHeight = new ZLIntegerRangeOption(myOptionGroupName, "Height", 2, 5, 3);
         myWidth = new ZLIntegerRangeOption(myOptionGroupName, "Width", 2, 5, 3);
         final ZLFile mapFile = ZLFile.createFileByPath(
-                "default/tapzones/" + name.toLowerCase() + ".xml"
+                "default/tapzones/" + name.toLowerCase(Locale.ROOT) + ".xml"
         );
         XmlUtil.parseQuietly(mapFile, new Reader());
     }

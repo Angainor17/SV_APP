@@ -24,7 +24,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
-import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -143,14 +142,14 @@ public final class ZLAndroidLibrary extends ZLibrary {
         if (manager != null) {
             String country0 = manager.getSimCountryIso();
             if (country0 != null) {
-                country0 = country0.toLowerCase();
+                country0 = country0.toLowerCase(Locale.ROOT);
             }
             String country1 = manager.getNetworkCountryIso();
             if (country1 != null) {
-                country1 = country1.toLowerCase();
+                country1 = country1.toLowerCase(Locale.ROOT);
             }
             for (Locale locale : Locale.getAvailableLocales()) {
-                final String country = locale.getCountry().toLowerCase();
+                final String country = locale.getCountry().toLowerCase(Locale.ROOT);
                 if (country != null && country.length() > 0 &&
                         (country.equals(country0) || country.equals(country1))) {
                     set.add(locale.getLanguage());
@@ -170,7 +169,7 @@ public final class ZLAndroidLibrary extends ZLibrary {
 
     @Override
     public boolean supportsAllOrientations() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
+        return true;
     }
 
     private static interface StreamStatus {

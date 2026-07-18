@@ -3,25 +3,7 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-
-    <!-- ABC text -->
     <path
-        android:fillColor="@color/white"
-        android:pathData="M2,15h1.5l0.5,-1.5h2.5l0.5,1.5h1.5l-2,-8h-2l-2,8zM4,8l1,3h-2l1,-3z" />
-
-    <path
-        android:fillColor="@color/white"
-        android:pathData="M8,15h3v-1h-2v-2h2v-1h-2v-2h2v-1h-3v7z" />
-
-    <path
-        android:fillColor="@color/white"
-        android:pathData="M12,15h1.5l0.5,-1.5h2.5l0.5,1.5h1.5l-2,-8h-2l-2,8zM14,8l1,3h-2l1,-3z" />
-
-    <!-- Red underline (wave-like for error indication) -->
-    <path
-        android:pathData="M1,17 Q3,19 5,17 Q7,15 9,17 Q11,19 13,17 Q15,15 17,17 Q19,19 21,17"
-        android:strokeWidth="2"
-        android:strokeColor="@android:color/holo_red_light"
-        android:fillType="evenOdd" />
-
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM13,17h-2v-2h2v2zM13,13h-2L11,7h2v6z"/>
 </vector>

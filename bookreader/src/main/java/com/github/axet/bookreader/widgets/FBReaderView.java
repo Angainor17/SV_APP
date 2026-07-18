@@ -40,15 +40,12 @@ import com.github.axet.androidlibrary.net.HttpClient;
 import com.github.axet.androidlibrary.preferences.AboutPreferenceCompat;
 import com.github.axet.androidlibrary.widgets.ThemeUtils;
 import com.github.axet.bookreader.R;
-import com.github.axet.bookreader.app.ReaderPreferences;
 import com.github.axet.bookreader.app.Plugin;
+import com.github.axet.bookreader.app.ReaderPreferences;
 import com.github.axet.bookreader.app.Reflow;
 import com.github.axet.bookreader.app.Storage;
 import com.github.axet.bookreader.services.ImagesProvider;
-import com.github.johnpersano.supertoasts.SuperActivityToast;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.OnClickWrapper;
-import com.github.johnpersano.supertoasts.util.OnDismissWrapper;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.geometerplus.android.fbreader.dict.DictionaryUtil;
 import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
@@ -473,32 +470,26 @@ public class FBReaderView extends RelativeLayout {
                                     break;
                             }
                             if (showToast) {
-                                final SuperActivityToast toast;
-                                if (snippet.IsEndOfText) {
-                                    toast = new SuperActivityToast(a, SuperToast.Type.STANDARD);
-                                } else {
-                                    toast = new SuperActivityToast(a, SuperToast.Type.BUTTON);
-                                    toast.setButtonIcon(
-                                            android.R.drawable.ic_menu_more,
-                                            ZLResource.resource("toast").getResource("more").getValue()
-                                    );
-                                    toast.setOnClickWrapper(new OnClickWrapper("ftnt", new SuperToast.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view, Parcelable token) {
-                                            showHyperlink(hyperlink);
-                                        }
-                                    }));
-                                }
-                                toast.setText(snippet.getText());
-                                toast.setDuration(app.MiscOptions.FootnoteToastDuration.getValue().Value);
-                                toast.setOnDismissWrapper(new OnDismissWrapper("ftnt", new SuperToast.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(View view) {
-                                        app.BookTextView.hideOutline();
-                                    }
-                                }));
                                 app.BookTextView.outlineRegion(region);
-                                showToast(toast);
+                                final View rootView = findViewById(android.R.id.content);
+                                if (rootView != null) {
+                                    if (snippet.IsEndOfText) {
+                                        Snackbar.make(rootView, snippet.getText(), Snackbar.LENGTH_SHORT).show();
+                                    } else {
+                                        Snackbar.make(rootView, snippet.getText(), Snackbar.LENGTH_LONG)
+                                                .setAction(ZLResource.resource("toast").getResource("more").getValue(), v -> {
+                                                    app.BookTextView.hideOutline();
+                                                    showHyperlink(hyperlink);
+                                                })
+                                                .addCallback(new Snackbar.Callback() {
+                                                    @Override
+                                                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                                                        app.BookTextView.hideOutline();
+                                                    }
+                                                })
+                                                .show();
+                                    }
+                                }
                             } else {
                                 book.info.position = getPosition();
                                 showHyperlink(hyperlink);
@@ -1040,10 +1031,6 @@ public class FBReaderView extends RelativeLayout {
             }
         });
         dialog.show();
-    }
-
-    void showToast(SuperActivityToast toast) {
-        toast.show();
     }
 
     void gotoPluginPosition(ZLTextPosition p) {

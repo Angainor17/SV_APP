@@ -70,11 +70,7 @@ public final class ZLAndroidPaintContext extends ZLPaintContext {
 
         myTextPaint.setLinearText(false);
         myTextPaint.setAntiAlias(AntiAliasOption.getValue());
-        if (DeviceKerningOption.getValue()) {
-            myTextPaint.setFlags(myTextPaint.getFlags() | Paint.DEV_KERN_TEXT_FLAG);
-        } else {
-            myTextPaint.setFlags(myTextPaint.getFlags() & ~Paint.DEV_KERN_TEXT_FLAG);
-        }
+        // DEV_KERN_TEXT_FLAG is deprecated and kerning is enabled by default
         myTextPaint.setDither(DitheringOption.getValue());
         myTextPaint.setSubpixelText(SubpixelOption.getValue());
 
