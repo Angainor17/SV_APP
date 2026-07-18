@@ -19,6 +19,8 @@
 
 package org.geometerplus.fbreader.book;
 
+import java.util.Locale;
+
 public final class Author implements Comparable<Author> {
     public static final Author NULL = new Author("", "");
     public final String DisplayName;
@@ -26,7 +28,7 @@ public final class Author implements Comparable<Author> {
 
     public Author(String displayName, String sortKey) {
         DisplayName = displayName;
-        SortKey = sortKey.toLowerCase();
+        SortKey = sortKey.toLowerCase(Locale.ROOT);
     }
 
     public static Author create(String name, String sortKey) {

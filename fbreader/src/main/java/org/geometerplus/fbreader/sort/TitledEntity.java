@@ -19,9 +19,6 @@
 
 package org.geometerplus.fbreader.sort;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-
 import org.fbreader.util.NaturalOrderComparator;
 
 import java.text.Normalizer;
@@ -75,9 +72,7 @@ public abstract class TitledEntity<T extends TitledEntity<T>> implements Compara
             return "";
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            s = normalize(s);
-        }
+        s = Normalizer.normalize(s, Normalizer.Form.NFKD);
         final StringBuilder buffer = new StringBuilder();
         int start = 0;
         if (s.startsWith("M\'") || s.startsWith("Mc")) {
@@ -130,11 +125,6 @@ public abstract class TitledEntity<T extends TitledEntity<T>> implements Compara
             }
         }
         return result;
-    }
-
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
-    private static String normalize(String s) {
-        return Normalizer.normalize(s, Normalizer.Form.NFKD);
     }
 
     public String getTitle() {

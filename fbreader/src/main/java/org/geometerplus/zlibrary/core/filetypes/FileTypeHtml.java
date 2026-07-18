@@ -23,6 +23,7 @@ import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.util.MimeType;
 
 import java.util.List;
+import java.util.Locale;
 
 class FileTypeHtml extends FileType {
     FileTypeHtml() {
@@ -31,7 +32,7 @@ class FileTypeHtml extends FileType {
 
     @Override
     public boolean acceptsFile(ZLFile file) {
-        final String extension = file.getExtension().toLowerCase();
+        final String extension = file.getExtension().toLowerCase(Locale.ROOT);
         return extension.endsWith("html") || "htm".equals(extension);
     }
 

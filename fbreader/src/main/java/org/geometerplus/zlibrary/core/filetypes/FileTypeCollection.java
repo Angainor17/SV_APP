@@ -24,6 +24,7 @@ import org.geometerplus.zlibrary.core.util.MimeType;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.TreeMap;
 
 public class FileTypeCollection {
@@ -46,7 +47,7 @@ public class FileTypeCollection {
     }
 
     private void addType(FileType type) {
-        myTypes.put(type.Id.toLowerCase(), type);
+        myTypes.put(type.Id.toLowerCase(Locale.ROOT), type);
     }
 
     public Collection<FileType> types() {
@@ -54,7 +55,7 @@ public class FileTypeCollection {
     }
 
     public FileType typeById(String id) {
-        return myTypes.get(id.toLowerCase());
+        return myTypes.get(id.toLowerCase(Locale.ROOT));
     }
 
     public FileType typeForFile(ZLFile file) {

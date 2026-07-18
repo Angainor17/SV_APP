@@ -24,6 +24,7 @@ import org.geometerplus.zlibrary.core.util.MimeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 class FileTypeFB2 extends FileType {
     private final List<MimeType> myMimeTypes = new ArrayList<MimeType>();
@@ -34,7 +35,7 @@ class FileTypeFB2 extends FileType {
 
     @Override
     public boolean acceptsFile(ZLFile file) {
-        final String lName = file.getShortName().toLowerCase();
+        final String lName = file.getShortName().toLowerCase(Locale.ROOT);
         return lName.endsWith(".fb2") || lName.endsWith(".fb2.zip");
     }
 
@@ -49,7 +50,7 @@ class FileTypeFB2 extends FileType {
 
     @Override
     public MimeType mimeType(ZLFile file) {
-        final String lName = file.getShortName().toLowerCase();
+        final String lName = file.getShortName().toLowerCase(Locale.ROOT);
         if (lName.endsWith(".fb2")) {
             return MimeType.APP_FB2_XML;
         } else if (lName.endsWith(".fb2.zip")) {
@@ -61,7 +62,7 @@ class FileTypeFB2 extends FileType {
 
     @Override
     public MimeType rawMimeType(ZLFile file) {
-        final String lName = file.getShortName().toLowerCase();
+        final String lName = file.getShortName().toLowerCase(Locale.ROOT);
         if (lName.endsWith(".fb2")) {
             return MimeType.TEXT_XML;
         } else if (lName.endsWith(".fb2.zip")) {

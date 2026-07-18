@@ -176,6 +176,7 @@ final class SQLiteConfig extends ConfigInterface.Stub {
     private void sendChangeEvent(String group, String name, String value) {
         myService.sendBroadcast(
                 new Intent(FBReaderIntents.Event.CONFIG_OPTION_CHANGE)
+                        .setPackage(myService.getPackageName())
                         .putExtra("group", group)
                         .putExtra("name", name)
                         .putExtra("value", value)

@@ -24,6 +24,7 @@ import org.geometerplus.zlibrary.core.util.MimeType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 class FileTypeMobipocket extends FileTypePalm {
     FileTypeMobipocket() {
@@ -36,7 +37,7 @@ class FileTypeMobipocket extends FileTypePalm {
             return true;
         }
         return
-                Arrays.asList("mobi", "azw", "azw3").contains(file.getExtension().toLowerCase())
+                Arrays.asList("mobi", "azw", "azw3").contains(file.getExtension().toLowerCase(Locale.ROOT))
                         && "BOOKMOBI".equals(palmFileType(file));
     }
 

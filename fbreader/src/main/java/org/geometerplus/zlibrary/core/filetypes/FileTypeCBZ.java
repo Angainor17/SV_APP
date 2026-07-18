@@ -23,6 +23,7 @@ import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.util.MimeType;
 
 import java.util.List;
+import java.util.Locale;
 
 class FileTypeCBZ extends FileType {
     FileTypeCBZ() {
@@ -42,7 +43,7 @@ class FileTypeCBZ extends FileType {
 
     @Override
     public MimeType mimeType(ZLFile file) {
-        final String lName = file.getShortName().toLowerCase();
+        final String lName = file.getShortName().toLowerCase(Locale.ROOT);
         if (lName.endsWith(".cbz")) {
             return MimeType.APP_CBZ;
         } else if (lName.endsWith(".cbr")) {
@@ -54,7 +55,7 @@ class FileTypeCBZ extends FileType {
 
     @Override
     public MimeType rawMimeType(ZLFile file) {
-        final String lName = file.getShortName().toLowerCase();
+        final String lName = file.getShortName().toLowerCase(Locale.ROOT);
         if (lName.endsWith(".cbz")) {
             return MimeType.APP_ZIP;
         } else if (lName.endsWith(".cbr")) {

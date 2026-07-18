@@ -26,6 +26,7 @@ import org.geometerplus.zlibrary.core.xml.ZLXMLProcessor;
 import org.geometerplus.zlibrary.core.xml.ZLXMLReaderAdapter;
 
 import java.io.IOException;
+import java.util.Locale;
 
 class OEBAnnotationReader extends ZLXMLReaderAdapter implements XMLNamespaces {
     private static final int READ_NONE = 0;
@@ -59,7 +60,7 @@ class OEBAnnotationReader extends ZLXMLReaderAdapter implements XMLNamespaces {
 
     @Override
     public boolean startElementHandler(String tag, ZLStringMap attributes) {
-        tag = tag.toLowerCase();
+        tag = tag.toLowerCase(Locale.ROOT);
         if (testTag(DublinCore, "description", tag) ||
                 testTag(DublinCoreLegacy, "description", tag)) {
             myReadState = READ_DESCRIPTION;
@@ -82,7 +83,7 @@ class OEBAnnotationReader extends ZLXMLReaderAdapter implements XMLNamespaces {
         if (myReadState != READ_DESCRIPTION) {
             return false;
         }
-        tag = tag.toLowerCase();
+        tag = tag.toLowerCase(Locale.ROOT);
         if (testTag(DublinCore, "description", tag) ||
                 testTag(DublinCoreLegacy, "description", tag)) {
             return true;

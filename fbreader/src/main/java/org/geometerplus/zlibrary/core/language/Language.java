@@ -19,9 +19,6 @@
 
 package org.geometerplus.zlibrary.core.language;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 import java.text.Normalizer;
@@ -45,11 +42,7 @@ public class Language implements Comparable<Language> {
         final ZLResource resource = root.getResource(code);
         Name = resource.hasValue() ? resource.getValue() : code;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            mySortKey = normalize(Name);
-        } else {
-            mySortKey = Name.toLowerCase();
-        }
+        mySortKey = Normalizer.normalize(Name, Normalizer.Form.NFKD);
         if (SYSTEM_CODE.equals(code) || ANY_CODE.equals(code)) {
             myOrder = Order.Before;
         } else if (MULTI_CODE.equals(code) || OTHER_CODE.equals(code)) {
@@ -57,11 +50,6 @@ public class Language implements Comparable<Language> {
         } else {
             myOrder = Order.Normal;
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
-    private static String normalize(String s) {
-        return Normalizer.normalize(s, Normalizer.Form.NFKD);
     }
 
     public int compareTo(Language other) {

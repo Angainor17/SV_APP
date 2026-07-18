@@ -19,8 +19,6 @@
 
 package org.geometerplus.fbreader.formats;
 
-import android.os.Build;
-
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.filetypes.FileType;
 import org.geometerplus.zlibrary.core.filetypes.FileTypeCollection;
@@ -45,11 +43,9 @@ public class PluginCollection implements IFormatPluginCollection {
             new LinkedList<ExternalFormatPlugin>();
 
     private PluginCollection(SystemInfo systemInfo) {
-        if (Build.VERSION.SDK_INT >= 8) {
-            myExternalPlugins.add(new DjVuPlugin(systemInfo));
-            myExternalPlugins.add(new PDFPlugin(systemInfo));
-            myExternalPlugins.add(new ComicBookPlugin(systemInfo));
-        }
+        myExternalPlugins.add(new DjVuPlugin(systemInfo));
+        myExternalPlugins.add(new PDFPlugin(systemInfo));
+        myExternalPlugins.add(new ComicBookPlugin(systemInfo));
     }
 
     public static PluginCollection Instance(SystemInfo systemInfo) {

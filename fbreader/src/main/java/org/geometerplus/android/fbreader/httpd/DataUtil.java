@@ -21,6 +21,8 @@ package org.geometerplus.android.fbreader.httpd;
 
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 
+import java.util.Locale;
+
 public abstract class DataUtil {
     static ZLFile fileFromEncodedPath(String encodedPath) {
         final StringBuilder path = new StringBuilder();
@@ -41,7 +43,7 @@ public abstract class DataUtil {
         final StringBuilder url = new StringBuilder("http://127.0.0.1:").append(port)
                 .append("/").append(prefix).append("/");
         for (int i = 0; i < path.length(); ++i) {
-            url.append(String.format("X%X", (short) path.charAt(i)));
+            url.append(String.format(Locale.ROOT, "X%X", (short) path.charAt(i)));
         }
         return url.toString();
     }

@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -90,7 +91,7 @@ public final class AndroidFontUtil {
                     if (name.startsWith(".")) {
                         return false;
                     }
-                    final String lcName = name.toLowerCase();
+                    final String lcName = name.toLowerCase(Locale.ROOT);
                     return lcName.endsWith(".ttf") || lcName.endsWith(".otf");
                 }
             };
@@ -184,6 +185,7 @@ public final class AndroidFontUtil {
         }
     }
 
+    @SuppressWarnings("WrongConstant")
     public static Typeface systemTypeface(String family, boolean bold, boolean italic) {
         family = realFontFamilyName(family);
         final int style = (bold ? Typeface.BOLD : 0) | (italic ? Typeface.ITALIC : 0);

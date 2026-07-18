@@ -185,6 +185,7 @@ public class LibraryService extends Service {
             myCollection.addListener(new BookCollection.Listener<DbBook>() {
                 public void onBookEvent(BookEvent event, DbBook book) {
                     final Intent intent = new Intent(FBReaderIntents.Event.LIBRARY_BOOK);
+                    intent.setPackage(getPackageName());
                     intent.putExtra("type", event.toString());
                     intent.putExtra("book", SerializerUtil.serialize(book));
                     sendBroadcast(intent);
@@ -192,6 +193,7 @@ public class LibraryService extends Service {
 
                 public void onBuildEvent(BookCollection.Status status) {
                     final Intent intent = new Intent(FBReaderIntents.Event.LIBRARY_BUILD);
+                    intent.setPackage(getPackageName());
                     intent.putExtra("type", status.toString());
                     sendBroadcast(intent);
                 }

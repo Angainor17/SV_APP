@@ -39,7 +39,7 @@ public abstract class ApiObject implements Parcelable {
                         case Type.SERIALIZABLE:
                             return new Serializable(parcel.readSerializable());
                         case Type.PARCELABALE:
-                            return new Parcelable(parcel.readParcelable(null));
+                            return new Parcelable(parcel.readParcelable(ApiObject.class.getClassLoader()));
                     }
                 }
 

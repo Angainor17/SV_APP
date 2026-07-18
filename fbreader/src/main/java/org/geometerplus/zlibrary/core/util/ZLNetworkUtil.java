@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 public class ZLNetworkUtil {
     public static String url(String baseUrl, String relativePath) {
@@ -128,7 +129,7 @@ public class ZLNetworkUtil {
     }
 
     public static String getUserAgent() {
-        return String.format(
+        return String.format(Locale.ROOT,
                 "%s/%s (Android %s, %s, %s)",
                 "FBReader",
                 ZLibrary.Instance().getVersionName(),

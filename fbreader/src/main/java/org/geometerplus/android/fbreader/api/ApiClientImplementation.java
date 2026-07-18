@@ -14,6 +14,8 @@ import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.os.Parcelable;
 
+import androidx.core.content.ContextCompat;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,7 +91,8 @@ public class ApiClientImplementation implements ServiceConnection, Api, ApiMetho
     public synchronized void connect() {
         if (myInterface == null) {
             myContext.bindService(FBReaderIntents.defaultInternalIntent(FBReaderIntents.Action.API), this, Context.BIND_AUTO_CREATE);
-            myContext.registerReceiver(myEventReceiver, new IntentFilter(FBReaderIntents.Action.API_CALLBACK));
+            final IntentFilter filter = new IntentFilter(FBReaderIntents.Action.API_CALLBACK);
+            ContextCompat.registerReceiver(myContext, myEventReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
         }
     }
 

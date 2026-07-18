@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class ZLFile implements InputStreamHolder {
     private final static HashMap<String, ZLFile> ourCachedFiles = new HashMap<String, ZLFile>();
@@ -109,7 +110,7 @@ public abstract class ZLFile implements InputStreamHolder {
     protected void init() {
         final String name = getLongName();
         final int index = name.lastIndexOf('.');
-        myExtension = (index > 0) ? name.substring(index + 1).toLowerCase().intern() : "";
+        myExtension = (index > 0) ? name.substring(index + 1).toLowerCase(Locale.ROOT).intern() : "";
         myShortName = name.substring(name.lastIndexOf('/') + 1);
 
 		/*

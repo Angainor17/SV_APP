@@ -29,6 +29,8 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import androidx.core.content.ContextCompat;
+
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
 import org.geometerplus.zlibrary.core.options.Config;
 
@@ -123,7 +125,7 @@ public final class ConfigShadow extends Config implements ServiceConnection {
 
     public void setSpecialBooleanValue(String name, boolean value) {
         myContext.getSharedPreferences("fbreader.ui", Context.MODE_PRIVATE).edit()
-                .putBoolean(name, value).commit();
+                .putBoolean(name, value).apply();
     }
 
     public String getSpecialStringValue(String name, String defaultValue) {
@@ -133,7 +135,7 @@ public final class ConfigShadow extends Config implements ServiceConnection {
 
     public void setSpecialStringValue(String name, String value) {
         myContext.getSharedPreferences("fbreader.ui", Context.MODE_PRIVATE).edit()
-                .putString(name, value).commit();
+                .putString(name, value).apply();
     }
 
     @Override
@@ -196,9 +198,8 @@ public final class ConfigShadow extends Config implements ServiceConnection {
     public void onServiceConnected(ComponentName name, IBinder service) {
         synchronized (this) {
             myInterface = ConfigInterface.Stub.asInterface(service);
-            myContext.registerReceiver(
-                    myReceiver, new IntentFilter(FBReaderIntents.Event.CONFIG_OPTION_CHANGE)
-            );
+            final IntentFilter filter = new IntentFilter(FBReaderIntents.Event.CONFIG_OPTION_CHANGE);
+            ContextCompat.registerReceiver(myContext, myReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
         }
 
         final List<Runnable> actions;

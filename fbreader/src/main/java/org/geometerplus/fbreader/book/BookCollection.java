@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -46,7 +47,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class BookCollection extends AbstractBookCollection<DbBook> {
-    private static final String ZERO_HASH = String.format("%040d", 0);
+    private static final String ZERO_HASH = String.format(Locale.ROOT, "%040d", 0);
     private final static String DEFAULT_STYLE_ID_KEY = "defaultStyle";
     public final PluginCollection PluginCollection;
     public final List<String> BookDirectories;
@@ -833,7 +834,7 @@ public class BookCollection extends AbstractBookCollection<DbBook> {
             if (uid == null) {
                 return null;
             }
-            hash = uid.id.toLowerCase();
+            hash = uid.id.toLowerCase(Locale.ROOT);
             try {
                 myDatabase.setHash(book.getId(), hash);
             } catch (BooksDatabase.NotAvailable e) {
