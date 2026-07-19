@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -39,6 +40,7 @@ import su.sv.news.presentation.root.RootNewsViewModel
 import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
+import su.sv.news.testing.NewsTestTags
 
 /**
  * Главный экран новостей
@@ -63,7 +65,9 @@ fun RootNews(
     HandleEffects(viewModel, snackbarHostState)
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .testTag(NewsTestTags.ROOT),
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             AppToolbarWithThemeToggle(
@@ -83,11 +87,14 @@ fun RootNews(
         // Оптимизация: упрощённая логика состояний для избежания вложенных when
         when {
             loadState is LoadState.Loading && !hasItems -> {
-                FullScreenLoading()
+                FullScreenLoading(
+                    modifier = Modifier.testTag(NewsTestTags.LOADING)
+                )
             }
 
             loadState is LoadState.Error && !hasItems -> {
                 FullScreenError(
+                    modifier = Modifier.testTag(NewsTestTags.ERROR),
                     onRetry = { lazyPagingItems.refresh() }
                 )
             }

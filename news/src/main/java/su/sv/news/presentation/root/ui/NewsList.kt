@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
@@ -25,6 +26,7 @@ import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiRootNewsState
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
+import su.sv.news.testing.NewsTestTags
 
 /**
  * Список новостей с поддержкой Pull-to-Refresh и пагинации
@@ -54,7 +56,9 @@ fun NewsList(
         state = pullToRefreshState,
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag(NewsTestTags.LIST),
             verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
             contentPadding = contentPadding,
         ) {
@@ -65,6 +69,7 @@ fun NewsList(
             ) { index ->
                 lazyPagingItems[index]?.let { item ->
                     NewsItem(
+                        modifier = Modifier.testTag(NewsTestTags.ITEM),
                         item = item,
                         onItemClick = {
                             actions.onAction(RootNewsActions.OnNewsMediaClick(it))

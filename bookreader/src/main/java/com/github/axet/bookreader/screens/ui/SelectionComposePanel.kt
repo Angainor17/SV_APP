@@ -11,9 +11,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import org.geometerplus.R as FbreaderR
 
 /**
@@ -37,7 +39,7 @@ fun SelectionComposePanel(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.testTag(ReaderTestTags.Selection.PANEL),
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 0.dp,
@@ -48,6 +50,7 @@ fun SelectionComposePanel(
         ) {
             // Bookmark
             SelectionIconButton(
+                modifier = Modifier.testTag(ReaderTestTags.Selection.BOOKMARK_BUTTON),
                 iconRes = FbreaderR.drawable.ic_bookmark_outline_white,
                 contentDescription = stringResource(FbreaderR.string.panel_bookmark),
                 onClick = onBookmark
@@ -55,6 +58,7 @@ fun SelectionComposePanel(
 
             // Share
             SelectionIconButton(
+                modifier = Modifier.testTag(ReaderTestTags.Selection.SHARE_BUTTON),
                 iconRes = FbreaderR.drawable.ic_share_white,
                 contentDescription = stringResource(FbreaderR.string.panel_share),
                 onClick = onShare
@@ -62,6 +66,7 @@ fun SelectionComposePanel(
 
             // Copy
             SelectionIconButton(
+                modifier = Modifier.testTag(ReaderTestTags.Selection.COPY_BUTTON),
                 iconRes = FbreaderR.drawable.ic_content_copy_white,
                 contentDescription = stringResource(FbreaderR.string.panel_copy),
                 onClick = onCopy
@@ -69,6 +74,7 @@ fun SelectionComposePanel(
 
             // Question
             SelectionIconButton(
+                modifier = Modifier.testTag(ReaderTestTags.Selection.QUESTION_BUTTON),
                 iconRes = FbreaderR.drawable.baseline_question_mark_24,
                 contentDescription = stringResource(FbreaderR.string.panel_question),
                 onClick = onQuestion
@@ -76,6 +82,7 @@ fun SelectionComposePanel(
 
             // Alert (misspell)
             SelectionIconButton(
+                modifier = Modifier.testTag(ReaderTestTags.Selection.ALERT_BUTTON),
                 iconRes = FbreaderR.drawable.ic_missplell,
                 contentDescription = stringResource(FbreaderR.string.panel_misspell),
                 onClick = onAlert
@@ -83,6 +90,7 @@ fun SelectionComposePanel(
 
             // Close
             SelectionIconButton(
+                modifier = Modifier.testTag(ReaderTestTags.Selection.CLOSE_BUTTON),
                 iconRes = FbreaderR.drawable.ic_close_white,
                 contentDescription = stringResource(FbreaderR.string.panel_close),
                 onClick = onClose
@@ -96,10 +104,11 @@ private fun SelectionIconButton(
     iconRes: Int,
     contentDescription: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier.size(40.dp)
+        modifier = modifier.size(40.dp)
     ) {
         Icon(
             painter = painterResource(iconRes),

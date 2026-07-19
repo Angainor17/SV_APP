@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,6 +40,7 @@ import su.sv.main.Screens
 import su.sv.main.badge.BadgeViewModel
 import su.sv.main.badge.NewBadge
 import su.sv.main.res.BooksVector
+import su.sv.main.testing.MainTestTags
 import su.sv.managers.theme.ThemeViewModel
 import su.sv.news.presentation.root.ui.RootNews
 import su.sv.wiki.root.RootWiki
@@ -98,11 +100,21 @@ private fun BottomNavContent(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             NavigationBar(
+                modifier = Modifier.testTag(MainTestTags.BottomNav.ROOT),
                 containerColor = MaterialTheme.colorScheme.background  // Цвет фона приложения
             ) {
                 bottomNavigationItems()
                     .forEachIndexed { index, navigationItem ->
+                        val testTag = when (navigationItem.route) {
+                            Screens.News.route -> MainTestTags.BottomNav.TAB_NEWS
+                            Screens.Books.route -> MainTestTags.BottomNav.TAB_BOOKS
+                            Screens.Wiki.route -> MainTestTags.BottomNav.TAB_WIKI
+                            Screens.Info.route -> MainTestTags.BottomNav.TAB_INFO
+                            else -> "tab_unknown"
+                        }
+
                         NavigationBarItem(
+                            modifier = Modifier.testTag(testTag),
                             selected = index == navigationSelectedItem,
                             label = {
                                 Text(navigationItem.label)

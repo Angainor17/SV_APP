@@ -47,11 +47,13 @@ import su.sv.news.presentation.root.model.UiNewsMedia
 /**
  * Карточка новости
  *
+ * @param modifier модификатор
  * @param item данные новости
  * @param onItemClick обработчик клика на медиа-контент
  */
 @Composable
 fun NewsItem(
+    modifier: Modifier = Modifier,
     item: UiNewsItem,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
@@ -60,7 +62,7 @@ fun NewsItem(
     val strokeColor = if (isDarkTheme) CardStrokeDark else CardStrokeLight
 
     Card(
-        modifier = Modifier.padding(
+        modifier = modifier.padding(
             horizontal = dimensions.screenPaddingHorizontal / 2,
             vertical = dimensions.cardPaddingOuter
         ),
@@ -243,7 +245,7 @@ fun SingleVideoPreview() {
         allMedia = listOf()
     )
     SVAPPThemeLightPreview {
-        NewsItem(item) {}
+        NewsItem(item = item, onItemClick = {})
     }
 }
 
@@ -268,7 +270,7 @@ fun SingleVideoPreviewDark() {
         allMedia = listOf()
     )
     SVAPPTheme(themeMode = su.sv.commonui.theme.ThemeMode.DARK) {
-        NewsItem(item) {}
+        NewsItem(item = item, onItemClick = {})
     }
 }
 
@@ -289,6 +291,6 @@ fun NewsItemPreview() {
         allMedia = listOf()
     )
     SVAPPThemeLightPreview {
-        NewsItem(item) {}
+        NewsItem(item = item, onItemClick = {})
     }
 }

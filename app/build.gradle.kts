@@ -23,7 +23,7 @@ android {
         versionCode = 11
         versionName = "0.3.1"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "su.sv.app.testing.HiltTestRunner"
     }
     buildTypes {
         release {
@@ -116,4 +116,90 @@ dependencies {
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.threetenabp)
+
+    // ============== Testing ==============
+    // Unit tests
+    testImplementation(libs.bundles.test)
+
+    // UI tests
+    androidTestImplementation(libs.bundles.androidTest)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// =====================================================
+// UI Test Tasks
+// =====================================================
+
+/**
+ * Запуск smoke-тестов (критичные сценарии)
+ * ./gradlew runSmokeTests
+ */
+tasks.register("runSmokeTests") {
+    group = "verification"
+    description = "Run smoke UI tests (critical scenarios)"
+
+    dependsOn("connectedAndroidTest")
+
+    doFirst {
+        project.extensions.extraProperties.set(
+            "android.testInstrumentationRunnerArguments.annotation",
+            "su.sv.app.testing.SmokeTest"
+        )
+    }
+}
+
+/**
+ * Запуск release-тестов (перед релизом)
+ * ./gradlew runReleaseTests
+ */
+tasks.register("runReleaseTests") {
+    group = "verification"
+    description = "Run release UI tests (before release)"
+
+    dependsOn("connectedAndroidTest")
+
+    doFirst {
+        project.extensions.extraProperties.set(
+            "android.testInstrumentationRunnerArguments.annotation",
+            "su.sv.app.testing.ReleaseTest"
+        )
+    }
+}
+
+/**
+ * Запуск тестов навигации
+ * ./gradlew runNavigationTests
+ */
+tasks.register("runNavigationTests") {
+    group = "verification"
+    description = "Run navigation UI tests"
+
+    dependsOn("connectedAndroidTest")
+
+    doFirst {
+        project.extensions.extraProperties.set(
+            "android.testInstrumentationRunnerArguments.annotation",
+            "su.sv.app.testing.NavigationTest"
+        )
+    }
+}
+
+/**
+ * Полный релизный пайплайн:
+ * - Сборка release APK
+ * - Запуск smoke-тестов
+ * ./gradlew releasePipeline
+ */
+tasks.register("releasePipeline") {
+    group = "build"
+    description = "Full release pipeline: build release APK and run smoke tests"
+
+    dependsOn("assembleRelease")
+    dependsOn("runSmokeTests")
+
+    doLast {
+        println("\n✅ Release pipeline completed!")
+        println("📱 APK: app/build/outputs/apk/release/app-release.apk")
+    }
 }
