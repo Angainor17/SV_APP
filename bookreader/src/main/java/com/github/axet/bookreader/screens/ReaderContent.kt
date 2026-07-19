@@ -57,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,6 +67,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookReaderInitializer
 import com.github.axet.bookreader.app.ReaderPreferences
+import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
 import com.github.axet.bookreader.screens.ui.NavigationComposeDialog
@@ -491,9 +493,15 @@ private fun TocComposeDialog(
 
     if (tocItems.isEmpty()) {
         AlertDialog(
+            modifier = Modifier.testTag(ReaderTestTags.Toc.DIALOG),
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.sv_toc_title)) },
-            text = { Text(stringResource(R.string.sv_toc_not_available)) },
+            text = {
+                Text(
+                    modifier = Modifier.testTag(ReaderTestTags.Toc.EMPTY_STATE),
+                    text = stringResource(R.string.sv_toc_not_available)
+                )
+            },
             confirmButton = {
                 TextButton(onClick = onDismiss) {
                     Text(stringResource(R.string.sv_close))
@@ -502,6 +510,7 @@ private fun TocComposeDialog(
         )
     } else {
         AlertDialog(
+            modifier = Modifier.testTag(ReaderTestTags.Toc.DIALOG),
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.sv_toc_title)) },
             text = {
@@ -716,6 +725,7 @@ private fun FontsComposeBottomSheet(
     }
 
     ModalBottomSheet(
+        modifier = Modifier.testTag(ReaderTestTags.FontSettings.SHEET),
         onDismissRequest = onDismiss,
         sheetState = sheetState
     ) {
@@ -732,18 +742,19 @@ private fun FontsComposeBottomSheet(
 
             // Размер шрифта
             Text(
+                modifier = Modifier.testTag(ReaderTestTags.FontSettings.SIZE_VALUE),
                 text = "Размер шрифта: ${fontSize.toInt()}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Slider(
+                modifier = Modifier.testTag(ReaderTestTags.FontSettings.SIZE_SLIDER),
                 value = fontSize,
                 onValueChange = { newSize ->
                     fontSize = newSize
                     onFontSizeChange(newSize.toInt())
                 },
                 valueRange = 8f..48f,
-                steps = 40,
-                modifier = Modifier.fillMaxWidth()
+                steps = 40
             )
 
             Spacer(modifier = Modifier.height(16.dp))

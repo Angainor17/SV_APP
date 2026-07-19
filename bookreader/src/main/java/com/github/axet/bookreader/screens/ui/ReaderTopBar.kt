@@ -31,12 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.axet.bookreader.R
+import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
 
@@ -54,10 +56,12 @@ fun ReaderTopBar(
     val searchState = state.searchState
 
     TopAppBar(
+        modifier = Modifier.testTag(ReaderTestTags.TopBar.ROOT),
         title = {
             if (searchState.isActive) {
                 // Search mode - show search field
                 Row(
+                    modifier = Modifier.testTag(ReaderTestTags.TopBar.SEARCH_PANEL),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -74,7 +78,9 @@ fun ReaderTopBar(
                         },
                         singleLine = true,
                         textStyle = TextStyle(fontSize = 14.sp),
-                        modifier = Modifier.width(220.dp)
+                        modifier = Modifier
+                            .width(220.dp)
+                            .testTag(ReaderTestTags.TopBar.SEARCH_FIELD)
                     )
 
                     // Loading indicator or results counter
@@ -145,13 +151,19 @@ fun ReaderTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = {
-                if (searchState.isActive) {
-                    onAction(ReaderActions.SearchClose)
-                } else {
-                    onAction(ReaderActions.NavigateBack)
+            IconButton(
+                modifier = Modifier.testTag(
+                    if (searchState.isActive) ReaderTestTags.TopBar.SEARCH_CLOSE
+                    else ReaderTestTags.TopBar.BACK_BUTTON
+                ),
+                onClick = {
+                    if (searchState.isActive) {
+                        onAction(ReaderActions.SearchClose)
+                    } else {
+                        onAction(ReaderActions.NavigateBack)
+                    }
                 }
-            }) {
+            ) {
                 Icon(
                     imageVector = if (searchState.isActive) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = if (searchState.isActive) "Close search" else "Back",
@@ -163,9 +175,12 @@ fun ReaderTopBar(
             // Only show other actions when not in search mode
             if (!searchState.isActive) {
                 // Search
-                IconButton(onClick = {
-                    onAction(ReaderActions.Search(""))
-                }) {
+                IconButton(
+                    modifier = Modifier.testTag(ReaderTestTags.TopBar.SEARCH_BUTTON),
+                    onClick = {
+                        onAction(ReaderActions.Search(""))
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
@@ -174,7 +189,10 @@ fun ReaderTopBar(
                 }
 
                 // Table of Contents
-                IconButton(onClick = { onAction(ReaderActions.ToggleToc) }) {
+                IconButton(
+                    modifier = Modifier.testTag(ReaderTestTags.TopBar.TOC_BUTTON),
+                    onClick = { onAction(ReaderActions.ToggleToc) }
+                ) {
                     Icon(
                         painter = androidx.compose.ui.res.painterResource(R.drawable.ic_toc_white_24dp),
                         contentDescription = "Table of Contents",
@@ -183,7 +201,10 @@ fun ReaderTopBar(
                 }
 
                 // Bookmarks
-                IconButton(onClick = { onAction(ReaderActions.ToggleBookmarks) }) {
+                IconButton(
+                    modifier = Modifier.testTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON),
+                    onClick = { onAction(ReaderActions.ToggleBookmarks) }
+                ) {
                     Icon(
                         painter = androidx.compose.ui.res.painterResource(R.drawable.ic_bookmark_white_24dp),
                         contentDescription = "Bookmarks",
@@ -193,7 +214,10 @@ fun ReaderTopBar(
 
                 // Font size - показываем только если шрифт можно менять
                 if (state.canChangeFont) {
-                    IconButton(onClick = { onAction(ReaderActions.ToggleFontSettings) }) {
+                    IconButton(
+                        modifier = Modifier.testTag(ReaderTestTags.TopBar.FONT_BUTTON),
+                        onClick = { onAction(ReaderActions.ToggleFontSettings) }
+                    ) {
                         Icon(
                             painter = androidx.compose.ui.res.painterResource(R.drawable.ic_format_size_white_24dp),
                             contentDescription = "Font Settings",
@@ -203,7 +227,10 @@ fun ReaderTopBar(
                 }
 
                 // More options menu
-                IconButton(onClick = { showMenu = true }) {
+                IconButton(
+                    modifier = Modifier.testTag(ReaderTestTags.TopBar.MENU_BUTTON),
+                    onClick = { showMenu = true }
+                ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "More",
@@ -212,6 +239,7 @@ fun ReaderTopBar(
                 }
 
                 DropdownMenu(
+                    modifier = Modifier.testTag(ReaderTestTags.TopBar.MENU_DROPDOWN),
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
                 ) {

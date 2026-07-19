@@ -26,10 +26,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.domain.cleanBookmarkText
+import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.PagerWidget
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
@@ -59,9 +61,15 @@ fun BookmarksComposeDialog(
 
     if (bookmarksState.isEmpty()) {
         AlertDialog(
+            modifier = Modifier.testTag(ReaderTestTags.Bookmarks.DIALOG),
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.sv_bookmarks_title)) },
-            text = { Text(stringResource(R.string.sv_bookmarks_empty)) },
+            text = {
+                Text(
+                    modifier = Modifier.testTag(ReaderTestTags.Bookmarks.EMPTY_STATE),
+                    text = stringResource(R.string.sv_bookmarks_empty)
+                )
+            },
             confirmButton = {
                 TextButton(onClick = onDismiss) {
                     Text(stringResource(R.string.sv_close))
@@ -70,10 +78,13 @@ fun BookmarksComposeDialog(
         )
     } else {
         AlertDialog(
+            modifier = Modifier.testTag(ReaderTestTags.Bookmarks.DIALOG),
             onDismissRequest = onDismiss,
             title = { Text(stringResource(R.string.sv_bookmarks_title)) },
             text = {
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.testTag(ReaderTestTags.Bookmarks.LIST)
+                ) {
                     // Используем last timestamp как unique key (каждая закладка имеет уникальный timestamp)
                     items(bookmarksState, key = { it.last }) { bookmark ->
                         Row(

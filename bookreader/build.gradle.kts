@@ -15,6 +15,9 @@ android {
     buildFeatures {
         compose = true
     }
+    defaultConfig {
+        testInstrumentationRunner = "com.github.axet.bookreader.screens.testing.HiltTestRunner"
+    }
     packaging {
         jniLibs {
             excludes.add("META-INF/DEPENDENCIES")
@@ -73,4 +76,11 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.material)
+
+    // ============== Testing ==============
+    // UI tests
+    androidTestImplementation(libs.bundles.androidTest)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    kspAndroidTest(libs.hilt.android.compiler)
 }
