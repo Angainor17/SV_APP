@@ -1,6 +1,7 @@
 package su.sv.app.testing
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -17,7 +18,8 @@ import su.sv.app.MainActivity
  * Предоставляет:
  * - HiltAndroidRule для внедрения зависимостей
  * - ComposeRule с MainActivity для тестирования реального приложения
- * - Вспомогательные методы
+ * - Вспомогательные методы для навигации и ожиданий
+ * - Интеграцию с [ScreenActions] для повторяемых операций
  *
  * Использование:
  * ```kotlin
@@ -26,8 +28,13 @@ import su.sv.app.MainActivity
  *
  *     @Test
  *     fun myTest() {
- *         // navigate и тесты
- *         composeRule.onNodeWithTag("...").assertIsDisplayed()
+ *         // Используйте хелперы
+ *         navigateToBooksTab()
+ *         waitForItems(TestTags.BooksCatalog.ITEM)
+ *
+ *         // Или используйте ScreenActions
+ *         screenActions.navigateToWiki()
+ *         screenActions.searchWiki("Солнце")
  *     }
  * }
  * ```
@@ -44,12 +51,39 @@ abstract class BaseUiTest {
     @get:Rule(order = 1)
     val composeRule = createAndroidComposeRule<MainActivity>()
 
+    // Экземпляр ScreenActions для повторяемых операций
+    protected val screenActions: ScreenActions by lazy { ScreenActions(composeRule) }
+
     @Before
     fun setup() {
         hiltRule.inject()
     }
 
-    // ==================== Helper Methods ====================
+    // ==================== Ожидания ====================
+
+    /**
+     * Ожидание появления элемента с указанным тегом.
+     */
+    protected fun waitForTag(tag: String, timeoutMs: Long = 5000) {
+        composeRule.waitUntil(timeoutMs) {
+            try {
+                composeRule.onNodeWithTag(tag, useUnmergedTree = true).fetchSemanticsNode() != null
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
+    /**
+     * Ожидание появления элементов с указанным тегом.
+     */
+    protected fun waitForItems(tag: String, timeoutMs: Long = 10000, minCount: Int = 1) {
+        composeRule.waitUntil(timeoutMs) {
+            composeRule.onAllNodesWithTag(tag, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size >= minCount
+        }
+    }
 
     /**
      * Ожидание в миллисекундах.
@@ -79,49 +113,58 @@ abstract class BaseUiTest {
         throw lastException ?: IllegalStateException("Unknown error")
     }
 
+    // ==================== Проверки ====================
+
+    /**
+     * Проверить, что элемент существует.
+     */
+    protected fun assertTagExists(tag: String) {
+        composeRule.onNodeWithTag(tag, useUnmergedTree = true).assertExists()
+    }
+
+    /**
+     * Проверить, что элемент отображается.
+     */
+    protected fun assertTagIsDisplayed(tag: String) {
+        composeRule.onNodeWithTag(tag, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    // ==================== Действия ====================
+
+    /**
+     * Кликнуть по элементу с указанным тегом.
+     */
+    protected fun clickOnTag(tag: String) {
+        composeRule.onNodeWithTag(tag, useUnmergedTree = true).performClick()
+    }
+
     // ==================== Navigation Helpers ====================
 
     /**
      * Переход на вкладку News.
      */
     protected fun navigateToNewsTab() {
-        composeRule.waitForIdle()
-        composeRule
-            .onNodeWithTag(TestTags.BottomNav.TAB_NEWS, useUnmergedTree = true)
-            .performClick()
-        composeRule.waitForIdle()
+        screenActions.navigateToNews()
     }
 
     /**
      * Переход на вкладку Books.
      */
     protected fun navigateToBooksTab() {
-        composeRule.waitForIdle()
-        composeRule
-            .onNodeWithTag(TestTags.BottomNav.TAB_BOOKS, useUnmergedTree = true)
-            .performClick()
-        composeRule.waitForIdle()
+        screenActions.navigateToBooks()
     }
 
     /**
      * Переход на вкладку Wiki.
      */
     protected fun navigateToWikiTab() {
-        composeRule.waitForIdle()
-        composeRule
-            .onNodeWithTag(TestTags.BottomNav.TAB_WIKI, useUnmergedTree = true)
-            .performClick()
-        composeRule.waitForIdle()
+        screenActions.navigateToWiki()
     }
 
     /**
      * Переход на вкладку Info.
      */
     protected fun navigateToInfoTab() {
-        composeRule.waitForIdle()
-        composeRule
-            .onNodeWithTag(TestTags.BottomNav.TAB_INFO, useUnmergedTree = true)
-            .performClick()
-        composeRule.waitForIdle()
+        screenActions.navigateToInfo()
     }
 }

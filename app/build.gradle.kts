@@ -125,6 +125,7 @@ dependencies {
     androidTestImplementation(libs.bundles.androidTest)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    kspAndroidTest(libs.hilt.android.compiler)
 }
 
 // =====================================================
