@@ -6,4 +6,8 @@
     <string name="nav_bar_wiki">Wiki</string>
     <string name="nav_bar_info">Наши проекты</string>
 
+    <!-- Snackbar "Продолжить чтение" -->
+    <string name="continue_reading_button">Продолжить</string>
+    <string name="continue_reading_dismiss">Закрыть</string>
+
 </resources>

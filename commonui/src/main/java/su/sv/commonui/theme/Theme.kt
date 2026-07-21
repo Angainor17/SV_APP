@@ -137,6 +137,14 @@ val ColorScheme.cardStroke: Color
     get() = if (this == DarkColorScheme) CardStrokeDark else CardStrokeLight
 
 /**
+ * Цвет Bottom Navigation Bar
+ */
+val ColorScheme.navigationBarColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (this == DarkColorScheme) DarkNavigationBarColor else LightNavigationBarColor
+
+/**
  * Функциональные цвета (одинаковы для обеих тем)
  */
 val ColorScheme.success: Color

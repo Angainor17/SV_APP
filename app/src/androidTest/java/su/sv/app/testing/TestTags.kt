@@ -168,4 +168,14 @@ object TestTags {
         const val RETRY_BUTTON = "retry_button"
         const val BACK_BUTTON = "back_button"
     }
+
+    // ==================== Continue Reading Snackbar ====================
+    object ContinueReading {
+        const val ROOT = "continue_reading_root"
+        const val COVER = "continue_reading_cover"
+        const val TITLE = "continue_reading_title"
+        const val AUTHOR = "continue_reading_author"
+        const val CONTINUE_BUTTON = "continue_reading_button"
+        const val DISMISS_BUTTON = "continue_reading_dismiss"
+    }
 }
