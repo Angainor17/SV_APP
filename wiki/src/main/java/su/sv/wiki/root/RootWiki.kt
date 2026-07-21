@@ -107,6 +107,10 @@ fun RootWiki(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val hints = remember {
+                    context.resources.getStringArray(R.array.wiki_search_hints).toList()
+                }
+
                 WikiSearchBar(
                     onSearch = { query ->
                         if (query.length >= 3) {
@@ -119,6 +123,7 @@ fun RootWiki(
                     onClearClick = {
                         focusManager.clearFocus()
                     },
+                    hints = hints,
                     isSuggestionsVisible = suggestions.isNotEmpty(),
                     selectedSuggestion = selectedSuggestion,
                     onSuggestionApplied = {
