@@ -27,6 +27,7 @@ dependencies {
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
+    implementation(project(":managers"))
 
     // Compose
     implementation(libs.bundles.coil)
