@@ -2,6 +2,7 @@ package su.sv.books.catalog.domain
 
 import android.net.Uri
 import su.sv.books.catalog.data.repo.BookDownloadRepository
+import su.sv.commonarchitecture.di.module.DispatcherProvider
 import javax.inject.Inject
 
 /**
@@ -10,6 +11,7 @@ import javax.inject.Inject
 class GetDownloadedBooksUseCase @Inject constructor(
     private val getBooksListUseCase: GetBooksListUseCase,
     private val downloadRepository: BookDownloadRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
 
     /**
@@ -20,8 +22,9 @@ class GetDownloadedBooksUseCase @Inject constructor(
         onProgressUpdate: ((bookId: String) -> Pair<Int, Int>)? = null
     ): Result<List<DownloadedBook>> {
         return getBooksListUseCase.execute().map { books ->
+            // Используем уже полученный fileUri из Book, вместо повторного запроса
             books.mapNotNull { book ->
-                val uri = downloadRepository.getDownloadsUri(book.fileNameWithExt)
+                val uri = book.fileUri
                 if (uri != null) {
                     val (currentPage, totalPages) = onProgressUpdate?.invoke(book.id) ?: (0 to 0)
                     DownloadedBook(
