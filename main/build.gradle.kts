@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":books"))
     implementation(project(":wiki"))
     implementation(project(":info"))
+    implementation(project(":bookreader"))
 
     // Модули-utils
     implementation(project(":commonarchitecture"))
@@ -34,6 +35,7 @@ dependencies {
     // Compose
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.coil.compose)
 
     // Navigation
     implementation(libs.modo.compose)

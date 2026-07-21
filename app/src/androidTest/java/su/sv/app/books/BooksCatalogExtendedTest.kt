@@ -7,6 +7,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeUp
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 import su.sv.app.testing.BaseUiTest

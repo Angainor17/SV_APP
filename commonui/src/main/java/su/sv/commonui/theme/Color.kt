@@ -216,6 +216,23 @@ val CardStrokeDark = Color(0x40FFFFFF)
 val NewItemBorderStroke = Color(0x40000000)
 
 // ============================================================
+// NAVIGATION BAR COLORS
+// ============================================================
+
+/**
+ * Цвет Bottom Navigation Bar - Light.
+ * Темнее фона приложения (WarmGray 50) для визуального разделения.
+ * Используем WarmGray 150 для лучшего контраста.
+ */
+val LightNavigationBarColor = Color(0xFFDDD3CA)  // WarmGray 150
+
+/**
+ * Цвет Bottom Navigation Bar - Dark.
+ * Темнее основного фона для визуального разделения.
+ */
+val DarkNavigationBarColor = Color(0xFF141218)  // Темнее фона (DarkSurfaceDim)
+
+// ============================================================
 // SWIPE ACTION COLORS
 // ============================================================
 

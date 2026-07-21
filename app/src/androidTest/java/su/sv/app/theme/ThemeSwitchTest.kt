@@ -335,6 +335,3 @@ class ThemeSwitchTest : BaseUiTest() {
             .assertExists()
     }
 }
-
-// Добавляем импорт для assertHasClickAction
-import androidx.compose.ui.test.assertHasClickAction
