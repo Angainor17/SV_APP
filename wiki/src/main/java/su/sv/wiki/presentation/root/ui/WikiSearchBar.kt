@@ -1,5 +1,7 @@
 package su.sv.wiki.presentation.root.ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,16 +28,19 @@ import su.sv.wiki.R
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Поле поиска статей с debounce
+ * Поле поиска статей с debounce и анимированным hint
  *
  * @param onSearch callback при поиске (вызывается через debounce только если suggestions не отображаются)
  * @param onQueryChanged callback при изменении текста (для подсказок)
  * @param onClearClick callback при нажатии на крестик (для скрытия клавиатуры)
+ * @param hints список текстов для анимированного hint (показываются по очереди)
  * @param isSuggestionsVisible true если подсказки отображаются под полем поиска
  * @param selectedSuggestion текст выбранной подсказки для помещения в поле ввода
  * @param onSuggestionApplied callback после помещения suggestion в поле (для сброса)
  * @param minQueryLength минимальная длина запроса для поиска (по умолчанию 3)
  * @param debounceMillis задержка в миллисекундах (по умолчанию 1500)
+ * @param typingSpeedMs скорость печати одного символа (по умолчанию 100ms)
+ * @param pauseBetweenHintsMs пауза между сменой hints (по умолчанию 3000ms)
  */
 @Composable
 fun WikiSearchBar(
@@ -43,14 +48,19 @@ fun WikiSearchBar(
     onQueryChanged: (String) -> Unit,
     onClearClick: () -> Unit,
     modifier: Modifier = Modifier,
+    hints: List<String> = emptyList(),
     isSuggestionsVisible: Boolean = false,
     selectedSuggestion: String? = null,
     onSuggestionApplied: () -> Unit = {},
     minQueryLength: Int = 3,
     debounceMillis: Long = 1500L,
+    typingSpeedMs: Long = 110L,
+    pauseBetweenHintsMs: Long = 3000L,
 ) {
     var searchText by remember { mutableStateOf("") }
     val dimensions = LocalAppDimensions.current
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
 
     // При выборе suggestion - помещаем текст в поле ввода
     LaunchedEffect(selectedSuggestion) {
@@ -69,23 +79,33 @@ fun WikiSearchBar(
         }
     }
 
+    // Показываем анимированный hint только если:
+    // 1. Поле пустое
+    // 2. Нет фокуса
+    // 3. Есть hints для показа
+    val showAnimatedHint = searchText.isEmpty() && !isFocused && hints.isNotEmpty()
+
     OutlinedTextField(
         value = searchText,
         onValueChange = { newText ->
             searchText = newText
             onQueryChanged(newText)
         },
-        label = {
-            Text(
-                text = stringResource(R.string.wiki_search_label),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        },
+        interactionSource = interactionSource,
         placeholder = {
-            Text(
-                text = stringResource(R.string.wiki_search_placeholder),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (showAnimatedHint) {
+                AnimatedTypingHint(
+                    hints = hints,
+                    typingSpeedMs = typingSpeedMs,
+                    pauseBetweenHintsMs = pauseBetweenHintsMs,
+                )
+            } else if (searchText.isEmpty()) {
+                // Показываем "Поиск" когда поле в фокусе
+                Text(
+                    text = stringResource(R.string.wiki_search_label),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         },
         singleLine = true,
         trailingIcon = {
@@ -130,6 +150,11 @@ fun WikiSearchBarPreview() {
             onSearch = {},
             onQueryChanged = {},
             onClearClick = {},
+            hints = listOf(
+                "Диктатура пролетариата",
+                "Октябрьская революция",
+                "Ленин",
+            ),
             isSuggestionsVisible = false,
         )
     }

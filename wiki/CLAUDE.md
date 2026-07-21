@@ -75,6 +75,7 @@ wiki/src/main/java/su/sv/wiki/
 │       ├── mapper/                # Мапперы
 │       ├── model/                 # UI модели
 │       ├── ui/                    # UI компоненты
+│       │   ├── AnimatedTypingHint.kt # Анимированный hint для поиска
 │       │   ├── ArticleContent.kt  # Контент статьи с ссылками и картинкой
 │       │   ├── ArticleView.kt     # Карточка статьи
 │       │   ├── HistoryList.kt     # Список истории
@@ -246,6 +247,31 @@ sealed class UiWikiState {
 - Анимация: `expandVertically/shrinkVertically`
 - Показываются над контентом
 - Фильтруются (не показывают текущую статью)
+
+### Анимированный hint поиска
+Поле поиска показывает анимированный hint с эффектом печатающегося текста:
+- **Без фокуса + поле пустое** → анимированный hint (побуквенное появление)
+- **В фокусе + поле пустое** → статичный "Поиск"
+- **Поле не пустое** → введённый текст
+
+**Параметры анимации:**
+- `typingSpeedMs = 110ms` — скорость печати одного символа
+- `pauseBetweenHintsMs = 3000ms` — пауза между сменой hints
+
+**Список hints** задаётся в `strings.xml` как строковый массив `wiki_search_hints`:
+```xml
+<string-array name="wiki_search_hints">
+    <item>Диктатура пролетариата</item>
+    <item>Классовая борьба</item>
+    <item>В-себе-бытие</item>
+    <item>Явление</item>
+</string-array>
+```
+
+**Реализация:**
+- `AnimatedTypingHint.kt` — компонент анимации
+- `WikiSearchBar.kt` — поле поиска с animated hint
+- Hints читаются из ресурсов через `context.resources.getStringArray()`
 
 ## Правила разработки
 

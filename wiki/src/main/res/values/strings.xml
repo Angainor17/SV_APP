@@ -8,6 +8,14 @@
     <string name="wiki_search_placeholder">Введите слово или фразу…</string>
     <string name="wiki_search_clear">Очистить поиск</string>
 
+    <!-- Подсказки для поиска (анимированный hint) -->
+    <string-array name="wiki_search_hints">
+        <item>Диктатура пролетариата</item>
+        <item>Классовая борьба</item>
+        <item>В-себе-бытие</item>
+        <item>Явление</item>
+    </string-array>
+
     <!-- Состояния -->
     <string name="wiki_loading">Загрузка…</string>
     <string name="wiki_not_found">Ничего не найдено</string>
