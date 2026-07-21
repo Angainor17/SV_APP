@@ -32,12 +32,16 @@ interface WikiApi {
     /**
      * Получение содержимого страницы
      * @param title заголовок страницы
+     * @param disableEditSection отключить ссылки "править" в секциях (default: true)
+     * @param disableTOC отключить оглавление (default: false)
      */
     @GET("api.php")
     suspend fun getPage(
         @Query("action") action: String = "parse",
         @Query("page") title: String,
         @Query("prop") prop: String = "text|links|displaytitle",
+        @Query("disableeditsection") disableEditSection: Int = 1,
+        @Query("disabletoc") disableTOC: Int = 0,
         @Query("format") format: String = "json",
     ): Response<ApiParseResponse>
 
