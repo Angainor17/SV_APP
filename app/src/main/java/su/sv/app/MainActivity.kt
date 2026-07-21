@@ -17,10 +17,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import su.sv.commonarchitecture.presentation.base.BaseActivity
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.main.bottomnav.BottomNavScreen
+import su.sv.managers.theme.CustomColorsRepository
 import su.sv.managers.theme.ThemeViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
+
+    @Inject
+    lateinit var customColorsRepository: CustomColorsRepository
 
     private var rootScreen: RootScreen<StackScreen>? = null
 
@@ -32,9 +37,15 @@ class MainActivity : BaseActivity() {
             val themeViewModel: ThemeViewModel = hiltViewModel()
             val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
 
+            // Загрузка кастомных цветов
+            val customColors by customColorsRepository.getCustomColors(
+                themeConfig.themeMode.name
+            ).collectAsStateWithLifecycle(initialValue = null)
+
             SVAPPTheme(
                 themeMode = themeConfig.themeMode,
-                useDynamicColors = themeConfig.useDynamicColors
+                useDynamicColors = themeConfig.useDynamicColors,
+                customColors = customColors,
             ) {
                 // Remember root screen using rememberSaveable under the hood.
                 val rootScreen = rememberRootScreen {

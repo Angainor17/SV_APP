@@ -28,6 +28,9 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
+    // JSON
+    implementation(libs.gson)
+
     // Logging
     implementation(libs.timber)
 

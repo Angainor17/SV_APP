@@ -108,6 +108,7 @@ fun AppToolbarWithBack(
  * @param title заголовок
  * @param currentThemeMode текущий режим темы
  * @param onThemeToggle обработчик переключения темы
+ * @param onThemeLongPress обработчик долгого нажатия на переключатель темы (открывает редактор)
  * @param modifier модификатор
  * @param windowInsets insets для тулбара
  * @param scrollBehavior поведение скролла тулбара (для скрытия при скролле)
@@ -121,6 +122,7 @@ fun AppToolbarWithThemeToggle(
     title: String,
     currentThemeMode: ThemeMode,
     onThemeToggle: (ThemeMode) -> Unit,
+    onThemeLongPress: () -> Unit = {},
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
@@ -139,7 +141,8 @@ fun AppToolbarWithThemeToggle(
         additionalActions()
         ThemeToggleIcon(
             currentMode = currentThemeMode,
-            onToggle = onThemeToggle
+            onToggle = onThemeToggle,
+            onLongPress = onThemeLongPress
         )
     }
 }

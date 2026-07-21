@@ -184,16 +184,23 @@ val LocalThemeConfig = staticCompositionLocalOf { ThemeConfig.Default }
 // ============================================================
 
 /**
+ * CompositionLocal для хранения кастомных цветов темы
+ */
+val LocalCustomColors = staticCompositionLocalOf<CustomThemeColors?> { null }
+
+/**
  * Тема приложения SV APP
  *
  * @param themeMode режим темы (LIGHT или DARK)
  * @param useDynamicColors использовать динамические цвета (Material You, Android 12+)
+ * @param customColors кастомные цвета темы (null для использования стандартных)
  * @param content контент приложения
  */
 @Composable
 fun SVAPPTheme(
     themeMode: ThemeMode = ThemeMode.LIGHT,
     useDynamicColors: Boolean = false,
+    customColors: CustomThemeColors? = null,
     content: @Composable () -> Unit,
 ) {
     val darkTheme = themeMode.isDarkTheme()
@@ -202,7 +209,7 @@ fun SVAPPTheme(
     val view = LocalView.current
 
     // Выбор цветовой схемы
-    val colorScheme = when {
+    val baseColorScheme = when {
         useDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) {
                 dynamicDarkColorScheme(context)
@@ -212,6 +219,13 @@ fun SVAPPTheme(
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    // Применение кастомных цветов если есть
+    val colorScheme = if (customColors != null) {
+        applyCustomColors(baseColorScheme, customColors)
+    } else {
+        baseColorScheme
     }
 
     // Настройка статус-бара и навигационной панели
@@ -232,7 +246,8 @@ fun SVAPPTheme(
         LocalAppDimensions provides appDimensions,
         LocalAppShapes provides appShapes,
         LocalCustomTypography provides CustomTypography.Default,
-        LocalThemeConfig provides ThemeConfig(themeMode, useDynamicColors)
+        LocalThemeConfig provides ThemeConfig(themeMode, useDynamicColors),
+        LocalCustomColors provides customColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -241,6 +256,58 @@ fun SVAPPTheme(
             content = content
         )
     }
+}
+
+/**
+ * Применить кастомные цвета к базовой цветовой схеме.
+ */
+private fun applyCustomColors(
+    baseScheme: ColorScheme,
+    customColors: CustomThemeColors
+): ColorScheme {
+    return baseScheme.copy(
+        primary = customColors.getColor("primary") ?: baseScheme.primary,
+        onPrimary = customColors.getColor("onPrimary") ?: baseScheme.onPrimary,
+        primaryContainer = customColors.getColor("primaryContainer") ?: baseScheme.primaryContainer,
+        onPrimaryContainer = customColors.getColor("onPrimaryContainer") ?: baseScheme.onPrimaryContainer,
+
+        secondary = customColors.getColor("secondary") ?: baseScheme.secondary,
+        onSecondary = customColors.getColor("onSecondary") ?: baseScheme.onSecondary,
+        secondaryContainer = customColors.getColor("secondaryContainer") ?: baseScheme.secondaryContainer,
+        onSecondaryContainer = customColors.getColor("onSecondaryContainer") ?: baseScheme.onSecondaryContainer,
+
+        tertiary = customColors.getColor("tertiary") ?: baseScheme.tertiary,
+        onTertiary = customColors.getColor("onTertiary") ?: baseScheme.onTertiary,
+        tertiaryContainer = customColors.getColor("tertiaryContainer") ?: baseScheme.tertiaryContainer,
+        onTertiaryContainer = customColors.getColor("onTertiaryContainer") ?: baseScheme.onTertiaryContainer,
+
+        background = customColors.getColor("background") ?: baseScheme.background,
+        onBackground = customColors.getColor("onBackground") ?: baseScheme.onBackground,
+
+        surface = customColors.getColor("surface") ?: baseScheme.surface,
+        onSurface = customColors.getColor("onSurface") ?: baseScheme.onSurface,
+        surfaceVariant = customColors.getColor("surfaceVariant") ?: baseScheme.surfaceVariant,
+        onSurfaceVariant = customColors.getColor("onSurfaceVariant") ?: baseScheme.onSurfaceVariant,
+        surfaceDim = customColors.getColor("surfaceDim") ?: baseScheme.surfaceDim,
+        surfaceBright = customColors.getColor("surfaceBright") ?: baseScheme.surfaceBright,
+        surfaceContainerLowest = customColors.getColor("surfaceContainerLowest") ?: baseScheme.surfaceContainerLowest,
+        surfaceContainerLow = customColors.getColor("surfaceContainerLow") ?: baseScheme.surfaceContainerLow,
+        surfaceContainer = customColors.getColor("surfaceContainer") ?: baseScheme.surfaceContainer,
+        surfaceContainerHigh = customColors.getColor("surfaceContainerHigh") ?: baseScheme.surfaceContainerHigh,
+        surfaceContainerHighest = customColors.getColor("surfaceContainerHighest") ?: baseScheme.surfaceContainerHighest,
+
+        outline = customColors.getColor("outline") ?: baseScheme.outline,
+        outlineVariant = customColors.getColor("outlineVariant") ?: baseScheme.outlineVariant,
+
+        error = customColors.getColor("error") ?: baseScheme.error,
+        onError = customColors.getColor("onError") ?: baseScheme.onError,
+        errorContainer = customColors.getColor("errorContainer") ?: baseScheme.errorContainer,
+        onErrorContainer = customColors.getColor("onErrorContainer") ?: baseScheme.onErrorContainer,
+
+        inverseSurface = customColors.getColor("inverseSurface") ?: baseScheme.inverseSurface,
+        inverseOnSurface = customColors.getColor("inverseOnSurface") ?: baseScheme.inverseOnSurface,
+        inversePrimary = customColors.getColor("inversePrimary") ?: baseScheme.inversePrimary,
+    )
 }
 
 // ============================================================

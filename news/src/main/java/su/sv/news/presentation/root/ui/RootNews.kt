@@ -29,6 +29,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.github.terrakok.modo.stack.LocalStackNavigation
+import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
 import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.ui.OneTimeEffect
@@ -36,6 +38,7 @@ import su.sv.commonui.ui.components.AppToolbarWithThemeToggle
 import su.sv.commonui.ui.components.FullScreenError
 import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.news.R
+import su.sv.news.presentation.debug.ThemeEditorScreen
 import su.sv.news.presentation.root.RootNewsViewModel
 import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
@@ -58,6 +61,7 @@ fun RootNews(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val stackNavigation = LocalStackNavigation.current
 
     val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems()
     val loadState = lazyPagingItems.loadState.refresh
@@ -75,7 +79,11 @@ fun RootNews(
                 windowInsets = WindowInsets(0.dp),
                 currentThemeMode = currentThemeMode,
                 scrollBehavior = scrollBehavior,
-                onThemeToggle = { onThemeToggle() }
+                onThemeToggle = { onThemeToggle() },
+                onThemeLongPress = {
+                    // Открыть редактор темы при долгом нажатии
+                    stackNavigation.forward(ThemeEditorScreen())
+                }
             )
         },
         snackbarHost = {

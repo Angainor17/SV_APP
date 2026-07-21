@@ -7,4 +7,43 @@
     <string name="news_item_image_content_description">Картинка новости</string>
     <string name="news_item_play_content_description">Иконка Play у видео</string>
 
+    <!-- Theme Editor -->
+    <string name="theme_editor_title">Редактор темы</string>
+    <string name="theme_editor_reset">Сбросить</string>
+    <string name="theme_editor_apply">Применить и перезапустить</string>
+    <string name="theme_editor_light">Светлая</string>
+    <string name="theme_editor_dark">Тёмная</string>
+
+    <!-- Color Picker Dialog -->
+    <string name="color_picker_title">Выбор цвета</string>
+    <string name="color_picker_original">Исходный</string>
+    <string name="color_picker_selected">Выбран</string>
+    <string name="color_picker_palette">Палитра</string>
+    <string name="color_picker_hex_label">HEX код</string>
+    <string name="color_picker_hex_hint">#RRGGBB</string>
+    <string name="color_picker_cancel">Отмена</string>
+    <string name="color_picker_select">Выбрать</string>
+
+    <!-- Color Attribute Groups -->
+    <string name="color_group_primary">Основные цвета</string>
+    <string name="color_group_secondary">Акцентные цвета</string>
+    <string name="color_group_tertiary">Третичные цвета (карточки)</string>
+    <string name="color_group_background">Фон</string>
+    <string name="color_group_surface">Поверхности</string>
+    <string name="color_group_outline">Обводка</string>
+    <string name="color_group_error">Ошибки</string>
+    <string name="color_group_inverse">Инверсные</string>
+    <string name="color_group_additional">Дополнительные</string>
+
+    <!-- Color Attribute Labels -->
+    <string name="color_label_original">Исходный</string>
+    <string name="color_label_new">Новый</string>
+    <string name="color_label_not_set">Не задан</string>
+
+    <!-- Reset Dialog -->
+    <string name="reset_dialog_title">Сброс темы</string>
+    <string name="reset_dialog_message">Вы уверены, что хотите сбросить все кастомные цвета темы?</string>
+    <string name="reset_dialog_confirm">Сбросить</string>
+    <string name="reset_dialog_cancel">Отмена</string>
+
 </resources>
