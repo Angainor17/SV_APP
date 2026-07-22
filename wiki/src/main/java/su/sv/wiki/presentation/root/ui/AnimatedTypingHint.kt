@@ -22,6 +22,8 @@ import kotlin.time.Duration.Companion.milliseconds
  * @param hints список текстов для показа (сменяются по очереди)
  * @param typingSpeedMs скорость печати одного символа (по умолчанию 110ms)
  * @param pauseBetweenHintsMs пауза между сменой hints (по умолчанию 3000ms)
+ * @param initialDelayMs начальная задержка перед началом анимации (по умолчанию 2000ms)
+ * @param initialPlaceholder текст, показываемый во время начальной паузы (по умолчанию "Поиск")
  * @param showCursor показывать мигающий курсор в конце (по умолчанию true)
  */
 @Composable
@@ -30,6 +32,8 @@ fun AnimatedTypingHint(
     modifier: Modifier = Modifier,
     typingSpeedMs: Long = 110L,
     pauseBetweenHintsMs: Long = 3000L,
+    initialDelayMs: Long = 2000L,
+    initialPlaceholder: String,
     showCursor: Boolean = true,
 ) {
     if (hints.isEmpty()) return
@@ -37,6 +41,7 @@ fun AnimatedTypingHint(
     var currentHintIndex by remember { mutableIntStateOf(0) }
     var currentTextLength by remember { mutableIntStateOf(0) }
     var isTyping by remember { mutableStateOf(true) }
+    var hasStarted by remember { mutableStateOf(false) }
 
     val currentHint = hints[currentHintIndex]
 
@@ -52,6 +57,12 @@ fun AnimatedTypingHint(
 
     // Эффект печати и смены hints
     LaunchedEffect(hints) {
+        // Начальная задержка перед началом анимации
+        if (!hasStarted) {
+            delay(initialDelayMs.milliseconds)
+            hasStarted = true
+        }
+
         while (true) {
             // Печатаем текст
             isTyping = true
@@ -69,6 +80,17 @@ fun AnimatedTypingHint(
             // Следующий hint
             currentHintIndex = (currentHintIndex + 1) % hints.size
         }
+    }
+
+    // До начала анимации показываем placeholder
+    if (!hasStarted) {
+        Text(
+            text = initialPlaceholder,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = modifier
+        )
+        return
     }
 
     val displayText = if (animatedLength > 0) {
