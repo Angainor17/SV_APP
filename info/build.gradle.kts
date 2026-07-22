@@ -23,10 +23,17 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
+    // Bug Report модуль
+    implementation(project(":bugreport"))
+
     // Compose
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material.icons.extended)
     debugImplementation(libs.androidx.ui.tooling)
+
+    // Navigation
+    implementation(libs.modo.compose)
 
     // DI
     implementation(libs.hilt.android)

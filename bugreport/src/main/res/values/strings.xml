@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bug Report Screen -->
+    <string name="bug_report_toolbar_title">Сообщить о проблеме</string>
+
+    <string name="bug_report_description_title">Опишите проблему</string>
+    <string name="bug_report_description_subtitle">Опишите найденную ошибку или пожелания к приложению</string>
+    <string name="bug_report_description_label">Описание</string>
+    <string name="bug_report_description_hint">Опишите проблему (минимум 10 символов)</string>
+
+    <string name="bug_report_screenshots_title">Скриншоты (до %d)</string>
+    <string name="bug_report_add_screenshot">Добавить скриншот (%d/%d)</string>
+    <string name="bug_report_screenshot_content_description">Скриншот</string>
+    <string name="bug_report_remove_screenshot">Удалить</string>
+
+    <string name="bug_report_send_button">Отправить</string>
+    <string name="bug_report_send_email_for_feedback">Для обратной связи (отправить копию на email)</string>
+
+    <string name="bug_report_success_title">Спасибо за вашу помощь!</string>
+    <string name="bug_report_success_message">Мы рассмотрим вашу проблему в ближайшее время</string>
+
+    <string name="bug_report_error_title">Ошибка</string>
+    <string name="bug_report_retry_button">Повторить</string>
+</resources>
