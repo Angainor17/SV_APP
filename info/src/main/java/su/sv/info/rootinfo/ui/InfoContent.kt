@@ -3,6 +3,7 @@ package su.sv.info.rootinfo.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,8 +33,11 @@ fun InfoContent(
     val pullToRefreshState = rememberPullToRefreshState()
     val dimensions = LocalAppDimensions.current
 
+    // PullToRefreshBox должен учитывать contentPadding, чтобы индикатор не уходил под тулбар
     PullToRefreshBox(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(contentPadding),
         isRefreshing = state.isRefreshing,
         onRefresh = {
             actionsHandler.onAction(RootInfoActions.OnSwipeRefresh)
@@ -43,7 +47,6 @@ fun InfoContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
-            contentPadding = contentPadding,
         ) {
             items(
                 items = state.items,

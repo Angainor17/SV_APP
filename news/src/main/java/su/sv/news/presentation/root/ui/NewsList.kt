@@ -46,8 +46,11 @@ fun NewsList(
     val pullToRefreshState = rememberPullToRefreshState()
     val dimensions = LocalAppDimensions.current
 
+    // PullToRefreshBox должен учитывать contentPadding, чтобы индикатор не уходил под тулбар
     PullToRefreshBox(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(contentPadding),
         isRefreshing = state.isRefreshing,
         onRefresh = {
             lazyPagingItems.refresh()
@@ -60,7 +63,6 @@ fun NewsList(
                 .fillMaxSize()
                 .testTag(NewsTestTags.LIST),
             verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
-            contentPadding = contentPadding,
         ) {
             items(
                 count = lazyPagingItems.itemCount,

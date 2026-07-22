@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -205,7 +206,15 @@ private fun BottomNavContent(
                                         launchSingleTop = true
                                         restoreState = true
                                     }
-                                }
+                                },
+                                // Явно задаём цвета для корректного отображения при несовпадении темы системы и приложения
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                )
                             )
                         }
                 }
