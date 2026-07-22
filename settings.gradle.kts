@@ -4,8 +4,8 @@ pluginManagement {
             .takeIf { it.exists() }
             ?.inputStream()
             ?.use { java.util.Properties().apply { load(it) } }
-            ?.getProperty("useNexus", "true")
-            ?.toBoolean() ?: true
+            ?.getProperty("useNexus", "false")
+            ?.toBoolean() ?: false
     }
 
     repositories {
@@ -32,8 +32,8 @@ dependencyResolutionManagement {
             .takeIf { it.exists() }
             ?.inputStream()
             ?.use { java.util.Properties().apply { load(it) } }
-            ?.getProperty("useNexus", "true")
-            ?.toBoolean() ?: true
+            ?.getProperty("useNexus", "false")
+            ?.toBoolean() ?: false
     }
 
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
