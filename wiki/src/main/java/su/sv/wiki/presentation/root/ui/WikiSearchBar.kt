@@ -98,6 +98,7 @@ fun WikiSearchBar(
                     hints = hints,
                     typingSpeedMs = typingSpeedMs,
                     pauseBetweenHintsMs = pauseBetweenHintsMs,
+                    initialPlaceholder = stringResource(R.string.wiki_search_label),
                 )
             } else if (searchText.isEmpty()) {
                 // Показываем "Поиск" когда поле в фокусе
