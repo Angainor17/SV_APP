@@ -19,6 +19,7 @@ import su.sv.wiki.domain.usecase.GetArticleUseCase
 import su.sv.wiki.domain.usecase.IsFavoriteUseCase
 import su.sv.wiki.domain.usecase.RemoveFavoriteUseCase
 import su.sv.wiki.presentation.root.mapper.UiWikiMapper
+import su.sv.wiki.presentation.root.model.UiWikiArticle
 import javax.inject.Inject
 
 /**
@@ -129,7 +130,7 @@ class ArticleViewModel @Inject constructor(
 sealed class ArticleState {
     object Loading : ArticleState()
     data class Content(
-        val article: su.sv.wiki.presentation.root.model.UiWikiArticle,
+        val article: UiWikiArticle,
         val isFavorite: Boolean,
     ) : ArticleState()
     object NotFound : ArticleState()

@@ -1,5 +1,6 @@
 package su.sv.wiki.domain.usecase
 
+import kotlinx.coroutines.withContext
 import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.wiki.domain.repository.WikiRepository
 import javax.inject.Inject
@@ -15,7 +16,7 @@ class IsFavoriteUseCase @Inject constructor(
 
     suspend fun execute(title: String): Boolean {
         // DB запрос - IO операция
-        return kotlinx.coroutines.withContext(dispatcherProvider.io) {
+        return withContext(dispatcherProvider.io) {
             repository.isFavorite(title)
         }
     }

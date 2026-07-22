@@ -19,6 +19,7 @@
 
 package org.geometerplus.zlibrary.text.hyphenation
 
+@Suppress("VariableNaming")
 class ZLTextHyphenationInfo(length: Int) {
     @JvmField
     internal val Mask: BooleanArray = BooleanArray(length - 1)

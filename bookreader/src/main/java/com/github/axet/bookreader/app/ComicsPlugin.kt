@@ -14,6 +14,7 @@ import de.innosystec.unrar.Archive
 import de.innosystec.unrar.NativeStorage
 import de.innosystec.unrar.exception.RarException
 import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.model.FileHeader
 import org.apache.commons.io.IOUtils
 import org.geometerplus.fbreader.book.AbstractBook
 import org.geometerplus.fbreader.book.BookUtil
@@ -207,7 +208,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
         internal fun load(file: File) {
             pages = list(file)
             if (pages!!.isEmpty())
-                throw RuntimeException("no comics found!")
+                throw IllegalStateException("no comics found!")
             Collections.sort(pages!!, SortByName())
             loadTOC()
         }
@@ -296,7 +297,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                                         r = getImageSize(open())
                                     r
                                 } catch (e: IOException) {
-                                    throw RuntimeException(e)
+                                    throw IllegalStateException(e)
                                 }
                             }
                     }
@@ -305,7 +306,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 }
                 ff
             } catch (e: Exception) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
 
@@ -314,7 +315,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 for (a in aa)
                     a.close()
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
             aa.clear()
         }
@@ -337,7 +338,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 aa.add(zip)
                 val list = zip.fileHeaders
                 for (o in list) {
-                    val zipEntry = o as net.lingala.zip4j.model.FileHeader
+                    val zipEntry = o as FileHeader
                     if (zipEntry.isDirectory)
                         continue
                     val a = object : ArchiveFile {
@@ -349,7 +350,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                             return try {
                                 ZipSAF.ZipInputStreamSafe(zip.getInputStream(zipEntry))
                             } catch (e: Exception) {
-                                throw RuntimeException(e)
+                                throw IllegalStateException(e)
                             }
                         }
 
@@ -358,7 +359,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                                 val `is` = zip.getInputStream(zipEntry)
                                 IOUtils.copy(`is`, os)
                             } catch (e: Exception) {
-                                throw RuntimeException(e)
+                                throw IllegalStateException(e)
                             }
                         }
 
@@ -376,7 +377,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 }
                 ff
             } catch (e: Exception) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
 

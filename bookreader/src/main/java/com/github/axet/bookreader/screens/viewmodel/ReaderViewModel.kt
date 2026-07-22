@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import su.sv.managers.OnBookPagerManager
 import timber.log.Timber
@@ -110,7 +111,7 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.HideSelection -> {
                 // Очищаем выделение в FBReaderView
                 // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
-                fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_CLEAR)
+                fbReaderView?.app?.runAction(ActionCode.SELECTION_CLEAR)
             }
             ReaderActions.SelectionCopy -> selectionCopy()
             ReaderActions.SelectionShare -> selectionShare()

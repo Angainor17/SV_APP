@@ -8,6 +8,7 @@ import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.app.Storage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import su.sv.commonarchitecture.di.module.DispatcherProvider
 import timber.log.Timber
@@ -180,7 +181,7 @@ class BookmarksRepository @Inject constructor(
                 val bookmarksArray = json.optJSONArray("bookmarks")
                 if (bookmarksArray != null) {
                     // Создаём новый массив без удаляемой заметки
-                    val newArray = org.json.JSONArray()
+                    val newArray = JSONArray()
                     for (i in 0 until bookmarksArray.length()) {
                         val bookmark = bookmarksArray.getJSONObject(i)
                         if (bookmark.optLong("last") != timestamp) {

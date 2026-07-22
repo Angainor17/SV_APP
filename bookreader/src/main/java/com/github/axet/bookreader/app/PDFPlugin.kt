@@ -64,7 +64,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             book.setTitle(doc.getMeta(Pdfium.META_TITLE))
             doc.close()
         } catch (e: IOException) {
-            throw RuntimeException(e)
+            throw IllegalStateException(e)
         }
     }
 
@@ -646,7 +646,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 doc = PdfRenderer(fd)
                 current = NativePage(doc)
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
 
@@ -717,13 +717,13 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 doc.open(fd.fileDescriptor)
                 current = PdfiumPage(doc)
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
 
         override fun close() {
             doc.close()
-            try { fd.close() } catch (e: IOException) { throw RuntimeException(e) }
+            try { fd.close() } catch (e: IOException) { throw IllegalStateException(e) }
         }
 
         override fun getPageInfo(w: Int, h: Int, c: ScrollWidget.ScrollAdapter.PageCursor): Plugin.Page? {

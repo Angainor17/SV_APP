@@ -6,6 +6,7 @@ import su.sv.books.catalog.domain.model.BookWithNotes
 import su.sv.books.catalog.domain.model.BookmarkNote
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.github.axet.bookreader.domain.BookmarksRepository as BookreaderBookmarksRepository
 import su.sv.books.catalog.domain.repository.BookmarksRepository as BooksBookmarksRepository
 
 /**
@@ -13,7 +14,7 @@ import su.sv.books.catalog.domain.repository.BookmarksRepository as BooksBookmar
  */
 @Singleton
 class BookmarksRepositoryImpl @Inject constructor(
-    private val bookreaderRepository: com.github.axet.bookreader.domain.BookmarksRepository,
+    private val bookreaderRepository: BookreaderBookmarksRepository,
 ) : BooksBookmarksRepository {
 
     override suspend fun getAllNotes(sortByDateAscending: Boolean): Result<List<BookmarkNote>> {

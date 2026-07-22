@@ -2,6 +2,7 @@ package su.sv.books.catalog.presentation.bookmarks.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.ui.components.FullScreenEmpty
 import su.sv.commonui.ui.components.FullScreenLoading
+import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
 import timber.log.Timber
 
@@ -299,10 +301,10 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                 } else {
                     Timber.w("Cannot open reader: bookFileUri is null for note ${note.id}")
                     // Показываем сообщение что книга не найдена
-                    android.widget.Toast.makeText(
+                    Toast.makeText(
                         context,
-                        context.getString(su.sv.books.R.string.bookmarks_book_not_found),
-                        android.widget.Toast.LENGTH_SHORT
+                        context.getString(R.string.bookmarks_book_not_found),
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
             }
@@ -327,7 +329,7 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                     downloadUrl = "",
                     fileNameWithExt = "",
                     category = "",
-                    downloadState = su.sv.models.ui.book.UIBookState.AVAILABLE_TO_DOWNLOAD,
+                    downloadState = UIBookState.AVAILABLE_TO_DOWNLOAD,
                     fileUri = null
                 )
                 stackNavigation.forward(BookDetailScreen(uiBook = uiBook))

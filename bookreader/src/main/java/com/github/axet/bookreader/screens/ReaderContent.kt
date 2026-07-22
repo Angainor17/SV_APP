@@ -8,6 +8,8 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
+import android.preference.PreferenceManager
+import android.view.KeyEvent
 import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -33,6 +35,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -67,6 +70,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.BookReaderInitializer
 import com.github.axet.bookreader.app.ReaderPreferences
+import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
@@ -77,8 +81,11 @@ import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
 import com.github.axet.bookreader.screens.viewmodel.ReaderViewModel
 import com.github.axet.bookreader.widgets.FBReaderView
+import org.geometerplus.fbreader.bookmodel.TOCTree
 import org.geometerplus.fbreader.fbreader.ActionCode
+import org.geometerplus.zlibrary.core.view.ZLViewEnums
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
+import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import su.sv.managers.theme.ThemeViewModel
 import timber.log.Timber
 
@@ -278,7 +285,7 @@ fun ReaderContent(
                             Timber.d("Creating FBReaderView for $bookUri")
                             FBReaderView(ctx).apply {
                                 listener = object : FBReaderView.Listener {
-                                    override fun onScrollingFinished(index: org.geometerplus.zlibrary.core.view.ZLViewEnums.PageIndex?) {
+                                    override fun onScrollingFinished(index: ZLViewEnums.PageIndex?) {
                                         viewModel.savePosition()
                                     }
 
@@ -292,7 +299,7 @@ fun ReaderContent(
                                         viewModel.volumeKeysEnabled = !speaking
                                     }
 
-                                    override fun onEditBookmark(bookmark: com.github.axet.bookreader.app.Storage.Bookmark) {
+                                    override fun onEditBookmark(bookmark: Storage.Bookmark) {
                                         viewModel.onAction(ReaderActions.EditBookmark(bookmark))
                                     }
 
@@ -462,7 +469,7 @@ fun ReaderContent(
 private fun TocComposeDialog(
     fbReaderView: FBReaderView?,
     onDismiss: () -> Unit,
-    onNavigate: (org.geometerplus.zlibrary.text.view.ZLTextPosition) -> Unit,
+    onNavigate: (ZLTextPosition) -> Unit,
 ) {
     // Собираем TOC элементы с информацией о дочерних элементах
     val tocItems = remember(fbReaderView) {
@@ -555,7 +562,7 @@ private fun TocItemRow(
     item: ExpandableTocItem,
     isExpanded: Boolean,
     onToggleExpand: () -> Unit,
-    onNavigate: (org.geometerplus.zlibrary.text.view.ZLTextPosition) -> Unit,
+    onNavigate: (ZLTextPosition) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -601,14 +608,14 @@ private fun TocItemRow(
 private data class ExpandableTocItem(
     val id: String,
     val title: String,
-    val position: org.geometerplus.zlibrary.text.view.ZLTextPosition,
+    val position: ZLTextPosition,
     val level: Int = 0,
     val hasChildren: Boolean = false,
     val parentId: String? = null,  // ID родительского элемента
 )
 
 private fun collectExpandableTocItems(
-    tree: org.geometerplus.fbreader.bookmodel.TOCTree,
+    tree: TOCTree,
     items: MutableList<ExpandableTocItem>,
     level: Int,
     parentId: String? = null
@@ -640,12 +647,12 @@ private fun collectExpandableTocItems(
 
 private data class TocItem(
     val title: String,
-    val position: org.geometerplus.zlibrary.text.view.ZLTextPosition,
+    val position: ZLTextPosition,
     val level: Int = 0
 )
 
 private fun collectTocItems(
-    tree: org.geometerplus.fbreader.bookmodel.TOCTree,
+    tree: TOCTree,
     items: MutableList<TocItem>,
     level: Int
 ) {
@@ -668,7 +675,7 @@ private fun collectTocItems(
 /**
  * Compose BottomSheet для настроек шрифтов
  */
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FontsComposeBottomSheet(
     fbReaderView: FBReaderView?,
@@ -681,7 +688,7 @@ private fun FontsComposeBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val shared = remember {
-        android.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     var fontSize by remember {
@@ -902,14 +909,14 @@ private fun VolumeKeysHandler(
             if (!viewModel.volumeKeysEnabled) return@OnKeyListener false
 
             when {
-                keyCode == android.view.KeyEvent.KEYCODE_VOLUME_DOWN &&
-                        event.action == android.view.KeyEvent.ACTION_DOWN -> {
+                keyCode == KeyEvent.KEYCODE_VOLUME_DOWN &&
+                        event.action == KeyEvent.ACTION_DOWN -> {
                     fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
                     true
                 }
 
-                keyCode == android.view.KeyEvent.KEYCODE_VOLUME_UP &&
-                        event.action == android.view.KeyEvent.ACTION_DOWN -> {
+                keyCode == KeyEvent.KEYCODE_VOLUME_UP &&
+                        event.action == KeyEvent.ACTION_DOWN -> {
                     fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
                     true
                 }

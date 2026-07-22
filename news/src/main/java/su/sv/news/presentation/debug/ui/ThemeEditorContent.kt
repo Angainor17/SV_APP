@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,8 +53,82 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
+import su.sv.commonui.theme.CardStrokeDark
+import su.sv.commonui.theme.CardStrokeLight
 import su.sv.commonui.theme.CustomColorAttribute
 import su.sv.commonui.theme.CustomThemeColors
+import su.sv.commonui.theme.DarkBackground
+import su.sv.commonui.theme.DarkError
+import su.sv.commonui.theme.DarkErrorContainer
+import su.sv.commonui.theme.DarkInverseOnSurface
+import su.sv.commonui.theme.DarkInversePrimary
+import su.sv.commonui.theme.DarkInverseSurface
+import su.sv.commonui.theme.DarkLinkColor
+import su.sv.commonui.theme.DarkNavigationBarColor
+import su.sv.commonui.theme.DarkOnBackground
+import su.sv.commonui.theme.DarkOnError
+import su.sv.commonui.theme.DarkOnErrorContainer
+import su.sv.commonui.theme.DarkOnPrimary
+import su.sv.commonui.theme.DarkOnPrimaryContainer
+import su.sv.commonui.theme.DarkOnSecondary
+import su.sv.commonui.theme.DarkOnSecondaryContainer
+import su.sv.commonui.theme.DarkOnSurface
+import su.sv.commonui.theme.DarkOnSurfaceVariant
+import su.sv.commonui.theme.DarkOnTertiary
+import su.sv.commonui.theme.DarkOnTertiaryContainer
+import su.sv.commonui.theme.DarkOutline
+import su.sv.commonui.theme.DarkOutlineVariant
+import su.sv.commonui.theme.DarkPrimary
+import su.sv.commonui.theme.DarkPrimaryContainer
+import su.sv.commonui.theme.DarkSecondary
+import su.sv.commonui.theme.DarkSecondaryContainer
+import su.sv.commonui.theme.DarkSurface
+import su.sv.commonui.theme.DarkSurfaceBright
+import su.sv.commonui.theme.DarkSurfaceContainer
+import su.sv.commonui.theme.DarkSurfaceContainerHigh
+import su.sv.commonui.theme.DarkSurfaceContainerHighest
+import su.sv.commonui.theme.DarkSurfaceContainerLow
+import su.sv.commonui.theme.DarkSurfaceContainerLowest
+import su.sv.commonui.theme.DarkSurfaceDim
+import su.sv.commonui.theme.DarkSurfaceVariant
+import su.sv.commonui.theme.DarkTertiary
+import su.sv.commonui.theme.DarkTertiaryContainer
+import su.sv.commonui.theme.LightBackground
+import su.sv.commonui.theme.LightError
+import su.sv.commonui.theme.LightErrorContainer
+import su.sv.commonui.theme.LightInverseOnSurface
+import su.sv.commonui.theme.LightInversePrimary
+import su.sv.commonui.theme.LightInverseSurface
+import su.sv.commonui.theme.LightLinkColor
+import su.sv.commonui.theme.LightNavigationBarColor
+import su.sv.commonui.theme.LightOnBackground
+import su.sv.commonui.theme.LightOnError
+import su.sv.commonui.theme.LightOnErrorContainer
+import su.sv.commonui.theme.LightOnPrimary
+import su.sv.commonui.theme.LightOnPrimaryContainer
+import su.sv.commonui.theme.LightOnSecondary
+import su.sv.commonui.theme.LightOnSecondaryContainer
+import su.sv.commonui.theme.LightOnSurface
+import su.sv.commonui.theme.LightOnSurfaceVariant
+import su.sv.commonui.theme.LightOnTertiary
+import su.sv.commonui.theme.LightOnTertiaryContainer
+import su.sv.commonui.theme.LightOutline
+import su.sv.commonui.theme.LightOutlineVariant
+import su.sv.commonui.theme.LightPrimary
+import su.sv.commonui.theme.LightPrimaryContainer
+import su.sv.commonui.theme.LightSecondary
+import su.sv.commonui.theme.LightSecondaryContainer
+import su.sv.commonui.theme.LightSurface
+import su.sv.commonui.theme.LightSurfaceBright
+import su.sv.commonui.theme.LightSurfaceContainer
+import su.sv.commonui.theme.LightSurfaceContainerHigh
+import su.sv.commonui.theme.LightSurfaceContainerHighest
+import su.sv.commonui.theme.LightSurfaceContainerLow
+import su.sv.commonui.theme.LightSurfaceContainerLowest
+import su.sv.commonui.theme.LightSurfaceDim
+import su.sv.commonui.theme.LightSurfaceVariant
+import su.sv.commonui.theme.LightTertiary
+import su.sv.commonui.theme.LightTertiaryContainer
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.news.R
 import su.sv.news.presentation.debug.ThemeEditorViewModel
@@ -376,7 +451,7 @@ private fun ResetThemeDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    androidx.compose.material3.AlertDialog(
+    AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.reset_dialog_title)) },
         text = { Text(stringResource(R.string.reset_dialog_message)) },
@@ -422,84 +497,84 @@ private fun getOriginalColor(attribute: CustomColorAttribute, themeMode: String)
 
 private fun getLightColor(attribute: CustomColorAttribute): Color {
     return when (attribute) {
-        CustomColorAttribute.PRIMARY -> su.sv.commonui.theme.LightPrimary
-        CustomColorAttribute.ON_PRIMARY -> su.sv.commonui.theme.LightOnPrimary
-        CustomColorAttribute.PRIMARY_CONTAINER -> su.sv.commonui.theme.LightPrimaryContainer
-        CustomColorAttribute.ON_PRIMARY_CONTAINER -> su.sv.commonui.theme.LightOnPrimaryContainer
-        CustomColorAttribute.SECONDARY -> su.sv.commonui.theme.LightSecondary
-        CustomColorAttribute.ON_SECONDARY -> su.sv.commonui.theme.LightOnSecondary
-        CustomColorAttribute.SECONDARY_CONTAINER -> su.sv.commonui.theme.LightSecondaryContainer
-        CustomColorAttribute.ON_SECONDARY_CONTAINER -> su.sv.commonui.theme.LightOnSecondaryContainer
-        CustomColorAttribute.TERTIARY -> su.sv.commonui.theme.LightTertiary
-        CustomColorAttribute.ON_TERTIARY -> su.sv.commonui.theme.LightOnTertiary
-        CustomColorAttribute.TERTIARY_CONTAINER -> su.sv.commonui.theme.LightTertiaryContainer
-        CustomColorAttribute.ON_TERTIARY_CONTAINER -> su.sv.commonui.theme.LightOnTertiaryContainer
-        CustomColorAttribute.BACKGROUND -> su.sv.commonui.theme.LightBackground
-        CustomColorAttribute.ON_BACKGROUND -> su.sv.commonui.theme.LightOnBackground
-        CustomColorAttribute.SURFACE -> su.sv.commonui.theme.LightSurface
-        CustomColorAttribute.ON_SURFACE -> su.sv.commonui.theme.LightOnSurface
-        CustomColorAttribute.SURFACE_VARIANT -> su.sv.commonui.theme.LightSurfaceVariant
-        CustomColorAttribute.ON_SURFACE_VARIANT -> su.sv.commonui.theme.LightOnSurfaceVariant
-        CustomColorAttribute.SURFACE_DIM -> su.sv.commonui.theme.LightSurfaceDim
-        CustomColorAttribute.SURFACE_BRIGHT -> su.sv.commonui.theme.LightSurfaceBright
-        CustomColorAttribute.SURFACE_CONTAINER_LOWEST -> su.sv.commonui.theme.LightSurfaceContainerLowest
-        CustomColorAttribute.SURFACE_CONTAINER_LOW -> su.sv.commonui.theme.LightSurfaceContainerLow
-        CustomColorAttribute.SURFACE_CONTAINER -> su.sv.commonui.theme.LightSurfaceContainer
-        CustomColorAttribute.SURFACE_CONTAINER_HIGH -> su.sv.commonui.theme.LightSurfaceContainerHigh
-        CustomColorAttribute.SURFACE_CONTAINER_HIGHEST -> su.sv.commonui.theme.LightSurfaceContainerHighest
-        CustomColorAttribute.OUTLINE -> su.sv.commonui.theme.LightOutline
-        CustomColorAttribute.OUTLINE_VARIANT -> su.sv.commonui.theme.LightOutlineVariant
-        CustomColorAttribute.ERROR -> su.sv.commonui.theme.LightError
-        CustomColorAttribute.ON_ERROR -> su.sv.commonui.theme.LightOnError
-        CustomColorAttribute.ERROR_CONTAINER -> su.sv.commonui.theme.LightErrorContainer
-        CustomColorAttribute.ON_ERROR_CONTAINER -> su.sv.commonui.theme.LightOnErrorContainer
-        CustomColorAttribute.INVERSE_SURFACE -> su.sv.commonui.theme.LightInverseSurface
-        CustomColorAttribute.INVERSE_ON_SURFACE -> su.sv.commonui.theme.LightInverseOnSurface
-        CustomColorAttribute.INVERSE_PRIMARY -> su.sv.commonui.theme.LightInversePrimary
-        CustomColorAttribute.NAVIGATION_BAR -> su.sv.commonui.theme.LightNavigationBarColor
-        CustomColorAttribute.LINK -> su.sv.commonui.theme.LightLinkColor
-        CustomColorAttribute.CARD_STROKE -> su.sv.commonui.theme.CardStrokeLight
+        CustomColorAttribute.PRIMARY -> LightPrimary
+        CustomColorAttribute.ON_PRIMARY -> LightOnPrimary
+        CustomColorAttribute.PRIMARY_CONTAINER -> LightPrimaryContainer
+        CustomColorAttribute.ON_PRIMARY_CONTAINER -> LightOnPrimaryContainer
+        CustomColorAttribute.SECONDARY -> LightSecondary
+        CustomColorAttribute.ON_SECONDARY -> LightOnSecondary
+        CustomColorAttribute.SECONDARY_CONTAINER -> LightSecondaryContainer
+        CustomColorAttribute.ON_SECONDARY_CONTAINER -> LightOnSecondaryContainer
+        CustomColorAttribute.TERTIARY -> LightTertiary
+        CustomColorAttribute.ON_TERTIARY -> LightOnTertiary
+        CustomColorAttribute.TERTIARY_CONTAINER -> LightTertiaryContainer
+        CustomColorAttribute.ON_TERTIARY_CONTAINER -> LightOnTertiaryContainer
+        CustomColorAttribute.BACKGROUND -> LightBackground
+        CustomColorAttribute.ON_BACKGROUND -> LightOnBackground
+        CustomColorAttribute.SURFACE -> LightSurface
+        CustomColorAttribute.ON_SURFACE -> LightOnSurface
+        CustomColorAttribute.SURFACE_VARIANT -> LightSurfaceVariant
+        CustomColorAttribute.ON_SURFACE_VARIANT -> LightOnSurfaceVariant
+        CustomColorAttribute.SURFACE_DIM -> LightSurfaceDim
+        CustomColorAttribute.SURFACE_BRIGHT -> LightSurfaceBright
+        CustomColorAttribute.SURFACE_CONTAINER_LOWEST -> LightSurfaceContainerLowest
+        CustomColorAttribute.SURFACE_CONTAINER_LOW -> LightSurfaceContainerLow
+        CustomColorAttribute.SURFACE_CONTAINER -> LightSurfaceContainer
+        CustomColorAttribute.SURFACE_CONTAINER_HIGH -> LightSurfaceContainerHigh
+        CustomColorAttribute.SURFACE_CONTAINER_HIGHEST -> LightSurfaceContainerHighest
+        CustomColorAttribute.OUTLINE -> LightOutline
+        CustomColorAttribute.OUTLINE_VARIANT -> LightOutlineVariant
+        CustomColorAttribute.ERROR -> LightError
+        CustomColorAttribute.ON_ERROR -> LightOnError
+        CustomColorAttribute.ERROR_CONTAINER -> LightErrorContainer
+        CustomColorAttribute.ON_ERROR_CONTAINER -> LightOnErrorContainer
+        CustomColorAttribute.INVERSE_SURFACE -> LightInverseSurface
+        CustomColorAttribute.INVERSE_ON_SURFACE -> LightInverseOnSurface
+        CustomColorAttribute.INVERSE_PRIMARY -> LightInversePrimary
+        CustomColorAttribute.NAVIGATION_BAR -> LightNavigationBarColor
+        CustomColorAttribute.LINK -> LightLinkColor
+        CustomColorAttribute.CARD_STROKE -> CardStrokeLight
     }
 }
 
 private fun getDarkColor(attribute: CustomColorAttribute): Color {
     return when (attribute) {
-        CustomColorAttribute.PRIMARY -> su.sv.commonui.theme.DarkPrimary
-        CustomColorAttribute.ON_PRIMARY -> su.sv.commonui.theme.DarkOnPrimary
-        CustomColorAttribute.PRIMARY_CONTAINER -> su.sv.commonui.theme.DarkPrimaryContainer
-        CustomColorAttribute.ON_PRIMARY_CONTAINER -> su.sv.commonui.theme.DarkOnPrimaryContainer
-        CustomColorAttribute.SECONDARY -> su.sv.commonui.theme.DarkSecondary
-        CustomColorAttribute.ON_SECONDARY -> su.sv.commonui.theme.DarkOnSecondary
-        CustomColorAttribute.SECONDARY_CONTAINER -> su.sv.commonui.theme.DarkSecondaryContainer
-        CustomColorAttribute.ON_SECONDARY_CONTAINER -> su.sv.commonui.theme.DarkOnSecondaryContainer
-        CustomColorAttribute.TERTIARY -> su.sv.commonui.theme.DarkTertiary
-        CustomColorAttribute.ON_TERTIARY -> su.sv.commonui.theme.DarkOnTertiary
-        CustomColorAttribute.TERTIARY_CONTAINER -> su.sv.commonui.theme.DarkTertiaryContainer
-        CustomColorAttribute.ON_TERTIARY_CONTAINER -> su.sv.commonui.theme.DarkOnTertiaryContainer
-        CustomColorAttribute.BACKGROUND -> su.sv.commonui.theme.DarkBackground
-        CustomColorAttribute.ON_BACKGROUND -> su.sv.commonui.theme.DarkOnBackground
-        CustomColorAttribute.SURFACE -> su.sv.commonui.theme.DarkSurface
-        CustomColorAttribute.ON_SURFACE -> su.sv.commonui.theme.DarkOnSurface
-        CustomColorAttribute.SURFACE_VARIANT -> su.sv.commonui.theme.DarkSurfaceVariant
-        CustomColorAttribute.ON_SURFACE_VARIANT -> su.sv.commonui.theme.DarkOnSurfaceVariant
-        CustomColorAttribute.SURFACE_DIM -> su.sv.commonui.theme.DarkSurfaceDim
-        CustomColorAttribute.SURFACE_BRIGHT -> su.sv.commonui.theme.DarkSurfaceBright
-        CustomColorAttribute.SURFACE_CONTAINER_LOWEST -> su.sv.commonui.theme.DarkSurfaceContainerLowest
-        CustomColorAttribute.SURFACE_CONTAINER_LOW -> su.sv.commonui.theme.DarkSurfaceContainerLow
-        CustomColorAttribute.SURFACE_CONTAINER -> su.sv.commonui.theme.DarkSurfaceContainer
-        CustomColorAttribute.SURFACE_CONTAINER_HIGH -> su.sv.commonui.theme.DarkSurfaceContainerHigh
-        CustomColorAttribute.SURFACE_CONTAINER_HIGHEST -> su.sv.commonui.theme.DarkSurfaceContainerHighest
-        CustomColorAttribute.OUTLINE -> su.sv.commonui.theme.DarkOutline
-        CustomColorAttribute.OUTLINE_VARIANT -> su.sv.commonui.theme.DarkOutlineVariant
-        CustomColorAttribute.ERROR -> su.sv.commonui.theme.DarkError
-        CustomColorAttribute.ON_ERROR -> su.sv.commonui.theme.DarkOnError
-        CustomColorAttribute.ERROR_CONTAINER -> su.sv.commonui.theme.DarkErrorContainer
-        CustomColorAttribute.ON_ERROR_CONTAINER -> su.sv.commonui.theme.DarkOnErrorContainer
-        CustomColorAttribute.INVERSE_SURFACE -> su.sv.commonui.theme.DarkInverseSurface
-        CustomColorAttribute.INVERSE_ON_SURFACE -> su.sv.commonui.theme.DarkInverseOnSurface
-        CustomColorAttribute.INVERSE_PRIMARY -> su.sv.commonui.theme.DarkInversePrimary
-        CustomColorAttribute.NAVIGATION_BAR -> su.sv.commonui.theme.DarkNavigationBarColor
-        CustomColorAttribute.LINK -> su.sv.commonui.theme.DarkLinkColor
-        CustomColorAttribute.CARD_STROKE -> su.sv.commonui.theme.CardStrokeDark
+        CustomColorAttribute.PRIMARY -> DarkPrimary
+        CustomColorAttribute.ON_PRIMARY -> DarkOnPrimary
+        CustomColorAttribute.PRIMARY_CONTAINER -> DarkPrimaryContainer
+        CustomColorAttribute.ON_PRIMARY_CONTAINER -> DarkOnPrimaryContainer
+        CustomColorAttribute.SECONDARY -> DarkSecondary
+        CustomColorAttribute.ON_SECONDARY -> DarkOnSecondary
+        CustomColorAttribute.SECONDARY_CONTAINER -> DarkSecondaryContainer
+        CustomColorAttribute.ON_SECONDARY_CONTAINER -> DarkOnSecondaryContainer
+        CustomColorAttribute.TERTIARY -> DarkTertiary
+        CustomColorAttribute.ON_TERTIARY -> DarkOnTertiary
+        CustomColorAttribute.TERTIARY_CONTAINER -> DarkTertiaryContainer
+        CustomColorAttribute.ON_TERTIARY_CONTAINER -> DarkOnTertiaryContainer
+        CustomColorAttribute.BACKGROUND -> DarkBackground
+        CustomColorAttribute.ON_BACKGROUND -> DarkOnBackground
+        CustomColorAttribute.SURFACE -> DarkSurface
+        CustomColorAttribute.ON_SURFACE -> DarkOnSurface
+        CustomColorAttribute.SURFACE_VARIANT -> DarkSurfaceVariant
+        CustomColorAttribute.ON_SURFACE_VARIANT -> DarkOnSurfaceVariant
+        CustomColorAttribute.SURFACE_DIM -> DarkSurfaceDim
+        CustomColorAttribute.SURFACE_BRIGHT -> DarkSurfaceBright
+        CustomColorAttribute.SURFACE_CONTAINER_LOWEST -> DarkSurfaceContainerLowest
+        CustomColorAttribute.SURFACE_CONTAINER_LOW -> DarkSurfaceContainerLow
+        CustomColorAttribute.SURFACE_CONTAINER -> DarkSurfaceContainer
+        CustomColorAttribute.SURFACE_CONTAINER_HIGH -> DarkSurfaceContainerHigh
+        CustomColorAttribute.SURFACE_CONTAINER_HIGHEST -> DarkSurfaceContainerHighest
+        CustomColorAttribute.OUTLINE -> DarkOutline
+        CustomColorAttribute.OUTLINE_VARIANT -> DarkOutlineVariant
+        CustomColorAttribute.ERROR -> DarkError
+        CustomColorAttribute.ON_ERROR -> DarkOnError
+        CustomColorAttribute.ERROR_CONTAINER -> DarkErrorContainer
+        CustomColorAttribute.ON_ERROR_CONTAINER -> DarkOnErrorContainer
+        CustomColorAttribute.INVERSE_SURFACE -> DarkInverseSurface
+        CustomColorAttribute.INVERSE_ON_SURFACE -> DarkInverseOnSurface
+        CustomColorAttribute.INVERSE_PRIMARY -> DarkInversePrimary
+        CustomColorAttribute.NAVIGATION_BAR -> DarkNavigationBarColor
+        CustomColorAttribute.LINK -> DarkLinkColor
+        CustomColorAttribute.CARD_STROKE -> CardStrokeDark
     }
 }

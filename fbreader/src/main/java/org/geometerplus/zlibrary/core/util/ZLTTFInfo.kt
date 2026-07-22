@@ -19,6 +19,7 @@
 
 package org.geometerplus.zlibrary.core.util
 
+@Suppress("VariableNaming")
 class ZLTTFInfo(
     @JvmField val FamilyName: String?,
     subfamily: String?

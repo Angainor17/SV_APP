@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -423,7 +424,7 @@ private fun GradientArcCanvas(
     color: Color,
     secondaryColor: Color
 ) {
-    androidx.compose.foundation.Canvas(
+    Canvas(
         modifier = Modifier.size(size)
     ) {
         val stroke = Stroke(
@@ -464,7 +465,7 @@ private fun LoadingArc(
     color: Color,
     sweepAngle: Float
 ) {
-    androidx.compose.foundation.Canvas(
+    Canvas(
         modifier = Modifier.size(size)
     ) {
         val stroke = Stroke(

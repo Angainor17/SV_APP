@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import su.sv.books.R
 import su.sv.books.catalog.domain.CheckBookFileExistsUseCase
 import su.sv.books.catalog.domain.DeleteNoteUseCase
 import su.sv.books.catalog.domain.GetAllNotesUseCase
@@ -19,6 +20,7 @@ import su.sv.books.catalog.presentation.bookmarks.data.BookmarksViewModePrefsRep
 import su.sv.books.catalog.presentation.bookmarks.mapper.UiBookmarkMapper
 import su.sv.books.catalog.presentation.bookmarks.model.DeleteNoteDialogState
 import su.sv.books.catalog.presentation.bookmarks.model.NotesViewMode
+import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarksState
 import su.sv.commonarchitecture.managers.ResourcesRepository
 import timber.log.Timber
@@ -133,7 +135,7 @@ class BookmarksViewModel @Inject constructor(
                 onFailure = { error ->
                     Timber.e(error, "Failed to load notes")
                     _state.value = UiBookmarksState.Error(
-                        resourcesRepository.getString(su.sv.books.R.string.books_error_loading)
+                        resourcesRepository.getString(R.string.books_error_loading)
                     )
                 }
             )
@@ -156,7 +158,7 @@ class BookmarksViewModel @Inject constructor(
                 onFailure = { error ->
                     Timber.e(error, "Failed to load books with notes")
                     _state.value = UiBookmarksState.Error(
-                        resourcesRepository.getString(su.sv.books.R.string.books_error_loading)
+                        resourcesRepository.getString(R.string.books_error_loading)
                     )
                 }
             )
@@ -186,7 +188,7 @@ class BookmarksViewModel @Inject constructor(
                 onFailure = { error ->
                     Timber.e(error, "Failed to load notes for book: $bookId")
                     _state.value = UiBookmarksState.Error(
-                        resourcesRepository.getString(su.sv.books.R.string.books_error_loading)
+                        resourcesRepository.getString(R.string.books_error_loading)
                     )
                 }
             )
@@ -223,7 +225,7 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    private fun showDeleteDialog(note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) {
+    private fun showDeleteDialog(note: UiBookmarkNote) {
         _deleteDialogState.value = DeleteNoteDialogState(
             note = note,
             isVisible = true
@@ -268,7 +270,7 @@ class BookmarksViewModel @Inject constructor(
                 onFailure = { error ->
                     Timber.e(error, "Failed to delete note")
                     _effect.trySend(BookmarksEffect.ShowError(
-                        resourcesRepository.getString(su.sv.books.R.string.books_error_loading)
+                        resourcesRepository.getString(R.string.books_error_loading)
                     ))
                 }
             )
@@ -283,13 +285,13 @@ sealed class BookmarksAction {
     object OnBackClick : BookmarksAction()
     object OnToggleViewMode : BookmarksAction()
     object OnRetryClick : BookmarksAction()
-    data class OnNoteClick(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
-    data class OnBookCardClick(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
-    data class OnDeleteNoteRequest(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
+    data class OnNoteClick(val note: UiBookmarkNote) : BookmarksAction()
+    data class OnBookCardClick(val note: UiBookmarkNote) : BookmarksAction()
+    data class OnDeleteNoteRequest(val note: UiBookmarkNote) : BookmarksAction()
     object OnDeleteNoteConfirm : BookmarksAction()
     object OnDeleteNoteCancel : BookmarksAction()
     data class OnBookClick(val bookId: String) : BookmarksAction()
-    data class OnShareNote(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksAction()
+    data class OnShareNote(val note: UiBookmarkNote) : BookmarksAction()
 }
 
 /**
@@ -297,8 +299,8 @@ sealed class BookmarksAction {
  */
 sealed class BookmarksEffect {
     object NavigateBack : BookmarksEffect()
-    data class OpenReader(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksEffect()
-    data class OpenBookCard(val note: su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote) : BookmarksEffect()
+    data class OpenReader(val note: UiBookmarkNote) : BookmarksEffect()
+    data class OpenBookCard(val note: UiBookmarkNote) : BookmarksEffect()
     data class ShareNote(val text: String) : BookmarksEffect()
     data class ShowError(val message: String) : BookmarksEffect()
 }

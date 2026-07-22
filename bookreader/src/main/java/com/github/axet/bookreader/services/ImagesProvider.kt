@@ -47,7 +47,7 @@ class ImagesProvider : StorageProvider() {
                     c += a
                 c.toLong()
             } catch (e: Exception) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
     }
@@ -118,7 +118,7 @@ class ImagesProvider : StorageProvider() {
                 override fun close() {}
             }, mode)
         } catch (e: Exception) {
-            throw RuntimeException(e)
+            throw IllegalStateException(e)
         }
     }
 

@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import su.sv.books.R
 import su.sv.books.catalog.domain.DeleteBookUseCase
 import su.sv.books.catalog.domain.GetDownloadedBooksUseCase
 import su.sv.books.catalog.presentation.downloaded.actions.DownloadedBookActions
 import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
 import su.sv.books.catalog.presentation.downloaded.mapper.UiDownloadedBookMapper
 import su.sv.books.catalog.presentation.downloaded.model.DeleteDialogState
+import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
 import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.commonarchitecture.managers.ResourcesRepository
@@ -116,7 +118,7 @@ class DownloadedBooksViewModel @Inject constructor(
                 },
                 onFailure = {
                     _effect.trySend(DownloadedBookEffect.ShowError(
-                        resourcesRepository.getString(su.sv.books.R.string.books_download_snack_error)
+                        resourcesRepository.getString(R.string.books_download_snack_error)
                     ))
                     _state.value = UiDownloadedBooksState.Empty
                 }
@@ -124,7 +126,7 @@ class DownloadedBooksViewModel @Inject constructor(
         }
     }
 
-    private fun showDeleteDialog(book: su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook) {
+    private fun showDeleteDialog(book: UiDownloadedBook) {
         // Отмечаем, что подсказка была показана
         sharedPreferences.edit { putBoolean(KEY_SWIPE_HINT_SHOWN, true) }
 
@@ -186,7 +188,7 @@ class DownloadedBooksViewModel @Inject constructor(
                 },
                 onFailure = { error ->
                     // Показываем конкретное сообщение об ошибке
-                    val errorMessage = error.message ?: resourcesRepository.getString(su.sv.books.R.string.books_download_snack_error)
+                    val errorMessage = error.message ?: resourcesRepository.getString(R.string.books_download_snack_error)
                     _effect.trySend(DownloadedBookEffect.ShowError(errorMessage))
                 }
             )
