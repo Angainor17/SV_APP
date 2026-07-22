@@ -1,7 +1,7 @@
 package su.sv.news.presentation.root.viewmodel.actions
 
-import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.model.UiNewsItem
+import su.sv.news.presentation.root.model.UiNewsMedia
 
 sealed class RootNewsActions {
 

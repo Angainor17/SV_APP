@@ -1,12 +1,14 @@
 package su.sv.books.catalog.data.repo
 
 import android.app.DownloadManager
+import android.content.ContentUris
 import android.content.Context
 import android.content.Context.DOWNLOAD_SERVICE
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.Environment.DIRECTORY_DOWNLOADS
+import android.provider.MediaStore
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import su.sv.books.R
@@ -188,24 +190,24 @@ class BookDownloadRepository @Inject constructor(
             Timber.d("Searching MediaStore for: $fileName")
 
             val projection = arrayOf(
-                android.provider.MediaStore.Downloads._ID,
-                android.provider.MediaStore.Downloads.DISPLAY_NAME
+                MediaStore.Downloads._ID,
+                MediaStore.Downloads.DISPLAY_NAME
             )
-            val selection = "${android.provider.MediaStore.Downloads.DISPLAY_NAME} = ?"
+            val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ?"
             val selectionArgs = arrayOf(fileName)
 
             context.contentResolver.query(
-                android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,
                 null
             )?.use { cursor ->
-                val idColumn = cursor.getColumnIndex(android.provider.MediaStore.Downloads._ID)
+                val idColumn = cursor.getColumnIndex(MediaStore.Downloads._ID)
                 if (cursor.moveToFirst() && idColumn >= 0) {
                     val id = cursor.getLong(idColumn)
-                    android.content.ContentUris.withAppendedId(
-                        android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    ContentUris.withAppendedId(
+                        MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                         id
                     )
                 } else null
@@ -224,24 +226,24 @@ class BookDownloadRepository @Inject constructor(
 
         return try {
             val projection = arrayOf(
-                android.provider.MediaStore.Downloads._ID,
-                android.provider.MediaStore.Downloads.DISPLAY_NAME
+                MediaStore.Downloads._ID,
+                MediaStore.Downloads.DISPLAY_NAME
             )
-            val selection = "${android.provider.MediaStore.Downloads.DISPLAY_NAME} = ?"
+            val selection = "${MediaStore.Downloads.DISPLAY_NAME} = ?"
             val selectionArgs = arrayOf(fileNameWithExt)
 
             context.contentResolver.query(
-                android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                 projection,
                 selection,
                 selectionArgs,
                 null
             )?.use { cursor ->
-                val idColumn = cursor.getColumnIndex(android.provider.MediaStore.Downloads._ID)
+                val idColumn = cursor.getColumnIndex(MediaStore.Downloads._ID)
                 if (cursor.moveToFirst() && idColumn >= 0) {
                     val id = cursor.getLong(idColumn)
-                    android.content.ContentUris.withAppendedId(
-                        android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    ContentUris.withAppendedId(
+                        MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                         id
                     )
                 } else null
@@ -260,13 +262,13 @@ class BookDownloadRepository @Inject constructor(
             // Проверяем только наличие URI в MediaStore, без открытия stream
             // Это значительно быстрее чем openInputStream
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val projection = arrayOf(android.provider.MediaStore.Downloads._ID)
-                val selection = "${android.provider.MediaStore.Downloads._ID} = ?"
-                val id = android.content.ContentUris.parseId(uri)
+                val projection = arrayOf(MediaStore.Downloads._ID)
+                val selection = "${MediaStore.Downloads._ID} = ?"
+                val id = ContentUris.parseId(uri)
                 val selectionArgs = arrayOf(id.toString())
 
                 context.contentResolver.query(
-                    android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI,
                     projection,
                     selection,
                     selectionArgs,
@@ -391,7 +393,7 @@ class BookDownloadRepository @Inject constructor(
                     val cursor = context.contentResolver.query(uri, null, null, null, null)
                     cursor?.use {
                         if (it.moveToFirst()) {
-                            val nameIndex = it.getColumnIndex(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+                            val nameIndex = it.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)
                             if (nameIndex >= 0) it.getString(nameIndex) else null
                         } else null
                     }

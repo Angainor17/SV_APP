@@ -20,8 +20,8 @@ import com.github.axet.androidlibrary.sound.TTS
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.androidlibrary.widgets.Toast
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Plugin
+import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Reflow
 import com.github.axet.bookreader.app.Storage
 import org.geometerplus.fbreader.fbreader.TextBuildTraverser

@@ -46,9 +46,9 @@ class ZoomGestureHandler(
         private set
 
     // Zoom limits
-    private val MIN_ZOOM = 1.0f
-    private val MAX_ZOOM = 3.0f
-    private val MAX_FIT_WIDTH_ZOOM = 1.25f  // Max for double tap fit-width (reduced)
+    private val minZoom = 1.0f
+    private val maxZoom = 3.0f
+    private val maxFitWidthZoom = 1.25f  // Max for double tap fit-width (reduced)
 
     // Fit-width zoom (calculated based on page width)
     private var fitWidthZoom: Float = 1.5f  // Default, will be calculated
@@ -107,19 +107,19 @@ class ZoomGestureHandler(
 
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 val scaleFactor = detector.scaleFactor
-                val newZoom = (currentZoom * scaleFactor).coerceIn(MIN_ZOOM, MAX_ZOOM)
+                val newZoom = (currentZoom * scaleFactor).coerceIn(minZoom, maxZoom)
 
                 if (newZoom != currentZoom) {
                     currentZoom = newZoom
                     pivotX = detector.focusX
                     pivotY = detector.focusY
-                    isInZoom = currentZoom > MIN_ZOOM
+                    isInZoom = currentZoom > minZoom
 
                     Timber.tag("voronin").d("ZoomGestureHandler: onScale zoom=$currentZoom pivot=$pivotX,$pivotY")
                     listener.onZoomChange(currentZoom, pivotX, pivotY)
 
                     // If zoom returns to 1.0, notify end
-                    if (currentZoom == MIN_ZOOM && isInZoom) {
+                    if (currentZoom == minZoom && isInZoom) {
                         isInZoom = false
                         listener.onZoomEnd()
                     }
@@ -142,7 +142,7 @@ class ZoomGestureHandler(
             override fun onDoubleTap(e: MotionEvent): Boolean {
                 Timber.tag("voronin").d("ZoomGestureHandler: onDoubleTap at ${e.x},${e.y}")
 
-                if (currentZoom > MIN_ZOOM) {
+                if (currentZoom > minZoom) {
                     // Already zoomed - reset to normal
                     resetZoom()
                 } else {
@@ -162,7 +162,7 @@ class ZoomGestureHandler(
                 distanceY: Float
             ): Boolean {
                 // Only pan when zoomed and primarily horizontal movement
-                if (currentZoom > MIN_ZOOM && abs(distanceX) > abs(distanceY) * 2) {
+                if (currentZoom > minZoom && abs(distanceX) > abs(distanceY) * 2) {
                     // Direct pan - no division by zoom (full sensitivity)
                     translationX -= distanceX
                     translationY -= distanceY
@@ -207,7 +207,7 @@ class ZoomGestureHandler(
             }
 
             // Clamp to reasonable range
-            fitWidthZoom = fitWidthZoom.coerceIn(1.05f, MAX_FIT_WIDTH_ZOOM)
+            fitWidthZoom = fitWidthZoom.coerceIn(1.05f, maxFitWidthZoom)
 
             Timber.tag("voronin").d("ZoomGestureHandler: fitWidthZoom=$fitWidthZoom (screen=$screenWidth, pageWidth=$actualPageWidth)")
         } else {
@@ -235,7 +235,7 @@ class ZoomGestureHandler(
         // Process tap gesture (double tap)
         tapDetector.onTouchEvent(e)
         // Process pan gesture (horizontal scroll when zoomed)
-        if (currentZoom > MIN_ZOOM) {
+        if (currentZoom > minZoom) {
             panDetector.onTouchEvent(e)
         }
         // Always return false - let other handlers work too!
@@ -246,8 +246,8 @@ class ZoomGestureHandler(
      * Reset zoom to normal (1.0)
      */
     fun resetZoom() {
-        if (currentZoom > MIN_ZOOM) {
-            currentZoom = MIN_ZOOM
+        if (currentZoom > minZoom) {
+            currentZoom = minZoom
             pivotX = 0f
             pivotY = 0f
             translationX = 0f
@@ -262,11 +262,11 @@ class ZoomGestureHandler(
      * Set zoom to a specific value (for double tap zoom)
      */
     fun setZoom(scale: Float, pivotX: Float, pivotY: Float) {
-        val newZoom = scale.coerceIn(MIN_ZOOM, MAX_ZOOM)
+        val newZoom = scale.coerceIn(minZoom, maxZoom)
         currentZoom = newZoom
         this.pivotX = pivotX
         this.pivotY = pivotY
-        isInZoom = currentZoom > MIN_ZOOM
+        isInZoom = currentZoom > minZoom
         listener.onZoomChange(currentZoom, pivotX, pivotY)
         Timber.tag("voronin").d("ZoomGestureHandler: setZoom zoom=$currentZoom pivot=$pivotX,$pivotY")
     }

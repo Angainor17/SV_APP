@@ -344,7 +344,7 @@ interface Plugin {
                 else
                     paint.colorFilter = null
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
 
@@ -719,7 +719,7 @@ interface Plugin {
         open fun getCurrentTOCElement(tocTree: TOCTree): TOCTree? {
             var treeToSelect: TOCTree? = null
             @Suppress("UNCHECKED_CAST")
-            val iterator = (tocTree as java.lang.Iterable<TOCTree>).iterator()
+            val iterator = (tocTree as Iterable<TOCTree>).iterator()
             while (iterator.hasNext()) {
                 val tree = iterator.next()
                 val reference = tree.reference

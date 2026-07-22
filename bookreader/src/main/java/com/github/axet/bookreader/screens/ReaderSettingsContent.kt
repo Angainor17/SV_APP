@@ -1,6 +1,7 @@
 package com.github.axet.bookreader.screens
 
 import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,7 +48,7 @@ fun ReaderSettingsContent(
 
     // Получаем SharedPreferences для настроек
     val shared = remember {
-        android.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     // Состояния настроек (кроме темы - она через ThemeViewModel)
@@ -169,8 +170,8 @@ private fun SettingsItem(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = subtitle,
-                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -199,8 +200,8 @@ private fun SettingsSwitch(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = subtitle,
-                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Switch(

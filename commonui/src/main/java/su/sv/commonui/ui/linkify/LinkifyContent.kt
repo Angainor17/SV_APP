@@ -5,7 +5,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
-import java.lang.StringBuilder
 
 /**
  * Created by: androdev

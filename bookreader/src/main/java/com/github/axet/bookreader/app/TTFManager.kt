@@ -207,10 +207,10 @@ class TTFManager(val context: Context) {
                         ourFontFileMap[file] = tf
                         return tf
                     } catch (e: IOException) {
-                        throw RuntimeException(e)
+                        throw IllegalStateException(e)
                     }
                 }
-                else -> throw RuntimeException("Unknown URI scheme")
+                else -> throw IllegalArgumentException("Unknown URI scheme")
             }
         } else {
             tf = Typeface.createFromFile(file)

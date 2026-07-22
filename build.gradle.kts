@@ -10,6 +10,15 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+// Apply detekt to all subprojects for type resolution
+subprojects {
+    apply(plugin = "dev.detekt")
+
+    detekt {
+        config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    }
+}
+
 detekt {
     toolVersion = libs.versions.detekt.get()
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
@@ -30,12 +39,8 @@ detekt {
     )
 }
 
-tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+tasks.withType<dev.detekt.gradle.Detekt>().configureEach {
     reports {
         html.required.set(true)
-        xml.required.set(false)
-        txt.required.set(false)
-        sarif.required.set(false)
-        md.required.set(false)
     }
 }

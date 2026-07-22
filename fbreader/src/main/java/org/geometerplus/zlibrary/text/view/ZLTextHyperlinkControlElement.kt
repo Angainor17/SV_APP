@@ -19,6 +19,7 @@
 
 package org.geometerplus.zlibrary.text.view
 
+@Suppress("VariableNaming")
 class ZLTextHyperlinkControlElement(
     kind: Byte,
     type: Byte,

@@ -1,6 +1,7 @@
 package su.sv.wiki.presentation.root.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,7 +51,7 @@ fun ArticleView(
             modifier = Modifier.padding(16.dp),
         ) {
             // Заголовок и кнопка избранного
-            androidx.compose.foundation.layout.Row(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

@@ -5,6 +5,7 @@ import su.sv.api.data.response.VkAttachmentVideo
 import su.sv.api.data.response.VkPhotoSize
 import su.sv.api.data.response.VkResponseNewsAttachment
 import su.sv.news.domain.model.NewsMediaItem
+import kotlin.math.abs
 
 /**
  * Целевая ширина изображения для отображения в ленте новостей (в пикселях)
@@ -117,7 +118,7 @@ private fun findOptimalSize(
         return validSizes
             .minByOrNull { size ->
                 val width = size.width ?: 0
-                kotlin.math.abs(width - targetWidth)
+                abs(width - targetWidth)
             }
             ?.url
             .orEmpty()

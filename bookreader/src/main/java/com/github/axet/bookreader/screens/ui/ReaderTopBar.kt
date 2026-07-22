@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -194,7 +195,7 @@ fun ReaderTopBar(
                     onClick = { onAction(ReaderActions.ToggleToc) }
                 ) {
                     Icon(
-                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_toc_white_24dp),
+                        painter = painterResource(R.drawable.ic_toc_white_24dp),
                         contentDescription = "Table of Contents",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -206,7 +207,7 @@ fun ReaderTopBar(
                     onClick = { onAction(ReaderActions.ToggleBookmarks) }
                 ) {
                     Icon(
-                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_bookmark_white_24dp),
+                        painter = painterResource(R.drawable.ic_bookmark_white_24dp),
                         contentDescription = "Bookmarks",
                         tint = MaterialTheme.colorScheme.onSurface
                     )
@@ -219,7 +220,7 @@ fun ReaderTopBar(
                         onClick = { onAction(ReaderActions.ToggleFontSettings) }
                     ) {
                         Icon(
-                            painter = androidx.compose.ui.res.painterResource(R.drawable.ic_format_size_white_24dp),
+                            painter = painterResource(R.drawable.ic_format_size_white_24dp),
                             contentDescription = "Font Settings",
                             tint = MaterialTheme.colorScheme.onSurface
                         )

@@ -2,6 +2,7 @@ package su.sv.wiki.presentation.root.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,7 +38,7 @@ fun HistoryList(
 ) {
     Column(modifier = modifier) {
         // Заголовок с кнопкой очистки
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -96,7 +97,7 @@ private fun HistoryItem(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),

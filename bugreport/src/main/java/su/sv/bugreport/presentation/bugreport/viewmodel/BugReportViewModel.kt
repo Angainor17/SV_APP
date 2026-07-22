@@ -1,6 +1,7 @@
 package su.sv.bugreport.presentation.bugreport.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -96,7 +97,7 @@ class BugReportViewModel @Inject constructor(
         }
     }
 
-    private fun addScreenshots(uris: List<android.net.Uri>) {
+    private fun addScreenshots(uris: List<Uri>) {
         _state.update { currentState ->
             if (currentState is BugReportState.Form) {
                 val newScreenshots = (currentState.screenshots + uris)
@@ -109,7 +110,7 @@ class BugReportViewModel @Inject constructor(
         }
     }
 
-    private fun removeScreenshot(uri: android.net.Uri) {
+    private fun removeScreenshot(uri: Uri) {
         _state.update { currentState ->
             if (currentState is BugReportState.Form) {
                 currentState.copy(

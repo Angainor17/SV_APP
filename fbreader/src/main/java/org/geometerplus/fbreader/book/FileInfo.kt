@@ -21,6 +21,7 @@ package org.geometerplus.fbreader.book
 
 import org.geometerplus.zlibrary.core.tree.ZLTree
 
+@Suppress("VariableNaming")
 class FileInfo : ZLTree<FileInfo> {
     @JvmField
     val Name: String

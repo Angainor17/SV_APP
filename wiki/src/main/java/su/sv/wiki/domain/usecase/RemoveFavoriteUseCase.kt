@@ -1,5 +1,6 @@
 package su.sv.wiki.domain.usecase
 
+import kotlinx.coroutines.withContext
 import su.sv.commonarchitecture.di.module.DispatcherProvider
 import su.sv.wiki.domain.repository.WikiRepository
 import javax.inject.Inject
@@ -15,7 +16,7 @@ class RemoveFavoriteUseCase @Inject constructor(
 
     suspend fun execute(title: String) {
         // DB операция - IO
-        kotlinx.coroutines.withContext(dispatcherProvider.io) {
+        withContext(dispatcherProvider.io) {
             repository.removeFromFavorites(title)
         }
     }

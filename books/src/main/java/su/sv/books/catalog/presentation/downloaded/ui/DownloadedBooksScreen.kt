@@ -29,12 +29,15 @@ import su.sv.books.R
 import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.books.catalog.presentation.downloaded.actions.DownloadedBookActions
 import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
+import su.sv.books.catalog.presentation.downloaded.model.DeleteDialogState
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
 import su.sv.books.catalog.presentation.downloaded.viewmodel.DownloadedBooksViewModel
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.ui.components.FullScreenLoading
+import su.sv.models.ui.book.UIBookState
+import su.sv.models.ui.book.UiBook
 
 /**
  * Экран "Ваши книги" (Modo Screen)
@@ -64,7 +67,7 @@ class DownloadedBooksScreen(
 @Composable
 private fun DownloadedBooksContent(
     state: UiDownloadedBooksState,
-    deleteDialogState: su.sv.books.catalog.presentation.downloaded.model.DeleteDialogState,
+    deleteDialogState: DeleteDialogState,
     onAction: (DownloadedBookActions) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -147,7 +150,7 @@ private fun HandleEffects(viewModel: DownloadedBooksViewModel) {
         when (effect) {
             is DownloadedBookEffect.OpenBookDetail -> {
                 // Конвертируем UiDownloadedBook в UiBook для BookDetailScreen
-                val uiBook = su.sv.models.ui.book.UiBook(
+                val uiBook = UiBook(
                     id = effect.book.id,
                     title = effect.book.title,
                     author = effect.book.author,
@@ -157,7 +160,7 @@ private fun HandleEffects(viewModel: DownloadedBooksViewModel) {
                     fileNameWithExt = "",
                     category = effect.book.category,
                     fileUri = effect.book.fileUri,
-                    downloadState = su.sv.models.ui.book.UIBookState.DOWNLOADED,
+                    downloadState = UIBookState.DOWNLOADED,
                 )
                 stackNavigation.forward(
                     BookDetailScreen(uiBook = uiBook)

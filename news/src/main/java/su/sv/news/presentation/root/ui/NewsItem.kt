@@ -38,6 +38,7 @@ import su.sv.commonui.theme.CardStrokeLight
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.SVAPPThemeLightPreview
+import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.ui.ExpandingText
 import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
@@ -269,7 +270,7 @@ fun SingleVideoPreviewDark() {
         ),
         allMedia = listOf()
     )
-    SVAPPTheme(themeMode = su.sv.commonui.theme.ThemeMode.DARK) {
+    SVAPPTheme(themeMode = ThemeMode.DARK) {
         NewsItem(item = item, onItemClick = {})
     }
 }

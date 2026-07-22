@@ -93,7 +93,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             doc.close()
             `is`.close()
         } catch (e: IOException) {
-            throw RuntimeException(e)
+            throw IllegalStateException(e)
         }
     }
 
@@ -661,7 +661,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 doc = DjvuLibre(`is`.fd)
                 current = DjvuPage(doc)
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                throw IllegalStateException(e)
             }
         }
 

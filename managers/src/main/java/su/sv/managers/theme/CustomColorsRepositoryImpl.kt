@@ -10,6 +10,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import su.sv.commonui.theme.CustomThemeColors
 import javax.inject.Inject
@@ -41,7 +42,7 @@ class CustomColorsRepositoryImpl @Inject constructor(
         val key = when (themeMode) {
             "LIGHT" -> PreferencesKeys.CUSTOM_COLORS_LIGHT
             "DARK" -> PreferencesKeys.CUSTOM_COLORS_DARK
-            else -> return kotlinx.coroutines.flow.flowOf(null)
+            else -> return flowOf(null)
         }
 
         return context.customColorsDataStore.data.map { preferences ->

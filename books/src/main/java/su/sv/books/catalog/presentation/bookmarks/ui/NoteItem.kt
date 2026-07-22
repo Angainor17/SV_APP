@@ -51,9 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import kotlinx.coroutines.delay
 import su.sv.books.R
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote
 import su.sv.commonui.theme.SVAPPTheme
+import java.io.File
 import kotlin.math.roundToInt
 
 /**
@@ -104,7 +106,7 @@ fun NoteItem(
     // Обработка dismissal
     LaunchedEffect(isDismissed) {
         if (isDismissed) {
-            kotlinx.coroutines.delay(200)
+            delay(200)
             onDeleteRequest()
             isDismissed = false
             offsetX = 0f
@@ -277,7 +279,7 @@ private fun BookCoverSmall(
             // Если это локальный путь к файлу, преобразуем в Uri
             if (coverUrl.startsWith("/") || coverUrl.startsWith("file://")) {
                 try {
-                    java.io.File(coverUrl).toUri()
+                    File(coverUrl).toUri()
                 } catch (e: Exception) {
                     coverUrl
                 }

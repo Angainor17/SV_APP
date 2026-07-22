@@ -3,8 +3,12 @@ package su.sv.bugreport.data
 import android.content.Context
 import android.net.Uri
 import androidx.hilt.work.HiltWorker
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -109,7 +113,7 @@ class BugReportWorkManager @Inject constructor(
      * Ставит задачу на отправку баг-репорта в очередь
      */
     fun enqueueBugReport(report: BugReport) {
-        val inputData = androidx.work.Data.Builder()
+        val inputData = Data.Builder()
             .putString(BugReportWorker.KEY_DESCRIPTION, report.description)
             .putString(BugReportWorker.KEY_APP_VERSION, report.appVersion)
             .putString(BugReportWorker.KEY_DEVICE_MODEL, report.deviceModel)
@@ -125,13 +129,13 @@ class BugReportWorkManager @Inject constructor(
         val workRequest = OneTimeWorkRequestBuilder<BugReportWorker>()
             .setInputData(inputData)
             .setBackoffCriteria(
-                androidx.work.BackoffPolicy.EXPONENTIAL,
+                BackoffPolicy.EXPONENTIAL,
                 30,
                 TimeUnit.SECONDS
             )
             .setConstraints(
-                androidx.work.Constraints.Builder()
-                    .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build()
             )
             .build()
