@@ -21,4 +21,6 @@
 
     <string name="bug_report_error_title">Ошибка</string>
     <string name="bug_report_retry_button">Повторить</string>
+
+    <string name="bug_report_email_chooser_title">Отправить отчет</string>
 </resources>

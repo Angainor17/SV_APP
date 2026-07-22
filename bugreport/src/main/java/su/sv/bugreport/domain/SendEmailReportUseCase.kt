@@ -2,7 +2,10 @@ package su.sv.bugreport.domain
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
+import su.sv.bugreport.R
 import su.sv.bugreport.domain.model.BugReport
 import javax.inject.Inject
 
@@ -44,7 +47,6 @@ class SendEmailReportUseCase @Inject constructor(
             appendLine("App Version: ${report.appVersion}")
             appendLine("Device: ${report.deviceManufacturer} ${report.deviceModel}")
             appendLine("Android: ${report.androidVersion}")
-            appendLine("Timestamp: ${report.timestamp}")
             appendLine()
             if (report.screenshots.isNotEmpty()) {
                 appendLine("Screenshots: ${report.screenshots.size} attached")
@@ -56,24 +58,38 @@ class SendEmailReportUseCase @Inject constructor(
         email: String,
         subject: String,
         body: String,
-        screenshots: List<android.net.Uri>,
+        screenshots: List<Uri>,
     ): Intent {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "message/rfc822"
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-            putExtra(Intent.EXTRA_SUBJECT, subject)
-            putExtra(Intent.EXTRA_TEXT, body)
+        val chooserTitle = context.getString(R.string.bug_report_email_chooser_title)
 
-            // Добавляем скриншоты как вложения
-            if (screenshots.isNotEmpty()) {
-                // Для множественных вложений используем putParcelableArrayListExtra
+        return if (screenshots.size > 1) {
+            // Для множественных вложений используем ACTION_SEND_MULTIPLE
+            // Это лучше поддерживается email-клиентами (Gmail и др.)
+            Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                type = "message/rfc822"
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+                putExtra(Intent.EXTRA_TEXT, body)
                 putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(screenshots))
-                type = "multipart/mixed"
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
+        } else {
+            // Для одного или отсутствия вложений используем ACTION_SENDTO с mailto:
+            // Это фильтрует только email-клиенты
+            val uri = "mailto:$email".toUri()
+            Intent(Intent.ACTION_SENDTO, uri).apply {
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+                putExtra(Intent.EXTRA_TEXT, body)
+                // Для одного вложения
+                if (screenshots.size == 1) {
+                    putExtra(Intent.EXTRA_STREAM, screenshots.first())
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            }
+        }.let { intent ->
+            // Показываем chooser с понятным заголовком
+            Intent.createChooser(intent, chooserTitle)
         }
-
-        return Intent.createChooser(intent, "Отправить отчет")
     }
 
     companion object {
