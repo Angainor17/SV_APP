@@ -8,4 +8,7 @@ sealed class RootInfoActions {
 
     /** Нажатие на кнопку "Повторить", которая отобразилась из-за ошибки */
     object OnRetryClick : RootInfoActions()
+
+    /** Нажатие на иконку бага в Toolbar */
+    object OnBugReportClick : RootInfoActions()
 }

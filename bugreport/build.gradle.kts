@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("kotlin-parcelize")
 }
 
 apply(
@@ -11,7 +12,7 @@ apply(
 )
 
 android {
-    namespace = "su.sv.info"
+    namespace = "su.sv.bugreport"
     buildFeatures {
         compose = true
     }
@@ -23,14 +24,14 @@ dependencies {
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
 
-    // Bug Report модуль
-    implementation(project(":bugreport"))
-
     // Compose
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.coil.compose)
     debugImplementation(libs.androidx.ui.tooling)
+
+    // Material Icons Extended (для BugReport иконки)
+    implementation(libs.androidx.material.icons.extended)
 
     // Navigation
     implementation(libs.modo.compose)
@@ -39,4 +40,19 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // Logging
+    implementation(libs.timber)
+
+    // Tracer
+    implementation(platform(libs.tracer.platform))
+    implementation(libs.tracer.crash.report)
+
+    // WorkManager for background upload
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+
+    // OkHttp for Imgbb API
+    implementation(libs.okhttp)
 }
