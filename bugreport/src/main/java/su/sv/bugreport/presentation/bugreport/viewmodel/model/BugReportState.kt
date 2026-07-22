@@ -1,5 +1,6 @@
 package su.sv.bugreport.presentation.bugreport.viewmodel.model
 
+import android.content.Intent
 import android.net.Uri
 
 /**
@@ -41,7 +42,7 @@ sealed class BugReportState {
      * Состояние успешной отправки (с email)
      */
     data class SuccessWithEmail(
-        val emailIntent: android.content.Intent
+        val emailIntent: Intent,
     ) : BugReportState()
 
     /**
