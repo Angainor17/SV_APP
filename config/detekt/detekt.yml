@@ -26,6 +26,12 @@ empty-blocks:
 exceptions:
   TooGenericExceptionThrown:
     active: true
+    # Запрещаем RuntimeException, Error, Throwable, Exception
+    exceptionNames:
+      - 'RuntimeException'
+      - 'Exception'
+      - 'Throwable'
+      - 'Error'
 
 naming:
   FunctionNaming:
