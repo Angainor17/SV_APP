@@ -4,5 +4,6 @@
     <string name="info_toolbar_title">Информация</string>
     <string name="resource_logo_content_description">Логотип ресурса</string>
     <string name="info_bug_report_content_description">Сообщить о проблеме</string>
+    <string name="link_copied">Ссылка скопирована</string>
 
 </resources>

@@ -12,6 +12,7 @@ import su.sv.info.domain.model.LinkItem.VkLobbyo
 import su.sv.info.domain.model.LinkItem.WinScience
 import su.sv.info.domain.model.LinkItem.YouTubeLobbyo
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class GetInfoLinksUseCase @Inject constructor() {
 
@@ -20,7 +21,8 @@ class GetInfoLinksUseCase @Inject constructor() {
      * Заготовка под наличие запроса к беку для получения данных
      */
     suspend fun execute(): Result<List<LinkItem>> {
-        delay(500)
+        delay(500.milliseconds)
+
         return Result.success(
             listOf(
                 BuyBook(

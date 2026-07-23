@@ -8,9 +8,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import su.sv.commonui.theme.CardStrokeDark
-import su.sv.commonui.theme.CardStrokeLight
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.cardStroke
 
 /**
  * Базовая карточка приложения
@@ -43,10 +42,9 @@ fun AppCard(
     )
 
     val border = if (hasBorder) {
-        val strokeColor = if (isSystemInDarkTheme()) CardStrokeDark else CardStrokeLight
         BorderStroke(
             width = dimensions.borderWidthStandard,
-            color = strokeColor
+            color = MaterialTheme.colorScheme.cardStroke
         )
     } else {
         null
@@ -78,12 +76,6 @@ fun AppCard(
     }
 }
 
-// Временная функция, будет заменена на проверку темы через MaterialTheme
-@Composable
-private fun isSystemInDarkTheme(): Boolean {
-    return MaterialTheme.colorScheme.background.red < 0.5f
-}
-
 /**
  * Карточка без внешних отступов
  *
@@ -104,10 +96,9 @@ fun AppCardNoPadding(
     )
 
     val border = if (hasBorder) {
-        val strokeColor = if (isSystemInDarkTheme()) CardStrokeDark else CardStrokeLight
         BorderStroke(
             width = dimensions.borderWidthStandard,
-            color = strokeColor
+            color = MaterialTheme.colorScheme.cardStroke
         )
     } else {
         null

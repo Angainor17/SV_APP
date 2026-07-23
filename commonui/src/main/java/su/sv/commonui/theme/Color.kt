@@ -221,16 +221,15 @@ val NewItemBorderStroke = Color(0x40000000)
 
 /**
  * Цвет Bottom Navigation Bar - Light.
- * Темнее фона приложения (WarmGray 50) для визуального разделения.
- * Используем WarmGray 150 для лучшего контраста.
+ * Совпадает с фоном приложения для единого внешнего вида.
  */
-val LightNavigationBarColor = Color(0xFFDDD3CA)  // WarmGray 150
+val LightNavigationBarColor = LightBackground  // WarmGray 50
 
 /**
  * Цвет Bottom Navigation Bar - Dark.
- * Темнее основного фона для визуального разделения.
+ * Совпадает с фоном приложения для единого внешнего вида.
  */
-val DarkNavigationBarColor = Color(0xFF141218)  // Темнее фона (DarkSurfaceDim)
+val DarkNavigationBarColor = DarkBackground  // #1C1B1F
 
 // ============================================================
 // SWIPE ACTION COLORS

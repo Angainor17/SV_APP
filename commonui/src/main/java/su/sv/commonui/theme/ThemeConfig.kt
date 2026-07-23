@@ -10,21 +10,32 @@ enum class ThemeMode {
     LIGHT,
 
     /** Тёмная тема */
-    DARK;
+    DARK,
+
+    /** Системная тема (следует за настройками устройства) */
+    SYSTEM;
 
     /**
      * Проверяет, является ли тема тёмной
+     * @param isSystemDark true если системная тема тёмная (из isSystemInDarkTheme())
      */
-    fun isDarkTheme(): Boolean = this == DARK
+    fun isDarkTheme(isSystemDark: Boolean = false): Boolean = when (this) {
+        DARK -> true
+        LIGHT -> false
+        SYSTEM -> isSystemDark
+    }
 
     /**
      * Следующий режим темы при переключении
+     * Переключает на противоположную отображаемую тему:
+     * - Если текущая отображаемая тема тёмная -> LIGHT
+     * - Если текущая отображаемая тема светлая -> DARK
+     *
+     * @param currentIsDark текущее отображаемое состояние (тёмная или светлая тема показывается)
      */
-    fun next(): ThemeMode {
-        return when (this) {
-            LIGHT -> DARK
-            DARK -> LIGHT
-        }
+    fun next(currentIsDark: Boolean): ThemeMode = when {
+        currentIsDark -> LIGHT  // Если показывается тёмная -> переключить на светлую
+        else -> DARK            // Если показывается светлая -> переключить на тёмную
     }
 }
 
@@ -33,7 +44,7 @@ enum class ThemeMode {
  */
 data class ThemeConfig(
     /** Режим темы */
-    val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
 
     /** Использовать динамические цвета (Material You, Android 12+) */
     val useDynamicColors: Boolean = false,

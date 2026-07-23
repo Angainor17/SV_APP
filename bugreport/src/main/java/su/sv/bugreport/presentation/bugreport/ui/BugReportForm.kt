@@ -58,13 +58,6 @@ fun BugReportForm(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Описание
-        Text(
-            text = stringResource(R.string.bug_report_description_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
         Text(
             text = stringResource(R.string.bug_report_description_subtitle),
             style = MaterialTheme.typography.bodyMedium,
@@ -95,7 +88,7 @@ fun BugReportForm(
 
         // Скриншоты
         Text(
-            text = stringResource(R.string.bug_report_screenshots_title, state.maxScreenshots),
+            text = stringResource(R.string.bug_report_screenshots_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )

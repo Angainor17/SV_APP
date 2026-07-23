@@ -154,7 +154,7 @@ private fun HandleEffects(viewModel: DownloadedBooksViewModel) {
                     id = effect.book.id,
                     title = effect.book.title,
                     author = effect.book.author,
-                    description = "",
+                    description = effect.book.description,
                     image = effect.book.coverUrl,
                     downloadUrl = "",
                     fileNameWithExt = "",

@@ -23,11 +23,8 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -67,19 +64,9 @@ fun RootBooksCatalog(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    var scrollEffect by remember { mutableStateOf<BooksListOneTimeEffect.ScrollToTop?>(null) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    HandleEffects(viewModel, snackbarHostState) { effect ->
-        when (effect) {
-            is BooksListOneTimeEffect.ScrollToTop -> {
-                scrollEffect = effect
-            }
-
-            else -> { /* другие эффекты обрабатываются в HandleEffects */
-            }
-        }
-    }
+    HandleEffects(viewModel, snackbarHostState)
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -112,13 +99,8 @@ fun RootBooksCatalog(
                 BookList(
                     actions = viewModel,
                     state = state.value as UiRootBooksState.Content,
-                    scrollEffect = scrollEffect,
                     contentPadding = contentPadding,
                 )
-                // Сбрасываем эффект после обработки
-                LaunchedEffect(scrollEffect) {
-                    scrollEffect = null
-                }
             }
 
             UiRootBooksState.EmptyState -> {
@@ -179,7 +161,6 @@ private fun BooksCatalogTopBar(
 private fun HandleEffects(
     viewModel: RootBooksCatalogViewModel,
     snackbarHostState: SnackbarHostState,
-    onEffect: (BooksListOneTimeEffect) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val stackNavigation = LocalStackNavigation.current
@@ -235,7 +216,7 @@ private fun HandleEffects(
             }
 
             is BooksListOneTimeEffect.ScrollToTop -> {
-                onEffect(effect)
+                // Обрабатывается в BookList через filterScrollResetKey
             }
         }
     }

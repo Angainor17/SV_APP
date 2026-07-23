@@ -33,12 +33,11 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
-import su.sv.commonui.theme.CardStrokeDark
-import su.sv.commonui.theme.CardStrokeLight
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.commonui.theme.ThemeMode
+import su.sv.commonui.theme.cardStroke
 import su.sv.commonui.ui.ExpandingText
 import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
@@ -59,8 +58,6 @@ fun NewsItem(
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val dimensions = LocalAppDimensions.current
-    val isDarkTheme = MaterialTheme.colorScheme.background.red < 0.5f
-    val strokeColor = if (isDarkTheme) CardStrokeDark else CardStrokeLight
 
     Card(
         modifier = modifier.padding(
@@ -68,7 +65,7 @@ fun NewsItem(
             vertical = dimensions.cardPaddingOuter
         ),
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(dimensions.borderWidthStandard, strokeColor),
+        border = BorderStroke(dimensions.borderWidthStandard, MaterialTheme.colorScheme.cardStroke),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()

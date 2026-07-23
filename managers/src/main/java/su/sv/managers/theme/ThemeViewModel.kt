@@ -1,8 +1,11 @@
 package su.sv.managers.theme
 
+import android.content.Context
+import android.content.res.Configuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -24,6 +27,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ThemeViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val themeRepository: ThemeRepository
 ) : ViewModel() {
@@ -45,7 +49,7 @@ class ThemeViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ThemeMode.LIGHT
+            initialValue = ThemeMode.SYSTEM
         )
 
     /**
@@ -65,10 +69,22 @@ class ThemeViewModel @Inject constructor(
         viewModelScope.launch {
             // DataStore - IO операция
             withContext(dispatcherProvider.io) {
-                val currentMode = themeConfig.value.themeMode
-                themeRepository.setThemeMode(currentMode.next())
+                val currentConfig = themeConfig.value
+                val currentIsDark = currentConfig.themeMode.isDarkTheme(
+                    isSystemDark = isSystemDark()
+                )
+                val newMode = currentConfig.themeMode.next(currentIsDark)
+                themeRepository.setThemeMode(newMode)
             }
         }
+    }
+
+    /**
+     * Определить, является ли системная тема тёмной
+     */
+    private fun isSystemDark(): Boolean {
+        val uiMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return uiMode == Configuration.UI_MODE_NIGHT_YES
     }
 
     /**

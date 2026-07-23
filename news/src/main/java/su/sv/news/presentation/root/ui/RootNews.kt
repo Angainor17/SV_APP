@@ -2,6 +2,7 @@ package su.sv.news.presentation.root.ui
 
 import android.content.Context
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -59,6 +60,7 @@ fun RootNews(
     onThemeToggle: () -> Unit = {},
     currentThemeMode: ThemeMode = ThemeMode.LIGHT
 ) {
+    val isSystemDark = isSystemInDarkTheme()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val stackNavigation = LocalStackNavigation.current
@@ -78,6 +80,7 @@ fun RootNews(
                 title = stringResource(R.string.news_toolbar_title),
                 windowInsets = WindowInsets(0.dp),
                 currentThemeMode = currentThemeMode,
+                isSystemDark = isSystemDark,
                 scrollBehavior = scrollBehavior,
                 onThemeToggle = { onThemeToggle() },
                 onThemeLongPress = {
