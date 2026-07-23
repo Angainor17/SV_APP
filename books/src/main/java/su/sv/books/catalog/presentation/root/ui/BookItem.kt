@@ -62,6 +62,7 @@ fun BookItem(item: UiBook, actions: RootBooksActions) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple()
@@ -79,7 +80,6 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
     Box {
         AsyncImage(
             modifier = Modifier
-                .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
                 .fillMaxWidth()
                 .height(250.dp),
             model = ImageRequest.Builder(LocalContext.current)
@@ -168,7 +168,6 @@ private fun InfoFooter(item: UiBook) {
 
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
             .background(MaterialTheme.colorScheme.tertiaryContainer)
             .padding(all = dimensions.cardPaddingInner)
     ) {

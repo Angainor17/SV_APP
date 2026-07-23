@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -159,15 +160,19 @@ private fun BottomNavContent(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                NavigationBar(
-                    modifier = Modifier
-                        .testTag(MainTestTags.BottomNav.ROOT)
-                        .onSizeChanged { size ->
-                            navigationBarHeight = size.height
-                        },
-                    containerColor = MaterialTheme.colorScheme.navigationBarColor,
-                    tonalElevation = 4.dp, // Elevation для визуального выделения
-                ) {
+                // Xiaomi/MIUI fix: key() для пересоздания при смене темы
+                val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+
+                key(onSurfaceColor) {
+                    NavigationBar(
+                        modifier = Modifier
+                            .testTag(MainTestTags.BottomNav.ROOT)
+                            .onSizeChanged { size ->
+                                navigationBarHeight = size.height
+                            },
+                        containerColor = MaterialTheme.colorScheme.navigationBarColor,
+                        tonalElevation = 4.dp, // Elevation для визуального выделения
+                    ) {
                     bottomNavigationItems()
                         .forEachIndexed { index, navigationItem ->
                             val testTag = when (navigationItem.route) {
@@ -218,7 +223,8 @@ private fun BottomNavContent(
                                 )
                             )
                         }
-                }
+                    }  // end NavigationBar
+                }  // end key()
             },
         ) { paddingValues ->
             BottomNavHost(

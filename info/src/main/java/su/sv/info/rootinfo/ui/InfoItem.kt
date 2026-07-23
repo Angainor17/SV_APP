@@ -2,9 +2,11 @@ package su.sv.info.rootinfo.ui
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -21,9 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import su.sv.commonui.theme.LocalAppDimensions
@@ -36,20 +40,27 @@ import su.sv.info.rootinfo.model.UiLinkItem
  *
  * @param item данные ссылки
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InfoItem(item: UiLinkItem) {
     val context = LocalContext.current
     val dimensions = LocalAppDimensions.current
+    val clipboardManager = LocalClipboardManager.current
 
     Row(
         modifier = Modifier
             .padding(horizontal = dimensions.screenPaddingHorizontal)
             .padding(vertical = dimensions.itemSpacingSmall)
             .clip(MaterialTheme.shapes.medium)
-            .clickable(
+            .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = ripple()
-            ) { openLink(context, item.url) }
+                indication = ripple(),
+                onClick = { openLink(context, item.url) },
+                onLongClick = {
+                    clipboardManager.setText(AnnotatedString(item.url))
+                    Toast.makeText(context, context.getString(R.string.link_copied), Toast.LENGTH_SHORT).show()
+                }
+            )
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .height(dimensions.listItemHeight)
             .fillMaxWidth()
@@ -77,9 +88,13 @@ fun InfoItem(item: UiLinkItem) {
 
 private fun openLink(context: Context, url: String) {
     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-    if (intent.resolveActivity(context.packageManager) != null) {
+    try {
         context.startActivity(intent)
+    } catch (_: Exception) {
+        // Fallback: копируем ссылку если не удалось открыть
+        Toast.makeText(context, R.string.link_copied, Toast.LENGTH_SHORT).show()
     }
 }
 

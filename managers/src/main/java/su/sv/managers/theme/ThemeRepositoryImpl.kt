@@ -36,9 +36,9 @@ class ThemeRepositoryImpl @Inject constructor(
     override val themeMode: Flow<ThemeMode> = context.themeDataStore.data
         .map { preferences ->
             val modeString = preferences[PreferencesKeys.THEME_MODE]
-                ?: ThemeMode.LIGHT.name
+                ?: ThemeMode.SYSTEM.name
             runCatching { ThemeMode.valueOf(modeString) }
-                .getOrDefault(ThemeMode.LIGHT)
+                .getOrDefault(ThemeMode.SYSTEM)
         }
 
     override val useDynamicColors: Flow<Boolean> = context.themeDataStore.data
@@ -49,9 +49,9 @@ class ThemeRepositoryImpl @Inject constructor(
     override val themeConfig: Flow<ThemeConfig> = context.themeDataStore.data
         .map { preferences ->
             val modeString = preferences[PreferencesKeys.THEME_MODE]
-                ?: ThemeMode.LIGHT.name
+                ?: ThemeMode.SYSTEM.name
             val mode = runCatching { ThemeMode.valueOf(modeString) }
-                .getOrDefault(ThemeMode.LIGHT)
+                .getOrDefault(ThemeMode.SYSTEM)
             val dynamicColors = preferences[PreferencesKeys.USE_DYNAMIC_COLORS] ?: false
 
             ThemeConfig(

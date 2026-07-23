@@ -14,6 +14,7 @@ class UiDownloadedBookMapper @Inject constructor() {
             id = book.id,
             title = book.title,
             author = book.author,
+            description = book.description,
             category = book.category,
             coverUrl = book.coverUrl,
             fileUri = book.fileUri,

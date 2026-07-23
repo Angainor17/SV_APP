@@ -24,14 +24,12 @@ import androidx.compose.ui.unit.dp
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
-import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
 import su.sv.commonui.theme.LocalAppDimensions
 
 @Composable
 fun BookList(
     state: UiRootBooksState.Content,
     actions: RootBooksActions,
-    scrollEffect: BooksListOneTimeEffect? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
@@ -39,10 +37,9 @@ fun BookList(
     val dimensions = LocalAppDimensions.current
 
     // Скролл к началу при смене фильтра
-    LaunchedEffect(scrollEffect) {
-        if (scrollEffect is BooksListOneTimeEffect.ScrollToTop) {
-            lazyGridState.animateScrollToItem(0)
-        }
+    // Используем filterScrollResetKey как ключ - он инкрементируется при каждом изменении фильтра
+    LaunchedEffect(state.filterScrollResetKey) {
+        lazyGridState.animateScrollToItem(0)
     }
 
     // Определяем, виден ли TopAppBar (для показа/скрытия фильтров)

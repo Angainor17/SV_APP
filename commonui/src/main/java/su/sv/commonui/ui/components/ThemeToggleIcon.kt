@@ -35,6 +35,7 @@ import su.sv.commonui.theme.ThemeMode
  * При долгом нажатии (>5 сек) открывает редактор темы (для отладки).
  *
  * @param currentMode текущий режим темы
+ * @param isSystemDark true если системная тема тёмная (для отображения иконки при SYSTEM режиме)
  * @param onToggle обработчик переключения (передаёт новый режим)
  * @param onLongPress обработчик долгого нажатия (открывает редактор темы)
  * @param modifier модификатор
@@ -43,20 +44,25 @@ import su.sv.commonui.theme.ThemeMode
 @Composable
 fun ThemeToggleIcon(
     currentMode: ThemeMode,
+    isSystemDark: Boolean = false,
     onToggle: (ThemeMode) -> Unit,
     onLongPress: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalAppDimensions.current
 
+    // Определяем иконку на основе текущего режима и системной темы
+    // При SYSTEM режиме показываем иконку на основе isSystemDark
     val iconRes = when (currentMode) {
         ThemeMode.LIGHT -> R.drawable.ic_theme_dark   // При светлой теме показываем луну (переключит на тёмную)
-        ThemeMode.DARK -> R.drawable.ic_theme_light   // При тёмной теме показываем солнце (переключит на светлую)
+        ThemeMode.DARK -> R.drawable.ic_theme_light    // При тёмной теме показываем солнце (переключит на светлую)
+        ThemeMode.SYSTEM -> if (isSystemDark) R.drawable.ic_theme_light else R.drawable.ic_theme_dark  // Показываем противоположную системной
     }
 
     val contentDescription = when (currentMode) {
         ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)   // Переключить на тёмную
         ThemeMode.DARK -> stringResource(R.string.theme_mode_light)   // Переключить на светлую
+        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(R.string.theme_mode_dark)
     }
 
     // Отслеживание долгого нажатия
@@ -100,7 +106,9 @@ fun ThemeToggleIcon(
                 indication = ripple(bounded = true, radius = 24.dp),
                 onClick = {
                     if (!hasTriggeredLongPress) {
-                        onToggle(currentMode.next())
+                        // Определяем текущее отображаемое состояние темы
+                        val currentIsDark = currentMode.isDarkTheme(isSystemDark)
+                        onToggle(currentMode.next(currentIsDark))
                     }
                 },
             ),
@@ -120,11 +128,13 @@ fun ThemeToggleIcon(
  * Показывает иконку следующего режима при переключении
  *
  * @param mode режим темы
+ * @param isSystemDark true если системная тема тёмная
  * @param modifier модификатор
  */
 @Composable
 fun ThemeModeIcon(
     mode: ThemeMode,
+    isSystemDark: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val dimensions = LocalAppDimensions.current
@@ -132,12 +142,14 @@ fun ThemeModeIcon(
     // Показываем иконку противоположного режима
     val iconRes = when (mode) {
         ThemeMode.LIGHT -> R.drawable.ic_theme_dark   // При светлой теме показываем луну
-        ThemeMode.DARK -> R.drawable.ic_theme_light   // При тёмной теме показываем солнце
+        ThemeMode.DARK -> R.drawable.ic_theme_light    // При тёмной теме показываем солнце
+        ThemeMode.SYSTEM -> if (isSystemDark) R.drawable.ic_theme_light else R.drawable.ic_theme_dark
     }
 
     val contentDescription = when (mode) {
         ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)
         ThemeMode.DARK -> stringResource(R.string.theme_mode_light)
+        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(R.string.theme_mode_dark)
     }
 
     Icon(

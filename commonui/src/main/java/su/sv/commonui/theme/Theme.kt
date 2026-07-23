@@ -10,10 +10,12 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -191,50 +193,67 @@ val LocalCustomColors = staticCompositionLocalOf<CustomThemeColors?> { null }
 /**
  * Тема приложения SV APP
  *
- * @param themeMode режим темы (LIGHT или DARK)
+ * @param themeMode режим темы (LIGHT, DARK или SYSTEM)
  * @param useDynamicColors использовать динамические цвета (Material You, Android 12+)
  * @param customColors кастомные цвета темы (null для использования стандартных)
  * @param content контент приложения
  */
 @Composable
 fun SVAPPTheme(
-    themeMode: ThemeMode = ThemeMode.LIGHT,
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     useDynamicColors: Boolean = false,
     customColors: CustomThemeColors? = null,
     content: @Composable () -> Unit,
 ) {
-    val darkTheme = themeMode.isDarkTheme()
+    // Для Xiaomi/MIUI: отслеживаем uiMode напрямую, а не через remember(configuration)
+    // Configuration объект может быть тем же, а uiMode меняться
+    val configuration = LocalConfiguration.current
+    val isSystemDark = remember(configuration.uiMode) {
+        val uiMode = configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+    }
+
+    // Явно определяем тему: если режим не SYSTEM, используем выбранный режим
+    val darkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemDark
+    }
 
     val context = LocalContext.current
     val view = LocalView.current
 
     // Выбор цветовой схемы
-    val baseColorScheme = when {
-        useDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) {
-                dynamicDarkColorScheme(context)
-            } else {
-                dynamicLightColorScheme(context)
+    val colorScheme = remember(darkTheme, useDynamicColors, customColors) {
+        val baseColorScheme = when {
+            useDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                if (darkTheme) {
+                    dynamicDarkColorScheme(context)
+                } else {
+                    dynamicLightColorScheme(context)
+                }
             }
+            darkTheme -> DarkColorScheme
+            else -> LightColorScheme
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
 
-    // Применение кастомных цветов если есть
-    val colorScheme = if (customColors != null) {
-        applyCustomColors(baseColorScheme, customColors)
-    } else {
-        baseColorScheme
+        // Применение кастомных цветов если есть
+        if (customColors != null) {
+            applyCustomColors(baseColorScheme, customColors)
+        } else {
+            baseColorScheme
+        }
     }
 
     // Настройка статус-бара и навигационной панели
+    // Xiaomi/MIUI fix: DisposableEffect с key() вместо SideEffect
     if (!view.isInEditMode) {
-        SideEffect {
+        DisposableEffect(darkTheme) {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = !darkTheme
+            onDispose { }
         }
     }
 

@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +23,9 @@ import su.sv.commonui.theme.ThemeMode
 
 /**
  * Стандартный тулбар приложения
+ *
+ * Xiaomi/MIUI fix: использует key() для принудительного пересоздания
+ * TopAppBar при смене темы, т.к. Material3 компоненты кэшируют цвета.
  *
  * @param title заголовок
  * @param modifier модификатор
@@ -41,41 +45,47 @@ fun AppToolbar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        modifier = modifier.fillMaxWidth(),
-        navigationIcon = {
-            if (navigationIcon != null) {
-                navigationIcon()
-            } else if (onNavigationClick != null) {
-                IconButton(onClick = onNavigationClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.common_navigate_back),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val backgroundColor = MaterialTheme.colorScheme.background
+
+    // Xiaomi/MIUI fix: key() для принудительного пересоздания при смене темы
+    key(onSurfaceColor) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = onSurfaceColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            modifier = modifier.fillMaxWidth(),
+            navigationIcon = {
+                if (navigationIcon != null) {
+                    navigationIcon()
+                } else if (onNavigationClick != null) {
+                    IconButton(onClick = onNavigationClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.common_navigate_back),
+                            tint = onSurfaceColor
+                        )
+                    }
                 }
-            }
-        },
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,  // Цвет фона приложения
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        scrollBehavior = scrollBehavior,
-        windowInsets = windowInsets,
-    )
+            },
+            actions = actions,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = backgroundColor,
+                scrolledContainerColor = backgroundColor,
+                titleContentColor = onSurfaceColor,
+                navigationIconContentColor = onSurfaceColor,
+                actionIconContentColor = onSurfaceColor
+            ),
+            scrollBehavior = scrollBehavior,
+            windowInsets = windowInsets,
+        )
+    }
 }
 
 /**
@@ -107,6 +117,7 @@ fun AppToolbarWithBack(
  *
  * @param title заголовок
  * @param currentThemeMode текущий режим темы
+ * @param isSystemDark true если системная тема тёмная (для отображения иконки при SYSTEM режиме)
  * @param onThemeToggle обработчик переключения темы
  * @param onThemeLongPress обработчик долгого нажатия на переключатель темы (открывает редактор)
  * @param modifier модификатор
@@ -121,6 +132,7 @@ fun AppToolbarWithBack(
 fun AppToolbarWithThemeToggle(
     title: String,
     currentThemeMode: ThemeMode,
+    isSystemDark: Boolean = false,
     onThemeToggle: (ThemeMode) -> Unit,
     onThemeLongPress: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -141,6 +153,7 @@ fun AppToolbarWithThemeToggle(
         additionalActions()
         ThemeToggleIcon(
             currentMode = currentThemeMode,
+            isSystemDark = isSystemDark,
             onToggle = onThemeToggle,
             onLongPress = onThemeLongPress
         )
@@ -163,23 +176,29 @@ fun AppToolbarSimple(
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        modifier = modifier.fillMaxWidth(),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,  // Цвет фона приложения
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        windowInsets = windowInsets,
-        scrollBehavior = scrollBehavior,
-    )
+    // Xiaomi/MIUI fix: key() для принудительного пересоздания при смене темы
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val backgroundColor = MaterialTheme.colorScheme.background
+
+    key(onSurfaceColor) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = onSurfaceColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            modifier = modifier.fillMaxWidth(),
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = backgroundColor,
+                scrolledContainerColor = backgroundColor,
+                titleContentColor = onSurfaceColor
+            ),
+            windowInsets = windowInsets,
+            scrollBehavior = scrollBehavior,
+        )
+    }
 }

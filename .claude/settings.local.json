@@ -90,7 +90,14 @@
       "Bash(./gradlew :books:compileDebugKotlin --no-daemon --info)",
       "WebSearch",
       "Bash(./gradlew :books:compileDebugKotlin --quiet)",
-      "Bash(adb devices *)"
+      "Bash(adb devices *)",
+      "Bash(./gradlew :commonui:compileDebugKotlin)",
+      "Bash(./gradlew :books:compileDebugKotlin)",
+      "Bash(./gradlew :news:compileDebugKotlin)",
+      "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin)",
+      "Bash(grep \".kt$\")",
+      "Bash(./gradlew :main:compileDebugKotlin)",
+      "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin :main:compileDebugKotlin)"
     ]
   }
 }
