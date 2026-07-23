@@ -1,163 +1,157 @@
 # Руководство миграции Java → Kotlin
 
 > Создано: 2026-07-23
-> Цель: Минимизация багов при миграции legacy Java кода
+> Цель: Универсальная стратегия для миграции любых Java классов
 
 ---
 
-## Ключевые принципы
+## Максимально эффективная стратегия
 
-### 1. Один файл = один коммит
+### Для Claude (AI)
 
-Мигрировать файл целиком, сохраняя внутренние классы внутри.
+**Проблема:** Миграция вручную требует переписывания 1000+ строк кода → много токенов, много ошибок
+
+**Решение:** Человеко-машинное партнёрство
 
 ```
-❌ НЕ: Создавать отдельные .kt файлы для каждого внутреннего класса
-✅ ДА: Конвертировать Storage.java → Storage.kt одним файлом
+┌─────────────────────────────────────────────────────────────┐
+│  Этап 1: Человек                                             │
+│  - Открыть файл в Android Studio                            │
+│  - Code → Convert Java File to Kotlin File                  │
+│  - Сохранить .kt файл                                       │
+│  - Удалить старый .java файл                                │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Этап 2: Claude                                              │
+│  - Добавить wrapper'ы для родительских методов              │
+│  - Добавить @JvmStatic/@JvmField                            │
+│  - Сделать open class для наследуемых классов               │
+│  - Компилировать → найти ошибки                             │
+│  - Исправить критичные ошибки                               │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Этап 3: Claude + Человек                                    │
+│  - Компиляция успешна → коммит                               │
+│  - Или: исправить remaining nullable проблемы               │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-**Причина:** Java код использует `OuterClass.InnerClass`, отдельные файлы ломают API.
+### Почему так эффективнее
+
+| Подход | Токены | Ошибки | Время |
+|--------|--------|--------|-------|
+| Claude пишет весь файл | 50,000+ | 20-50 | 30+ мин |
+| Android Studio конвертирует | 0 | 5-10 | 2 мин |
+| **Партнёрство** | 5,000 | 0-5 | 5-10 мин |
 
 ---
 
-### 2. Сохранять package и импорты
+## Универсальные правила для всех классов
 
-```kotlin
-// Java
-package com.github.axet.bookreader.app;
-import org.geometerplus.zlibrary.text.view.ZLTextPosition;
-
-// Kotlin - тот же package, те же импорты
-package com.github.axet.bookreader.app
-import org.geometerplus.zlibrary.text.view.ZLTextPosition
-```
-
----
-
-### 3. Классы для наследования = `open`
-
-Проверить наследование ПЕРЕД миграцией:
+### 1. Проверить наследование ПЕРЕД миграцией
 
 ```bash
-# Найти наследников
-grep -rn "extends MyClass\|: MyClass\|: Storage\.Bookmark" --include="*.java" --include="*.kt"
+# Найти наследников класса
+grep -rn "extends MyClass\|: MyClass\|: OuterClass\.InnerClass" --include="*.java" --include="*.kt"
 ```
 
+Если есть наследники → класс должен быть `open`:
+
 ```kotlin
-// Если класс наследуется - обязательно open
-open class Bookmark {
-    open var color: Int = 0  // поле тоже open если переопределяется
+open class MyClass {
+    open fun method() {}  // если переопределяется
 }
 ```
 
-**Пример из SV APP:**
-- `Storage.Bookmark` наследуется в `TTSPopup.Fragment.Bookmark` → нужен `open class Bookmark`
-
----
-
-### 4. @JvmStatic и @JvmField для Java-совместимости
+### 2. Статические методы → @JvmStatic
 
 ```kotlin
-class Storage {
-    // Статические методы в companion object с @JvmStatic
+class MyClass {
     companion object {
         @JvmStatic
-        fun loadPosition(json: JSONArray?): ZLTextPosition? { ... }
-
+        fun staticMethod() { }
+        
         @JvmStatic
-        fun getAndroidId(context: Context): String { ... }
-    }
-
-    // Внутренние классы с @JvmField для public полей
-    class Book {
-        @JvmField var url: Uri? = null      // Java: book.url
-        @JvmField var md5: String? = null   // Java: book.md5
-        @JvmField var cover: File? = null
+        fun loadPosition(json: JSONArray?): ZLTextPosition? { }
     }
 }
 ```
 
+### 3. Публичные поля → @JvmField
+
+```kotlin
+class MyClass {
+    @JvmField var url: Uri? = null
+    @JvmField var name: String? = null
+}
+```
+
+### 4. Wrapper'ы для родительских методов
+
+Если класс наследуется от другой Java библиотеки:
+
+```kotlin
+class Storage(context: Context) : com.github.axet.androidlibrary.app.Storage(context) {
+    companion object {
+        // Wrapper'ы для статических методов родителя
+        @JvmStatic
+        fun getFile(uri: Uri): File = com.github.axet.androidlibrary.app.Storage.getFile(uri)
+        
+        @JvmStatic
+        fun exists(context: Context, uri: Uri): Boolean = 
+            com.github.axet.androidlibrary.app.Storage.exists(context, uri)
+    }
+}
+```
+
+### 5. Nullable стратегия
+
+**Правило:** Сначала оставить nullable (как в Java), потом оптимизировать
+
+```kotlin
+// Этап 1: Как в Java
+var text: String? = null
+var start: ZLTextPosition? = null
+
+// Этап 2: После анализа использования
+// Если 90% использования non-null → сделать non-null
+var text: String = ""  // дефолт
+var start: ZLTextPosition? = null  // оставить nullable
+```
+
 ---
 
-### 5. Nullable типы = по анализу Java кода
+## Чек-лист миграции
 
-```java
-// Java - анализ кода
-public ZLTextPosition position;  // может быть null? → проверить использование
-public String title;             // может быть null? → проверить
-```
+### Перед миграцией (Человек)
 
-```bash
-# Проверить использование поля
-grep -rn "\.position\s*=" --include="*.java"
-grep -rn "\.position\s*!=" --include="*.java"
-```
+- [ ] Проверить наследование класса
+- [ ] Найти все использования внутренних классов
+- [ ] Записать список wrapper'ов для родительских методов
 
-```kotlin
-// Kotlin - только если действительно nullable
-var position: ZLTextPosition? = null  // если было = null в Java
-var title: String? = null              // если null возможен
-```
+### Конвертация (Человек)
 
----
+- [ ] Открыть файл в Android Studio
+- [ ] Code → Convert Java File to Kotlin File
+- [ ] Сохранить .kt файл
+- [ ] Удалить .java файл
 
-## Пошаговый план миграции
+### После конвертации (Claude)
 
-### Шаг 1: Анализ файла
+- [ ] Добавить `open` для наследуемых классов
+- [ ] Добавить `@JvmStatic` для статических методов
+- [ ] Добавить `@JvmField` для публичных полей
+- [ ] Добавить wrapper'ы для родительских методов
+- [ ] Запустить компиляцию
+- [ ] Исправить ошибки
 
-```bash
-# 1. Размер файла
-wc -l path/to/File.java
+### Финализация
 
-# 2. Количество внутренних классов
-grep -c "public static class\|public class" path/to/File.java
-
-# 3. Наследники классов
-grep -rn "extends ClassName\|: ClassName" --include="*.java" --include="*.kt"
-
-# 4. Использование внутренних классов
-grep -rn "OuterClass\.InnerClass" --include="*.java" --include="*.kt"
-```
-
-### Шаг 2: Конвертация
-
-**Вариант A: Android Studio (рекомендуется)**
-1. Открыть файл в Android Studio
-2. `Code → Convert Java File to Kotlin File`
-3. Проверить результат
-
-### Шаг 3: Добавить модификаторы
-
-```kotlin
-// Чек-лист:
-// ☐ open class для наследуемых классов
-// ☐ @JvmStatic для статических методов
-// ☐ @JvmField для public полей, используемых из Java
-// ☐ @Throws для методов с checked exceptions
-```
-
-### Шаг 4: Замена RuntimeException
-
-```kotlin
-// Java
-throw new RuntimeException(e);
-
-// Kotlin
-throw IllegalStateException(e)
-```
-
-### Шаг 5: Проверка сборки
-
-```bash
-./gradlew :module:compileDebugKotlin :module:compileDebugJavaWithJavac
-```
-
-### Шаг 6: Коммит
-
-```bash
-git add path/to/File.kt
-git commit -m "Convert File.java to Kotlin"
-```
+- [ ] `./gradlew :module:compileDebugKotlin`
+- [ ] Проверить WARNINGS
+- [ ] Закоммитить
 
 ---
 
@@ -165,60 +159,66 @@ git commit -m "Convert File.java to Kotlin"
 
 | Ошибка | Причина | Решение |
 |--------|---------|---------|
-| `This type is final` | Класс наследуется, но не `open` | `open class MyClass` |
-| `Cannot access class` | Неправильный import | Проверить package |
-| `Unresolved reference` | Статический метод без `@JvmStatic` | Добавить `@JvmStatic` |
-| `Nullable type mismatch` | Неправильный nullable тип | Проверить Java код |
-| `'indexOf' hides member` | Метод переопределяет родительский | Добавить `override` |
+| `This type is final` | Класс наследуется | `open class` |
+| `Cannot access` | Неправильный import | Проверить package |
+| `Unresolved reference` | Нет @JvmStatic | Добавить |
+| `Nullable type mismatch` | Kotlin nullable vs Java platform type | `!!` или `?.` |
+| `No accessor` | Поле private | `@JvmField` |
 
 ---
 
-## Особенности SV APP
+## Примеры для SV APP
 
-### Тактика Nullable типов
-
-При миграции Java → Kotlin, поля класса становятся nullable (`Type?`), что ломает код-потребитель.
-
-**Стратегия:**
-
-1. **Этап 1:** Мигрировать файл с nullable типами (как в Java)
-2. **Этап 2:** После успешной сборки, постепенно убирать `?` где это безопасно:
-   - Проверить все использования поля
-   - Если 90% использования non-null → сделать поле non-null
-   - Если много null-check → оставить nullable
-
-**Пример для Bookmark:**
-
-```kotlin
-// Этап 1: nullable как в Java
-@JvmField var text: String? = null
-@JvmField var start: ZLTextPosition? = null
-@JvmField var end: ZLTextPosition? = null
-
-// Этап 2: после анализа использования
-// text используется всегда → сделать non-null с дефолтом
-@JvmField var text: String = ""
-// start/end часто nullable → оставить nullable
-@JvmField var start: ZLTextPosition? = null
-```
-
-**Правило:** Сначала добиваемся сборки с nullable, потом оптимизируем.
-
-### Storage.java - внутренние классы
+### Storage.java (1411 строк)
 
 ```
-Storage.java (1411 строк)
-├── Info          - используется в Plugin
-├── Progress      - используется при загрузке
-├── FBook         - книга в FBReader
-├── Book          - книга в библиотеке
-├── RecentInfo    - метаданные чтения
-├── Bookmark      - закладка (наследуется в TTSPopup!) → OPEN
-└── Bookmarks     - коллекция закладок
+Наследники: Bookmark (в TTSPopup)
+Wrapper'ы: getFile, exists, getName, getExt
+Модификаторы: open class Bookmark
 ```
 
-### Порядок миграции
+### ScrollWidget.java (1767 строк)
 
-1. Storage.java → Storage.kt
-2. ScrollWidget.java → ScrollWidget.kt
-3. FBReaderView.java → FBReaderView.kt
+```
+Наследники: нет
+Внутренние классы: ScrollAdapter, PageView, PageHolder
+Модификаторы: @JvmStatic для статических методов
+```
+
+### FBReaderView.java (2307 строк)
+
+```
+Наследники: нет
+Внутренние классы: Listener, ZLBookmark, ZLTTSMark
+Модификаторы: open для внутренних классов-наследников
+```
+
+---
+
+## Команды для анализа
+
+```bash
+# Найти все Java файлы
+find . -name "*.java" -type f
+
+# Найти наследников
+grep -rn "extends ClassName" --include="*.java" --include="*.kt"
+
+# Найти использования внутренних классов
+grep -rn "OuterClass\.InnerClass" --include="*.java" --include="*.kt"
+
+# Размер файла
+wc -l path/to/File.java
+```
+
+---
+
+## Итог
+
+**Для максимальной эффективности:**
+
+1. **Человек** конвертирует через Android Studio (2 мин)
+2. **Claude** добавляет модификаторы и wrapper'ы (3 мин)
+3. **Вместе** исправляют nullable проблемы (5 мин)
+
+**Итого: 10 минут на файл вместо 30+ минут вручную**
