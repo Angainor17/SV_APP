@@ -39,17 +39,19 @@ import kotlin.math.roundToInt
  * Особенности реализации:
  * - Максимальное смещение свайпа ограничено 30% ширины экрана
  * - Красный фон отображается на всю ширину карточки
- * - После отмены удаления свайп продолжает работать
+ * - При открытом диалоге удаления свайп остаётся в открытом положении
  * - Подсказка свайпа для первого элемента
  */
 @Composable
 fun DownloadedBooksList(
     books: List<UiDownloadedBook>,
     onReadClick: (UiDownloadedBook) -> Unit,
+    onBookClick: (UiDownloadedBook) -> Unit,
     onDeleteRequest: (UiDownloadedBook) -> Unit,
     showSwipeHint: Boolean = false,
     onSwipeHintShown: () -> Unit = {},
     resetKey: Any? = null,
+    deletingBookId: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -71,6 +73,7 @@ fun DownloadedBooksList(
             SwipeableBookItem(
                 book = book,
                 onReadClick = { onReadClick(book) },
+                onBookClick = { onBookClick(book) },
                 onDeleteRequest = { onDeleteRequest(book) },
                 showHint = shouldShowHint,
                 onHintShown = {
@@ -78,6 +81,7 @@ fun DownloadedBooksList(
                     onSwipeHintShown()
                 },
                 resetKey = resetKey,
+                isDeleting = deletingBookId == book.id,
             )
         }
     }
@@ -90,10 +94,12 @@ fun DownloadedBooksList(
 private fun SwipeableBookItem(
     book: UiDownloadedBook,
     onReadClick: () -> Unit,
+    onBookClick: () -> Unit,
     onDeleteRequest: () -> Unit,
     showHint: Boolean,
     onHintShown: () -> Unit,
     resetKey: Any?,
+    isDeleting: Boolean,
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -128,8 +134,13 @@ private fun SwipeableBookItem(
     }
 
     // Анимация возвращения или dismissal
+    // Если isDeleting = true, держим свайп открытым
     val animatedOffsetX by animateFloatAsState(
-        targetValue = if (isDismissed) -maxSwipeDistance else offsetX,
+        targetValue = when {
+            isDeleting -> -maxSwipeDistance  // Держим открытым пока диалог виден
+            isDismissed -> -maxSwipeDistance
+            else -> offsetX
+        },
         animationSpec = SpringSpec(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
@@ -142,9 +153,14 @@ private fun SwipeableBookItem(
         if (isDismissed) {
             delay(200) // Небольшая задержка для анимации
             onDeleteRequest()
-            // Сбрасываем состояние после вызова onDeleteRequest
-            // (диалог покажется и пользователь может отменить)
+            // Сбрасываем флаг dismissal - свайп останется открытым если isDeleting=true
             isDismissed = false
+        }
+    }
+
+    // Сброс свайпа когда диалог закрылся (isDeleting = false)
+    LaunchedEffect(isDeleting) {
+        if (!isDeleting && offsetX < 0) {
             offsetX = 0f
         }
     }
@@ -191,6 +207,7 @@ private fun SwipeableBookItem(
             DownloadedBookItem(
                 book = book,
                 onReadClick = onReadClick,
+                onBookClick = onBookClick,
             )
         }
     }

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.ScreenKey
 import com.github.terrakok.modo.generateScreenKey
@@ -97,12 +98,17 @@ private fun DownloadedBooksContent(
                         onReadClick = { book ->
                             onAction(DownloadedBookActions.OnReadClick(book))
                         },
+                        onBookClick = { book ->
+                            onAction(DownloadedBookActions.OnBookClick(book))
+                        },
                         onDeleteRequest = { book ->
                             onAction(DownloadedBookActions.OnDeleteRequest(book))
                         },
                         showSwipeHint = state.showSwipeHint,
                         onSwipeHintShown = { onAction(DownloadedBookActions.OnSwipeHintShown) },
                         resetKey = state.resetKey,
+                        // ID книги в процессе удаления - держим свайп открытым
+                        deletingBookId = deleteDialogState.book?.id,
                     )
                 }
 
@@ -164,6 +170,18 @@ private fun HandleEffects(viewModel: DownloadedBooksViewModel) {
                 )
                 stackNavigation.forward(
                     BookDetailScreen(uiBook = uiBook)
+                )
+            }
+
+            is DownloadedBookEffect.OpenReader -> {
+                // Открываем читалку напрямую
+                stackNavigation.forward(
+                    ReaderScreen(
+                        bookUri = effect.book.fileUri,
+                        bookTitle = effect.book.title,
+                        bookAuthor = effect.book.author,
+                        bookCoverUrl = effect.book.coverUrl
+                    )
                 )
             }
 
