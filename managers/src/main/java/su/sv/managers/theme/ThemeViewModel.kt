@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,6 +18,11 @@ import su.sv.commonui.theme.ThemeConfig
 import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.theme.ThemeRepository
 import javax.inject.Inject
+
+/**
+ * Эффект пересоздания Activity при смене темы
+ */
+object RecreateActivity
 
 /**
  * ViewModel для управления темой приложения
@@ -32,6 +39,9 @@ class ThemeViewModel @Inject constructor(
     private val themeRepository: ThemeRepository
 ) : ViewModel() {
 
+    // Синхронное чтение начального значения темы из SharedPreferences
+    private val initialThemeMode: ThemeMode = ThemeRepositoryImpl.getThemeModeSync(context)
+
     /**
      * Текущая конфигурация темы
      */
@@ -39,7 +49,10 @@ class ThemeViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ThemeConfig.Default
+            initialValue = ThemeConfig(
+                themeMode = initialThemeMode,
+                useDynamicColors = false
+            )
         )
 
     /**
@@ -49,7 +62,7 @@ class ThemeViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ThemeMode.SYSTEM
+            initialValue = initialThemeMode
         )
 
     /**
@@ -62,12 +75,15 @@ class ThemeViewModel @Inject constructor(
             initialValue = false
         )
 
+    // Эффект для пересоздания Activity
+    private val _effect = Channel<RecreateActivity>(capacity = Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
+
     /**
      * Переключить режим темы
      */
     fun toggleTheme() {
         viewModelScope.launch {
-            // DataStore - IO операция
             withContext(dispatcherProvider.io) {
                 val currentConfig = themeConfig.value
                 val currentIsDark = currentConfig.themeMode.isDarkTheme(
@@ -76,6 +92,7 @@ class ThemeViewModel @Inject constructor(
                 val newMode = currentConfig.themeMode.next(currentIsDark)
                 themeRepository.setThemeMode(newMode)
             }
+            _effect.trySend(RecreateActivity)
         }
     }
 
@@ -92,10 +109,10 @@ class ThemeViewModel @Inject constructor(
      */
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch {
-            // DataStore - IO операция
             withContext(dispatcherProvider.io) {
                 themeRepository.setThemeMode(mode)
             }
+            _effect.trySend(RecreateActivity)
         }
     }
 
@@ -104,7 +121,6 @@ class ThemeViewModel @Inject constructor(
      */
     fun setUseDynamicColors(use: Boolean) {
         viewModelScope.launch {
-            // DataStore - IO операция
             withContext(dispatcherProvider.io) {
                 themeRepository.setUseDynamicColors(use)
             }

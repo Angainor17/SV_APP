@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import timber.log.Timber
 
 // ============================================================
 // COLOR SCHEMES
@@ -210,7 +211,16 @@ fun SVAPPTheme(
     val configuration = LocalConfiguration.current
     val isSystemDark = remember(configuration.uiMode) {
         val uiMode = configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-        uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val result = uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        // DIAGNOSTIC: логируем определение системной темы
+        Timber.tag("voronin").d(
+            "SVAPPTheme: isSystemDark calculation - uiMode=%d, UI_MODE_NIGHT_MASK=%d, result=%s",
+            configuration.uiMode,
+            uiMode,
+            result
+        )
+        result
     }
 
     // Явно определяем тему: если режим не SYSTEM, используем выбранный режим
@@ -219,6 +229,14 @@ fun SVAPPTheme(
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemDark
     }
+
+    // DIAGNOSTIC: логируем итоговое решение о теме
+    Timber.tag("voronin").d(
+        "SVAPPTheme: themeMode=%s, isSystemDark=%s, darkTheme=%s",
+        themeMode.name,
+        isSystemDark,
+        darkTheme
+    )
 
     val context = LocalContext.current
     val view = LocalView.current
@@ -237,6 +255,22 @@ fun SVAPPTheme(
             else -> LightColorScheme
         }
 
+        // DIAGNOSTIC: логируем выбор цветовой схемы
+        Timber.tag("voronin").d(
+            "SVAPPTheme: colorScheme selected - darkTheme=%s, useDynamicColors=%s, isDark=%s",
+            darkTheme,
+            useDynamicColors,
+            baseColorScheme == DarkColorScheme
+        )
+
+        // DIAGNOSTIC: логируем конкретные значения цветов
+        Timber.tag("voronin").d(
+            "SVAPPTheme: colorScheme values - background=%s, surface=%s, primary=%s",
+            baseColorScheme.background,
+            baseColorScheme.surface,
+            baseColorScheme.primary
+        )
+
         // Применение кастомных цветов если есть
         if (customColors != null) {
             applyCustomColors(baseColorScheme, customColors)
@@ -245,14 +279,37 @@ fun SVAPPTheme(
         }
     }
 
+    // DIAGNOSTIC: логируем итоговый colorScheme после remember
+    Timber.tag("voronin").d(
+        "SVAPPTheme: final colorScheme - background=%s, surface=%s",
+        colorScheme.background,
+        colorScheme.surface
+    )
+
     // Настройка статус-бара и навигационной панели
     // Xiaomi/MIUI fix: DisposableEffect с key() вместо SideEffect
+    // Также явная установка цвета navigation bar для MIUI
     if (!view.isInEditMode) {
         DisposableEffect(darkTheme) {
             val window = (view.context as Activity).window
             val insetsController = WindowCompat.getInsetsController(window, view)
+
+            // Статус-бар
             insetsController.isAppearanceLightStatusBars = !darkTheme
+
+            // Навигационная панель
             insetsController.isAppearanceLightNavigationBars = !darkTheme
+
+            // Дополнительно для Xiaomi/MIUI: явная установка цвета navigation bar
+            // Для светлой темы - светлый фон с тёмными кнопками
+            // Для тёмной темы - тёмный фон со светлыми кнопками
+            @Suppress("DEPRECATION")
+            window.navigationBarColor = if (darkTheme) {
+                android.graphics.Color.BLACK
+            } else {
+                android.graphics.Color.WHITE
+            }
+
             onDispose { }
         }
     }
@@ -261,19 +318,23 @@ fun SVAPPTheme(
     val appDimensions = AppDimensions.Default
     val appShapes = AppShapes.Default
 
-    CompositionLocalProvider(
-        LocalAppDimensions provides appDimensions,
-        LocalAppShapes provides appShapes,
-        LocalCustomTypography provides CustomTypography.Default,
-        LocalThemeConfig provides ThemeConfig(themeMode, useDynamicColors),
-        LocalCustomColors provides customColors
-    ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = AppTypography,
-            shapes = appShapes.toMaterialShapes(),
-            content = content
-        )
+    // Для Xiaomi/MIUI: key() принудительно пересоздаёт MaterialTheme при смене themeMode
+    // Это гарантирует, что все компоненты получат новый colorScheme
+    androidx.compose.runtime.key(themeMode) {
+        CompositionLocalProvider(
+            LocalAppDimensions provides appDimensions,
+            LocalAppShapes provides appShapes,
+            LocalCustomTypography provides CustomTypography.Default,
+            LocalThemeConfig provides ThemeConfig(themeMode, useDynamicColors),
+            LocalCustomColors provides customColors
+        ) {
+            MaterialTheme(
+                colorScheme = colorScheme,
+                typography = AppTypography,
+                shapes = appShapes.toMaterialShapes(),
+                content = content
+            )
+        }
     }
 }
 

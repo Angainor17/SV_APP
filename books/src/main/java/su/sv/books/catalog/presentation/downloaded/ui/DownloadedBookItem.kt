@@ -2,6 +2,7 @@ package su.sv.books.catalog.presentation.downloaded.ui
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,13 +36,15 @@ import su.sv.commonui.theme.SVAPPThemeLightPreview
  * Карточка скачанной книги для отображения в списке
  *
  * @param book данные книги
- * @param onReadClick обработчик клика на кнопку "Читать"
+ * @param onReadClick обработчик клика на кнопку "Читать" - открывает читалку
+ * @param onBookClick обработчик клика на карточку - открывает экран информации о книге
  * @param modifier модификатор
  */
 @Composable
 fun DownloadedBookItem(
     book: UiDownloadedBook,
     onReadClick: () -> Unit,
+    onBookClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dimensions = LocalAppDimensions.current
@@ -51,6 +54,7 @@ fun DownloadedBookItem(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(onClick = onBookClick)
             .padding(
                 horizontal = dimensions.itemSpacingMedium,
                 vertical = dimensions.itemSpacingMedium
@@ -163,6 +167,7 @@ private fun DownloadedBookItemPreview() {
                     totalPages = 120,
                 ),
                 onReadClick = {},
+                onBookClick = {},
             )
             DownloadedBookItem(
                 book = UiDownloadedBook(
@@ -177,6 +182,7 @@ private fun DownloadedBookItemPreview() {
                     totalPages = 0,
                 ),
                 onReadClick = {},
+                onBookClick = {},
             )
         }
     }

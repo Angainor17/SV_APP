@@ -43,7 +43,7 @@ fun DeleteSwipeBackground(
         Icon(
             imageVector = Icons.Default.Delete,
             contentDescription = stringResource(R.string.books_downloaded_delete_content_description),
-            tint = MaterialTheme.colorScheme.error,
+            tint = MaterialTheme.colorScheme.onErrorContainer,
             modifier = Modifier.size(dimensions.iconSizeLarge)
         )
     }

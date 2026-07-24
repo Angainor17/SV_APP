@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.SVAPP" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Нейтральная тема без DayNight - вся тема управляется через Compose SVAPPTheme -->
+    <!-- MIUI не корректно обрабатывает AppCompatDelegate.setDefaultNightMode() -->
+    <!-- Поэтому используем нейтральную тему и управляем цветами только из Compose -->
+    <style name="Theme.SVAPP" parent="Theme.AppCompat.NoActionBar">
+        <!-- Материал3 цвета будут установлены через Compose SVAPPTheme -->
+    </style>
 </resources>

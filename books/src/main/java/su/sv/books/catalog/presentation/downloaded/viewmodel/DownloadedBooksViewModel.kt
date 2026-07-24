@@ -66,8 +66,14 @@ class DownloadedBooksViewModel @Inject constructor(
                 _effect.trySend(DownloadedBookEffect.NavigateBack)
             }
 
-            is DownloadedBookActions.OnReadClick -> {
+            is DownloadedBookActions.OnBookClick -> {
+                // Клик на карточку - открываем детали книги
                 _effect.trySend(DownloadedBookEffect.OpenBookDetail(action.book))
+            }
+
+            is DownloadedBookActions.OnReadClick -> {
+                // Клик на кнопку "Читать" - открываем читалку напрямую
+                _effect.trySend(DownloadedBookEffect.OpenReader(action.book))
             }
 
             is DownloadedBookActions.OnDeleteRequest -> {

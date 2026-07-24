@@ -21,7 +21,10 @@ private val Context.themeDataStore: DataStore<Preferences> by preferencesDataSto
 )
 
 /**
- * Реализация ThemeRepository на основе DataStore
+ * Реализация ThemeRepository на основе DataStore и SharedPreferences
+ *
+ * SharedPreferences используется для синхронного чтения темы при запуске приложения.
+ * Это необходимо для применения темы до создания Activity через AppCompatDelegate.
  */
 @Singleton
 class ThemeRepositoryImpl @Inject constructor(
@@ -31,6 +34,30 @@ class ThemeRepositoryImpl @Inject constructor(
     private object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val USE_DYNAMIC_COLORS = booleanPreferencesKey("use_dynamic_colors")
+    }
+
+    companion object {
+        private const val SHARED_PREFS_NAME = "theme_prefs"
+        private const val KEY_THEME_MODE = "theme_mode_sync"
+
+        /**
+         * Синхронное чтение режима темы из SharedPreferences
+         * Используется при запуске приложения до создания Activity
+         */
+        fun getThemeModeSync(context: Context): ThemeMode {
+            val prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+            val modeString = prefs.getString(KEY_THEME_MODE, null)
+            return runCatching { ThemeMode.valueOf(modeString ?: ThemeMode.SYSTEM.name) }
+                .getOrDefault(ThemeMode.SYSTEM)
+        }
+
+        /**
+         * Синхронное сохранение режима темы в SharedPreferences
+         */
+        private fun saveThemeModeSync(context: Context, mode: ThemeMode) {
+            val prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putString(KEY_THEME_MODE, mode.name).apply()
+        }
     }
 
     override val themeMode: Flow<ThemeMode> = context.themeDataStore.data
@@ -61,9 +88,12 @@ class ThemeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun setThemeMode(mode: ThemeMode) {
+        // Сохраняем в DataStore (асинхронно для Flow)
         context.themeDataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = mode.name
         }
+        // Сохраняем в SharedPreferences (синхронно для быстрого запуска)
+        saveThemeModeSync(context, mode)
     }
 
     override suspend fun setUseDynamicColors(use: Boolean) {

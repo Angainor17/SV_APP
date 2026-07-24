@@ -16,6 +16,7 @@ import com.github.terrakok.modo.stack.StackScreen
 import dagger.hilt.android.AndroidEntryPoint
 import su.sv.commonarchitecture.presentation.base.BaseActivity
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.commonui.ui.OneTimeEffect
 import su.sv.main.bottomnav.BottomNavScreen
 import su.sv.managers.theme.CustomColorsRepository
 import su.sv.managers.theme.ThemeViewModel
@@ -42,12 +43,16 @@ class MainActivity : BaseActivity() {
                 themeConfig.themeMode.name
             ).collectAsStateWithLifecycle(initialValue = null)
 
+            // Пересоздание Activity при смене темы
+            OneTimeEffect(themeViewModel.effect) {
+                recreate()
+            }
+
             SVAPPTheme(
                 themeMode = themeConfig.themeMode,
                 useDynamicColors = themeConfig.useDynamicColors,
                 customColors = customColors,
             ) {
-                // Remember root screen using rememberSaveable under the hood.
                 val rootScreen = rememberRootScreen {
                     AppStackScreen(
                         StackNavModel(

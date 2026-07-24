@@ -10,7 +10,10 @@ sealed class DownloadedBookActions {
     /** Нажатие кнопки "Назад" */
     object OnBackClick : DownloadedBookActions()
 
-    /** Нажатие кнопки "Читать" */
+    /** Клик на карточку книги - открывает экран информации */
+    data class OnBookClick(val book: UiDownloadedBook) : DownloadedBookActions()
+
+    /** Нажатие кнопки "Читать" - открывает читалку */
     data class OnReadClick(val book: UiDownloadedBook) : DownloadedBookActions()
 
     /** Запрос на удаление книги (свайп) */

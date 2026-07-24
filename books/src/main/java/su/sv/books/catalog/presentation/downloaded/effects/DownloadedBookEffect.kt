@@ -10,6 +10,9 @@ sealed class DownloadedBookEffect {
     /** Открыть детали книги */
     data class OpenBookDetail(val book: UiDownloadedBook) : DownloadedBookEffect()
 
+    /** Открыть читалку напрямую */
+    data class OpenReader(val book: UiDownloadedBook) : DownloadedBookEffect()
+
     /** Вернуться назад */
     object NavigateBack : DownloadedBookEffect()
 
