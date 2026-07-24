@@ -20,8 +20,8 @@ android {
         minSdk = 24
         targetSdk = 37
         // Для нового релиза поднять versionCode и versionName
-        versionCode = 11
-        versionName = "0.3.1"
+        versionCode = 12
+        versionName = "0.3.2"
 
         testInstrumentationRunner = "su.sv.app.testing.HiltTestRunner"
     }
