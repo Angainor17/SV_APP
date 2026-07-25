@@ -47,6 +47,7 @@ import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.commonui.theme.DarkSurfaceContainerHighest
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPThemeLightPreview
+import su.sv.commonui.theme.bookDownloadIndicator
 import su.sv.commonui.ui.components.AppLoadingIndicator
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
@@ -155,7 +156,7 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
                 AppLoadingIndicator(
                     size = 26.dp,
                     strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.bookDownloadIndicator
                 )
             }
         }

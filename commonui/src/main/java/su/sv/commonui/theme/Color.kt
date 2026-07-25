@@ -240,3 +240,13 @@ val SwipeDeleteBackground = Color(0xFFB3261E)
 
 /** Фон при свайпе "в избранное" */
 val SwipeFavoriteBackground = Color(0xFFFFC107)
+
+// ============================================================
+// BOOK DOWNLOAD INDICATOR COLORS
+// ============================================================
+
+/** Цвет индикатора загрузки книги - Light (тёмный для контраста) */
+val LightBookDownloadIndicator = DarkOnPrimary
+
+/** Цвет индикатора загрузки книги - Dark (светлый для контраста) */
+val DarkBookDownloadIndicator = Color(0xFF40C4FF)  // Светлый для тёмного фона

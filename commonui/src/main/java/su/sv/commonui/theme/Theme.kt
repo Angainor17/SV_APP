@@ -173,6 +173,14 @@ val ColorScheme.favorite: Color
     @ReadOnlyComposable
     get() = FavoriteColor
 
+/**
+ * Цвет индикатора загрузки книги (на тёмном фоне кнопки скачивания)
+ */
+val ColorScheme.bookDownloadIndicator: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (this == DarkColorScheme) DarkBookDownloadIndicator else LightBookDownloadIndicator
+
 // ============================================================
 // COMPOSITION LOCAL
 // ============================================================
