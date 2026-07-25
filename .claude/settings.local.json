@@ -99,7 +99,9 @@
       "Bash(./gradlew :main:compileDebugKotlin)",
       "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin :main:compileDebugKotlin)",
       "Skill(deep-research)",
-      "Workflow(deep-research)"
+      "Workflow(deep-research)",
+      "Bash(identify /Users/i.u.voronin/StudioProjects/SV_APP/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp)",
+      "Bash(python3 -c \"import sys; print\\('python:', sys.version\\)\")"
     ]
   }
 }
