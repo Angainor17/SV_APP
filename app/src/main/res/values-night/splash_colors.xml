@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Цвет фона splash screen для ТЁМНОЙ темы -->
+    <color name="splash_background">#1C1B1F</color>
+    <!-- Цвет иконки splash screen - светлый -->
+    <color name="splash_icon_tint">#E6E1E5</color>
+</resources>
