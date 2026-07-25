@@ -97,7 +97,9 @@
       "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin)",
       "Bash(grep \".kt$\")",
       "Bash(./gradlew :main:compileDebugKotlin)",
-      "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin :main:compileDebugKotlin)"
+      "Bash(./gradlew :commonui:compileDebugKotlin :managers:compileDebugKotlin :main:compileDebugKotlin)",
+      "Skill(deep-research)",
+      "Workflow(deep-research)"
     ]
   }
 }
