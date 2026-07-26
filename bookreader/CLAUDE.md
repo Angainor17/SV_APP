@@ -134,29 +134,60 @@ fun BookmarksComposeDialog(
 
 ```
 bookreader/src/main/java/com/github/axet/bookreader/
-├── activities/
-│   ├── BookReaderMainActivity.kt
-│   ├── FullscreenActivity.kt
-│   ├── SettingsActivity.kt
-│   └── ActivityExt.kt
+├── app/
+│   ├── BookReaderInitializer.kt  # Инициализация читалки
+│   ├── ComicsPlugin.kt
+│   ├── DjvuPlugin.kt
+│   ├── PDFPlugin.kt
+│   ├── PermissionHelper.kt
+│   ├── Plugin.kt
+│   ├── ReaderPreferences.kt
+│   ├── Reflow.kt
+│   ├── Storage.java            # Legacy Java class с Bookmark
+│   ├── TTFManager.kt
+│   └── TextFormatter.kt
 ├── domain/
+│   ├── BookmarkTextUtils.kt     # cleanBookmarkText()
 │   ├── BookmarksRepository.kt
-│   └── BookmarkTextUtils.kt     # cleanBookmarkText()
+│   └── GetLastReadBookUseCase.kt
 ├── screens/
+│   ├── ReaderScreen.kt          # Главный экран чтения
+│   ├── ReaderContent.kt
+│   ├── ReaderSettingsScreen.kt
+│   ├── ReaderSettingsContent.kt
+│   ├── testing/
+│   │   └── ReaderTestTags.kt
 │   └── ui/
 │       ├── BookmarksComposeDialog.kt  # Диалог списка закладок
-│       └── BookmarkBottomSheet.kt     # BottomSheet редактирования
-├── fragments/
-│   ├── ReaderFragment.kt
-│   └── LibraryFragment.kt
+│       ├── BookmarkBottomSheet.kt     # BottomSheet редактирования
+│       ├── NavigationComposeDialog.kt
+│       ├── ReaderTopBar.kt
+│       ├── SearchComposePanel.kt
+│       └── SelectionComposePanel.kt
+├── viewmodel/
+│   ├── ReaderViewModel.kt
+│   ├── ReaderActions.kt
+│   ├── ReaderState.kt
+│   └── SearchState.kt
 ├── widgets/
-│   ├── BookmarkPopup.kt
+│   ├── ActiveAreasView.kt
+│   ├── BrightnessGesture.kt
+│   ├── FBFooterView.kt
+│   ├── FBReaderView.java        # Legacy Java
+│   ├── PagerWidget.kt
+│   ├── ScrollWidget.java        # Legacy Java
+│   ├── SelectionCoordinates.kt
+│   ├── SelectionState.kt
+│   ├── SelectionView.kt
+│   ├── TTSPopup.kt
+│   ├── TimeAnimatorCompat.kt
+│   ├── WallpaperLayout.kt
 │   ├── ZLBookmark.kt
-│   └── ...
-└── app/
-    ├── BookApplication.kt
-    ├── Storage.java            # Legacy Java class с Bookmark
-    └── PermissionHelper.kt
+│   ├── ZLTextIndexPosition.kt
+│   ├── ZoomGestureHandler.kt
+│   └── ZoomTouchAdapter.kt
+└── services/
+    └── ImagesProvider.kt
 ```
 
 ## Зависимости
@@ -167,59 +198,29 @@ bookreader/src/main/java/com/github/axet/bookreader/
 
 ## Миграция на Kotlin
 
-### Статус миграции (обновлено 2026-07-02)
+### Статус миграции (обновлено 2026-07-26)
 
 **Мигрированные файлы:**
-- activities/ (все файлы)
-- fragments/ (все файлы)
-- app/BookApplication.kt
-- app/PermissionHelper.kt
-- app/Plugin.kt
-- app/Reflow.kt
-- app/TTFManager.kt
-- app/TextFormatter.kt
-- app/ComicsPlugin.kt
-- app/PDFPlugin.kt
-- app/DjvuPlugin.kt
+- app/ (все Kotlin файлы кроме Storage.java)
+- domain/ (все файлы)
+- screens/ (все Compose экраны)
+- viewmodel/ (все файлы)
 - services/ImagesProvider.kt
-- widgets/ActiveAreasView.kt
-- widgets/BookmarkPopup.kt
-- widgets/BookmarksDialog.kt
-- widgets/FBFooterView.kt
-- widgets/FontsPopup.kt
-- widgets/FullWidthActionView.kt
-- widgets/SelectionView.kt
-- widgets/TimeAnimatorCompat.kt
-- widgets/WallpaperLayout.kt
-- widgets/TTSPopup.kt
-- widgets/PagerWidget.kt
-- widgets/StoragePathPreferenceCompat.kt
-- widgets/ZLTextIndexPosition.kt (выделен из FBReaderView.java)
-- widgets/ZLBookmark.kt (выделен из FBReaderView.java)
-- widgets/BrightnessGesture.kt (выделен из FBReaderView.java)
-- domain/BookmarkTextUtils.kt (новый)
-- screens/ui/BookmarksComposeDialog.kt (Compose диалог)
-- screens/ui/BookmarkBottomSheet.kt (Compose bottomSheet)
+- widgets/ (большинство файлов, кроме FBReaderView.java и ScrollWidget.java)
 
-**Оставшиеся Java файлы (3 файла) - в процессе декомпозиции:**
-- `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки
-- `widgets/ScrollWidget.java` (1717 строк) - много внутренних классов
-- `widgets/FBReaderView.java` (2158 строк, было 2294) - декомпозируется
+**Оставшиеся Java файлы (3 файла):**
+- `app/Storage.java` - наследуется от внешней Java библиотеки
+- `widgets/ScrollWidget.java` - много внутренних классов
+- `widgets/FBReaderView.java` - декомпозируется
 
-### Декомпозиция Java файлов
-
-Выделенные классы из FBReaderView.java:
-- `ZLTextIndexPosition` → `ZLTextIndexPosition.kt`
-- `ZLBookmark`, `ZLTTSMark` → `ZLBookmark.kt`
-- `BrightnessGesture` → `BrightnessGesture.kt`
-
-### Порядок миграции
-
-1. ~~DjvuPlugin.java → DjvuPlugin.kt~~ ✅
-2. ~~PDFPlugin.java → PDFPlugin.kt~~ ✅
-3. **Storage.java → Storage.kt** (следующий) - наследуется от `com.github.axet.androidlibrary.app.Storage`
-4. ScrollWidget.java → ScrollWidget.kt
-5. FBReaderView.java → FBReaderView.kt (самый сложный)
+### Новые компоненты (2026-07-26)
+- `screens/ReaderScreen.kt` — главный Compose экран чтения
+- `screens/ReaderSettingsScreen.kt` — экран настроек
+- `screens/viewmodel/` — ViewModel с MVI паттерном
+- `widgets/ZoomGestureHandler.kt` — обработка зума
+- `widgets/ZoomTouchAdapter.kt` — адаптер для touch событий зума
+- `app/ReaderPreferences.kt` — настройки чтения на DataStore
+- `domain/GetLastReadBookUseCase.kt` — use case для последней книги
 
 ### Особенности миграции Storage.java
 

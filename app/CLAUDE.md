@@ -41,8 +41,10 @@ class MainActivity : AppCompatActivity() {
 
 ```
 app/src/main/java/su/sv/app/
-├── SvApp.kt          # Application класс
-└── MainActivity.kt   # Главная Activity
+├── SvApp.kt               # Application класс
+├── MainActivity.kt        # Главная Activity
+├── AppScreenTransition.kt # Анимации переходов между экранами
+└── AppStackScreen.kt      # Корневой экран с Modo навигацией
 ```
 
 ## Зависимости

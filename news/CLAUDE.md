@@ -99,6 +99,23 @@ Pager(
 ).flow
 ```
 
+## Debug-экраны
+
+Модуль содержит отладочные экраны:
+
+### ThemeEditorScreen
+Экран для редактирования цветов темы в реальном времени:
+
+```kotlin
+@Parcelize
+class ThemeEditorScreen : Screen {
+    // Позволяет изменять цвета темы на лету
+    // Сохраняет кастомные цвета через CustomColorsRepository
+}
+```
+
+Используется для отладки и настройки темы приложения.
+
 ## Структура файлов
 
 ```
@@ -109,24 +126,35 @@ news/src/main/java/su/sv/news/
 │   └── model/
 │       ├── NewsItem.kt
 │       └── NewsMediaItem.kt
-└── presentation/
-    ├── utils/BasePagingSource.kt
-    └── root/
-        ├── RootNewsViewModel.kt
-        ├── RootNews.kt
-        ├── ui/
-        │   ├── NewsList.kt
-        │   ├── NewsItem.kt
-        │   └── ImageCarousel.kt
-        ├── mapper/
-        │   ├── UiNewsMapper.kt
-        │   └── UiNewsMediaMapper.kt
-        ├── model/
-        │   ├── UiRootNewsState.kt
-        │   ├── UiNewsItem.kt
-        │   └── UiNewsMedia.kt
-        └── viewmodel/
-            ├── NewsPagingSource.kt
-            ├── actions/
-            ├── effects/
+├── presentation/
+│   ├── utils/BasePagingSource.kt
+│   ├── debug/                      # Отладочные экраны
+│   │   ├── ThemeEditorScreen.kt    # Редактор темы
+│   │   ├── ThemeEditorViewModel.kt
+│   │   └── ui/
+│   │       ├── ColorPickerDialog.kt
+│   │       └── ThemeEditorContent.kt
+│   └── root/
+│       ├── RootNewsViewModel.kt
+│       ├── mapper/
+│       │   ├── UiNewsMapper.kt
+│       │   └── UiNewsMediaMapper.kt
+│       ├── model/
+│       │   ├── UiNewsItem.kt
+│       │   ├── UiNewsMedia.kt
+│       │   └── UiRootNewsState.kt
+│       ├── ui/
+│       │   ├── RootNews.kt
+│       │   ├── NewsList.kt
+│       │   ├── NewsItem.kt
+│       │   └── ImageCarousel.kt
+│       └── viewmodel/
+│           ├── NewsPagingSource.kt
+│           ├── actions/
+│           │   ├── RootNewsActions.kt
+│           │   └── RootNewsActionsHandler.kt
+│           └── effects/
+│               └── NewsListOneTimeEffect.kt
+└── testing/
+    └── NewsTestTags.kt             # Тестовые теги
 ```

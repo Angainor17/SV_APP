@@ -24,15 +24,6 @@ abstract class BaseViewModel : ViewModel()
 abstract class BaseActivity : AppCompatActivity()
 ```
 
-### SingleLiveEvent
-LiveData, которая отправляет событие только один раз:
-
-```kotlin
-class SingleLiveEvent<T> : MutableLiveData<T>() {
-    // Событие не будет получено повторно при повороте экрана
-}
-```
-
 ### NetworkError
 Класс ошибки сети:
 
@@ -54,6 +45,24 @@ when {
     else -> { /* Другая ошибка */ }
 }
 ```
+
+### ResourcesRepository
+Доступ к ресурсам приложения (перемещён в commonarchitecture):
+
+```kotlin
+class ResourcesRepository @Inject constructor(context: Context) {
+    fun getString(resId: Int): String
+    fun getString(resId: Int, vararg args: Any): String
+}
+```
+
+## Mock-система
+
+Модуль содержит систему моков для сетевых запросов:
+
+- `MockConfig` — конфигурация включения моков
+- `MockDataProvider` — провайдер мок-данных для API
+- `MockInterceptor` — OkHttp интерцептор для подмены ответов
 
 ## DI Модули
 
@@ -98,10 +107,13 @@ commonarchitecture/src/main/java/su/sv/commonarchitecture/
 │   ├── ApiServiceModule.kt          # DI модуль для API
 │   └── module/
 │       └── CoroutineModule.kt       # DI модуль для корутин
-├── domain/usecase/
-│   └── UseCases.kt                  # Базовые интерфейсы use cases
+├── managers/
+│   └── ResourcesRepository.kt       # Доступ к ресурсам (перемещён сюда)
+├── mock/
+│   ├── MockConfig.kt                # Конфигурация моков
+│   ├── MockDataProvider.kt          # Провайдер мок-данных
+│   └── MockInterceptor.kt           # OkHttp интерцептор для моков
 └── presentation/base/
     ├── BaseActivity.kt              # Базовая Activity
-    ├── BaseViewModel.kt             # Базовая ViewModel
-    └── SingleLiveEvent.kt           # LiveData для однократных событий
+    └── BaseViewModel.kt             # Базовая ViewModel
 ```
