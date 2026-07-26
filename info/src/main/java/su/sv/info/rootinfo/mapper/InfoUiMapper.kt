@@ -16,26 +16,20 @@ import javax.inject.Inject
 
 class InfoUiMapper @Inject constructor() {
 
-    fun fromDomainToUi(links: List<LinkItem>): List<UiLinkItem> {
-        return links.map { fromDomainToUi(it) }
-    }
+    fun fromDomainToUi(links: List<LinkItem>) = links.map { fromDomainToUi(it) }
 
-    private fun fromDomainToUi(link: LinkItem): UiLinkItem {
-        return UiLinkItem(
-            text = link.text,
-            url = link.url,
-            logo = link.getLogo(),
-        )
-    }
+    private fun fromDomainToUi(link: LinkItem) = UiLinkItem(
+        text = link.text,
+        url = link.url,
+        logo = link.getLogo(),
+    )
 
-    private fun LinkItem.getLogo(): Int {
-        return when (this) {
-            is BuyBook -> R.drawable.ic_sv // TODO: размеры и тип картинки
-            is DownloadBook -> R.drawable.ic_fra // TODO: размеры и тип картинки
-            is VkGroupSV, is WinScience, is RedUniversity, is VkLobbyo -> R.drawable.ic_vk
-            is YouTubeLobbyo -> R.drawable.ic_youtube
-            is DzenSv -> R.drawable.ic_dzen
-            is TelegramSv -> R.drawable.ic_telegram
-        }
+    private fun LinkItem.getLogo() = when (this) {
+        is BuyBook -> R.drawable.ic_sv // TODO: размеры и тип картинки
+        is DownloadBook -> R.drawable.ic_fra // TODO: размеры и тип картинки
+        is VkGroupSV, is WinScience, is RedUniversity, is VkLobbyo -> R.drawable.ic_vk
+        is YouTubeLobbyo -> R.drawable.ic_youtube
+        is DzenSv -> R.drawable.ic_dzen
+        is TelegramSv -> R.drawable.ic_telegram
     }
 }

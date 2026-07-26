@@ -59,6 +59,20 @@
     <string name="sv_bookmark_color_selected">Выбрано</string>
 
     <!-- Font Settings -->
+    <string name="sv_font_settings_title">Настройки шрифта</string>
+    <string name="sv_font_size_label">Размер шрифта: %d</string>
+    <string name="sv_font_label">Шрифт</string>
+    <string name="sv_expand_content">Раскрыть</string>
+    <string name="sv_collapse_content">Скрыть</string>
+
+    <!-- Book title fallbacks -->
+    <string name="sv_book_title_fallback">Книга</string>
+    <string name="sv_unknown_book">Неизвестная книга</string>
+
+    <!-- Error messages -->
+    <string name="sv_error_file_access">Нет доступа к файлу. Файл был перемещён или удалён. Попробуйте скачать книгу заново.</string>
+    <string name="sv_error_file_not_found">Файл не найден или недоступен. Попробуйте скачать книгу заново.</string>
+    <string name="sv_error_open_book">Не удалось открыть книгу</string>
 
     <!-- Error -->
     <string name="sv_error_prefix">Ошибка: %s</string>

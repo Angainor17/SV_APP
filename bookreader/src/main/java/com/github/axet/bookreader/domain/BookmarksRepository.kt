@@ -229,9 +229,12 @@ class BookmarksRepository @Inject constructor(
                     )
                     val cursor = contentResolver.query(childrenUri, null, null, null, null)
                     cursor?.use {
+                        val idIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                        val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
                         while (it.moveToNext()) {
-                            val id = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
-                            val name = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                            if (idIndex < 0 || nameIndex < 0) continue
+                            val id = it.getString(idIndex)
+                            val name = it.getString(nameIndex)
 
                             // Ищем JSON файлы с именем {md5}.json
                             if (name.endsWith(".json")) {
@@ -290,9 +293,12 @@ class BookmarksRepository @Inject constructor(
                     )
                     val cursor = contentResolver.query(childrenUri, null, null, null, null)
                     cursor?.use {
+                        val idIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                        val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
                         while (it.moveToNext()) {
-                            val id = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
-                            val name = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                            if (idIndex < 0 || nameIndex < 0) continue
+                            val id = it.getString(idIndex)
+                            val name = it.getString(nameIndex)
                             if (name == fileName) {
                                 return DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
                             }
@@ -514,11 +520,14 @@ class BookmarksRepository @Inject constructor(
                     )
                     val cursor = contentResolver.query(childrenUri, null, null, null, null)
                     cursor?.use {
+                        val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                        val idIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
                         while (it.moveToNext()) {
-                            val name = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                            if (nameIndex < 0 || idIndex < 0) continue
+                            val name = it.getString(nameIndex)
                             // Ищем файл который начинается с bookId (MD5) и не является JSON
                             if (name.startsWith(bookId) && !name.endsWith(".json")) {
-                                val id = it.getString(it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
+                                val id = it.getString(idIndex)
                                 val uri = DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
                                 Timber.d("Found book file: $name for bookId: $bookId")
                                 return uri.toString()

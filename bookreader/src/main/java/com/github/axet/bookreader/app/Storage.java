@@ -15,7 +15,6 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -68,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -78,6 +78,7 @@ import java.util.zip.ZipOutputStream;
 import de.innosystec.unrar.Archive;
 import de.innosystec.unrar.NativeStorage;
 import de.innosystec.unrar.rarfile.FileHeader;
+import timber.log.Timber;
 
 public class Storage extends com.github.axet.androidlibrary.app.Storage {
     public static final int MD5_SIZE = 32;
@@ -241,9 +242,11 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             if (childCursor != null) {
                 try {
                     while (childCursor.moveToNext()) {
-                        String id = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID));
-                        String t = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
-                        String e = getExt(t).toLowerCase();
+                        int idIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID);
+                        String id = idIdx >= 0 ? childCursor.getString(idIdx) : "";
+                        int tIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME);
+                        String t = tIdx >= 0 ? childCursor.getString(tIdx) : "";
+                        String e = getExt(t).toLowerCase(Locale.ROOT);
                         if (t.startsWith(book.md5) && e.equals(JSON_EXT)) { // delete all but json
                             Uri k = DocumentsContract.buildDocumentUriUsingTree(storage, id);
                             list.add(k);
@@ -256,7 +259,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         } else if (s.equals(ContentResolver.SCHEME_FILE)) {
             File dir = getFile(storage);
             File[] ff = dir.listFiles((dir1, name) -> {
-                String e = getExt(name).toLowerCase();
+                String e = getExt(name).toLowerCase(Locale.ROOT);
                 return name.startsWith(book.md5) && e.equals(JSON_EXT);
             });
             if (ff != null) {
@@ -328,7 +331,10 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 if (meta != null) {
                     try {
                         if (meta.moveToFirst()) {
-                            contentDisposition = meta.getString(meta.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME));
+                            int displayNameIdx = meta.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME);
+                            if (displayNameIdx >= 0) {
+                                contentDisposition = meta.getString(displayNameIdx);
+                            }
                             contentDisposition = Storage.getNameNoExt(contentDisposition);
                         }
                     } finally {
@@ -386,7 +392,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             try {
                 book.info = new RecentInfo(context, r);
             } catch (RuntimeException e) {
-                Log.e(TAG, "Unable to load info", e);
+                Timber.tag(TAG).e(e, "Unable to load info");
             }
         }
         if (book.info == null) {
@@ -511,8 +517,10 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 Cursor childCursor = contentResolver.query(childrenUri, null, null, null, null);
                 if (childCursor != null) {
                     while (childCursor.moveToNext()) {
-                        String id = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID));
-                        String t = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+                        int idIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID);
+                        String id = idIdx >= 0 ? childCursor.getString(idIdx) : "";
+                        int tIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME);
+                        String t = tIdx >= 0 ? childCursor.getString(tIdx) : "";
                         String n = Storage.getNameNoExt(t);
                         String e = Storage.getExt(t);
                         if (n.equals(book.md5) && !e.equals(JSON_EXT)) { // delete all but book and json
@@ -520,7 +528,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                             try {
                                 delete(context, k);
                             } catch (RuntimeException e1) {
-                                Log.w(TAG, e1);
+                                Timber.tag(TAG).w(e1);
                             }
                         }
                     }
@@ -597,7 +605,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 try {
                     book.info = new RecentInfo(context, r);
                 } catch (RuntimeException e) {
-                    Log.e(TAG, "Unable to load info", e);
+                    Timber.tag(TAG).e(e, "Unable to load info");
                 }
         }
         if (book.info == null) {
@@ -674,7 +682,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             public boolean accept(File dir, String name) {
                 String n = Storage.getNameNoExt(name);
                 String e = getExt(name);
-                e = e.toLowerCase();
+                e = e.toLowerCase(Locale.ROOT);
                 if (n.length() != MD5_SIZE)
                     return false;
                 FileTypeDetector.Detector[] dd = supported();
@@ -699,7 +707,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 try {
                     b.info = new RecentInfo(context, r);
                 } catch (RuntimeException e) {
-                    Log.d(TAG, "Unable to load info", e);
+                    Timber.tag(TAG).d(e, "Unable to load info");
                 }
             }
             if (b.info == null) {
@@ -721,11 +729,14 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             if (childCursor != null) {
                 try {
                     while (childCursor.moveToNext()) {
-                        String id = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID));
-                        String t = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
-                        long size = childCursor.getLong(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_SIZE));
+                        int idIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID);
+                        String id = idIdx >= 0 ? childCursor.getString(idIdx) : "";
+                        int tIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME);
+                        String t = tIdx >= 0 ? childCursor.getString(tIdx) : "";
+                        int sizeIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_SIZE);
+                        long size = sizeIdx >= 0 ? childCursor.getLong(sizeIdx) : 0L;
                         if (size > 0) {
-                            t = t.toLowerCase();
+                            t = t.toLowerCase(Locale.ROOT);
                             String n = Storage.getNameNoExt(t);
                             if (n.length() != MD5_SIZE) // prevent scan *.fb2 and other books but only sync related files
                                 continue;
@@ -744,7 +755,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                                         try {
                                             b.info = new RecentInfo(context, r);
                                         } catch (RuntimeException e) {
-                                            Log.e(TAG, "Unable to load info", e);
+                                            Timber.tag(TAG).e(e, "Unable to load info");
                                         }
                                     }
                                     if (b.info == null) {
@@ -777,7 +788,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
         try {
             delete(context, recentUri(book));
         } catch (RuntimeException e) {
-            Log.e(TAG, "failed to delete json", e); // not exists? IllegalArgument if not exists
+            Timber.tag(TAG).e(e, "failed to delete json"); // not exists? IllegalArgument if not exists
         }
         // delete all md5.* files (old, cover images, and sync conflicts files)
         Uri storage = getStoragePath();
@@ -789,8 +800,10 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             if (childCursor != null) {
                 try {
                     while (childCursor.moveToNext()) {
-                        String id = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID));
-                        String t = childCursor.getString(childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+                        int idIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID);
+                        String id = idIdx >= 0 ? childCursor.getString(idIdx) : "";
+                        int tIdx = childCursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME);
+                        String t = tIdx >= 0 ? childCursor.getString(tIdx) : "";
                         if (t.startsWith(book.md5)) { // delete all but json
                             Uri k = DocumentsContract.buildDocumentUriUsingTree(storage, id);
                             delete(context, k);
@@ -844,7 +857,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
                 throw new UnknownUri();
             }
 
-            String ext = getExt(file).toLowerCase();
+            String ext = getExt(file).toLowerCase(Locale.ROOT);
             if (ext.equals(Storage.ZIP_EXT)) { // handle zip files manually, better perfomance
                 FileTypeDetector.Detector[] dd = supported();
                 try {
@@ -935,7 +948,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             if (!f.isFile())
                 continue;
             boolean m = false;
-            String e = Storage.getExt(f).toLowerCase();
+            String e = Storage.getExt(f).toLowerCase(Locale.ROOT);
             if (e.equals(JSON_EXT))
                 m = true;
             else {

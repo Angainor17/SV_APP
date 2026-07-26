@@ -2,9 +2,9 @@ package com.github.axet.bookreader.domain
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.github.axet.bookreader.app.Storage
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val TAG = "GetLastReadBook"
@@ -41,10 +41,10 @@ class GetLastReadBookUseCase @Inject constructor(
         val storage = Storage(context)
         val books = storage.list()
 
-        Log.d(TAG, "invoke: found ${books.size} books in storage")
+        Timber.tag(TAG).d("invoke: found ${books.size} books in storage")
 
         if (books.isEmpty()) {
-            Log.d(TAG, "invoke: no books in storage")
+            Timber.tag(TAG).d("invoke: no books in storage")
             return null
         }
 
@@ -54,10 +54,10 @@ class GetLastReadBookUseCase @Inject constructor(
             lastTime > 0L
         }
 
-        Log.d(TAG, "invoke: ${booksWithHistory.size} books with reading history")
+        Timber.tag(TAG).d("invoke: ${booksWithHistory.size} books with reading history")
 
         if (booksWithHistory.isEmpty()) {
-            Log.d(TAG, "invoke: no books with reading history")
+            Timber.tag(TAG).d("invoke: no books with reading history")
             return null
         }
 
@@ -69,7 +69,7 @@ class GetLastReadBookUseCase @Inject constructor(
         // Берём первую книгу (последняя прочитанная)
         val lastBook = sortedBooks.first()
 
-        Log.d(TAG, "invoke: last book = ${lastBook.info?.title}, last=${lastBook.info?.last}")
+        Timber.tag(TAG).d("invoke: last book = ${lastBook.info?.title}, last=${lastBook.info?.last}")
 
         // book.url - это URI файла книги (файл существует, т.к. Storage.list() его нашёл)
         val bookFileUri = lastBook.url.toString()
@@ -95,7 +95,7 @@ class GetLastReadBookUseCase @Inject constructor(
             val uri = Uri.parse(uriString)
             Storage.getName(context, uri)
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting file name: $uriString", e)
+            Timber.tag(TAG).e("Error getting file name: $uriString", e)
             "Книга"
         }
     }

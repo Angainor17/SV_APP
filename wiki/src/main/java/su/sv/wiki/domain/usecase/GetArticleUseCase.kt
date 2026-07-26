@@ -18,10 +18,8 @@ class GetArticleUseCase @Inject constructor(
 
     suspend fun execute(title: String): WikiResult<WikiArticle> {
         // Сетевой запрос и DB кэш - IO операция
-        return dispatcherProvider.io.let { io ->
-            withContext(io) {
-                repository.getArticle(title)
-            }
+        return withContext(dispatcherProvider.io) {
+            repository.getArticle(title)
         }
     }
 }

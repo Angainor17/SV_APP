@@ -7,7 +7,6 @@ import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
-import android.util.Log
 import androidx.core.graphics.ColorUtils
 import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.ScrollWidget
@@ -19,6 +18,7 @@ import org.geometerplus.zlibrary.core.view.ZLViewEnums
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import org.geometerplus.zlibrary.text.view.ZLTextView
+import timber.log.Timber
 import java.io.IOException
 
 /**
@@ -408,7 +408,7 @@ interface Plugin {
             }
             if (reflower != null) {
                 reflower!!.onScrollingFinished(index)
-                Log.d(TAG, "Reflow position: ${reflower!!.page}.${reflower!!.index}")
+                Timber.tag(TAG).d("Reflow position: ${reflower!!.page}.${reflower!!.index}")
                 if (index == ZLViewEnums.PageIndex.current)
                     return false
                 if (reflower!!.page != current!!.pageNumber) {

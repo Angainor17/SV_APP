@@ -18,35 +18,29 @@ class UiWikiMapper @Inject constructor() {
     /**
      * Маппинг статьи в UI модель
      */
-    fun mapToUi(article: WikiArticle, isFavorite: Boolean = false): UiWikiArticle {
-        return UiWikiArticle(
-            title = article.title,
-            content = article.content,
-            links = article.links.map { it.toUi() },
-            externalLinks = article.externalLinks.map { it.toUi() },
-            articleUrl = article.articleUrl,
-            imageUrl = article.imageUrl,
-        )
-    }
+    fun mapToUi(article: WikiArticle, isFavorite: Boolean = false) = UiWikiArticle(
+        title = article.title,
+        content = article.content,
+        links = article.links.map { it.toUi() },
+        externalLinks = article.externalLinks.map { it.toUi() },
+        articleUrl = article.articleUrl,
+        imageUrl = article.imageUrl,
+    )
 
     /**
      * Маппинг внутренней ссылки в UI модель
      */
-    private fun WikiLink.toUi(): UiWikiLink {
-        return UiWikiLink(
-            text = this.title,
-            targetTitle = this.title,
-            exists = this.exists,
-        )
-    }
+    private fun WikiLink.toUi() = UiWikiLink(
+        text = this.title,
+        targetTitle = this.title,
+        exists = this.exists,
+    )
 
     /**
      * Маппинг внешней ссылки в UI модель
      */
-    private fun WikiExternalLink.toUi(): UiExternalLink {
-        return UiExternalLink(
-            text = this.text,
-            url = this.url,
-        )
-    }
+    private fun WikiExternalLink.toUi() = UiExternalLink(
+        text = this.text,
+        url = this.url,
+    )
 }

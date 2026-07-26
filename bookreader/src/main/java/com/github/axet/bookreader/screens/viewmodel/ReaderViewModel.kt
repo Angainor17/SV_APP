@@ -7,6 +7,7 @@ import android.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Storage
 import com.github.axet.bookreader.widgets.FBReaderView
@@ -162,7 +163,7 @@ class ReaderViewModel @Inject constructor(
                 } catch (e: SecurityException) {
                     Timber.e(e, "Security exception accessing file: $uri")
                     _state.value = ReaderState.Error(
-                        "Нет доступа к файлу. Файл был перемещён или удалён. Попробуйте скачать книгу заново."
+                        context.getString(R.string.sv_error_file_access)
                     )
                     return@launch
                 } catch (e: Exception) {
@@ -172,7 +173,7 @@ class ReaderViewModel @Inject constructor(
 
                 if (inputStream == null) {
                     _state.value = ReaderState.Error(
-                        "Файл не найден или недоступен. Попробуйте скачать книгу заново."
+                        context.getString(R.string.sv_error_file_not_found)
                     )
                     return@launch
                 }
@@ -218,11 +219,11 @@ class ReaderViewModel @Inject constructor(
                 Timber.e(e, "Failed to load book")
                 val errorMessage = when {
                     e.message?.contains("EACCES") == true ->
-                        "Нет доступа к файлу. Попробуйте скачать книгу заново."
+                        context.getString(R.string.sv_error_file_access)
                     e.message?.contains("ENOENT") == true ||
                     e.message?.contains("No such file") == true ->
-                        "Файл не найден. Попробуйте скачать книгу заново."
-                    else -> e.message ?: "Не удалось открыть книгу"
+                        context.getString(R.string.sv_error_file_not_found)
+                    else -> e.message ?: context.getString(R.string.sv_error_open_book)
                 }
                 _state.value = ReaderState.Error(errorMessage)
             }
