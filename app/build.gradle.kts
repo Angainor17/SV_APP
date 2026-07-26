@@ -24,6 +24,9 @@ android {
         versionName = "0.3.2"
 
         testInstrumentationRunner = "su.sv.app.testing.HiltTestRunner"
+
+        // Локализация: только русский
+        androidResources.localeFilters.add("ru")
     }
     buildTypes {
         release {
