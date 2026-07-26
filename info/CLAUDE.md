@@ -90,14 +90,15 @@ info/src/main/java/su/sv/info/
 │   └── model/LinkItem.kt
 └── rootinfo/
     ├── RootInfoViewModel.kt
-    ├── RootInfo.kt
     ├── ui/
+    │   ├── RootInfo.kt            # Главный экран
     │   ├── InfoContent.kt
     │   └── InfoItem.kt
     ├── mapper/InfoUiMapper.kt
     ├── model/
     │   ├── UiInfoState.kt
-    │   └── UiLinkItem.kt
+    │   ├── UiLinkItem.kt
+    │   └── RootInfoEffect.kt      # One-time эффекты
     └── viewmodel/
         ├── RootInfoActions.kt
         └── RootInfoActionsHandler.kt

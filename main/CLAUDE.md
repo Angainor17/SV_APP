@@ -70,8 +70,20 @@ main/src/main/java/su/sv/main/
 ├── Screens.kt                      # Маршруты экранов
 ├── res/
 │   └── BooksVector.kt              # Векторные иконки
-└── bottomnav/
-    ├── BottomNavigationItem.kt     # Модель элемента
-    ├── BottomNavigationUi.kt       # UI компонент
-    └── BottomNavScreen.kt          # Главный экран
+├── badge/
+│   ├── BadgeManager.kt             # Управление badge счётчиком
+│   ├── BadgeViewModel.kt
+│   └── NewBadge.kt
+├── bottomnav/
+│   ├── BottomNavigationItem.kt     # Модель элемента
+│   ├── BottomNavigationUi.kt       # UI компонент
+│   └── BottomNavScreen.kt          # Главный экран
+├── continuereading/
+│   ├── ContinueReadingState.kt
+│   ├── ContinueReadingViewModel.kt
+│   └── ui/
+│       ├── ContinueReadingSnackbar.kt
+│       └── ContinueReadingSnackbarHost.kt
+└── testing/
+    └── MainTestTags.kt             # Тестовые теги
 ```

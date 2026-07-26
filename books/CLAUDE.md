@@ -226,40 +226,87 @@ books/src/main/java/su/sv/books/catalog/
 ├── di/BooksApiModule.kt
 ├── data/
 │   ├── api/
-│   ├── models/
-│   ├── repo/
-│   └── receivers/
+│   │   ├── BooksApi.kt
+│   │   └── BooksApiMock.kt
+│   ├── models/ApiBook.kt
+│   ├── receivers/
+│   │   ├── BookDownloadBroadcastReceiver.kt
+│   │   └── BookDownloadedActionHandler.kt
+│   └── repo/
+│       ├── BookDownloadRepository.kt
+│       ├── BookmarksRepositoryImpl.kt
+│       └── RemoteBooksRepo.kt
 ├── domain/
 │   ├── model/
 │   │   ├── Book.kt
-│   │   └── BookmarkNote.kt     # Модель заметки + cleanBookmarkText()
-│   ├── GetBooksListUseCase.kt
+│   │   ├── BookFilter.kt
+│   │   ├── BookmarkNote.kt     # Модель заметки + cleanBookmarkText()
+│   │   └── repository/BookmarksRepository.kt
+│   ├── BookmarksUseCases.kt
+│   ├── CheckBookFileExistsUseCase.kt
+│   ├── DeleteBookUseCase.kt
 │   ├── DownloadBookUseCase.kt
-│   └── GetBookUriUseCase.kt
+│   ├── GetBookFiltersUseCase.kt
+│   ├── GetBookUriUseCase.kt
+│   ├── GetBooksListUseCase.kt
+│   └── GetDownloadedBooksUseCase.kt
 └── presentation/
     ├── CommonDownloadBookStates.kt
     ├── base/BaseBookViewModel.kt
     ├── root/
     │   ├── viewmodel/RootBooksCatalogViewModel.kt
-    │   ├── ui/BookList.kt
-    │   └── ...
+    │   ├── mapper/
+    │   │   ├── UiBookFilterMapper.kt
+    │   │   └── UiBookMapper.kt
+    │   ├── model/
+    │   │   ├── UiBookFilter.kt
+    │   │   └── UiRootBooksState.kt
+    │   ├── ui/
+    │   │   ├── BookFiltersChips.kt
+    │   │   ├── BookItem.kt
+    │   │   ├── BookList.kt
+    │   │   └── RootBooksCatalog.kt
+    │   └── viewmodel/
+    │       ├── actions/
+    │       │   ├── RootBookActions.kt
+    │       │   └── RootBooksActions.kt
+    │       └── effects/BooksListOneTimeEffect.kt
     ├── detail/
     │   ├── viewmodel/BookDetailViewModel.kt
-    │   ├── ui/BookDetailUi.kt
+    │   ├── actions/
+    │   │   ├── DetailBookActions.kt
+    │   │   └── DetailBooksActionsHandler.kt
+    │   ├── effects/BookDetailOneTimeEffect.kt
+    │   ├── mapper/UiDetailBookMapper.kt
+    │   ├── model/UiBookDetailState.kt
     │   ├── nav/BookDetailScreen.kt
-    │   └── ...
+    │   └── ui/
+    │       ├── BookDetailInfoUi.kt
+    │       └── BookDetailUi.kt
     ├── bookmarks/
-    │   ├── nav/BookmarksScreen.kt
-    │   ├── model/UiBookmarkNote.kt
+    │   ├── viewmodel/BookmarksViewModel.kt
+    │   ├── data/BookmarksViewModePrefsRepository.kt
     │   ├── mapper/UiBookmarkMapper.kt  # Маппер с очисткой текста
-    │   ├── ui/
-    │   │   ├── NoteItem.kt
-    │   │   ├── BookWithNotesItem.kt
-    │   │   └── DeleteNoteDialog.kt
-    │   └── viewmodel/BookmarksViewModel.kt
+    │   ├── model/UiBookmarkNote.kt
+    │   ├── nav/BookmarksScreen.kt
+    │   └── ui/
+    │       ├── BookWithNotesItem.kt
+    │       ├── BookmarksScreen.kt
+    │       ├── CompactBookCard.kt
+    │       ├── DeleteNoteDialog.kt
+    │       └── NoteItem.kt
     └── downloaded/
-        ├── ui/DownloadedBooksScreen.kt
-        └── viewmodel/DownloadedBooksViewModel.kt
+        ├── viewmodel/DownloadedBooksViewModel.kt
+        ├── actions/
+        │   ├── DownloadedBookActions.kt
+        │   └── effects/DownloadedBookEffect.kt
+        ├── mapper/UiDownloadedBookMapper.kt
+        ├── model/UiDownloadedBookState.kt
+        └── ui/
+            ├── DeleteSwipeBackground.kt
+            ├── DownloadedBookItem.kt
+            ├── DownloadedBooksList.kt
+            └── DownloadedBooksScreen.kt
 ```
 
 ---

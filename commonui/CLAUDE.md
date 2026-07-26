@@ -295,17 +295,6 @@ Shimmer-эффект для плейсхолдеров загрузки.
 
 ## Менеджеры
 
-### ResourcesRepository
-
-Доступ к ресурсам приложения:
-
-```kotlin
-class ResourcesRepository @Inject constructor(context: Context) {
-    fun getString(resId: Int): String
-    fun getString(resId: Int, vararg args: Any): String
-}
-```
-
 ### DateFormatter
 
 Форматирование дат:
@@ -315,6 +304,8 @@ class DateFormatter @Inject constructor() {
     fun formatDate(timestamp: Long): String
 }
 ```
+
+> **Примечание:** `ResourcesRepository` перемещён в модуль `commonarchitecture`
 
 ---
 
@@ -338,36 +329,41 @@ commonui/src/main/java/su/sv/commonui/
 │   ├── IntExt.kt
 │   └── LongExt.kt
 ├── managers/
-│   ├── DateFormatter.kt
-│   └── ResourcesRepository.kt
+│   └── DateFormatter.kt
 ├── theme/
 │   ├── Color.kt
+│   ├── CustomColorAttribute.kt    # Кастомные атрибуты цветов
+│   ├── CustomThemeColors.kt       # Кастомные цвета темы
 │   ├── Dimensions.kt
 │   ├── Shape.kt
 │   ├── Theme.kt
 │   ├── ThemeConfig.kt
 │   └── Type.kt
-└── ui/
-    ├── components/
-    │   ├── AppButton.kt
-    │   ├── AppCard.kt
-    │   ├── AppDialog.kt
-    │   ├── AppLoadingIndicator.kt
-    │   ├── AnimatedLoadingIndicator.kt
-    │   ├── AppStates.kt
-    │   ├── AppSwipeRefresh.kt
-    │   ├── AppToolbar.kt
-    │   └── ThemeToggleIcon.kt
-    ├── ButtonWithLoader.kt
-    ├── ExpandingText.kt
-    ├── FullScreenError.kt
-    ├── LoadableResultDialog.kt
-    ├── LoadingIndicator.kt
-    ├── OneTimeEffect.kt
-    ├── shimmerBrush.kt
-    └── linkify/
-        ├── LinkifyContent.kt
-        ├── LinkifyContentDefaults.kt
-        ├── LinkifyTextKt.kt
-        └── LinkMatcher.kt
+├── ui/
+│   ├── ButtonWithLoader.kt
+│   ├── ExpandingText.kt
+│   ├── FullScreenError.kt
+│   ├── LoadableResultDialog.kt
+│   ├── LoadingIndicator.kt
+│   ├── OneTimeEffect.kt
+│   ├── shimmerBrush.kt
+│   ├── components/
+│   │   ├── AnimatedLoadingIndicator.kt
+│   │   ├── AppButton.kt
+│   │   ├── AppCard.kt
+│   │   ├── AppDialog.kt
+│   │   ├── AppLoadingIndicator.kt
+│   │   ├── AppStates.kt
+│   │   ├── AppSwipeRefresh.kt
+│   │   ├── AppToolbar.kt
+│   │   └── ThemeToggleIcon.kt
+│   ├── linkify/
+│   │   ├── LinkMatcher.kt
+│   │   ├── LinkifyContent.kt
+│   │   ├── LinkifyContentDefaults.kt
+│   │   └── LinkifyTextKt.kt
+│   └── util/
+│       └── DeviceUtils.kt         # Утилиты для устройства
+└── util/
+    └── DeviceUtils.kt             # Альтернативное расположение
 ```

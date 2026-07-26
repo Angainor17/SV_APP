@@ -175,12 +175,47 @@ override fun Content(modifier: Modifier) {
 
 ---
 
+## Кастомные цвета темы
+
+### CustomColorsRepository
+
+Репозиторий для хранения кастомных цветов темы:
+
+```kotlin
+interface CustomColorsRepository {
+    /** Получить кастомный цвет по атрибуту */
+    suspend fun getCustomColor(attribute: CustomColorAttribute): Int?
+    
+    /** Сохранить кастомный цвет */
+    suspend fun setCustomColor(attribute: CustomColorAttribute, color: Int)
+}
+```
+
+### CustomColorsModule
+
+Hilt модуль для предоставления зависимостей:
+
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+object CustomColorsModule {
+    @Provides
+    @Singleton
+    fun provideCustomColorsRepository(): CustomColorsRepository
+}
+```
+
+---
+
 ## Структура файлов
 
 ```
 managers/src/main/java/su/sv/managers/
 ├── OnBookPagerManager.kt
 └── theme/
+    ├── CustomColorsModule.kt       # DI модуль для кастомных цветов
+    ├── CustomColorsRepository.kt   # Интерфейс репозитория
+    ├── CustomColorsRepositoryImpl.kt
     ├── ThemeModule.kt
     ├── ThemeRepositoryImpl.kt
     └── ThemeViewModel.kt

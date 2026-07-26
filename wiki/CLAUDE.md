@@ -39,57 +39,85 @@ fun RootWiki(viewModel: RootWikiViewModel = hiltViewModel()) {
 
 Дочерние экраны (`ArticleScreen`, `FavoritesScreen`) **не применяют** тему отдельно, так как она уже применена на уровне корневого экрана.
 
-## Архитектура
+## Структура файлов
 
 ```
 wiki/src/main/java/su/sv/wiki/
-├── data/                          # Data слой
-│   ├── api/                       # API клиент
-│   │   ├── WikiApi.kt             # Retrofit интерфейс
-│   │   └── model/                 # API модели
-│   ├── local/                     # Локальное хранилище (Room)
-│   │   ├── dao/                   # DAO интерфейсы
-│   │   │   ├── ArticleCacheDao.kt # Кэш статей
-│   │   │   ├── FavoriteDao.kt     # Избранное
-│   │   │   └── HistoryDao.kt      # История
-│   │   ├── database/              # База данных
-│   │   └── entity/                # Entity классы
-│   └── repository/                # Реализация репозитория
+├── data/
+│   ├── api/
+│   │   ├── WikiApi.kt
+│   │   └── model/
+│   │       ├── ApiOpenSearchResponse.kt
+│   │       ├── ApiParseResponse.kt
+│   │       └── ApiSearchResponse.kt
+│   ├── local/
+│   │   ├── dao/
+│   │   │   ├── ArticleCacheDao.kt
+│   │   │   ├── FavoriteDao.kt
+│   │   │   └── HistoryDao.kt
+│   │   ├── database/
+│   │   │   └── WikiDatabase.kt
+│   │   └── entity/
+│   │       ├── ArticleCacheEntity.kt
+│   │       ├── FavoriteEntity.kt
+│   │       └── HistoryEntity.kt
+│   └── repository/
 │       └── WikiRepositoryImpl.kt
-├── domain/                        # Domain слой
-│   ├── model/                     # Доменные модели
+├── domain/
+│   ├── model/
 │   │   └── WikiArticle.kt
-│   ├── repository/                # Интерфейсы репозиториев
+│   ├── repository/
 │   │   └── WikiRepository.kt
-│   └── usecase/                   # Use Cases
-├── presentation/                  # Presentation слой
-│   ├── article/                   # Экран статьи
-│   │   ├── ArticleScreen.kt       # Modo Screen
+│   └── usecase/
+│       ├── AddFavoriteUseCase.kt
+│       ├── AddHistoryUseCase.kt
+│       ├── ClearFavoritesUseCase.kt
+│       ├── ClearHistoryUseCase.kt
+│       ├── GetArticleUseCase.kt
+│       ├── GetFavoriteTitlesUseCase.kt
+│       ├── GetFavoritesUseCase.kt
+│       ├── GetHistoryUseCase.kt
+│       ├── GetSearchSuggestionsUseCase.kt
+│       ├── HasFavoritesUseCase.kt
+│       ├── IsFavoriteUseCase.kt
+│       ├── RemoveFavoriteUseCase.kt
+│       └── SearchArticleUseCase.kt
+├── presentation/
+│   ├── article/
+│   │   ├── ArticleScreen.kt
 │   │   ├── ArticleScreenContent.kt
 │   │   └── ArticleViewModel.kt
-│   ├── favorites/                 # Экран избранного
+│   ├── favorites/
 │   │   ├── FavoritesScreen.kt
 │   │   ├── FavoritesScreenContent.kt
 │   │   └── FavoritesViewModel.kt
-│   └── root/                      # Главный экран
-│       ├── mapper/                # Мапперы
-│       ├── model/                 # UI модели
-│       ├── ui/                    # UI компоненты
-│       │   ├── AnimatedTypingHint.kt # Анимированный hint для поиска
-│       │   ├── ArticleContent.kt  # Контент статьи с ссылками и картинкой
-│       │   ├── ArticleView.kt     # Карточка статьи
-│       │   ├── HistoryList.kt     # Список истории
+│   └── root/
+│       ├── mapper/
+│       │   └── UiWikiMapper.kt
+│       ├── model/
+│       │   ├── UiWikiArticle.kt
+│       │   └── UiWikiState.kt
+│       ├── ui/
+│       │   ├── AnimatedTypingHint.kt
+│       │   ├── ArticleContent.kt
+│       │   ├── ArticleView.kt
+│       │   ├── HistoryList.kt
 │       │   ├── SearchSuggestions.kt
-│       │   └── WikiSearchBar.kt   # Поле поиска
-│       └── viewmodel/             # ViewModel
+│       │   └── WikiSearchBar.kt
+│       └── viewmodel/
 │           ├── RootWikiViewModel.kt
-│           ├── actions/           # Действия (MVI)
-│           └── effects/           # Одноразовые эффекты
-├── di/                            # Dependency Injection
+│           ├── actions/
+│           │   ├── WikiActions.kt
+│           │   └── WikiActionsHandler.kt
+│           └── effects/
+│               └── WikiOneTimeEffect.kt
+├── di/
 │   ├── WikiApiModule.kt
 │   └── WikiDatabaseModule.kt
-└── root/
-    └── RootWiki.kt                # Точка входа
+├── root/
+│   └── RootWiki.kt
+└── testing/
+    └── WikiTestTags.kt
 ```
 
 ## Основные компоненты
