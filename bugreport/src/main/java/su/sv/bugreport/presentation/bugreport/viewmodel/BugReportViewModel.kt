@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import su.sv.bugreport.R
 import su.sv.bugreport.domain.SendBugReportUseCase
 import su.sv.bugreport.domain.SendEmailReportUseCase
 import su.sv.bugreport.domain.model.BugReport
@@ -72,7 +73,7 @@ class BugReportViewModel @Inject constructor(
         _state.update { currentState ->
             if (currentState is BugReportState.Form) {
                 val error = if (text.isNotEmpty() && text.length < MIN_DESCRIPTION_LENGTH) {
-                    "Минимум $MIN_DESCRIPTION_LENGTH символов"
+                    context.getString(R.string.bug_report_description_min_length, MIN_DESCRIPTION_LENGTH)
                 } else {
                     null
                 }
@@ -146,7 +147,7 @@ class BugReportViewModel @Inject constructor(
                 .onFailure { error ->
                     Timber.tag("voronin").e(error, "Failed to send bug report")
                     _state.value = BugReportState.Error(
-                        message = error.message ?: "Не удалось отправить отчет"
+                        message = error.message ?: context.getString(R.string.bug_report_send_failed)
                     )
                 }
         }

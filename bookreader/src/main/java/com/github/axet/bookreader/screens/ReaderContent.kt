@@ -594,7 +594,9 @@ private fun TocItemRow(
             IconButton(onClick = onToggleExpand) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (isExpanded) "Скрыть" else "Раскрыть",
+                    contentDescription = stringResource(
+                        if (isExpanded) R.string.sv_collapse_content else R.string.sv_expand_content
+                    ),
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
@@ -742,7 +744,7 @@ private fun FontsComposeBottomSheet(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Настройки шрифта",
+                text = stringResource(R.string.sv_font_settings_title),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -750,7 +752,7 @@ private fun FontsComposeBottomSheet(
             // Размер шрифта
             Text(
                 modifier = Modifier.testTag(ReaderTestTags.FontSettings.SIZE_VALUE),
-                text = "Размер шрифта: ${fontSize.toInt()}",
+                text = stringResource(R.string.sv_font_size_label, fontSize.toInt()),
                 style = MaterialTheme.typography.bodyMedium
             )
             Slider(
@@ -768,7 +770,7 @@ private fun FontsComposeBottomSheet(
 
             // Выбор шрифта
             Text(
-                text = "Шрифт",
+                text = stringResource(R.string.sv_font_label),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -828,7 +830,7 @@ private fun FontsComposeBottomSheet(
                     }
                 )
                 Text(
-                    text = "Игнорировать встроенные шрифты",
+                    text = stringResource(R.string.sv_ignore_embedded_fonts),
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }

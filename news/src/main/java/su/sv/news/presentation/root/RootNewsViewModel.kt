@@ -73,14 +73,8 @@ class RootNewsViewModel @Inject constructor(
 
             is RootNewsActions.OnNewsMediaClick -> {
                 val item = action.item
-                when (item) {
-                    is UiNewsMedia.ItemVideo -> {
-                        _oneTimeEffect.trySend(
-                            NewsListOneTimeEffect.OpenNewsVideo(item)
-                        )
-                    }
-
-                    else -> Unit
+                if (item is UiNewsMedia.ItemVideo) {
+                    _oneTimeEffect.trySend(NewsListOneTimeEffect.OpenNewsVideo(item))
                 }
             }
         }

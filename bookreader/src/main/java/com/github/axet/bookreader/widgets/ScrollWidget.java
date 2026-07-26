@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -1521,13 +1522,13 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
                 if (start == null)
                     str += "- ";
                 else
-                    str += String.format(format, start.getParagraphIndex(), start.getElementIndex(), start.getCharIndex());
+                    str += String.format(Locale.ROOT, format, start.getParagraphIndex(), start.getElementIndex(), start.getCharIndex());
                 if (end == null)
                     str += " -";
                 else {
                     if (start != null)
                         str += " - ";
-                    str += String.format(format, end.getParagraphIndex(), end.getElementIndex(), end.getCharIndex());
+                    str += String.format(Locale.ROOT, format, end.getParagraphIndex(), end.getElementIndex(), end.getCharIndex());
                 }
                 return str;
             }

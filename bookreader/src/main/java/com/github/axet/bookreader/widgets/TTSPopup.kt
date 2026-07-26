@@ -7,7 +7,6 @@ import android.os.Handler
 import android.os.Looper
 import android.preference.PreferenceManager
 import android.speech.tts.TextToSpeech
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +31,7 @@ import org.geometerplus.zlibrary.text.view.ZLTextParagraphCursor
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import org.geometerplus.zlibrary.text.view.ZLTextWord
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor
+import timber.log.Timber
 import java.util.Arrays
 import java.util.Collections
 import java.util.Locale
@@ -179,7 +179,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         override fun onError(utteranceId: String?, done: Runnable) {
-            Log.d(TAG, "onError")
+            Timber.tag(TAG).d("onError")
             if (fragment!!.isEmpty() && fragment!!.retry < 2) {
                 dones.remove(delayed)
                 handler.removeCallbacks(delayed)
@@ -193,7 +193,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         override fun onDone(utteranceId: String?, done: Runnable) {
-            Log.d(TAG, "onDone")
+            Timber.tag(TAG).d("onDone")
             super.onDone(utteranceId, done)
         }
     }
@@ -216,7 +216,7 @@ class TTSPopup(val fb: FBReaderView) {
     var speakRetry: Runnable? = null
 
     private val speakNext = Runnable {
-        Log.d(TAG, "speakNext")
+        Timber.tag(TAG).d("speakNext")
         selectNext()
         speakNext()
     }

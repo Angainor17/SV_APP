@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import com.github.axet.androidlibrary.app.RarSAF
 import com.github.axet.androidlibrary.app.ZipSAF
 import com.github.axet.androidlibrary.services.StorageProvider
@@ -29,6 +28,7 @@ import org.geometerplus.zlibrary.text.model.ZLTextMark
 import org.geometerplus.zlibrary.text.model.ZLTextModel
 import org.geometerplus.zlibrary.text.model.ZLTextParagraph
 import org.geometerplus.zlibrary.ui.android.image.ZLBitmapImage
+import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -66,7 +66,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 if (size == null) null
                 else Plugin.Box(0, 0, size.width(), size.height())
             } catch (e: IOException) {
-                Log.d(TAG, "unable to close is", e)
+                Timber.tag(TAG).d(e, "unable to close is")
                 null
             }
         }
@@ -200,7 +200,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 `is`.close()
                 bm
             } catch (e: IOException) {
-                Log.d(TAG, "closing stream", e)
+                Timber.tag(TAG).d(e, "closing stream")
                 null
             }
         }

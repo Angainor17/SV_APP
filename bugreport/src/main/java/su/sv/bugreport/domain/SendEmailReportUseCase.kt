@@ -32,25 +32,21 @@ class SendEmailReportUseCase @Inject constructor(
         return createEmailIntent(email, subject, body, report.screenshots)
     }
 
-    private fun buildSubject(report: BugReport): String {
-        return "Bug Report: SV App ${report.appVersion}"
-    }
+    private fun buildSubject(report: BugReport) = "Bug Report: SV App ${report.appVersion}"
 
-    private fun buildBody(report: BugReport): String {
-        return buildString {
-            appendLine("=== Bug Report ===")
-            appendLine()
-            appendLine("Описание проблемы:")
-            appendLine(report.description)
-            appendLine()
-            appendLine("--- Device Info ---")
-            appendLine("App Version: ${report.appVersion}")
-            appendLine("Device: ${report.deviceManufacturer} ${report.deviceModel}")
-            appendLine("Android: ${report.androidVersion}")
-            appendLine()
-            if (report.screenshots.isNotEmpty()) {
-                appendLine("Screenshots: ${report.screenshots.size} attached")
-            }
+    private fun buildBody(report: BugReport) = buildString {
+        appendLine("=== Bug Report ===")
+        appendLine()
+        appendLine("Описание проблемы:")
+        appendLine(report.description)
+        appendLine()
+        appendLine("--- Device Info ---")
+        appendLine("App Version: ${report.appVersion}")
+        appendLine("Device: ${report.deviceManufacturer} ${report.deviceModel}")
+        appendLine("Android: ${report.androidVersion}")
+        appendLine()
+        if (report.screenshots.isNotEmpty()) {
+            appendLine("Screenshots: ${report.screenshots.size} attached")
         }
     }
 
@@ -62,7 +58,7 @@ class SendEmailReportUseCase @Inject constructor(
     ): Intent {
         val chooserTitle = context.getString(R.string.bug_report_email_chooser_title)
 
-        return if (screenshots.size > 1) {
+        val intent = if (screenshots.size > 1) {
             // Для множественных вложений используем ACTION_SEND_MULTIPLE
             // Это лучше поддерживается email-клиентами (Gmail и др.)
             Intent(Intent.ACTION_SEND_MULTIPLE).apply {
@@ -86,10 +82,9 @@ class SendEmailReportUseCase @Inject constructor(
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             }
-        }.let { intent ->
-            // Показываем chooser с понятным заголовком
-            Intent.createChooser(intent, chooserTitle)
         }
+        // Показываем chooser с понятным заголовком
+        return Intent.createChooser(intent, chooserTitle)
     }
 
     companion object {
