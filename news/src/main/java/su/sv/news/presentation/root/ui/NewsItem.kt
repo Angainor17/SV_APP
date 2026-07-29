@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
@@ -106,8 +106,7 @@ private fun NewsItemPhone(
             .padding(
                 horizontal = dimensions.screenPaddingHorizontal / 2,
                 vertical = dimensions.cardPaddingOuter
-            )
-            .widthIn(max = adaptiveDims.contentMaxWidth ?: 600.dp),
+            ),
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(dimensions.borderWidthStandard, MaterialTheme.colorScheme.cardStroke),
     ) {
@@ -117,6 +116,7 @@ private fun NewsItemPhone(
             val hasText = item.description.isNotBlank()
             Logo(
                 item = item,
+                isTablet = false,
                 onItemClick = onItemClick,
             )
             if (hasText) {
@@ -189,6 +189,7 @@ private fun NewsItemTablet(
                 ) {
                     Logo(
                         item = item,
+                        isTablet = true,
                         onItemClick = onItemClick,
                     )
                 }
@@ -232,6 +233,7 @@ private fun NewsItemTablet(
 @Composable
 private fun Logo(
     item: UiNewsItem,
+    isTablet: Boolean,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val imageSize = item.images.size
@@ -242,8 +244,8 @@ private fun Logo(
 
     when {
         mediaSize == 0 -> return
-        isOnlyOneVideo -> SingleVideo(item, onItemClick)
-        isOnlyOneImage -> SingleImage(item, onItemClick)
+        isOnlyOneVideo -> SingleVideo(item, isTablet, onItemClick)
+        isOnlyOneImage -> SingleImage(item, isTablet, onItemClick)
         else -> MultiImage(
             item = item,
             onItemClick = onItemClick
@@ -254,6 +256,7 @@ private fun Logo(
 @Composable
 private fun SingleImage(
     item: UiNewsItem,
+    isTablet: Boolean,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val showShimmer = remember { mutableStateOf(true) }
@@ -264,8 +267,15 @@ private fun SingleImage(
         modifier = Modifier
             .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
             .fillMaxWidth()
-            .aspectRatio(16f / 9f) // Стандартное соотношение для изображений
-            .clip(MaterialTheme.shapes.small)
+            .then(
+                if (isTablet) {
+                    Modifier
+                        .aspectRatio(16f / 9f)
+                        .clip(MaterialTheme.shapes.small)
+                } else {
+                    Modifier.defaultMinSize(minHeight = 200.dp)
+                }
+            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple()
@@ -276,7 +286,7 @@ private fun SingleImage(
             .data(url)
             .build(),
         contentDescription = stringResource(R.string.news_item_image_content_description),
-        contentScale = ContentScale.Fit, // Сохраняет пропорции изображения
+        contentScale = if (isTablet) ContentScale.Fit else ContentScale.FillWidth,
         onState = { state ->
             if (state is State.Success) {
                 showShimmer.value = false
@@ -288,6 +298,7 @@ private fun SingleImage(
 @Composable
 private fun SingleVideo(
     item: UiNewsItem,
+    isTablet: Boolean,
     onVideoClick: (UiNewsMedia) -> Unit,
 ) {
     val showShimmer = remember { mutableStateOf(true) }
@@ -303,8 +314,15 @@ private fun SingleVideo(
             modifier = Modifier
                 .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
                 .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .clip(MaterialTheme.shapes.small)
+                .then(
+                    if (isTablet) {
+                        Modifier
+                            .aspectRatio(16f / 9f)
+                            .clip(MaterialTheme.shapes.small)
+                    } else {
+                        Modifier.defaultMinSize(minHeight = 200.dp)
+                    }
+                )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple()
@@ -315,7 +333,7 @@ private fun SingleVideo(
                 .data(url)
                 .build(),
             contentDescription = stringResource(R.string.news_item_image_content_description),
-            contentScale = ContentScale.Fit,
+            contentScale = if (isTablet) ContentScale.Fit else ContentScale.FillWidth,
             onState = { state ->
                 if (state is State.Success) {
                     showShimmer.value = false
