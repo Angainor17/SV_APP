@@ -16,4 +16,10 @@ object ReaderPreferences {
     const val PREFERENCE_LANGUAGE: String = "tts_pref"
     const val PREFERENCE_IGNORE_EMBEDDED_FONTS: String = "ignore_embedded_fonts"
     const val PREFERENCE_FONTS_FOLDER: String = "fonts_folder"
+
+    /**
+     * Двухстраничный режим (Two Column View)
+     * null = авто (по размеру экрана), true = включить, false = выключить
+     */
+    const val PREFERENCE_TWO_COLUMN_VIEW: String = "two_column_view"
 }
