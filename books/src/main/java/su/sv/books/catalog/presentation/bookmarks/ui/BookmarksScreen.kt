@@ -46,6 +46,7 @@ import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksEffect
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksViewModel
 import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.OneTimeEffect
@@ -62,6 +63,26 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookmarksContent(
+    viewModel: BookmarksViewModel = hiltViewModel(),
+) {
+    val formFactor = LocalDeviceFormFactor.current
+
+    // На планшетах (Expanded) используем master-detail layout
+    if (formFactor.isExpanded()) {
+        BookmarksMasterDetailScreen(viewModel)
+        return
+    }
+
+    // На телефонах (Compact/Medium) - текущее поведение
+    BookmarksCompactScreen(viewModel)
+}
+
+/**
+ * Компактный экран заметок для телефонов (Compact/Medium)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BookmarksCompactScreen(
     viewModel: BookmarksViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

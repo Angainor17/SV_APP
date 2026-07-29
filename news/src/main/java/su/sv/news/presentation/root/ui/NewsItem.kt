@@ -7,10 +7,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Card
@@ -22,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -33,7 +39,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
+import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.commonui.theme.ThemeMode
@@ -58,12 +66,48 @@ fun NewsItem(
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val dimensions = LocalAppDimensions.current
+    val adaptiveDims = LocalAdaptiveDimensions.current
+    val formFactor = LocalDeviceFormFactor.current
 
+    // На планшетах используем горизонтальный layout
+    if (formFactor.shouldUseNavigationRail()) {
+        NewsItemTablet(
+            modifier = modifier,
+            item = item,
+            dimensions = dimensions,
+            adaptiveDims = adaptiveDims,
+            onItemClick = onItemClick,
+        )
+    } else {
+        NewsItemPhone(
+            modifier = modifier,
+            item = item,
+            dimensions = dimensions,
+            adaptiveDims = adaptiveDims,
+            onItemClick = onItemClick,
+        )
+    }
+}
+
+/**
+ * Вертикальный layout для телефонов (Compact)
+ * Картинка сверху, текст и дата снизу
+ */
+@Composable
+private fun NewsItemPhone(
+    modifier: Modifier,
+    item: UiNewsItem,
+    dimensions: su.sv.commonui.theme.AppDimensions,
+    adaptiveDims: su.sv.commonui.theme.AdaptiveDimensions,
+    onItemClick: (UiNewsMedia) -> Unit,
+) {
     Card(
-        modifier = modifier.padding(
-            horizontal = dimensions.screenPaddingHorizontal / 2,
-            vertical = dimensions.cardPaddingOuter
-        ),
+        modifier = modifier
+            .padding(
+                horizontal = dimensions.screenPaddingHorizontal / 2,
+                vertical = dimensions.cardPaddingOuter
+            )
+            .widthIn(max = adaptiveDims.contentMaxWidth ?: 600.dp),
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(dimensions.borderWidthStandard, MaterialTheme.colorScheme.cardStroke),
     ) {
@@ -108,6 +152,83 @@ fun NewsItem(
     }
 }
 
+/**
+ * Горизонтальный layout для планшетов (Medium/Expanded)
+ * Картинка слева фиксированного размера, текст справа с датой в правом нижнем углу
+ */
+@Composable
+private fun NewsItemTablet(
+    modifier: Modifier,
+    item: UiNewsItem,
+    dimensions: su.sv.commonui.theme.AppDimensions,
+    adaptiveDims: su.sv.commonui.theme.AdaptiveDimensions,
+    onItemClick: (UiNewsMedia) -> Unit,
+) {
+    val hasMedia = item.images.isNotEmpty() || item.videos.isNotEmpty()
+    val hasText = item.description.isNotBlank()
+
+    Card(
+        modifier = modifier
+            .padding(
+                horizontal = dimensions.screenPaddingHorizontal / 2,
+                vertical = dimensions.cardPaddingOuter
+            )
+            .fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(dimensions.borderWidthStandard, MaterialTheme.colorScheme.cardStroke),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Картинка слева фиксированного размера
+            if (hasMedia) {
+                Box(
+                    modifier = Modifier
+                        .width(240.dp) // Фиксированная ширина для планшета
+                        .height(180.dp) // Фиксированная высота (4:3 соотношение)
+                ) {
+                    Logo(
+                        item = item,
+                        onItemClick = onItemClick,
+                    )
+                }
+            }
+
+            // Текст справа с датой в правом нижнем углу
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(dimensions.cardContentPaddingHorizontal)
+                    .heightIn(min = 180.dp) // Минимум как у картинки
+            ) {
+                if (hasText) {
+                    SelectionContainer {
+                        // Динамический расчёт maxLines на основе высоты
+                        // Для планшетов показываем больше текста
+                        ExpandingText(
+                            text = item.description,
+                            minimizedMaxLines = 8, // Увеличено для планшета
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+
+                // Дата в правом нижнем углу
+                Text(
+                    text = item.dateFormatted,
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = dimensions.itemSpacingSmall),
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun Logo(
     item: UiNewsItem,
@@ -122,7 +243,7 @@ private fun Logo(
     when {
         mediaSize == 0 -> return
         isOnlyOneVideo -> SingleVideo(item, onItemClick)
-        isOnlyOneImage -> SingleImage(item)
+        isOnlyOneImage -> SingleImage(item, onItemClick)
         else -> MultiImage(
             item = item,
             onItemClick = onItemClick
@@ -131,7 +252,10 @@ private fun Logo(
 }
 
 @Composable
-private fun SingleImage(item: UiNewsItem) {
+private fun SingleImage(
+    item: UiNewsItem,
+    onItemClick: (UiNewsMedia) -> Unit,
+) {
     val showShimmer = remember { mutableStateOf(true) }
 
     val url = item.images.firstOrNull()?.image.orEmpty()
@@ -140,12 +264,19 @@ private fun SingleImage(item: UiNewsItem) {
         modifier = Modifier
             .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 200.dp),
+            .aspectRatio(16f / 9f) // Стандартное соотношение для изображений
+            .clip(MaterialTheme.shapes.small)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple()
+            ) {
+                item.images.firstOrNull()?.let { onItemClick(it) }
+            },
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
             .build(),
         contentDescription = stringResource(R.string.news_item_image_content_description),
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.Fit, // Сохраняет пропорции изображения
         onState = { state ->
             if (state is State.Success) {
                 showShimmer.value = false
@@ -171,9 +302,9 @@ private fun SingleVideo(
         AsyncImage(
             modifier = Modifier
                 .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
-                .defaultMinSize(minHeight = 200.dp)
                 .fillMaxWidth()
-                .align(Alignment.TopCenter)
+                .aspectRatio(16f / 9f)
+                .clip(MaterialTheme.shapes.small)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple()
@@ -184,7 +315,7 @@ private fun SingleVideo(
                 .data(url)
                 .build(),
             contentDescription = stringResource(R.string.news_item_image_content_description),
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Fit,
             onState = { state ->
                 if (state is State.Success) {
                     showShimmer.value = false

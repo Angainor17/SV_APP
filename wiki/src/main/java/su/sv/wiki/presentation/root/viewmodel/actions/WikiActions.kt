@@ -1,5 +1,7 @@
 package su.sv.wiki.presentation.root.viewmodel.actions
 
+import su.sv.wiki.domain.model.WikiArticle
+
 /**
  * Действия на экране Wiki
  */
@@ -37,4 +39,10 @@ sealed class WikiActions {
 
     /** Закрыть статью (вернуться к истории) */
     object OnCloseArticle : WikiActions()
+
+    /** Выбрать статью из избранного (для master-detail на планшетах) */
+    data class OnFavoriteClick(val article: WikiArticle) : WikiActions()
+
+    /** Закрыть detail панель (для master-detail на планшетах) */
+    object OnCloseDetail : WikiActions()
 }

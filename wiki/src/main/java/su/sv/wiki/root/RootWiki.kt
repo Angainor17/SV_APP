@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -48,7 +49,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
+import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.favorite
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.FullScreenError
@@ -56,6 +59,7 @@ import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.wiki.R
 import su.sv.wiki.presentation.article.ArticleScreen
 import su.sv.wiki.presentation.favorites.FavoritesScreen
+import su.sv.wiki.presentation.root.WikiMasterDetailScreen
 import su.sv.wiki.presentation.root.model.UiWikiState
 import su.sv.wiki.presentation.root.ui.ArticleView
 import su.sv.wiki.presentation.root.ui.HistoryList
@@ -72,6 +76,25 @@ import su.sv.wiki.presentation.root.viewmodel.effects.WikiOneTimeEffect
 fun RootWiki(
     viewModel: RootWikiViewModel = hiltViewModel(),
 ) {
+    val formFactor = LocalDeviceFormFactor.current
+
+    // На планшетах (Expanded) используем master-detail layout
+    if (formFactor.isExpanded()) {
+        WikiMasterDetailScreen(viewModel)
+        return
+    }
+
+    // На телефонах (Compact/Medium) - текущее поведение
+    WikiCompactScreen(viewModel)
+}
+
+/**
+ * Компактный экран Wiki для телефонов (Compact/Medium)
+ */
+@Composable
+fun WikiCompactScreen(
+    viewModel: RootWikiViewModel = hiltViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsState(initial = emptyList())
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
@@ -82,6 +105,7 @@ fun RootWiki(
     val stackNavigation = LocalStackNavigation.current
     val focusManager = LocalFocusManager.current
     val dimensions = LocalAppDimensions.current
+    val adaptiveDims = LocalAdaptiveDimensions.current
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -97,18 +121,25 @@ fun RootWiki(
             }
         },
     ) { paddingValues ->
-        Column(
+        // Ограничение ширины контента для планшетов
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets(0.dp))
-                .padding(bottom = paddingValues.calculateBottomPadding())
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) {
-                    focusManager.clearFocus()
-                },
+                .windowInsetsPadding(WindowInsets(0.dp)),
+            contentAlignment = Alignment.Center,
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .widthIn(max = adaptiveDims.contentMaxWidth ?: androidx.compose.ui.unit.Dp.Infinity)
+                    .padding(bottom = paddingValues.calculateBottomPadding())
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ) {
+                        focusManager.clearFocus()
+                    },
+            ) {
             // Поле поиска с иконкой избранного
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -242,6 +273,7 @@ fun RootWiki(
                     )
                 }
             }
+        }
         }
     }
 }

@@ -3,6 +3,8 @@ package su.sv.books.catalog.presentation.downloaded.ui
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,6 +33,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -31,16 +42,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import kotlin.math.roundToInt
 
 /**
- * Список скачанных книг с поддержкой свайпа для удаления.
+ * Адаптивный список скачанных книг.
  *
- * Особенности реализации:
- * - Максимальное смещение свайпа ограничено 30% ширины экрана
- * - Красный фон отображается на всю ширину карточки
- * - При открытом диалоге удаления свайп остаётся в открытом положении
- * - Подсказка свайпа для первого элемента
+ * - Compact: список со swipe-to-delete
+ * - Medium/Expanded: grid с долгим нажатием для удаления
  */
 @Composable
 fun DownloadedBooksList(
@@ -53,6 +62,129 @@ fun DownloadedBooksList(
     resetKey: Any? = null,
     deletingBookId: String? = null,
     modifier: Modifier = Modifier,
+) {
+    val formFactor = LocalDeviceFormFactor.current
+
+    if (formFactor.shouldUseNavigationRail()) {
+        // Планшеты: grid layout с долгим нажатием для удаления
+        DownloadedBooksGrid(
+            books = books,
+            onReadClick = onReadClick,
+            onBookClick = onBookClick,
+            onDeleteRequest = onDeleteRequest,
+            deletingBookId = deletingBookId,
+            modifier = modifier,
+        )
+    } else {
+        // Телефоны: список со swipe-to-delete
+        DownloadedBooksListCompact(
+            books = books,
+            onReadClick = onReadClick,
+            onBookClick = onBookClick,
+            onDeleteRequest = onDeleteRequest,
+            showSwipeHint = showSwipeHint,
+            onSwipeHintShown = onSwipeHintShown,
+            resetKey = resetKey,
+            deletingBookId = deletingBookId,
+            modifier = modifier,
+        )
+    }
+}
+
+/**
+ * Grid layout для планшетов
+ */
+@Composable
+private fun DownloadedBooksGrid(
+    books: List<UiDownloadedBook>,
+    onReadClick: (UiDownloadedBook) -> Unit,
+    onBookClick: (UiDownloadedBook) -> Unit,
+    onDeleteRequest: (UiDownloadedBook) -> Unit,
+    deletingBookId: String?,
+    modifier: Modifier = Modifier,
+) {
+    val gridState = rememberLazyStaggeredGridState()
+
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(minSize = 280.dp),
+        modifier = modifier.fillMaxSize(),
+        state = gridState,
+        contentPadding = PaddingValues(8.dp),
+        verticalItemSpacing = 8.dp,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(
+            items = books,
+            key = { it.id }
+        ) { book ->
+            DownloadedBookGridItem(
+                book = book,
+                onReadClick = { onReadClick(book) },
+                onBookClick = { onBookClick(book) },
+                onDeleteRequest = { onDeleteRequest(book) },
+                isDeleting = deletingBookId == book.id,
+            )
+        }
+    }
+}
+
+/**
+ * Карточка книги для grid layout (планшеты)
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun DownloadedBookGridItem(
+    book: UiDownloadedBook,
+    onReadClick: () -> Unit,
+    onBookClick: () -> Unit,
+    onDeleteRequest: () -> Unit,
+    isDeleting: Boolean,
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        DownloadedBookItem(
+            book = book,
+            onReadClick = onReadClick,
+            onBookClick = onBookClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onBookClick,
+                    onLongClick = onDeleteRequest,
+                )
+        )
+
+        // Кнопка удаления в углу карточки для планшетов
+        IconButton(
+            onClick = onDeleteRequest,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = "Удалить книгу",
+                tint = androidx.compose.material3.MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+/**
+ * Список со swipe-to-delete для телефонов (Compact)
+ */
+@Composable
+private fun DownloadedBooksListCompact(
+    books: List<UiDownloadedBook>,
+    onReadClick: (UiDownloadedBook) -> Unit,
+    onBookClick: (UiDownloadedBook) -> Unit,
+    onDeleteRequest: (UiDownloadedBook) -> Unit,
+    showSwipeHint: Boolean,
+    onSwipeHintShown: () -> Unit,
+    resetKey: Any?,
+    deletingBookId: String?,
+    modifier: Modifier,
 ) {
     val listState = rememberLazyListState()
     var hintAnimationPlayed by remember { mutableStateOf(false) }
@@ -88,7 +220,7 @@ fun DownloadedBooksList(
 }
 
 /**
- * Элемент книги с поддержкой свайпа
+ * Элемент книги с поддержкой свайпа (для телефонов)
  */
 @Composable
 private fun SwipeableBookItem(

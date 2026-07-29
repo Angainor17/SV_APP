@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -82,7 +83,7 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
         AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp),
+                .aspectRatio(0.7f), // Типичное соотношение для книжных обложек (ширина : высота = 0.7)
             model = ImageRequest.Builder(LocalContext.current)
                 .data(item.image)
                 .build(),

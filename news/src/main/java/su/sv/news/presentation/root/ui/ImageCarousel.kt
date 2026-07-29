@@ -8,7 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -61,7 +62,6 @@ fun ImageCarousel(
 
     Column(
         modifier
-            .defaultMinSize(minHeight = 190.dp)
             .fillMaxWidth()
     ) {
         HorizontalPager(
@@ -92,7 +92,8 @@ fun ImageCarousel(
                             )
                         )
                         .fillMaxWidth()
-                        .defaultMinSize(minHeight = 180.dp)
+                        .aspectRatio(16f / 9f) // Стандартное соотношение для изображений
+                        .clip(MaterialTheme.shapes.small)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = ripple()
@@ -102,14 +103,14 @@ fun ImageCarousel(
                                 (pagerState.currentPage - page + pagerState.currentPageOffsetFraction).absoluteValue
 
                             lerp(
-                                start = 75.dp,
+                                start = 90.dp,
                                 stop = 100.dp,
                                 fraction = 1f - pageOffset.coerceIn(0f, 1f)
                             ).also { scale ->
                                 scaleY = scale / 100.dp
                             }
                         },
-                    contentScale = ContentScale.FillWidth,
+                    contentScale = ContentScale.Fit, // Сохраняет пропорции изображения
                     onState = { state ->
                         if (state is State.Success) {
                             showShimmer.value = false

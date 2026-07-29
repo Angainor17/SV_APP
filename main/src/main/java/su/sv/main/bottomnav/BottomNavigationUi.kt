@@ -2,22 +2,15 @@ package su.sv.main.bottomnav
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,13 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -45,13 +35,16 @@ import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import su.sv.books.catalog.presentation.root.ui.RootBooksCatalog
+import su.sv.commonui.theme.DeviceFormFactor
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.ThemeMode
-import su.sv.commonui.theme.navigationBarColor
+import su.sv.commonui.ui.adaptive.navigation.AdaptiveNavigation
+import su.sv.commonui.ui.adaptive.navigation.NavigationItem
+import su.sv.commonui.util.ProvideAdaptiveDimensions
 import su.sv.info.rootinfo.ui.RootInfo
 import su.sv.main.R
 import su.sv.main.Screens
 import su.sv.main.badge.BadgeViewModel
-import su.sv.main.badge.NewBadge
 import su.sv.main.continuereading.ContinueReadingEffect
 import su.sv.main.continuereading.ContinueReadingState
 import su.sv.main.continuereading.ContinueReadingViewModel
@@ -63,9 +56,10 @@ import su.sv.news.presentation.root.ui.RootNews
 import su.sv.wiki.root.RootWiki
 
 /**
- * Главный экран с нижней навигацией
+ * Главный экран с адаптивной навигацией
  *
- * Управляет темой приложения и навигацией между основными разделами.
+ * - Compact: BottomNavigation (снизу)
+ * - Medium/Expanded: NavigationRail (слева)
  *
  * @param themeViewModel ViewModel для управления темой
  * @param badgeViewModel ViewModel для бейджей
@@ -77,6 +71,22 @@ internal fun BottomNavigationBar(
     badgeViewModel: BadgeViewModel = hiltViewModel(),
     continueReadingViewModel: ContinueReadingViewModel = hiltViewModel(),
 ) {
+    // Предоставляем адаптивные размеры через CompositionLocal
+    ProvideAdaptiveDimensions {
+        AdaptiveBottomNavContent(
+            themeViewModel = themeViewModel,
+            badgeViewModel = badgeViewModel,
+            continueReadingViewModel = continueReadingViewModel,
+        )
+    }
+}
+
+@Composable
+private fun AdaptiveBottomNavContent(
+    themeViewModel: ThemeViewModel,
+    badgeViewModel: BadgeViewModel,
+    continueReadingViewModel: ContinueReadingViewModel,
+) {
     // Состояние темы
     val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
 
@@ -86,7 +96,7 @@ internal fun BottomNavigationBar(
     // Состояние snackbar "Продолжить чтение"
     val continueReadingState by continueReadingViewModel.state.collectAsStateWithLifecycle()
 
-    // Мodo навигация для открытия книги
+    // Modo навигация для открытия книги
     val stackNavigation = LocalStackNavigation.current
 
     // Загружаем данные о последней книге при запуске
@@ -134,6 +144,7 @@ private fun BottomNavContent(
     onContinueReadingDismiss: () -> Unit,
 ) {
     val navController = rememberNavController()
+    val formFactor = LocalDeviceFormFactor.current
 
     // Отслеживаем текущий маршрут
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -154,113 +165,165 @@ private fun BottomNavContent(
     var navigationBarHeight by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
 
-    // Box для overlay snackbar над NavigationBar
-    Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            bottomBar = {
-                NavigationBar(
-                    modifier = Modifier
-                        .testTag(MainTestTags.BottomNav.ROOT)
-                        .onSizeChanged { size ->
-                            navigationBarHeight = size.height
-                        },
-                    containerColor = MaterialTheme.colorScheme.navigationBarColor,
-                    tonalElevation = 4.dp, // Elevation для визуального выделения
-                ) {
-                    bottomNavigationItems()
-                        .forEachIndexed { index, navigationItem ->
-                            val testTag = when (navigationItem.route) {
-                                Screens.News.route -> MainTestTags.BottomNav.TAB_NEWS
-                                Screens.Books.route -> MainTestTags.BottomNav.TAB_BOOKS
-                                Screens.Wiki.route -> MainTestTags.BottomNav.TAB_WIKI
-                                Screens.Info.route -> MainTestTags.BottomNav.TAB_INFO
-                                else -> "tab_unknown"
-                            }
-
-                            NavigationBarItem(
-                                modifier = Modifier.testTag(testTag),
-                                selected = index == navigationSelectedItem,
-                                label = {
-                                    Text(
-                                        text = navigationItem.label,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                },
-                                icon = {
-                                    NavigationIcon(
-                                        icon = navigationItem.icon,
-                                        label = navigationItem.label,
-                                        showBadge = navigationItem.route == Screens.Wiki.route && showWikiBadge,
-                                    )
-                                },
-                                onClick = {
-                                    // Скрываем бейдж при клике на Wiki
-                                    if (navigationItem.route == Screens.Wiki.route && showWikiBadge) {
-                                        onWikiBadgeClick()
-                                    }
-                                    navController.navigate(navigationItem.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                                // Явно задаём цвета для корректного отображения при несовпадении темы системы и приложения
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                                )
-                            )
-                        }
-                }  // end NavigationBar
-            },
-        ) { paddingValues ->
-            BottomNavHost(
-                navController = navController,
-                paddingValues = paddingValues,
-                onThemeToggle = onThemeToggle,
-                currentThemeMode = currentThemeMode
+    // Элементы навигации
+    val bottomItems = bottomNavigationItems()
+    val navigationItems = remember(showWikiBadge, bottomItems) {
+        bottomItems.map { item ->
+            NavigationItem(
+                label = item.label,
+                icon = item.icon,
+                route = item.route,
+                showBadge = item.route == Screens.Wiki.route && showWikiBadge,
             )
         }
+    }
 
-        // Snackbar "Продолжить чтение" над NavigationBar
-        // Используем динамическую высоту NavigationBar вместо hardcoded значения
-        ContinueReadingSnackbarHost(
-            state = continueReadingState,
-            onContinueClick = onContinueReadingClick,
-            onDismissClick = onContinueReadingDismiss,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = with(density) { navigationBarHeight.toDp() })
+    // Box для overlay snackbar над NavigationBar
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (formFactor) {
+            is DeviceFormFactor.Compact -> {
+                // Compact: BottomNavigation
+                CompactNavLayout(
+                    navController = navController,
+                    navigationItems = navigationItems,
+                    navigationSelectedItem = navigationSelectedItem,
+                    onItemSelected = { index ->
+                        handleNavigation(
+                            navController = navController,
+                            route = navigationItems[index].route,
+                            showWikiBadge = showWikiBadge,
+                            onWikiBadgeClick = onWikiBadgeClick,
+                        )
+                    },
+                    onNavigationBarSizeChanged = { size ->
+                        navigationBarHeight = size
+                    },
+                    onThemeToggle = onThemeToggle,
+                    currentThemeMode = currentThemeMode,
+                )
+            }
+
+            is DeviceFormFactor.Medium,
+            is DeviceFormFactor.Expanded -> {
+                // Medium/Expanded: NavigationRail
+                RailNavLayout(
+                    navController = navController,
+                    navigationItems = navigationItems,
+                    navigationSelectedItem = navigationSelectedItem,
+                    onItemSelected = { index ->
+                        handleNavigation(
+                            navController = navController,
+                            route = navigationItems[index].route,
+                            showWikiBadge = showWikiBadge,
+                            onWikiBadgeClick = onWikiBadgeClick,
+                        )
+                    },
+                    onThemeToggle = onThemeToggle,
+                    currentThemeMode = currentThemeMode,
+                )
+                // Для Rail нет bottom padding для snackbar
+                navigationBarHeight = 0
+            }
+        }
+
+        // Snackbar "Продолжить чтение" над NavigationBar (только для Compact)
+        if (formFactor.isCompact()) {
+            ContinueReadingSnackbarHost(
+                state = continueReadingState,
+                onContinueClick = onContinueReadingClick,
+                onDismissClick = onContinueReadingDismiss,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = with(density) { navigationBarHeight.toDp() })
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactNavLayout(
+    navController: NavHostController,
+    navigationItems: List<NavigationItem>,
+    navigationSelectedItem: Int,
+    onItemSelected: (Int) -> Unit,
+    onNavigationBarSizeChanged: (Int) -> Unit,
+    onThemeToggle: () -> Unit,
+    currentThemeMode: ThemeMode,
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            AdaptiveNavigation(
+                items = navigationItems,
+                selectedItem = navigationSelectedItem,
+                onItemSelected = onItemSelected,
+                modifier = Modifier
+                    .testTag(MainTestTags.BottomNav.ROOT)
+                    .onSizeChanged { size ->
+                        onNavigationBarSizeChanged(size.height)
+                    },
+            )
+        },
+    ) { paddingValues ->
+        BottomNavHost(
+            navController = navController,
+            paddingValues = paddingValues,
+            onThemeToggle = onThemeToggle,
+            currentThemeMode = currentThemeMode,
         )
     }
 }
 
 @Composable
-private fun NavigationIcon(
-    icon: ImageVector,
-    label: String,
-    showBadge: Boolean,
+private fun RailNavLayout(
+    navController: NavHostController,
+    navigationItems: List<NavigationItem>,
+    navigationSelectedItem: Int,
+    onItemSelected: (Int) -> Unit,
+    onThemeToggle: () -> Unit,
+    currentThemeMode: ThemeMode,
 ) {
-    Box {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            modifier = Modifier.size(24.dp),
+    Row(modifier = Modifier.fillMaxSize()) {
+        // NavigationRail слева
+        AdaptiveNavigation(
+            items = navigationItems,
+            selectedItem = navigationSelectedItem,
+            onItemSelected = onItemSelected,
+            modifier = Modifier.fillMaxHeight(),
         )
-        if (showBadge) {
-            NewBadge(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 4.dp, y = 4.dp),
+
+        // Контент справа
+        Scaffold(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+        ) { paddingValues ->
+            BottomNavHost(
+                navController = navController,
+                paddingValues = paddingValues,
+                onThemeToggle = onThemeToggle,
+                currentThemeMode = currentThemeMode,
             )
         }
+    }
+}
+
+private fun handleNavigation(
+    navController: NavHostController,
+    route: String,
+    showWikiBadge: Boolean,
+    onWikiBadgeClick: () -> Unit,
+) {
+    // Скрываем бейдж при клике на Wiki
+    if (route == Screens.Wiki.route && showWikiBadge) {
+        onWikiBadgeClick()
+    }
+    navController.navigate(route) {
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }
 
@@ -269,19 +332,17 @@ private fun BottomNavHost(
     navController: NavHostController,
     paddingValues: PaddingValues,
     onThemeToggle: () -> Unit,
-    currentThemeMode: ThemeMode
+    currentThemeMode: ThemeMode,
 ) {
     NavHost(
         navController = navController,
         startDestination = Screens.News.route,
-        modifier = Modifier.padding(
-            paddingValues = paddingValues,
-        ),
+        modifier = Modifier.padding(paddingValues),
     ) {
         composable(Screens.News.route) {
             RootNews(
                 onThemeToggle = onThemeToggle,
-                currentThemeMode = currentThemeMode
+                currentThemeMode = currentThemeMode,
             )
         }
         composable(Screens.Books.route) {
@@ -302,22 +363,22 @@ fun bottomNavigationItems(): List<BottomNavigationItem> {
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_news),
             icon = Icons.Filled.Home,
-            route = Screens.News.route
+            route = Screens.News.route,
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_books),
             icon = Icons.Filled.BooksVector,
-            route = Screens.Books.route
+            route = Screens.Books.route,
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_wiki),
             icon = Icons.Filled.Search,
-            route = Screens.Wiki.route
+            route = Screens.Wiki.route,
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_info),
             icon = Icons.Filled.Info,
-            route = Screens.Info.route
+            route = Screens.Info.route,
         ),
     )
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import su.sv.bugreport.R
 import su.sv.bugreport.presentation.bugreport.viewmodel.model.BugReportState
+import su.sv.commonui.theme.LocalAdaptiveDimensions
+
+private val FORM_MAX_WIDTH = 600.dp
 
 @Composable
 fun BugReportForm(
@@ -50,112 +54,120 @@ fun BugReportForm(
     onSendReport: () -> Unit,
     contentPadding: PaddingValues,
 ) {
-    Column(
+    val adaptiveDims = LocalAdaptiveDimensions.current
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(contentPadding)
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(contentPadding),
+        contentAlignment = Alignment.TopCenter,
     ) {
-        Text(
-            text = stringResource(R.string.bug_report_description_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-        )
-
-        OutlinedTextField(
-            value = state.description,
-            onValueChange = onDescriptionChange,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(R.string.bug_report_description_label)) },
-            placeholder = { Text(stringResource(R.string.bug_report_description_hint)) },
-            isError = state.descriptionError != null,
-            supportingText = {
-                state.descriptionError?.let { error ->
-                    Text(error)
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences
-            ),
-            minLines = 3,
-            // Авто-расширение в зависимости от текста
-            maxLines = Int.MAX_VALUE,
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Скриншоты
-        Text(
-            text = stringResource(R.string.bug_report_screenshots_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        // Превью скриншотов
-        if (state.screenshots.isNotEmpty()) {
-            ScreenshotPreviewRow(
-                screenshots = state.screenshots,
-                onRemoveClick = onRemoveScreenshot
-            )
-        }
-
-        // Кнопка добавления скриншотов
-        if (state.canAddMoreScreenshots) {
-            OutlinedButton(
-                onClick = onAddScreenshotsClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    stringResource(
-                        R.string.bug_report_add_screenshot,
-                        state.screenshotCount,
-                        state.maxScreenshots
-                    )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Чекбокс для обратной связи
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .widthIn(max = adaptiveDims.contentMaxWidth ?: FORM_MAX_WIDTH)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Checkbox(
-                checked = state.sendEmailForFeedback,
-                onCheckedChange = onSendEmailForFeedbackChange
-            )
             Text(
-                text = stringResource(R.string.bug_report_send_email_for_feedback),
+                text = stringResource(R.string.bug_report_description_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            )
+
+            OutlinedTextField(
+                value = state.description,
+                onValueChange = onDescriptionChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.bug_report_description_label)) },
+                placeholder = { Text(stringResource(R.string.bug_report_description_hint)) },
+                isError = state.descriptionError != null,
+                supportingText = {
+                    state.descriptionError?.let { error ->
+                        Text(error)
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences
+                ),
+                minLines = 3,
+                // Авто-расширение в зависимости от текста
+                maxLines = Int.MAX_VALUE,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Скриншоты
+            Text(
+                text = stringResource(R.string.bug_report_screenshots_title),
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Кнопка отправки
-        Button(
-            onClick = onSendReport,
-            enabled = state.isSendButtonEnabled && !state.isSending,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            if (state.isSending) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
+            // Превью скриншотов
+            if (state.screenshots.isNotEmpty()) {
+                ScreenshotPreviewRow(
+                    screenshots = state.screenshots,
+                    onRemoveClick = onRemoveScreenshot
                 )
-            } else {
-                Text(stringResource(R.string.bug_report_send_button))
+            }
+
+            // Кнопка добавления скриншотов
+            if (state.canAddMoreScreenshots) {
+                OutlinedButton(
+                    onClick = onAddScreenshotsClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        stringResource(
+                            R.string.bug_report_add_screenshot,
+                            state.screenshotCount,
+                            state.maxScreenshots
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Чекбокс для обратной связи
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = state.sendEmailForFeedback,
+                    onCheckedChange = onSendEmailForFeedbackChange
+                )
+                Text(
+                    text = stringResource(R.string.bug_report_send_email_for_feedback),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Кнопка отправки
+            Button(
+                onClick = onSendReport,
+                enabled = state.isSendButtonEnabled && !state.isSending,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (state.isSending) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(stringResource(R.string.bug_report_send_button))
+                }
             }
         }
     }

@@ -47,6 +47,10 @@ class BookmarksViewModel @Inject constructor(
     private val _effect = Channel<BookmarksEffect>(capacity = Channel.BUFFERED)
     val effect: Flow<BookmarksEffect> get() = _effect.receiveAsFlow()
 
+    /** Выбранная заметка для detail панели (master-detail на планшетах) */
+    private val _selectedNote = MutableStateFlow<UiBookmarkNote?>(null)
+    val selectedNote: StateFlow<UiBookmarkNote?> get() = _selectedNote
+
     private var currentViewMode: NotesViewMode = NotesViewMode.LIST
 
     init {
@@ -112,6 +116,14 @@ class BookmarksViewModel @Inject constructor(
 
             is BookmarksAction.OnShareNote -> {
                 _effect.trySend(BookmarksEffect.ShareNote(action.note.getShareText()))
+            }
+
+            is BookmarksAction.OnNoteSelect -> {
+                _selectedNote.value = action.note
+            }
+
+            BookmarksAction.OnNoteDeselect -> {
+                _selectedNote.value = null
             }
         }
     }
@@ -292,6 +304,12 @@ sealed class BookmarksAction {
     object OnDeleteNoteCancel : BookmarksAction()
     data class OnBookClick(val bookId: String) : BookmarksAction()
     data class OnShareNote(val note: UiBookmarkNote) : BookmarksAction()
+
+    /** Выбрать заметку для detail панели (master-detail на планшетах) */
+    data class OnNoteSelect(val note: UiBookmarkNote) : BookmarksAction()
+
+    /** Сбросить выбор заметки (master-detail на планшетах) */
+    object OnNoteDeselect : BookmarksAction()
 }
 
 /**

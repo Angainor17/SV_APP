@@ -21,6 +21,7 @@ import su.sv.wiki.domain.usecase.AddFavoriteUseCase
 import su.sv.wiki.domain.usecase.AddHistoryUseCase
 import su.sv.wiki.domain.usecase.ClearHistoryUseCase
 import su.sv.wiki.domain.usecase.GetArticleUseCase
+import su.sv.wiki.domain.usecase.GetFavoritesUseCase
 import su.sv.wiki.domain.usecase.GetHistoryUseCase
 import su.sv.wiki.domain.usecase.GetSearchSuggestionsUseCase
 import su.sv.wiki.domain.usecase.HasFavoritesUseCase
@@ -54,6 +55,7 @@ class RootWikiViewModel @Inject constructor(
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val getSearchSuggestionsUseCase: GetSearchSuggestionsUseCase,
     private val hasFavoritesUseCase: HasFavoritesUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
     private val mapper: UiWikiMapper,
 ) : BaseViewModel(), WikiActionsHandler {
 
@@ -75,6 +77,13 @@ class RootWikiViewModel @Inject constructor(
     /** Наличие избранных статей */
     val hasFavorites: Flow<Boolean> = hasFavoritesUseCase.execute()
 
+    /** Список избранных статей (для master-detail на планшетах) */
+    val favorites: Flow<List<WikiArticle>> = getFavoritesUseCase()
+
+    /** Выбранная статья для detail панели (null если ничего не выбрано) */
+    private val _selectedArticleTitle = MutableStateFlow<String?>(null)
+    val selectedArticleTitle: StateFlow<String?> = _selectedArticleTitle.asStateFlow()
+
     /** Одноразовые события */
     private val _oneTimeEffect = Channel<WikiOneTimeEffect>(capacity = Channel.BUFFERED)
     val oneTimeEffect: Flow<WikiOneTimeEffect> = _oneTimeEffect.receiveAsFlow()
@@ -95,6 +104,8 @@ class RootWikiViewModel @Inject constructor(
             is WikiActions.OnSearchQueryChanged -> onSearchQueryChanged(action.query)
             is WikiActions.OnSuggestionClick -> onSuggestionClick(action.title)
             is WikiActions.OnSuggestionApplied -> onSuggestionApplied()
+            is WikiActions.OnFavoriteClick -> onFavoriteClick(action.article)
+            is WikiActions.OnCloseDetail -> onCloseDetail()
         }
     }
 
@@ -279,5 +290,23 @@ class RootWikiViewModel @Inject constructor(
     private fun onCloseArticle() {
         _state.value = UiWikiState.Initial
         currentQuery = ""
+    }
+
+    /**
+     * Выбрать статью из избранного для показа в detail панели
+     * (используется в master-detail layout на планшетах)
+     */
+    private fun onFavoriteClick(article: WikiArticle) {
+        _selectedArticleTitle.value = article.title
+        loadArticle(article.title, addToHistory = true)
+    }
+
+    /**
+     * Закрыть detail панель
+     * (используется в master-detail layout на планшетах)
+     */
+    private fun onCloseDetail() {
+        _selectedArticleTitle.value = null
+        _state.value = UiWikiState.Initial
     }
 }
