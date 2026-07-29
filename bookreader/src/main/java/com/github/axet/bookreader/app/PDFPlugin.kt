@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import android.util.SparseArray
 import com.github.axet.androidlibrary.app.Natives
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
@@ -41,9 +42,17 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         @JvmStatic
         fun create(info: Storage.Info): PDFPlugin {
+            Log.d(TAG, "create() called, Config.natives=${Config.natives}")
             if (Config.natives) {
-                Natives.loadLibraries(info.context, "modpdfium", "pdfiumjni")
-                Config.natives = false
+                Log.d(TAG, "Loading native libraries: modpdfium, pdfiumjni")
+                try {
+                    Natives.loadLibraries(info.context, "modpdfium", "pdfiumjni")
+                    Config.natives = false
+                    Log.d(TAG, "Native libraries loaded successfully")
+                } catch (e: Throwable) {
+                    Log.e(TAG, "Failed to load native libraries", e)
+                    throw e
+                }
             }
             return PDFPlugin(info)
         }
@@ -56,15 +65,51 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     @Throws(BookReadingException::class)
     override fun readMetainfo(book: AbstractBook) {
         val f = BookUtil.fileByBook(book)
+        Log.d(TAG, "readMetainfo() file=${f.path}, exists=${f.exists()}")
+
+        // Проверяем размер файла
+        val file = File(f.path)
+        val fileSize = if (file.exists()) file.length() else -1L
+        Log.d(TAG, "readMetainfo() fileSize=$fileSize bytes")
+
+        if (!file.exists()) {
+            Log.e(TAG, "readMetainfo() file does not exist!")
+            throw IllegalStateException("File does not exist: ${f.path}")
+        }
+
+        if (fileSize == 0L) {
+            Log.e(TAG, "readMetainfo() file is empty!")
+            throw IllegalStateException("File is empty: ${f.path}")
+        }
+
         try {
             val doc = Pdfium()
+            Log.d(TAG, "readMetainfo() opening file: ${f.path}")
             val fd = ParcelFileDescriptor.open(File(f.path), ParcelFileDescriptor.MODE_READ_ONLY)
+            Log.d(TAG, "readMetainfo() fd created, fd=$fd")
+
+            if (fd.fileDescriptor == null) {
+                Log.e(TAG, "readMetainfo() fileDescriptor is null")
+                fd.close()
+                throw IllegalStateException("FileDescriptor is null")
+            }
+
+            Log.d(TAG, "readMetainfo() calling doc.open()...")
             doc.open(fd.fileDescriptor)
+            Log.d(TAG, "readMetainfo() doc opened successfully")
+
             book.addAuthor(doc.getMeta(Pdfium.META_AUTHOR))
             book.setTitle(doc.getMeta(Pdfium.META_TITLE))
+            Log.d(TAG, "readMetainfo() meta read, closing doc")
             doc.close()
+            fd.close()
+            Log.d(TAG, "readMetainfo() completed successfully")
         } catch (e: IOException) {
+            Log.e(TAG, "readMetainfo() IOException", e)
             throw IllegalStateException(e)
+        } catch (e: Throwable) {
+            Log.e(TAG, "readMetainfo() unexpected error: ${e.javaClass.simpleName}: ${e.message}", e)
+            throw e
         }
     }
 
@@ -77,13 +122,20 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     }
 
     override fun readCover(f: ZLFile): ZLImage {
+        Log.d(TAG, "readCover() file=${f.path}")
         val view = PdfiumView(f)
+        Log.d(TAG, "readCover() view created, scaling")
         view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
+        Log.d(TAG, "readCover() creating bitmap: ${view.current!!.pageBox!!.w}x${view.current!!.pageBox!!.h}")
         val bm = Bitmap.createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
         val canvas = Canvas(bm)
+        Log.d(TAG, "readCover() drawing wallpaper")
         view.drawWallpaper(canvas)
+        Log.d(TAG, "readCover() rendering page")
         view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)
+        Log.d(TAG, "readCover() closing view")
         view.close()
+        Log.d(TAG, "readCover() completed")
         return ZLBitmapImage(bm)
     }
 
@@ -711,13 +763,47 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         var fd: ParcelFileDescriptor
 
         init {
+            Log.d(TAG, "PdfiumView.init() file=${f.path}, exists=${f.exists()}")
+
+            // Проверяем размер файла
+            val file = File(f.path)
+            val fileSize = if (file.exists()) file.length() else -1L
+            Log.d(TAG, "PdfiumView.init() fileSize=$fileSize bytes")
+
+            if (!file.exists()) {
+                Log.e(TAG, "PdfiumView.init() file does not exist!")
+                throw IllegalStateException("File does not exist: ${f.path}")
+            }
+
+            if (fileSize == 0L) {
+                Log.e(TAG, "PdfiumView.init() file is empty!")
+                throw IllegalStateException("File is empty: ${f.path}")
+            }
+
             try {
+                Log.d(TAG, "PdfiumView.init() creating Pdfium instance")
                 doc = Pdfium()
+                Log.d(TAG, "PdfiumView.init() opening ParcelFileDescriptor")
                 fd = ParcelFileDescriptor.open(File(f.path), ParcelFileDescriptor.MODE_READ_ONLY)
+                Log.d(TAG, "PdfiumView.init() fd=$fd")
+
+                if (fd.fileDescriptor == null) {
+                    Log.e(TAG, "PdfiumView.init() fileDescriptor is null")
+                    fd.close()
+                    throw IllegalStateException("FileDescriptor is null")
+                }
+
+                Log.d(TAG, "PdfiumView.init() calling doc.open()...")
                 doc.open(fd.fileDescriptor)
+                Log.d(TAG, "PdfiumView.init() doc opened, pages=${doc.pagesCount}")
                 current = PdfiumPage(doc)
+                Log.d(TAG, "PdfiumView.init() completed successfully")
             } catch (e: IOException) {
+                Log.e(TAG, "PdfiumView.init() IOException", e)
                 throw IllegalStateException(e)
+            } catch (e: Throwable) {
+                Log.e(TAG, "PdfiumView.init() unexpected error", e)
+                throw e
             }
         }
 
@@ -732,13 +818,23 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         override fun render(w: Int, h: Int, page: Int, c: Bitmap.Config): Bitmap? {
+            // Ограничиваем масштаб на больших экранах, чтобы избежать краша pdfium
+            // На планшетах w и h уже большие, не нужно удваивать
+            val maxDimension = 2000
+            val scaleMultiplier = if (w > maxDimension || h > maxDimension) 1 else 2
+
+            Log.d(TAG, "render() page=$page, w=$w, h=$h, scaleMultiplier=$scaleMultiplier")
             val r = PdfiumPage(doc, page, w, h)
-            r.scale(w * 2, h * 2)
+            r.scale(w * scaleMultiplier, h * scaleMultiplier)
+            Log.d(TAG, "render() creating bitmap: ${r.pageBox!!.w}x${r.pageBox!!.h}")
             val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
+            Log.d(TAG, "render() opening page $page")
             val p = doc.openPage(r.pageNumber)
+            Log.d(TAG, "render() rendering page")
             p.render(bm, 0, 0, bm.width, bm.height)
             p.close()
             bm.density = r.dpi
+            Log.d(TAG, "render() completed")
             return bm
         }
 

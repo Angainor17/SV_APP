@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -16,8 +17,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -33,10 +37,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
+import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithThemeToggle
 import su.sv.commonui.ui.components.FullScreenError
+import su.sv.commonui.ui.components.FullScreenImageViewer
 import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.news.R
 import su.sv.news.presentation.debug.ThemeEditorScreen
@@ -45,6 +51,16 @@ import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
 import su.sv.news.testing.NewsTestTags
+
+/**
+ * Состояние для полноэкранного просмотра изображений
+ */
+private data class ImageViewerState(
+    val images: List<String> = emptyList(),
+    val initialIndex: Int = 0,
+) {
+    val isVisible: Boolean = images.isNotEmpty()
+}
 
 /**
  * Главный экран новостей
@@ -64,9 +80,13 @@ fun RootNews(
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val stackNavigation = LocalStackNavigation.current
+    val adaptiveDims = LocalAdaptiveDimensions.current
 
     val lazyPagingItems = viewModel.pagingDataFlow.collectAsLazyPagingItems()
     val loadState = lazyPagingItems.loadState.refresh
+
+    // Состояние для просмотрщика изображений
+    var imageViewerState by remember { mutableStateOf(ImageViewerState()) }
 
     HandleEffects(viewModel, snackbarHostState)
 
@@ -118,18 +138,44 @@ fun RootNews(
                     viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
                 }
 
-                NewsList(
-                    lazyPagingItems = lazyPagingItems,
-                    actions = viewModel,
-                    state = stateValue,
-                    contentPadding = contentPadding,
-                )
+                // Ограничение ширины контента для планшетов
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .widthIn(max = adaptiveDims.contentMaxWidth ?: 840.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    NewsList(
+                        lazyPagingItems = lazyPagingItems,
+                        actions = viewModel,
+                        state = stateValue,
+                        contentPadding = contentPadding,
+                        onImageClick = { newsItem, imageIndex ->
+                            // Открываем просмотрщик изображений
+                            imageViewerState = ImageViewerState(
+                                images = newsItem.images.map { it.image },
+                                initialIndex = imageIndex,
+                            )
+                        }
+                    )
+                }
             }
 
             else -> {
                 NoNews()
             }
         }
+    }
+
+    // Полноэкранный просмотрщик изображений
+    if (imageViewerState.isVisible) {
+        FullScreenImageViewer(
+            images = imageViewerState.images,
+            initialIndex = imageViewerState.initialIndex,
+            onDismiss = {
+                imageViewerState = ImageViewerState()
+            }
+        )
     }
 }
 
@@ -158,6 +204,10 @@ private fun HandleEffects(
 
             is NewsListOneTimeEffect.OpenNewsVideo -> {
                 context.openVideo(effect.item)
+            }
+
+            is NewsListOneTimeEffect.OpenNewsImages -> {
+                // Обрабатывается через UI state, не через эффект
             }
         }
     }

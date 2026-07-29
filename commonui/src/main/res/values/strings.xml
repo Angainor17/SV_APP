@@ -28,4 +28,8 @@
     <string name="theme_switch_to_dark">Переключить на тёмную тему</string>
     <string name="theme_switch_to_system">Переключить на системную тему</string>
 
+    <!-- ПОЛНОЭКРАННЫЙ ПРОСМОТР ИЗОБРАЖЕНИЙ -->
+    <string name="image_viewer_content_description">Изображение %1$d из %2$d</string>
+    <string name="image_viewer_close">Закрыть просмотр изображения</string>
+
 </resources>

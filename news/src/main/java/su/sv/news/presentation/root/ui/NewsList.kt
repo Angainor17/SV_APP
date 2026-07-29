@@ -23,6 +23,7 @@ import androidx.paging.compose.itemKey
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.ui.components.AppLoadingIndicator
 import su.sv.news.presentation.root.model.UiNewsItem
+import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.model.UiRootNewsState
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
@@ -35,6 +36,7 @@ import su.sv.news.testing.NewsTestTags
  * @param state состояние экрана
  * @param actions обработчик действий
  * @param contentPadding отступы от Scaffold
+ * @param onImageClick обработчик клика на изображение (новость, индекс изображения)
  */
 @Composable
 fun NewsList(
@@ -42,6 +44,7 @@ fun NewsList(
     state: UiRootNewsState,
     actions: RootNewsActionsHandler,
     contentPadding: PaddingValues,
+    onImageClick: (UiNewsItem, Int) -> Unit = { _, _ -> },
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     val dimensions = LocalAppDimensions.current
@@ -73,12 +76,33 @@ fun NewsList(
                     NewsItem(
                         modifier = Modifier.testTag(NewsTestTags.ITEM),
                         item = item,
-                        onItemClick = {
-                            actions.onAction(RootNewsActions.OnNewsMediaClick(it))
+                        onItemClick = { media ->
+                            handleMediaClick(item, media, actions, onImageClick)
                         }
                     )
                 } ?: MessagePlaceholder()
             }
+        }
+    }
+}
+
+/**
+ * Обработка клика на медиа-контент
+ */
+private fun handleMediaClick(
+    newsItem: UiNewsItem,
+    media: UiNewsMedia,
+    actions: RootNewsActionsHandler,
+    onImageClick: (UiNewsItem, Int) -> Unit,
+) {
+    when (media) {
+        is UiNewsMedia.ItemVideo -> {
+            actions.onAction(RootNewsActions.OnNewsMediaClick(media))
+        }
+        is UiNewsMedia.ItemImage -> {
+            // Находим индекс изображения в списке изображений новости
+            val imageIndex = newsItem.images.indexOfFirst { it.image == media.image }
+            onImageClick(newsItem, imageIndex.coerceAtLeast(0))
         }
     }
 }

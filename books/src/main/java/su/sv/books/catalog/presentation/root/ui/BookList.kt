@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
+import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalAppDimensions
 
 @Composable
@@ -35,6 +36,7 @@ fun BookList(
     val pullToRefreshState = rememberPullToRefreshState()
     val lazyGridState = rememberLazyGridState()
     val dimensions = LocalAppDimensions.current
+    val adaptiveDims = LocalAdaptiveDimensions.current
 
     // Скролл к началу при смене фильтра
     // Используем filterScrollResetKey как ключ - он инкрементируется при каждом изменении фильтра
@@ -77,12 +79,12 @@ fun BookList(
         ) {
             LazyVerticalGrid(
                 state = lazyGridState,
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
+                columns = GridCells.Fixed(adaptiveDims.gridColumns),
+                horizontalArrangement = Arrangement.spacedBy(adaptiveDims.gridSpacing),
                 verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
                 contentPadding = PaddingValues(
-                    start = dimensions.screenPaddingHorizontal / 2,
-                    end = dimensions.screenPaddingHorizontal / 2,
+                    start = adaptiveDims.screenPadding / 2,
+                    end = adaptiveDims.screenPadding / 2,
                     bottom = 16.dp,
                 ),
             ) {

@@ -39,4 +39,8 @@
     <string name="wiki_added_to_favorites">\"%s\" добавлено в избранное</string>
     <string name="wiki_removed_from_favorites">\"%s\" удалено из избранного</string>
     <string name="wiki_open_in_browser">Открыть в браузере</string>
+
+    <!-- Master-Detail (планшеты) -->
+    <string name="wiki_favorites_select_hint">Выберите статью из избранного</string>
+    <string name="wiki_error_loading">Ошибка загрузки</string>
 </resources>

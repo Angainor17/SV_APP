@@ -1,6 +1,9 @@
 package su.sv.info.rootinfo.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -10,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -19,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.forward
 import su.sv.bugreport.presentation.nav.BugReportScreen
+import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbar
 import su.sv.commonui.ui.components.FullScreenError
@@ -38,6 +43,7 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val stackNavigation = LocalStackNavigation.current
+    val adaptiveDims = LocalAdaptiveDimensions.current
 
     // Обработка эффектов навигации
     OneTimeEffect(viewModel.effect) { effect ->
@@ -71,23 +77,31 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
             )
         }
     ) { contentPadding ->
-        when (val currentState = state.value) {
-            is UiInfoState.Content -> {
-                InfoContent(
-                    actionsHandler = viewModel,
-                    state = currentState,
-                    contentPadding = contentPadding,
-                )
-            }
+        // Ограничение ширины контента для планшетов
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .widthIn(max = adaptiveDims.contentMaxWidth ?: 840.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            when (val currentState = state.value) {
+                is UiInfoState.Content -> {
+                    InfoContent(
+                        actionsHandler = viewModel,
+                        state = currentState,
+                        contentPadding = contentPadding,
+                    )
+                }
 
-            UiInfoState.Loading -> {
-                FullScreenLoading()
-            }
+                UiInfoState.Loading -> {
+                    FullScreenLoading()
+                }
 
-            is UiInfoState.Failure -> {
-                FullScreenError(
-                    onRetry = { viewModel.onAction(RootInfoActions.OnRetryClick) }
-                )
+                is UiInfoState.Failure -> {
+                    FullScreenError(
+                        onRetry = { viewModel.onAction(RootInfoActions.OnRetryClick) }
+                    )
+                }
             }
         }
     }

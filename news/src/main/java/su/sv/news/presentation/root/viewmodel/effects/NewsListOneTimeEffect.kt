@@ -22,4 +22,10 @@ sealed class NewsListOneTimeEffect {
     data class OpenNewsVideo(
         val item: UiNewsMedia.ItemVideo,
     ) : NewsListOneTimeEffect()
+
+    /** Открыть просмотрщик изображений новости */
+    data class OpenNewsImages(
+        val images: List<UiNewsMedia.ItemImage>,
+        val initialIndex: Int = 0,
+    ) : NewsListOneTimeEffect()
 }

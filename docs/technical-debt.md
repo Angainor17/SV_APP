@@ -185,6 +185,135 @@ tasks.register("checkDependencies") {
 
 ---
 
+## Адаптивный UI для планшетов
+
+### 🔴 P0: Краш PDF на планшете
+
+**Проблема:** При открытии PDF книги на планшете происходит краш в нативной библиотеке.
+
+**Модуль:** bookreader / fbreader
+**Ошибка:** `Fatal signal 5 (SIGTRAP)` в `libmodpdfium.so`
+
+**Стек:**
+```
+#00 pc 0000000000333e2c  libmodpdfium.so
+#01 pc 0000000000335f94  libmodpdfium.so
+...
+```
+
+**Возможные причины:**
+- Проблема с размером экрана/буфером
+- Несовместимость PDF плагина с планшетами
+- Проблема с memory allocation
+
+**Решение:**
+1. Проверить на другом PDF файле
+2. Обновить axet/pdfium версию
+3. Добавить fallback для планшетов
+
+---
+
+### 🟡 P2: Двухстраничный режим читалки
+
+**Проблема:** Читалка книг не поддерживает режим "книжного разворота" для планшетов.
+
+**Модуль:** bookreader
+**Файлы:**
+- `widgets/ScrollWidget.java` — legacy Java, требует декомпозиции
+- `widgets/FBReaderView.java` — legacy Java
+- `screens/ReaderScreen.kt` — интеграция
+
+**Решение:**
+1. Создать `TwoPageLayout.kt` компонент
+2. Модифицировать ScrollWidget для отображения двух страниц
+3. Добавить настройку в ReaderSettings для включения/выключения
+4. Активировать только для Expanded + landscape
+
+**Сложности:**
+- Требует изменений в legacy Java коде (ScrollWidget, FBReaderView)
+- Нужно синхронизировать скролл между двумя страницами
+- Управление состоянием (текущая страница, режим)
+
+**Риски:** Может сломать существующий функционал чтения
+
+---
+
+### 🟡 P2: Wiki Master-detail layout
+
+**Проблема:** На планшетах можно показать список избранного слева и статью справа.
+
+**Модуль:** wiki
+**Файлы:**
+- `root/RootWiki.kt` — главный экран
+- `presentation/favorites/FavoritesScreen.kt` — список избранного
+- `presentation/article/ArticleScreen.kt` — статья
+
+**Решение:**
+1. Использовать `MasterDetailLayout` из commonui
+2. Создать адаптивную версию RootWiki для Expanded
+3. Слева: список избранного (35%)
+4. Справа: статья (65%)
+5. Синхронизация выбора с навигацией
+
+**Риски:**
+- Усложнение навигации (Modo + внутренний state)
+- Управление состоянием выбора статьи
+- Требует изменения ViewModel для поддержки двухпанельного режима
+
+**Статус:** Отложено - требует значительной переработки навигации
+
+---
+
+### 🟡 P2: Bookmarks Master-detail layout
+
+**Проблема:** На планшетах можно показать список заметок слева и предпросмотр справа.
+
+**Модуль:** books/bookreader
+**Файлы:**
+- `bookreader/screens/ui/BookmarksComposeDialog.kt`
+- `books/catalog/presentation/bookmarks/`
+
+**Решение:**
+1. Master-detail layout для Expanded
+2. Слева: список заметок с текстом
+3. Справа: навигация к заметке или предпросмотр
+
+**Статус:** Отложено - требует переработки навигации
+
+---
+
+### 🟡 P2: DownloadedBooks адаптивный layout
+
+**Проблема:** Список скачанных книг не оптимизирован для планшетов.
+
+**Модуль:** books
+**Файлы:**
+- `books/catalog/presentation/downloaded/ui/DownloadedBooksScreen.kt`
+- `DownloadedBookItem.kt`
+
+**Решение:**
+1. Заменить список на плитку (grid) для планшетов
+2. Адаптивный layout для удаления (swipe → долгое нажатие или кнопка)
+3. На телефонах сохранить текущий список со swipe-to-delete
+
+---
+
+### 🟡 P2: BugReport адаптивный layout
+
+**Проблема:** Поля и кнопки на весь экран планшета - неудобно.
+
+**Модуль:** bugreport
+**Файлы:**
+- `bugreport/presentation/nav/BugReportScreen.kt`
+- `bugreport/presentation/bugreport/ui/BugReportContent.kt`
+
+**Решение:**
+1. Ограничить ширину формы (maxWidth = 600dp)
+2. Компактный layout для планшетов
+3. Центрировать форму на экране
+
+---
+
 ## Документация
 
 ### 🟢 P3: Обновить ARCHITECTURE.md
@@ -227,6 +356,41 @@ tasks.register("checkDependencies") {
 ### ✅ Локализация (2026-07-27)
 
 - Настроена локализация только на русский: `resConfigs("ru")`
+
+### ✅ Адаптивный UI для планшетов (2026-07-27)
+
+- Добавлена зависимость `androidx.window:window-core:1.3.0`
+- Создан `DeviceFormFactor` sealed class (Compact/Medium/Expanded)
+- Создан `AdaptiveDimensions` для размеров по форм-фактору
+- Реализована адаптивная навигация:
+  - Compact: BottomNavigation (без изменений)
+  - Medium/Expanded: NavigationRail
+- Адаптивные колонки в каталоге книг (2/3/4)
+- Master-detail компонент для планшетов
+- Ограничение ширины контента (Wiki, News, Info)
+- Документация: `docs/ADAPTIVE_UI_ARCHITECTURE.md`
+
+### ✅ FullScreenImageViewer (2026-07-28)
+
+- Компонент для полноэкранного просмотра изображений
+- HorizontalPager для свайпа между изображениями
+- Pinch-to-zoom и pan для масштабирования
+- Двойной тап для быстрого зума
+- Индикатор страниц и счётчик
+- Интеграция в модуль News
+
+### ✅ BugReport адаптивный layout (2026-07-28)
+
+- Ограничение ширины формы (max 600dp)
+- Центрирование на планшетах
+- Использование LocalAdaptiveDimensions
+
+### ✅ DownloadedBooks адаптивный layout (2026-07-28)
+
+- Grid layout для планшетов (LazyVerticalStaggeredGrid)
+- Кнопка удаления в карточке для планшетов
+- Долгое нажатие для удаления на планшетах
+- Сохранён swipe-to-delete для телефонов
 
 ---
 

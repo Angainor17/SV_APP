@@ -62,5 +62,8 @@ dependencies {
     // Logging
     implementation(libs.timber)
 
+    // Adaptive UI
+    implementation(libs.androidx.window.core)
+
     implementation(libs.threetenabp)
 }

@@ -77,6 +77,10 @@ class RootNewsViewModel @Inject constructor(
                     _oneTimeEffect.trySend(NewsListOneTimeEffect.OpenNewsVideo(item))
                 }
             }
+
+            is RootNewsActions.OnNewsImageClick -> {
+                // Обрабатывается в UI через onImageClick callback
+            }
         }
     }
 

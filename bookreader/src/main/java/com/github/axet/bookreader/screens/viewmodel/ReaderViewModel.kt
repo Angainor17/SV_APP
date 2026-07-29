@@ -147,31 +147,38 @@ class ReaderViewModel @Inject constructor(
     // ==================== Загрузка книги ====================
 
     private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?, bookCoverUrl: String?, bookTitle: String?, bookAuthor: String?) {
+        Timber.tag("voronin").d("=== loadBook START ===")
+        Timber.tag("voronin").d("uri=$uri")
+        Timber.tag("voronin").d("position=$position")
+        Timber.tag("voronin").d("bookCoverUrl=$bookCoverUrl, bookTitle=$bookTitle, bookAuthor=$bookAuthor")
+
         viewModelScope.launch {
             _state.value = ReaderState.Loading
 
             // Сохраняем переданную позицию для применения после загрузки книги
             if (position != null) {
                 savedPosition = position
-                Timber.d("Saved initial position from bookmark: $position")
+                Timber.tag("voronin").d("Saved initial position from bookmark: $position")
             }
 
             try {
+                Timber.tag("voronin").d("Checking file accessibility...")
                 // Проверяем доступность файла
                 val inputStream = try {
                     context.contentResolver.openInputStream(uri)
                 } catch (e: SecurityException) {
-                    Timber.e(e, "Security exception accessing file: $uri")
+                    Timber.tag("voronin").e(e, "Security exception accessing file: $uri")
                     _state.value = ReaderState.Error(
                         context.getString(R.string.sv_error_file_access)
                     )
                     return@launch
                 } catch (e: Exception) {
-                    Timber.e(e, "Error accessing file: $uri")
+                    Timber.tag("voronin").e(e, "Error accessing file: $uri")
                     null
                 }
 
                 if (inputStream == null) {
+                    Timber.tag("voronin").e("Input stream is null - file not found")
                     _state.value = ReaderState.Error(
                         context.getString(R.string.sv_error_file_not_found)
                     )
@@ -179,9 +186,12 @@ class ReaderViewModel @Inject constructor(
                 }
 
                 inputStream.close()
+                Timber.tag("voronin").d("File accessibility check passed")
 
+                Timber.tag("voronin").d("Loading book info via storage.load(uri)...")
                 // Загружаем информацию о книге
                 currentBook = storage.load(uri)
+                Timber.tag("voronin").d("Book loaded: url=${currentBook?.url}, title=${currentBook?.info?.title}")
 
                 // Сохраняем URL обложки из API если передан
                 if (bookCoverUrl != null) {
@@ -196,16 +206,21 @@ class ReaderViewModel @Inject constructor(
                     currentBook?.info?.authors = bookAuthor
                 }
 
+                Timber.tag("voronin").d("Opening book file via storage.read(currentBook)...")
                 // Открываем файл книги
                 currentFBook = storage.read(currentBook)
+                Timber.tag("voronin").d("storage.read() completed, fbook=${currentFBook != null}")
 
                 // Создаём обложку если её нет
+                Timber.tag("voronin").d("Creating cover if needed...")
                 ensureCoverCreated(currentBook, currentFBook)
+                Timber.tag("voronin").d("Cover creation done")
 
                 // Определяем возможность смены шрифта после создания FBReaderView
                 // (canChangeFont требует pluginview который создаётся позже)
 
                 // Обновляем состояние
+                Timber.tag("voronin").d("Updating state to Content...")
                 val currentState = ReaderState.Content(
                     book = currentBook!!,
                     positionText = "",
@@ -213,10 +228,9 @@ class ReaderViewModel @Inject constructor(
                     viewMode = getViewModeFromPrefs(),
                 )
                 _state.value = currentState
-
-                Timber.d("Book loaded: ${currentBook?.info?.title}, savedPosition=$savedPosition")
+                Timber.tag("voronin").d("State updated, book loaded: ${currentBook?.info?.title}, savedPosition=$savedPosition")
             } catch (e: Exception) {
-                Timber.e(e, "Failed to load book")
+                Timber.tag("voronin").e(e, "=== loadBook FAILED ===")
                 val errorMessage = when {
                     e.message?.contains("EACCES") == true ->
                         context.getString(R.string.sv_error_file_access)

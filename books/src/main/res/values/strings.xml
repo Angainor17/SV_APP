@@ -43,6 +43,14 @@
     <string name="bookmarks_delete_dialog_no">Нет</string>
     <string name="bookmarks_book_not_found">Книга не найдена или перемещена</string>
 
+    <!-- NotePreviewDetail -->
+    <string name="bookmarks_note_text_label">Текст заметки</string>
+    <string name="bookmarks_go_to_reader">Перейти к тексту</string>
+    <string name="bookmarks_share_note">Поделиться</string>
+    <string name="bookmarks_delete_note">Удалить</string>
+    <string name="bookmarks_page_format">стр. %1$d</string>
+    <string name="bookmarks_select_hint">Выберите заметку для просмотра</string>
+
     <!-- Plurals for notes count -->
     <plurals name="bookmarks_notes_count">
         <item quantity="one">%1$d заметка</item>

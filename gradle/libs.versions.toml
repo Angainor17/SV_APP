@@ -24,6 +24,7 @@ coilCompose = "3.3.0"
 tracerVersion = "1.3.4"
 uiTooling = "1.8.3"
 datastore = "1.1.7"
+window = "1.3.0"
 
 appcompat = "1.7.1"
 material = "1.12.0"
@@ -83,6 +84,9 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 # DataStore
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# Window Manager (adaptive UI)
+androidx-window-core = { module = "androidx.window:window-core", version.ref = "window" }
 
 #Tracer
 tracer-gradle = { module = 'ru.ok.tracer:ru.ok.tracer.gradle.plugin', version.ref = 'tracerVersion' }

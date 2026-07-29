@@ -16,4 +16,10 @@ sealed class RootNewsActions {
 
     /** Нажатие на видео в списке новости */
     data class OnNewsMediaClick(val item: UiNewsMedia) : RootNewsActions()
+
+    /** Нажатие на изображение в новости */
+    data class OnNewsImageClick(
+        val newsItem: UiNewsItem,
+        val imageIndex: Int = 0,
+    ) : RootNewsActions()
 }
