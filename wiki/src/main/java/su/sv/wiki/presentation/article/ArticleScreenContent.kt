@@ -1,6 +1,7 @@
 package su.sv.wiki.presentation.article
 
 import android.content.Intent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -32,7 +34,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import su.sv.commonui.theme.DeviceFormFactor
+import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.favorite
 import su.sv.commonui.ui.FullScreenError
@@ -92,23 +97,39 @@ fun ArticleScreenContent(
                 FullScreenLoading()
             }
             is ArticleState.Content -> {
-                ArticleContent(
-                    content = currentState.article.content,
-                    links = currentState.article.links,
-                    externalLinks = currentState.article.externalLinks,
-                    imageUrl = currentState.article.imageUrl,
-                    onLinkClick = { title ->
-                        stackNavigation.forward(ArticleScreen(title = title))
-                    },
-                    onExternalLinkClick = { url ->
-                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                        context.startActivity(intent)
-                    },
+                val adaptiveDims = LocalAdaptiveDimensions.current
+                val formFactor = LocalDeviceFormFactor.current
+
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(dimensions.screenPaddingHorizontal),
-                )
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    ArticleContent(
+                        content = currentState.article.content,
+                        links = currentState.article.links,
+                        externalLinks = currentState.article.externalLinks,
+                        imageUrl = currentState.article.imageUrl,
+                        onLinkClick = { title ->
+                            stackNavigation.forward(ArticleScreen(title = title))
+                        },
+                        onExternalLinkClick = { url ->
+                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(dimensions.screenPaddingHorizontal)
+                            .then(
+                                if (formFactor is DeviceFormFactor.Expanded && adaptiveDims.contentMaxWidth != null) {
+                                    Modifier.widthIn(max = adaptiveDims.contentMaxWidth)
+                                } else {
+                                    Modifier
+                                }
+                            ),
+                    )
+                }
             }
             is ArticleState.NotFound -> {
                 NotFoundContent(
