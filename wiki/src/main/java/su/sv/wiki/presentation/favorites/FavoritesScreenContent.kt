@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +48,9 @@ import coil3.compose.SubcomposeAsyncImage
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
+import su.sv.commonui.theme.DeviceFormFactor
+import su.sv.commonui.theme.LocalAdaptiveDimensions
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
@@ -102,31 +106,45 @@ fun FavoritesScreenContent(
             )
         },
     ) { paddingValues ->
-        if (favorites.isEmpty()) {
-            FullScreenEmpty(
-                title = stringResource(R.string.wiki_favorites_empty),
-                icon = Icons.Default.Favorite,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp),
-            ) {
-                items(
-                    items = favorites,
-                    key = { article -> article.title },
-                ) { article ->
-                    FavoriteItem(
-                        article = article,
-                        onClick = {
-                            stackNavigation.forward(ArticleScreen(title = article.title))
-                        },
-                    )
+        val adaptiveDims = LocalAdaptiveDimensions.current
+        val formFactor = LocalDeviceFormFactor.current
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (favorites.isEmpty()) {
+                FullScreenEmpty(
+                    title = stringResource(R.string.wiki_favorites_empty),
+                    icon = Icons.Default.Favorite,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .then(
+                            if (formFactor is DeviceFormFactor.Expanded && adaptiveDims.contentMaxWidth != null) {
+                                Modifier.widthIn(max = adaptiveDims.contentMaxWidth)
+                            } else {
+                                Modifier
+                            }
+                        ),
+                    contentPadding = PaddingValues(16.dp),
+                ) {
+                    items(
+                        items = favorites,
+                        key = { article -> article.title },
+                    ) { article ->
+                        FavoriteItem(
+                            article = article,
+                            onClick = {
+                                stackNavigation.forward(ArticleScreen(title = article.title))
+                            },
+                        )
+                    }
                 }
             }
         }
