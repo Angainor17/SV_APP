@@ -1,6 +1,6 @@
 pluginManagement {
     fun useNexus(): Boolean {
-        return File("local.properties")
+        return File(settingsDir, "local.properties")
             .takeIf { it.exists() }
             ?.inputStream()
             ?.use { java.util.Properties().apply { load(it) } }
@@ -28,7 +28,7 @@ pluginManagement {
 
 dependencyResolutionManagement {
     fun useNexus(): Boolean {
-        return File("local.properties")
+        return File(settingsDir, "local.properties")
             .takeIf { it.exists() }
             ?.inputStream()
             ?.use { java.util.Properties().apply { load(it) } }
