@@ -40,32 +40,78 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         const val EXT = "pdf"
         val TAG: String = PDFPlugin::class.java.simpleName
 
+        // Флаг: использовать Android PdfRenderer вместо нативного pdfium
+        // PdfRenderer работает стабильно на всех устройствах, но имеет меньше функций
+        // pdfium может крашиться на некоторых устройствах (особенно планшеты с большим экраном)
+        private var usePdfRenderer: Boolean? = null
+
         @JvmStatic
         fun create(info: Storage.Info): PDFPlugin {
-            Log.d(TAG, "create() called, Config.natives=${Config.natives}")
-            if (Config.natives) {
-                Log.d(TAG, "Loading native libraries: modpdfium, pdfiumjni")
-                try {
-                    Natives.loadLibraries(info.context, "modpdfium", "pdfiumjni")
-                    Config.natives = false
-                    Log.d(TAG, "Native libraries loaded successfully")
-                } catch (e: Throwable) {
-                    Log.e(TAG, "Failed to load native libraries", e)
-                    throw e
+            Log.d(TAG, "create() called, Config.natives=${Config.natives}, usePdfRenderer=$usePdfRenderer")
+
+            // Определяем, нужно ли использовать Android PdfRenderer
+            if (usePdfRenderer == null) {
+                // На планшетах с большим экраном pdfium может крашиться
+                // Используем Android PdfRenderer как более стабильную альтернативу
+                val isTablet = isTabletDevice(info)
+                Log.d(TAG, "Device type: isTablet=$isTablet")
+
+                // Всегда используем Android PdfRenderer, так как pdfium нестабилен
+                usePdfRenderer = true
+                Log.d(TAG, "Using Android PdfRenderer for stability")
+
+                // Не загружаем нативные библиотеки, если используем PdfRenderer
+                if (usePdfRenderer != true && Config.natives) {
+                    Log.d(TAG, "Loading native libraries: modpdfium, pdfiumjni")
+                    try {
+                        Natives.loadLibraries(info.context, "modpdfium", "pdfiumjni")
+                        Config.natives = false
+                        Log.d(TAG, "Native libraries loaded successfully")
+                    } catch (e: Throwable) {
+                        Log.e(TAG, "Failed to load native libraries", e)
+                        usePdfRenderer = true
+                    }
                 }
             }
+
             return PDFPlugin(info)
         }
+
+        /**
+         * Определить, является ли устройство планшетом
+         */
+        private fun isTabletDevice(info: Storage.Info): Boolean {
+            val dm = info.context.resources.displayMetrics
+            val widthInches = dm.widthPixels / dm.xdpi
+            val heightInches = dm.heightPixels / dm.ydpi
+            val screenSize = kotlin.math.sqrt(widthInches * widthInches + heightInches * heightInches).toDouble()
+            Log.d(TAG, "Screen size: $screenSize inches, width=$widthInches, height=$heightInches")
+            return screenSize >= 7.0 // 7+ дюймов = планшет
+        }
+
+        /**
+         * Проверить, используется ли Android PdfRenderer
+         */
+        fun isUsingPdfRenderer(): Boolean = usePdfRenderer == true
     }
 
     override fun create(fbook: Storage.FBook): Plugin.View {
-        return PdfiumView(BookUtil.fileByBook(fbook.book))
+        val file = BookUtil.fileByBook(fbook.book)
+        Log.d(TAG, "create(fbook) file=${file.path}, usePdfRenderer=$usePdfRenderer")
+
+        return if (isUsingPdfRenderer()) {
+            Log.d(TAG, "Using NativeView (Android PdfRenderer)")
+            NativeView(file)
+        } else {
+            Log.d(TAG, "Using PdfiumView (native library)")
+            PdfiumView(file)
+        }
     }
 
     @Throws(BookReadingException::class)
     override fun readMetainfo(book: AbstractBook) {
         val f = BookUtil.fileByBook(book)
-        Log.d(TAG, "readMetainfo() file=${f.path}, exists=${f.exists()}")
+        Log.d(TAG, "readMetainfo() file=${f.path}, exists=${f.exists()}, usePdfRenderer=$usePdfRenderer")
 
         // Проверяем размер файла
         val file = File(f.path)
@@ -82,33 +128,73 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             throw IllegalStateException("File is empty: ${f.path}")
         }
 
+        if (isUsingPdfRenderer()) {
+            readMetainfoWithPdfRenderer(book, file)
+        } else {
+            readMetainfoWithPdfium(book, file)
+        }
+    }
+
+    @Throws(BookReadingException::class)
+    private fun readMetainfoWithPdfium(book: AbstractBook, file: File) {
+        Log.d(TAG, "readMetainfoWithPdfium() file=${file.path}")
         try {
             val doc = Pdfium()
-            Log.d(TAG, "readMetainfo() opening file: ${f.path}")
-            val fd = ParcelFileDescriptor.open(File(f.path), ParcelFileDescriptor.MODE_READ_ONLY)
-            Log.d(TAG, "readMetainfo() fd created, fd=$fd")
+            Log.d(TAG, "readMetainfoWithPdfium() opening file: ${file.path}")
+            val fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            Log.d(TAG, "readMetainfoWithPdfium() fd created, fd=$fd")
 
             if (fd.fileDescriptor == null) {
-                Log.e(TAG, "readMetainfo() fileDescriptor is null")
+                Log.e(TAG, "readMetainfoWithPdfium() fileDescriptor is null")
                 fd.close()
                 throw IllegalStateException("FileDescriptor is null")
             }
 
-            Log.d(TAG, "readMetainfo() calling doc.open()...")
+            Log.d(TAG, "readMetainfoWithPdfium() calling doc.open()...")
             doc.open(fd.fileDescriptor)
-            Log.d(TAG, "readMetainfo() doc opened successfully")
+            Log.d(TAG, "readMetainfoWithPdfium() doc opened successfully")
 
             book.addAuthor(doc.getMeta(Pdfium.META_AUTHOR))
             book.setTitle(doc.getMeta(Pdfium.META_TITLE))
-            Log.d(TAG, "readMetainfo() meta read, closing doc")
+            Log.d(TAG, "readMetainfoWithPdfium() meta read, closing doc")
             doc.close()
             fd.close()
-            Log.d(TAG, "readMetainfo() completed successfully")
+            Log.d(TAG, "readMetainfoWithPdfium() completed successfully")
         } catch (e: IOException) {
-            Log.e(TAG, "readMetainfo() IOException", e)
+            Log.e(TAG, "readMetainfoWithPdfium() IOException", e)
             throw IllegalStateException(e)
         } catch (e: Throwable) {
-            Log.e(TAG, "readMetainfo() unexpected error: ${e.javaClass.simpleName}: ${e.message}", e)
+            Log.e(TAG, "readMetainfoWithPdfium() unexpected error: ${e.javaClass.simpleName}: ${e.message}", e)
+            throw e
+        }
+    }
+
+    @Throws(BookReadingException::class)
+    private fun readMetainfoWithPdfRenderer(book: AbstractBook, file: File) {
+        Log.d(TAG, "readMetainfoWithPdfRenderer() file=${file.path}")
+        try {
+            val fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            Log.d(TAG, "readMetainfoWithPdfRenderer() fd created, fd=$fd")
+
+            val renderer = PdfRenderer(fd)
+            Log.d(TAG, "readMetainfoWithPdfRenderer() renderer created, pages=${renderer.pageCount}")
+
+            // PdfRenderer не предоставляет метаданные автора/названия
+            // Используем имя файла как заголовок если не задано
+            if (book.getTitle().isNullOrEmpty()) {
+                val title = file.nameWithoutExtension
+                book.setTitle(title)
+                Log.d(TAG, "readMetainfoWithPdfRenderer() set title from filename: $title")
+            }
+
+            renderer.close()
+            fd.close()
+            Log.d(TAG, "readMetainfoWithPdfRenderer() completed successfully")
+        } catch (e: IOException) {
+            Log.e(TAG, "readMetainfoWithPdfRenderer() IOException", e)
+            throw IllegalStateException(e)
+        } catch (e: Throwable) {
+            Log.e(TAG, "readMetainfoWithPdfRenderer() unexpected error: ${e.javaClass.simpleName}: ${e.message}", e)
             throw e
         }
     }
@@ -122,20 +208,46 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     }
 
     override fun readCover(f: ZLFile): ZLImage {
-        Log.d(TAG, "readCover() file=${f.path}")
+        Log.d(TAG, "readCover() file=${f.path}, usePdfRenderer=$usePdfRenderer")
+
+        return if (isUsingPdfRenderer()) {
+            readCoverWithPdfRenderer(f)
+        } else {
+            readCoverWithPdfium(f)
+        }
+    }
+
+    private fun readCoverWithPdfium(f: ZLFile): ZLImage {
+        Log.d(TAG, "readCoverWithPdfium() file=${f.path}")
         val view = PdfiumView(f)
-        Log.d(TAG, "readCover() view created, scaling")
+        Log.d(TAG, "readCoverWithPdfium() view created, scaling")
         view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
-        Log.d(TAG, "readCover() creating bitmap: ${view.current!!.pageBox!!.w}x${view.current!!.pageBox!!.h}")
+        Log.d(TAG, "readCoverWithPdfium() creating bitmap: ${view.current!!.pageBox!!.w}x${view.current!!.pageBox!!.h}")
         val bm = Bitmap.createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
         val canvas = Canvas(bm)
-        Log.d(TAG, "readCover() drawing wallpaper")
+        Log.d(TAG, "readCoverWithPdfium() drawing wallpaper")
         view.drawWallpaper(canvas)
-        Log.d(TAG, "readCover() rendering page")
+        Log.d(TAG, "readCoverWithPdfium() rendering page")
         view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)
-        Log.d(TAG, "readCover() closing view")
+        Log.d(TAG, "readCoverWithPdfium() closing view")
         view.close()
-        Log.d(TAG, "readCover() completed")
+        Log.d(TAG, "readCoverWithPdfium() completed")
+        return ZLBitmapImage(bm)
+    }
+
+    private fun readCoverWithPdfRenderer(f: ZLFile): ZLImage {
+        Log.d(TAG, "readCoverWithPdfRenderer() file=${f.path}")
+        val view = NativeView(f)
+        Log.d(TAG, "readCoverWithPdfRenderer() view created, scaling")
+        view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
+        Log.d(TAG, "readCoverWithPdfRenderer() creating bitmap: ${view.current!!.pageBox!!.w}x${view.current!!.pageBox!!.h}")
+        val bm = Bitmap.createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
+        val canvas = Canvas(bm)
+        Log.d(TAG, "readCoverWithPdfRenderer() rendering page")
+        view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)
+        Log.d(TAG, "readCoverWithPdfRenderer() closing view")
+        view.close()
+        Log.d(TAG, "readCoverWithPdfRenderer() completed")
         return ZLBitmapImage(bm)
     }
 
@@ -147,10 +259,62 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
     @Throws(BookReadingException::class)
     override fun readModel(model: BookModel) {
-        val m = PDFTextModel(BookUtil.fileByBook(model.Book))
-        model.setBookTextModel(m)
-        val bookmarks = m.doc.toc
-        loadTOC(0, 0, bookmarks, model.TOCTree)
+        if (isUsingPdfRenderer()) {
+            // Android PdfRenderer не предоставляет текстовую модель
+            // Создаём простую модель на основе количества страниц
+            readModelWithPdfRenderer(model)
+        } else {
+            val m = PDFTextModel(BookUtil.fileByBook(model.Book))
+            model.setBookTextModel(m)
+            val bookmarks = m.doc.toc
+            loadTOC(0, 0, bookmarks, model.TOCTree)
+        }
+    }
+
+    @Throws(BookReadingException::class)
+    private fun readModelWithPdfRenderer(model: BookModel) {
+        Log.d(TAG, "readModelWithPdfRenderer() creating simple model")
+        val file = BookUtil.fileByBook(model.Book)
+        try {
+            val fd = ParcelFileDescriptor.open(File(file.path), ParcelFileDescriptor.MODE_READ_ONLY)
+            val renderer = PdfRenderer(fd)
+            val pagesCount = renderer.pageCount
+            Log.d(TAG, "readModelWithPdfRenderer() pages=$pagesCount")
+
+            // Создаём простую текстовую модель с количеством страниц
+            val textModel = SimplePdfTextModel(pagesCount)
+            model.setBookTextModel(textModel)
+
+            // PdfRenderer не предоставляет TOC
+            renderer.close()
+            fd.close()
+            Log.d(TAG, "readModelWithPdfRenderer() completed")
+        } catch (e: Exception) {
+            Log.e(TAG, "readModelWithPdfRenderer() error", e)
+            throw IllegalStateException(e)
+        }
+    }
+
+    /**
+     * Простая текстовая модель для PDF без текстового содержимого
+     */
+    private class SimplePdfTextModel(private val pagesCount: Int) : ZLTextModel {
+        override fun getId(): String? = null
+        override fun getLanguage(): String? = null
+        override fun getParagraphsNumber(): Int = pagesCount
+        override fun getParagraph(index: Int): ZLTextParagraph = object : ZLTextParagraph {
+            override fun iterator(): ZLTextParagraph.EntryIterator? = null
+            override fun getKind(): Byte = ZLTextParagraph.Kind.END_OF_TEXT_PARAGRAPH
+        }
+        override fun removeAllMarks() {}
+        override fun getFirstMark(): ZLTextMark? = null
+        override fun getLastMark(): ZLTextMark? = null
+        override fun getNextMark(position: ZLTextMark): ZLTextMark? = null
+        override fun getPreviousMark(position: ZLTextMark): ZLTextMark? = null
+        override fun getMarks(): List<ZLTextMark> = emptyList()
+        override fun getTextLength(index: Int): Int = index
+        override fun findParagraphByTextLength(length: Int): Int = 0
+        override fun search(text: String, startIndex: Int, endIndex: Int, ignoreCase: Boolean): Int = 0
     }
 
     private fun loadTOC(pos: Int, level: Int, bb: Array<Pdfium.Bookmark>, tree: TOCTree): Int {
@@ -671,9 +835,9 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         constructor(r: NativePage, index: ZLViewEnums.PageIndex, w: Int, h: Int) : this(r) {
             this.w = w
             this.h = h
-            load(index)
+            loadPageIndex(index)
+            loadPage() // Всегда загружаем страницу
             if (index == ZLViewEnums.PageIndex.current) {
-                load()
                 renderPage()
             }
         }
@@ -683,40 +847,76 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun getPagesCount(): Int = doc.pageCount
 
         override fun load() {
-            page?.close()
-            page = doc.openPage(pageNumber)
-            pageBox = Plugin.Box(0, 0, page!!.width, page!!.height)
+            loadPage()
         }
+
+        private fun loadPageIndex(index: ZLViewEnums.PageIndex) {
+            when (index) {
+                ZLViewEnums.PageIndex.current -> { /* pageNumber уже установлен */ }
+                ZLViewEnums.PageIndex.previous -> pageNumber = getPrevPage()
+                ZLViewEnums.PageIndex.next -> pageNumber = getNextPage()
+            }
+        }
+
+        private fun loadPage() {
+            try {
+                page?.close()
+                page = doc.openPage(pageNumber)
+                pageBox = Plugin.Box(0, 0, page!!.width, page!!.height)
+                Log.d(TAG, "NativePage.loadPage() page=$pageNumber, size=${page!!.width}x${page!!.height}")
+            } catch (e: Exception) {
+                Log.e(TAG, "NativePage.loadPage() error for page $pageNumber", e)
+                throw e
+            }
+        }
+
+        private fun getPrevPage(): Int = if (pageNumber > 0) pageNumber - 1 else 0
+        private fun getNextPage(): Int = if (pageNumber < getPagesCount() - 1) pageNumber + 1 else getPagesCount() - 1
     }
 
     class NativeView(f: ZLFile) : Plugin.View() {
         var doc: PdfRenderer
+        var fd: ParcelFileDescriptor
 
         init {
             try {
-                val fd = ParcelFileDescriptor.open(File(f.path), ParcelFileDescriptor.MODE_READ_ONLY)
+                fd = ParcelFileDescriptor.open(File(f.path), ParcelFileDescriptor.MODE_READ_ONLY)
                 doc = PdfRenderer(fd)
                 current = NativePage(doc)
+                Log.d(TAG, "NativeView.init() opened ${f.path}, pages=${doc.pageCount}")
             } catch (e: IOException) {
                 throw IllegalStateException(e)
             }
         }
 
-        override fun close() { doc.close() }
+        override fun close() {
+            doc.close()
+            try { fd.close() } catch (e: IOException) { /* ignore */ }
+        }
 
         override fun draw(bitmap: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
+            Log.d(TAG, "NativeView.draw() index=$index, w=$w, h=$h, config=$c")
             val curr = current as NativePage
             val r = NativePage(curr, index, w, h)
             if (index == ZLViewEnums.PageIndex.current) current!!.updatePage(r)
             r.scale(w, h)
             val render = r.renderRect()
-            val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
+
+            // PdfRenderer требует ARGB_8888, не поддерживает RGB_565
+            val config = Bitmap.Config.ARGB_8888
+            Log.d(TAG, "NativeView.draw() creating bitmap ${r.pageBox!!.w}x${r.pageBox!!.h} with config=$config")
+            val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, config)
             bm.eraseColor(FBReaderView.PAGE_PAPER_COLOR)
-            r.page!!.render(bm, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-            bitmap.drawBitmap(bm, render.toRect(bm.width, bm.height), render.dst!!, paint)
-            bm.recycle()
-            r.page!!.close()
-            r.page = null
+
+            try {
+                Log.d(TAG, "NativeView.draw() rendering page ${r.pageNumber}")
+                r.page!!.render(bm, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                bitmap.drawBitmap(bm, render.toRect(bm.width, bm.height), render.dst!!, paint)
+            } finally {
+                bm.recycle()
+                // НЕ закрываем страницу здесь - она нужна для PagerWidget.getPageRect()
+                // Страница будет закрыта при следующем вызове loadPage() или в close()
+            }
         }
     }
 

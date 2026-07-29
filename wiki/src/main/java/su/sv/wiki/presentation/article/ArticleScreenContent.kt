@@ -99,6 +99,7 @@ fun ArticleScreenContent(
             is ArticleState.Content -> {
                 val adaptiveDims = LocalAdaptiveDimensions.current
                 val formFactor = LocalDeviceFormFactor.current
+                val maxContentWidth = adaptiveDims.contentMaxWidth
 
                 Box(
                     modifier = Modifier
@@ -122,8 +123,8 @@ fun ArticleScreenContent(
                             .fillMaxSize()
                             .padding(dimensions.screenPaddingHorizontal)
                             .then(
-                                if (formFactor is DeviceFormFactor.Expanded && adaptiveDims.contentMaxWidth != null) {
-                                    Modifier.widthIn(max = adaptiveDims.contentMaxWidth)
+                                if (formFactor is DeviceFormFactor.Expanded && maxContentWidth != null) {
+                                    Modifier.widthIn(max = maxContentWidth)
                                 } else {
                                     Modifier
                                 }

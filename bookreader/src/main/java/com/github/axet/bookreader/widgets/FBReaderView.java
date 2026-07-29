@@ -244,6 +244,20 @@ public class FBReaderView extends RelativeLayout {
         config.setValue(app.ImageOptions.FitToScreen, FBView.ImageFitting.covers);
 
         config.setValue(app.MiscOptions.WordTappingAction, MiscOptions.WordTappingActionEnum.startSelecting);
+
+        // Two column view setting
+        String twoColumnValue = shared.getString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, "auto");
+        boolean twoColumnEnabled;
+        if ("true".equals(twoColumnValue)) {
+            twoColumnEnabled = true;
+        } else if ("false".equals(twoColumnValue)) {
+            twoColumnEnabled = false;
+        } else {
+            // auto - use default FBReader logic (based on screen size)
+            // Don't override, let FBReader decide
+            twoColumnEnabled = app.ViewOptions.TwoColumnView.getValue();
+        }
+        config.setValue(app.ViewOptions.TwoColumnView, twoColumnEnabled);
     }
 
     public void setWidget(Widgets w) {

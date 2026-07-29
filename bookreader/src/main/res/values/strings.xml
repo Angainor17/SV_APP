@@ -32,6 +32,9 @@
     <string name="sv_delete_bookmark">Удалить заметку</string>
     <string name="sv_pref_volume_title">Кнопки громкости</string>
     <string name="sv_pref_volume_summary">Использовать кнопки громкости для перелистывания страниц</string>
+    <string name="sv_pref_two_column_title">Двухстраничный режим</string>
+    <string name="sv_pref_two_column_summary">Отображать две страницы рядом на планшетах в ландшафте</string>
+    <string name="sv_pref_two_column_auto">Авто (по размеру экрана)</string>
     <string name="sv_bookmark_edit">Редактировать</string>
     <string name="sv_ignore_embedded_fonts">Игнорировать встроенные в книгу шрифты</string>
 

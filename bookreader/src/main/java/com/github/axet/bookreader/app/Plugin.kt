@@ -273,6 +273,9 @@ interface Plugin {
             hh = r.hh
             pageStep = r.pageStep
             pageOverlap = r.pageOverlap
+            if (r.pageBox != null) {
+                pageBox = Box(r.pageBox!!)
+            }
         }
     }
 

@@ -66,6 +66,16 @@ fun ReaderSettingsContent(
     var rotate by remember {
         mutableStateOf(shared.getBoolean(ReaderPreferences.PREFERENCE_ROTATE, false))
     }
+    // Two column view: null = auto, true = enable, false = disable
+    var twoColumnView by remember {
+        mutableStateOf(
+            when (shared.getString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, "auto")) {
+                "true" -> "true"
+                "false" -> "false"
+                else -> "auto"
+            }
+        )
+    }
 
     // Слушатель изменений (без темы)
     val listener = remember {
@@ -79,6 +89,12 @@ fun ReaderSettingsContent(
                     screenLock = sharedPreferences.getString(key, "0") ?: "0"
                 ReaderPreferences.PREFERENCE_ROTATE ->
                     rotate = sharedPreferences.getBoolean(key, false)
+                ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW ->
+                    twoColumnView = when (sharedPreferences.getString(key, "auto")) {
+                        "true" -> "true"
+                        "false" -> "false"
+                        else -> "auto"
+                    }
             }
         }
     }
@@ -137,6 +153,25 @@ fun ReaderSettingsContent(
                 checked = rotate,
                 onCheckedChange = { checked ->
                     shared.edit { putBoolean(ReaderPreferences.PREFERENCE_ROTATE, checked) }
+                },
+            )
+
+            // Двухстраничный режим
+            SettingsItem(
+                title = stringResource(R.string.sv_pref_two_column_title),
+                subtitle = when (twoColumnView) {
+                    "true" -> stringResource(R.string.sv_view_mode_paging) // Включено
+                    "false" -> stringResource(R.string.sv_view_mode_continuous) // Выключено (одна колонка)
+                    else -> stringResource(R.string.sv_pref_two_column_auto)
+                },
+                onClick = {
+                    // Циклический переключатель: auto -> true -> false -> auto
+                    val newValue = when (twoColumnView) {
+                        "auto" -> "true"
+                        "true" -> "false"
+                        else -> "auto"
+                    }
+                    shared.edit { putString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, newValue) }
                 },
             )
 
