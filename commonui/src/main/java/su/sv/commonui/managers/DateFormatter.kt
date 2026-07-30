@@ -8,12 +8,16 @@ import javax.inject.Inject
 /** Пример: "20 окт." */
 private const val SHORT_DATE_TEMPLATE = "d MMM"
 
+/** Пример: "20 окт. 2024" */
+private const val SHORT_DATE_WITH_YEAR_TEMPLATE = "d MMM yyyy"
+
 /** Пример: "17:40" */
 private const val SHORT_TIME_TEMPLATE = "HH:mm"
 
 class DateFormatter @Inject constructor() {
 
     private val shortDateFormat = createFormat(SHORT_DATE_TEMPLATE)
+    private val shortDateWithYearFormat = createFormat(SHORT_DATE_WITH_YEAR_TEMPLATE)
     private val shortTimeFormat = createFormat(SHORT_TIME_TEMPLATE)
 
     /**
@@ -26,6 +30,18 @@ class DateFormatter @Inject constructor() {
         if (date == null) return ""
 
         return shortDateFormat.format(date).replace(".", "")
+    }
+
+    /**
+     * Форматирует дату с годом
+     * @see SHORT_DATE_WITH_YEAR_TEMPLATE
+     *
+     * Пример: 20 окт 2024
+     */
+    fun formatShortDateWithYear(date: LocalDateTime?): String {
+        if (date == null) return ""
+
+        return shortDateWithYearFormat.format(date).replace(".", "")
     }
 
     /**

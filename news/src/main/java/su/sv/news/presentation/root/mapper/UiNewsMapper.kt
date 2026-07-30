@@ -17,11 +17,7 @@ class UiNewsMapper @Inject constructor(
 
         return UiNewsItem(
             id = domain.id.orEmpty(),
-            dateFormatted = if (date.isToday()) {
-                dateFormatter.formatShortTimeOnly(date)
-            } else {
-                dateFormatter.formatShortDateOnly(date)
-            },
+            dateFormatted = formatDate(date),
             description = domain.description.orEmpty(),
             images = domain.images.map {
                 mediaMapper.fromDomainToUi(it)
@@ -33,6 +29,16 @@ class UiNewsMapper @Inject constructor(
                 mediaMapper.fromDomainToUi(it)
             },
         )
+    }
+
+    private fun formatDate(date: LocalDateTime?): String {
+        if (date == null) return ""
+
+        return when {
+            date.isToday() -> dateFormatter.formatShortTimeOnly(date)
+            date.year == LocalDate.now().year -> dateFormatter.formatShortDateOnly(date)
+            else -> dateFormatter.formatShortDateWithYear(date)
+        }
     }
 
     private fun LocalDateTime?.isToday(): Boolean {

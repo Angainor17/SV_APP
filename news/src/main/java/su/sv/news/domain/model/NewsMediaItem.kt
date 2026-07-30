@@ -4,8 +4,14 @@ sealed class NewsMediaItem {
 
     data class ImageItem(
 
-        /** Превью видео */
+        /** Изображение */
         val image: String,
+
+        /** Ширина изображения в пикселях */
+        val width: Int? = null,
+
+        /** Высота изображения в пикселях */
+        val height: Int? = null,
     ) : NewsMediaItem()
 
     data class VideoItem(
@@ -15,6 +21,12 @@ sealed class NewsMediaItem {
 
         /** Превью видео */
         val image: String,
+
+        /** Ширина превью в пикселях */
+        val width: Int? = null,
+
+        /** Высота превью в пикселях */
+        val height: Int? = null,
 
         /** Ссылка на видео */
         val link: String,

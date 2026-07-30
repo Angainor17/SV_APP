@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -47,6 +48,7 @@ import kotlin.math.absoluteValue
  *
  * @param modifier модификатор
  * @param item новость с медиа-контентом
+ * @param isTablet true для планшета (заполняет всю высоту)
  * @param onItemClick обработчик клика на медиа
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -54,6 +56,7 @@ import kotlin.math.absoluteValue
 fun ImageCarousel(
     modifier: Modifier = Modifier,
     item: UiNewsItem,
+    isTablet: Boolean = false,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val allMedia = item.allMedia
@@ -91,8 +94,15 @@ fun ImageCarousel(
                                 showShimmer = showShimmer.value
                             )
                         )
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f) // Стандартное соотношение для изображений
+                        .then(
+                            if (isTablet) {
+                                Modifier.fillMaxSize()
+                            } else {
+                                Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(16f / 9f)
+                            }
+                        )
                         .clip(MaterialTheme.shapes.small)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
@@ -110,7 +120,7 @@ fun ImageCarousel(
                                 scaleY = scale / 100.dp
                             }
                         },
-                    contentScale = ContentScale.Fit, // Сохраняет пропорции изображения
+                    contentScale = if (isTablet) ContentScale.Crop else ContentScale.Fit,
                     onState = { state ->
                         if (state is State.Success) {
                             showShimmer.value = false
