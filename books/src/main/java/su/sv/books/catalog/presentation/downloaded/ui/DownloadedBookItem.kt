@@ -30,6 +30,7 @@ import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
 import su.sv.commonui.theme.LocalAppDimensions
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPThemeLightPreview
 
 /**
@@ -42,6 +43,36 @@ import su.sv.commonui.theme.SVAPPThemeLightPreview
  */
 @Composable
 fun DownloadedBookItem(
+    book: UiDownloadedBook,
+    onReadClick: () -> Unit,
+    onBookClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val formFactor = LocalDeviceFormFactor.current
+
+    // На планшетах используем другой layout
+    if (formFactor.isExpanded()) {
+        DownloadedBookItemTablet(
+            book = book,
+            onReadClick = onReadClick,
+            onBookClick = onBookClick,
+            modifier = modifier,
+        )
+    } else {
+        DownloadedBookItemCompact(
+            book = book,
+            onReadClick = onReadClick,
+            onBookClick = onBookClick,
+            modifier = modifier,
+        )
+    }
+}
+
+/**
+ * Компактная карточка для телефонов
+ */
+@Composable
+fun DownloadedBookItemCompact(
     book: UiDownloadedBook,
     onReadClick: () -> Unit,
     onBookClick: () -> Unit,
@@ -119,6 +150,105 @@ fun DownloadedBookItem(
             ) {
                 Text(
                     text = stringResource(R.string.books_downloaded_read_button)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Карточка для планшетов: картинка слева (большая), кнопка под ней, текст справа
+ */
+@Composable
+fun DownloadedBookItemTablet(
+    book: UiDownloadedBook,
+    onReadClick: () -> Unit,
+    onBookClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable(onClick = onBookClick)
+            .padding(16.dp),
+    ) {
+        // Левая колонка: картинка + кнопка
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Обложка книги (большая)
+            BookCover(
+                coverUrl = book.coverUrl,
+                modifier = Modifier.size(width = 120.dp, height = 180.dp)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Кнопка "Читать" под картинкой (шириной с картинку)
+            OutlinedButton(
+                onClick = onReadClick,
+                modifier = Modifier.width(120.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.books_downloaded_read_button)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Правая колонка: текст
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Название
+            Text(
+                text = book.title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Text(
+                text = book.author,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Text(
+                text = book.category,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            // Прогресс чтения
+            if (book.totalPages > 0) {
+                Text(
+                    text = stringResource(
+                        R.string.books_downloaded_page_progress,
+                        book.currentPage,
+                        book.totalPages
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            // Описание книги
+            if (book.description.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = book.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

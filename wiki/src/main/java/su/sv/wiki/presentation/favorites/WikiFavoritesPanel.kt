@@ -71,7 +71,7 @@ fun WikiFavoritesPanel(
         else -> {
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
             ) {
                 items(
                     items = articles,

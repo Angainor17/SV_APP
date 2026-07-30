@@ -55,6 +55,7 @@ import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.ui.components.FullScreenEmpty
+import su.sv.commonui.util.ProvideAdaptiveDimensions
 import su.sv.wiki.R
 import su.sv.wiki.domain.model.WikiArticle
 import su.sv.wiki.presentation.article.ArticleScreen
@@ -65,6 +66,37 @@ import su.sv.wiki.presentation.article.ArticleScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreenContent(
+    viewModel: FavoritesViewModel = hiltViewModel(),
+) {
+    ProvideAdaptiveDimensions {
+        FavoritesScreenContentInternal(viewModel)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FavoritesScreenContentInternal(
+    viewModel: FavoritesViewModel,
+) {
+    val formFactor = LocalDeviceFormFactor.current
+
+    // На планшетах (Expanded) используем master-detail layout
+    if (formFactor.isExpanded()) {
+        FavoritesMasterDetailScreen(
+            favoritesViewModel = viewModel,
+        )
+    } else {
+        // На телефонах (Compact/Medium) - текущее поведение
+        FavoritesCompactScreen(viewModel)
+    }
+}
+
+/**
+ * Компактный экран избранного для телефонов (Compact/Medium)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FavoritesCompactScreen(
     viewModel: FavoritesViewModel = hiltViewModel(),
 ) {
     val stackNavigation = LocalStackNavigation.current

@@ -51,17 +51,16 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
             // Определяем, нужно ли использовать Android PdfRenderer
             if (usePdfRenderer == null) {
-                // На планшетах с большим экраном pdfium может крашиться
-                // Используем Android PdfRenderer как более стабильную альтернативу
                 val isTablet = isTabletDevice(info)
                 Log.d(TAG, "Device type: isTablet=$isTablet")
 
-                // Всегда используем Android PdfRenderer, так как pdfium нестабилен
-                usePdfRenderer = true
-                Log.d(TAG, "Using Android PdfRenderer for stability")
+                // На планшетах используем PdfRenderer (стабильный), pdfium крашится при открытии
+                // На смартфонах используем pdfium (есть выделение текста, поиск)
+                usePdfRenderer = isTablet
+                Log.d(TAG, "usePdfRenderer=$usePdfRenderer (tablet=$isTablet)")
 
-                // Не загружаем нативные библиотеки, если используем PdfRenderer
-                if (usePdfRenderer != true && Config.natives) {
+                // Загружаем нативные библиотеки для pdfium (для смартфонов или для текстовых операций)
+                if (Config.natives) {
                     Log.d(TAG, "Loading native libraries: modpdfium, pdfiumjni")
                     try {
                         Natives.loadLibraries(info.context, "modpdfium", "pdfiumjni")
@@ -69,6 +68,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                         Log.d(TAG, "Native libraries loaded successfully")
                     } catch (e: Throwable) {
                         Log.e(TAG, "Failed to load native libraries", e)
+                        // Если библиотеки не загрузились, используем PdfRenderer
                         usePdfRenderer = true
                     }
                 }
@@ -826,7 +826,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
     }
 
-    class NativePage : Plugin.Page {
+    inner class NativePage : Plugin.Page {
         var doc: PdfRenderer
         var page: PdfRenderer.Page? = null
 
@@ -840,6 +840,16 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             if (index == ZLViewEnums.PageIndex.current) {
                 renderPage()
             }
+        }
+
+        constructor(d: PdfRenderer, page: Int, w: Int, h: Int) {
+            doc = d
+            this.w = w
+            this.h = h
+            pageNumber = page
+            pageOffset = 0
+            loadPage()
+            renderPage()
         }
 
         constructor(d: PdfRenderer) { doc = d }
@@ -874,9 +884,14 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         private fun getNextPage(): Int = if (pageNumber < getPagesCount() - 1) pageNumber + 1 else getPagesCount() - 1
     }
 
-    class NativeView(f: ZLFile) : Plugin.View() {
+    inner class NativeView(f: ZLFile) : Plugin.View() {
         var doc: PdfRenderer
         var fd: ParcelFileDescriptor
+
+        // Pdfium для текстовых операций (выделение, поиск) - ленивая инициализация
+        private var textDoc: Pdfium? = null
+        private var textFd: ParcelFileDescriptor? = null
+        private val filePath: String = f.path
 
         init {
             try {
@@ -889,9 +904,42 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
+        /**
+         * Инициализирует pdfium для текстовых операций
+         */
+        private fun initTextDoc(): Boolean {
+            if (textDoc != null) return true
+
+            try {
+                Log.d(TAG, "NativeView.initTextDoc() initializing pdfium for text operations")
+                textFd = ParcelFileDescriptor.open(File(filePath), ParcelFileDescriptor.MODE_READ_ONLY)
+                textDoc = Pdfium()
+                textDoc!!.open(textFd!!.fileDescriptor)
+                Log.d(TAG, "NativeView.initTextDoc() pdfium initialized successfully")
+                return true
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.initTextDoc() failed to initialize pdfium", e)
+                textDoc = null
+                textFd?.close()
+                textFd = null
+                return false
+            }
+        }
+
         override fun close() {
             doc.close()
             try { fd.close() } catch (e: IOException) { /* ignore */ }
+
+            // Закрываем pdfium для текста
+            textDoc?.close()
+            textDoc = null
+            try { textFd?.close() } catch (e: IOException) { /* ignore */ }
+            textFd = null
+        }
+
+        override fun getPageInfo(w: Int, h: Int, c: ScrollWidget.ScrollAdapter.PageCursor): Plugin.Page? {
+            val page: Int = if (c.start == null) c.end.paragraphIndex - 1 else c.start.paragraphIndex
+            return NativePage(doc, page, w, h)
         }
 
         override fun draw(bitmap: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
@@ -901,6 +949,8 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             if (index == ZLViewEnums.PageIndex.current) current!!.updatePage(r)
             r.scale(w, h)
             val render = r.renderRect()
+
+            Log.d(TAG, "NativeView.draw() after scale: pageBox=${r.pageBox!!.w}x${r.pageBox!!.h} render.src=${render.src} render.dst=${render.dst}")
 
             // PdfRenderer требует ARGB_8888, не поддерживает RGB_565
             val config = Bitmap.Config.ARGB_8888
@@ -917,6 +967,84 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 // НЕ закрываем страницу здесь - она нужна для PagerWidget.getPageRect()
                 // Страница будет закрыта при следующем вызове loadPage() или в close()
             }
+        }
+
+        override fun select(page: Selection.Page, point: Selection.Point): Selection? {
+            if (!initTextDoc()) {
+                Log.w(TAG, "NativeView.select() pdfium not available for text operations")
+                return null
+            }
+
+            try {
+                Log.d(TAG, "NativeView.select() creating selection at page=${page.page}, point=(${point.x}, ${point.y})")
+                // Используем Selection из PdfiumView
+                val selPage = SelectionPage(textDoc!!, page)
+                if (selPage.count > 0) {
+                    return Selection(textDoc!!, selPage, point)
+                }
+                selPage.close()
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.select() error creating selection", e)
+            }
+            return null
+        }
+
+        override fun select(start: ZLTextPosition, end: ZLTextPosition): Selection? {
+            if (!initTextDoc()) {
+                Log.w(TAG, "NativeView.select() pdfium not available for text operations")
+                return null
+            }
+
+            try {
+                Log.d(TAG, "NativeView.select() creating selection from $start to $end")
+                return Selection(textDoc!!, start, end)
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.select() error creating selection", e)
+            }
+            return null
+        }
+
+        override fun select(page: Int): Selection? {
+            if (!initTextDoc()) {
+                Log.w(TAG, "NativeView.select() pdfium not available for text operations")
+                return null
+            }
+
+            try {
+                Log.d(TAG, "NativeView.select() creating selection for page $page")
+                return Selection(textDoc!!, page)
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.select() error creating selection", e)
+            }
+            return null
+        }
+
+        override fun getLinks(page: Selection.Page): Array<Link>? {
+            if (!initTextDoc()) return null
+
+            try {
+                val p = textDoc!!.openPage(page.page)
+                val ll = p.links
+                return Array(ll.size) { i ->
+                    val l = ll[i]
+                    Link(l.uri, l.index, p.toDevice(0, 0, page.w, page.h, 0, l.bounds))
+                }
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.getLinks() error", e)
+            }
+            return null
+        }
+
+        override fun search(text: String): Search? {
+            if (!initTextDoc()) return null
+
+            try {
+                Log.d(TAG, "NativeView.search() searching for '$text'")
+                return PdfSearch(textDoc!!, text)
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.search() error", e)
+            }
+            return null
         }
     }
 
