@@ -12,6 +12,8 @@ import kotlinx.parcelize.Parcelize
 sealed class UiNewsMedia : Parcelable {
 
     abstract val image: String
+    abstract val width: Int?
+    abstract val height: Int?
 
     /**
      * Элемент картинки в новости
@@ -23,6 +25,12 @@ sealed class UiNewsMedia : Parcelable {
 
         /** Изображение */
         override val image: String,
+
+        /** Ширина изображения в пикселях */
+        override val width: Int? = null,
+
+        /** Высота изображения в пикселях */
+        override val height: Int? = null,
     ) : UiNewsMedia()
 
     /**
@@ -38,6 +46,12 @@ sealed class UiNewsMedia : Parcelable {
 
         /** Превью видео */
         override val image: String,
+
+        /** Ширина превью в пикселях */
+        override val width: Int? = null,
+
+        /** Высота превью в пикселях */
+        override val height: Int? = null,
 
         /** Ссылка на видео */
         val link: String,

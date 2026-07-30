@@ -49,8 +49,15 @@ fun fromApiToDomain(api: VkResponseNewsAttachment): NewsMediaItem? {
 }
 
 fun fromApiToDomain(api: VkAttachmentPhoto): NewsMediaItem.ImageItem {
+    // Находим оптимальный размер и его ширину/высоту
+    val optimalSize = api.sizes?.let { sizeList ->
+        findOptimalSizeWithDimensions(sizeList, PHOTO_SIZE_PRIORITY, TARGET_IMAGE_WIDTH)
+    }
+
     return NewsMediaItem.ImageItem(
-        image = api.getOptimalImageUrl(),
+        image = optimalSize?.url ?: api.origPhoto?.url.orEmpty(),
+        width = optimalSize?.width,
+        height = optimalSize?.height,
     )
 }
 
@@ -58,9 +65,16 @@ fun fromApiToDomain(api: VkAttachmentVideo): NewsMediaItem.VideoItem {
     val id = api.id.toString()
     val ownerId = api.ownerId.orEmpty()
 
+    // Находим оптимальный размер превью
+    val optimalSize = api.image?.let { sizeList ->
+        findOptimalSizeWithDimensions(sizeList, VIDEO_SIZE_PRIORITY, TARGET_IMAGE_WIDTH)
+    }
+
     return NewsMediaItem.VideoItem(
         id = id,
-        image = api.getOptimalPreviewUrl(),
+        image = optimalSize?.url.orEmpty(),
+        width = optimalSize?.width,
+        height = optimalSize?.height,
         link = "https://vk.com/video${ownerId}_$id",
     )
 }
@@ -133,4 +147,39 @@ private fun findOptimalSize(
 
     // Последний fallback: берём последний размер (обычно самый большой)
     return sizes.lastOrNull { !it.url.isNullOrEmpty() }?.url.orEmpty()
+}
+
+/**
+ * Найти оптимальный размер изображения с размерами
+ *
+ * @return VkPhotoSize с url, width, height или null
+ */
+private fun findOptimalSizeWithDimensions(
+    sizes: List<VkPhotoSize>,
+    typePriority: List<String>,
+    targetWidth: Int,
+): VkPhotoSize? {
+    // Фильтруем валидные размеры
+    val validSizes = sizes.filter { size ->
+        val width = size.width
+        !size.url.isNullOrEmpty() && width != null && width >= MIN_IMAGE_WIDTH
+    }
+
+    // Если есть размеры с указанной шириной - выбираем ближайший к целевому
+    if (validSizes.isNotEmpty()) {
+        return validSizes
+            .minByOrNull { size ->
+                val width = size.width ?: 0
+                abs(width - targetWidth)
+            }
+    }
+
+    // Fallback: ищем по приоритету типов
+    for (type in typePriority) {
+        sizes.find { it.type == type && !it.url.isNullOrEmpty() }
+            ?.let { return it }
+    }
+
+    // Последний fallback: берём последний размер (обычно самый большой)
+    return sizes.lastOrNull { !it.url.isNullOrEmpty() }
 }
