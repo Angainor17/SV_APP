@@ -29,6 +29,7 @@ import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
 import su.sv.books.catalog.presentation.detail.viewmodel.BookDetailViewModel
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.commonui.util.ProvideAdaptiveDimensions
 import su.sv.models.ui.book.UiBook
 
 @ExperimentalMaterial3Api
@@ -38,45 +39,47 @@ fun BookDetailUi(
     uiBook: UiBook,
     modifier: Modifier
 ) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val stackNavigation = LocalStackNavigation.current
+    ProvideAdaptiveDimensions {
+        val state = viewModel.state.collectAsStateWithLifecycle()
+        val snackbarHostState = remember { SnackbarHostState() }
+        val stackNavigation = LocalStackNavigation.current
 
-    LaunchedEffect(Unit) {
-        viewModel.onAction(DetailBookActions.LoadState(uiBook))
-    }
+        LaunchedEffect(Unit) {
+            viewModel.onAction(DetailBookActions.LoadState(uiBook))
+        }
 
-    HandleEffects(
-        viewModel = viewModel,
-        snackbarHostState = snackbarHostState,
-    )
+        HandleEffects(
+            viewModel = viewModel,
+            snackbarHostState = snackbarHostState,
+        )
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets.statusBars,
-        modifier = modifier,
-        topBar = {
-            AppToolbarWithBack(
-                title = uiBook.title,
-                onBackClick = { stackNavigation.back() }
-            )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            when (val value = state.value) {
-                is UiBookDetailState.Content -> {
-                    BookDetailInfoUi(
-                        state = value,
-                        actionsHandler = viewModel,
-                    )
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets.statusBars,
+            modifier = modifier,
+            topBar = {
+                AppToolbarWithBack(
+                    title = uiBook.title,
+                    onBackClick = { stackNavigation.back() }
+                )
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                when (val value = state.value) {
+                    is UiBookDetailState.Content -> {
+                        BookDetailInfoUi(
+                            state = value,
+                            actionsHandler = viewModel,
+                        )
+                    }
+
+                    UiBookDetailState.NoContent -> Unit
                 }
-
-                UiBookDetailState.NoContent -> Unit
             }
         }
     }

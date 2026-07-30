@@ -189,12 +189,14 @@ interface Plugin {
          */
         fun scale(w: Int, h: Int) {
             val ratio = w / pageBox!!.w.toDouble()
+            Timber.tag("voronin").d("Plugin.Page.scale() w=$w h=$h oldRatio=${this.ratio} newRatio=$ratio pageBox=${pageBox!!.w}x${pageBox!!.h} hh=$hh")
             this.hh *= ratio
             this.ratio *= ratio
             pageBox!!.w = w
             pageBox!!.h = (pageBox!!.h * ratio).toInt()
             pageOffset = (pageOffset * ratio).toInt()
             dpi = (dpi * ratio).toInt()
+            Timber.tag("voronin").d("Plugin.Page.scale() result: pageBox=${pageBox!!.w}x${pageBox!!.h} hh=$hh ratio=${this.ratio}")
         }
 
         /**
@@ -206,6 +208,8 @@ interface Plugin {
             render.x = 0
             render.w = pageBox!!.w
 
+            Timber.tag("voronin").d("Plugin.Page.renderRect() pageOffset=$pageOffset hh=$hh pageBox=${pageBox!!.w}x${pageBox!!.h} ratio=$ratio w=$w h=$h")
+
             if (pageOffset < 0) { // показываем пустое пространство в начале
                 val tail = (pageBox!!.h - pageOffset - hh).toInt() // хвост для обрезки снизу
                 if (tail < 0) {
@@ -216,10 +220,12 @@ interface Plugin {
                     render.y = tail
                 }
                 render.dst = Rect(0, (-pageOffset / ratio).toInt(), w, h)
+                Timber.tag("voronin").d("Plugin.Page.renderRect() case1: pageOffset<0 dst=${render.dst}")
             } else if (pageOffset == 0 && hh > pageBox!!.h) {  // показываем по центру по вертикали
                 val t = ((hh - pageBox!!.h) / ratio / 2).toInt()
                 render.h = pageBox!!.h
                 render.dst = Rect(0, t, w, h - t)
+                Timber.tag("voronin").d("Plugin.Page.renderRect() case2: centered t=$t dst=${render.dst}")
             } else {
                 render.h = hh.toInt()
                 render.y = pageBox!!.h - render.h - pageOffset - 1
@@ -229,6 +235,7 @@ interface Plugin {
                     render.y = 0
                 }
                 render.dst = Rect(0, 0, w, h)
+                Timber.tag("voronin").d("Plugin.Page.renderRect() case3: normal dst=${render.dst}")
             }
 
             render.src = Rect(0, 0, render.w, render.h)
@@ -600,14 +607,22 @@ interface Plugin {
                     ZLViewEnums.PageIndex.previous -> { // предыдущая может указывать на несколько страниц назад
                         if (reflower!!.count() == -1 && render > 0) { // прогулка по сброшенному reflower, перезагрузка
                             bm = render(reflower!!.rw, reflower!!.h, page)
-                            reflower!!.load(bm!!)
+                            if (bm == null) {
+                                drawWallpaper(canvas)
+                                return
+                            }
+                            reflower!!.load(bm)
                         }
                         render -= 1
                         while (render < 0) {
                             page--
                             bm?.recycle()
                             bm = render(reflower!!.rw, reflower!!.h, page)
-                            reflower!!.load(bm!!)
+                            if (bm == null) {
+                                drawWallpaper(canvas)
+                                return
+                            }
+                            reflower!!.load(bm)
                             render = render + reflower!!.emptyCount()
                             reflower!!.page = page
                             reflower!!.index = render + 1 // onScrollingFinished - 1
@@ -623,11 +638,15 @@ interface Plugin {
                             bm = reflower!!.render(render)
                         } else {
                             bm = render(reflower!!.rw, reflower!!.h, page)
+                            if (bm == null) {
+                                drawWallpaper(canvas)
+                                return
+                            }
                             if (reflowDebug) {
                                 reflower!!.k2!!.verbose = true
                                 reflower!!.k2!!.showMarkedSource = true
                             }
-                            reflower!!.load(bm!!, page, render)
+                            reflower!!.load(bm, page, render)
                             if (reflowDebug) {
                                 reflower!!.bm = null // не утилизировать
                                 reflower!!.close()
@@ -643,7 +662,11 @@ interface Plugin {
                     ZLViewEnums.PageIndex.next -> { // следующая может указывать на несколько страниц вперёд
                         if (reflower!!.count() == -1) { // прогулка по сброшенному reflower, перезагрузка
                             bm = render(reflower!!.rw, reflower!!.h, page)
-                            reflower!!.load(bm!!)
+                            if (bm == null) {
+                                drawWallpaper(canvas)
+                                return
+                            }
+                            reflower!!.load(bm)
                         }
                         render += 1
                         while (reflower!!.emptyCount() - render <= 0) {
@@ -651,7 +674,11 @@ interface Plugin {
                             render -= reflower!!.emptyCount()
                             bm?.recycle()
                             bm = render(reflower!!.rw, reflower!!.h, page)
-                            reflower!!.load(bm!!, page, render - 1) // onScrollingFinished + 1
+                            if (bm == null) {
+                                drawWallpaper(canvas)
+                                return
+                            }
+                            reflower!!.load(bm, page, render - 1) // onScrollingFinished + 1
                         }
                         if (reflower!!.count() > render) {
                             bm?.recycle()

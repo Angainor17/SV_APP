@@ -130,6 +130,7 @@ class RootWikiViewModel @Inject constructor(
         _suggestions.value = emptyList()
         _selectedSuggestion.value = title  // Помещаем текст в поле поиска
         currentQuery = title
+        _selectedArticleTitle.value = title  // Для master-detail на планшетах
         loadArticle(title)
     }
 
@@ -147,12 +148,14 @@ class RootWikiViewModel @Inject constructor(
 
     private fun onLinkClick(title: String) {
         _suggestions.value = emptyList()
+        _selectedArticleTitle.value = title  // Для master-detail на планшетах
         loadArticle(title)
     }
 
     private fun onHistoryItemClick(title: String) {
         _suggestions.value = emptyList()
         currentQuery = title
+        _selectedArticleTitle.value = title  // Для master-detail на планшетах
         loadArticle(title)
     }
 
