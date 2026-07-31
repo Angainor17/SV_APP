@@ -14,6 +14,7 @@ import su.sv.books.R
 import su.sv.books.catalog.data.receivers.BookDownloadedActionHandler
 import su.sv.books.catalog.domain.DownloadBookUseCase
 import su.sv.books.catalog.domain.GetBookUriUseCase
+import su.sv.books.catalog.domain.GetNotesWithContextForBookUseCase
 import su.sv.books.catalog.presentation.CommonDownloadBookStates
 import su.sv.books.catalog.presentation.base.BaseBookViewModel
 import su.sv.books.catalog.presentation.detail.actions.DetailBookActions
@@ -21,9 +22,12 @@ import su.sv.books.catalog.presentation.detail.actions.DetailBooksActionsHandler
 import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
 import su.sv.books.catalog.presentation.detail.mapper.UiDetailBookMapper
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
+import su.sv.books.catalog.presentation.detail.model.UiNoteWithContext
+import su.sv.books.catalog.presentation.detail.model.UiNotesBlockState
 import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.models.ui.book.UIBookState
 import su.sv.models.ui.book.UiBook
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,6 +39,8 @@ class BookDetailViewModel @Inject constructor(
     private val downloadBookUseCase: Lazy<DownloadBookUseCase>,
 
     val bookDownloadedActionHandler: Lazy<BookDownloadedActionHandler>,
+
+    private val getNotesWithContextUseCase: Lazy<GetNotesWithContextForBookUseCase>,
 
     getBookUriUseCase: Lazy<GetBookUriUseCase>,
 ) : BaseBookViewModel(
@@ -54,6 +60,8 @@ class BookDetailViewModel @Inject constructor(
         when (action) {
             is DetailBookActions.LoadState -> {
                 _state.tryEmit(uiMapper.createState(action.book))
+                // Загружаем заметки если книга скачана
+                loadNotesIfBookDownloaded(action.book)
             }
 
             is DetailBookActions.OnActionClick -> {
@@ -62,6 +70,69 @@ class BookDetailViewModel @Inject constructor(
 
             is DetailBookActions.OnBookStateHandle -> {
                 handleDownloadedBook(action.bookState)
+            }
+
+            is DetailBookActions.OnNoteClick -> {
+                handleNoteClick(action.book, action.note)
+            }
+
+            is DetailBookActions.OnAllNotesClick -> {
+                handleAllNotesClick(action.book)
+            }
+        }
+    }
+
+    private fun handleNoteClick(book: UiBook, note: UiNoteWithContext) {
+        _oneTimeEffect.trySend(BookDetailOneTimeEffect.OpenBookAtNote(book, note))
+    }
+
+    private fun handleAllNotesClick(book: UiBook) {
+        _oneTimeEffect.trySend(BookDetailOneTimeEffect.OpenBookmarksForBook(
+            bookFileUri = book.fileUri?.toString(),
+            bookTitle = book.title,
+        ))
+    }
+
+    private fun loadNotesIfBookDownloaded(book: UiBook) {
+        val fileUri = book.fileUri
+        if (fileUri != null) {
+            loadNotesForBook(fileUri)
+        } else {
+            updateNotesState(UiNotesBlockState.Hidden)
+        }
+    }
+
+    private fun loadNotesForBook(fileUri: android.net.Uri) {
+        viewModelScope.launch {
+            updateNotesState(UiNotesBlockState.Loading)
+
+            getNotesWithContextUseCase.get().execute(fileUri)
+                .onSuccess { notes ->
+                    if (notes.isEmpty()) {
+                        updateNotesState(UiNotesBlockState.Hidden)
+                    } else {
+                        updateNotesState(
+                            UiNotesBlockState.Content(
+                                notes = notes,
+                                totalCount = notes.size,
+                                hasMore = notes.size >= 5
+                            )
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    Timber.e(error, "Failed to load notes for book")
+                    updateNotesState(UiNotesBlockState.Hidden)
+                }
+        }
+    }
+
+    private fun updateNotesState(newState: UiNotesBlockState) {
+        _state.update { state ->
+            if (state is UiBookDetailState.Content) {
+                state.copy(notesBlockState = newState)
+            } else {
+                state
             }
         }
     }

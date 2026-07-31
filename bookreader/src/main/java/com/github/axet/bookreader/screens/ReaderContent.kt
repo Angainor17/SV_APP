@@ -366,6 +366,9 @@ fun ReaderContent(
                                         // Обновляем возможность смены шрифта
                                         viewModel.updateCanChangeFont()
 
+                                        // Миграция контекста для старых заметок (после инициализации BookTextView)
+                                        viewModel.migrateBookmarksContextAsync()
+
                                         isLoaded = true
                                         Timber.d("Book loaded successfully")
                                     } catch (e: Exception) {

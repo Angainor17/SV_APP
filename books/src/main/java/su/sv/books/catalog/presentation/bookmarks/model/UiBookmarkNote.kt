@@ -27,6 +27,8 @@ data class UiBookmarkNote(
     val endParagraph: Int,
     val endElement: Int,
     val endChar: Int,
+    val sentenceBefore: String?,     // Контекст предложения до заметки
+    val sentenceAfter: String?,      // Контекст предложения после заметки
 ) : Parcelable {
 
     /**
@@ -73,6 +75,7 @@ sealed class UiBookmarksState {
     data class NotesList(
         val notes: List<UiBookmarkNote>,
         val viewMode: NotesViewMode = NotesViewMode.LIST,
+        val filterBookTitle: String? = null,  // Название книги для заголовка при фильтрации
     ) : UiBookmarksState()
 
     /**

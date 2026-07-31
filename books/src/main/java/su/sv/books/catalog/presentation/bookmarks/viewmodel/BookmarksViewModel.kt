@@ -1,5 +1,6 @@
 package su.sv.books.catalog.presentation.bookmarks.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import su.sv.books.R
+import su.sv.books.catalog.domain.CalculateBookMd5UseCase
 import su.sv.books.catalog.domain.CheckBookFileExistsUseCase
 import su.sv.books.catalog.domain.DeleteNoteUseCase
 import su.sv.books.catalog.domain.GetAllNotesUseCase
@@ -33,6 +35,7 @@ class BookmarksViewModel @Inject constructor(
     private val getBooksWithNotesUseCase: GetBooksWithNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val checkBookFileExistsUseCase: CheckBookFileExistsUseCase,
+    private val calculateMd5UseCase: CalculateBookMd5UseCase,
     private val mapper: UiBookmarkMapper,
     private val resourcesRepository: ResourcesRepository,
     private val viewModePrefsRepository: BookmarksViewModePrefsRepository,
@@ -51,6 +54,10 @@ class BookmarksViewModel @Inject constructor(
     private val _selectedNote = MutableStateFlow<UiBookmarkNote?>(null)
     val selectedNote: StateFlow<UiBookmarkNote?> get() = _selectedNote
 
+    /** Фильтр по книге */
+    private var filterBookId: String? = null
+    private var filterBookTitle: String? = null
+
     private var currentViewMode: NotesViewMode = NotesViewMode.LIST
 
     init {
@@ -59,11 +66,8 @@ class BookmarksViewModel @Inject constructor(
             BookmarksViewModePrefsRepository.MODE_BY_BOOK -> NotesViewMode.BY_BOOK
             else -> NotesViewMode.LIST
         }
-        // Загружаем данные в соответствии с режимом
-        when (currentViewMode) {
-            NotesViewMode.LIST -> loadNotes()
-            NotesViewMode.BY_BOOK -> loadBooks()
-        }
+        // Данные загружаем после установки фильтра (если есть) или сразу
+        // Фильтр устанавливается через SetBookFilter action
     }
 
     fun onAction(action: BookmarksAction) {
@@ -78,6 +82,15 @@ class BookmarksViewModel @Inject constructor(
 
             BookmarksAction.OnRetryClick -> {
                 loadNotes()
+            }
+
+            BookmarksAction.LoadData -> {
+                Timber.tag("voronin2").d("LoadData action received")
+                if (currentViewMode == NotesViewMode.BY_BOOK) {
+                    loadBooks()
+                } else {
+                    loadNotes()
+                }
             }
 
             is BookmarksAction.OnNoteClick -> {
@@ -125,19 +138,74 @@ class BookmarksViewModel @Inject constructor(
             BookmarksAction.OnNoteDeselect -> {
                 _selectedNote.value = null
             }
+
+            is BookmarksAction.SetBookFilter -> {
+                setBookFilter(action.bookFileUri, action.bookTitle)
+            }
+        }
+    }
+
+    private fun setBookFilter(bookFileUri: String, bookTitle: String?) {
+        filterBookTitle = bookTitle
+        Timber.d("Set book filter: bookFileUri=$bookFileUri, bookTitle=$bookTitle")
+        // Вычисляем MD5 и загружаем заметки
+        loadNotesFilteredByUri(bookFileUri)
+    }
+
+    private fun loadNotesFilteredByUri(bookFileUri: String) {
+        viewModelScope.launch {
+            _state.value = UiBookmarksState.Loading
+
+            // Вычисляем MD5 из URI
+            val bookId = calculateMd5UseCase.execute(Uri.parse(bookFileUri)).getOrNull()
+
+            if (bookId == null) {
+                Timber.w("Failed to calculate MD5 for bookFileUri: $bookFileUri")
+                _state.value = UiBookmarksState.Empty
+                return@launch
+            }
+
+            Timber.d("Calculated MD5: $bookId")
+
+            getNotesForBookUseCase.execute(bookId).fold(
+                onSuccess = { notes ->
+                    val uiNotes = mapper.mapNotes(notes)
+                    Timber.d("Loaded ${uiNotes.size} notes for book $bookId")
+                    if (uiNotes.isEmpty()) {
+                        _state.value = UiBookmarksState.Empty
+                    } else {
+                        _state.value = UiBookmarksState.NotesList(
+                            notes = uiNotes,
+                            viewMode = currentViewMode,
+                            filterBookTitle = filterBookTitle
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    Timber.e(error, "Failed to load notes for book $bookId")
+                    _state.value = UiBookmarksState.Error(
+                        resourcesRepository.getString(R.string.books_error_loading)
+                    )
+                }
+            )
         }
     }
 
     private fun loadNotes() {
         viewModelScope.launch {
+            Timber.tag("voronin2").d("loadNotes: START")
             _state.value = UiBookmarksState.Loading
 
             getAllNotesUseCase.execute().fold(
                 onSuccess = { notes ->
+                    Timber.tag("voronin2").d("loadNotes: got ${notes.size} notes")
                     val uiNotes = mapper.mapNotes(notes)
+                    Timber.tag("voronin2").d("loadNotes: mapped to ${uiNotes.size} uiNotes")
                     if (uiNotes.isEmpty()) {
+                        Timber.tag("voronin2").d("loadNotes: state -> Empty")
                         _state.value = UiBookmarksState.Empty
                     } else {
+                        Timber.tag("voronin2").d("loadNotes: state -> NotesList")
                         _state.value = UiBookmarksState.NotesList(
                             notes = uiNotes,
                             viewMode = currentViewMode
@@ -145,7 +213,7 @@ class BookmarksViewModel @Inject constructor(
                     }
                 },
                 onFailure = { error ->
-                    Timber.e(error, "Failed to load notes")
+                    Timber.tag("voronin2").e(error, "loadNotes: FAILED")
                     _state.value = UiBookmarksState.Error(
                         resourcesRepository.getString(R.string.books_error_loading)
                     )
@@ -156,19 +224,24 @@ class BookmarksViewModel @Inject constructor(
 
     private fun loadBooks() {
         viewModelScope.launch {
+            Timber.tag("voronin2").d("loadBooks: START")
             _state.value = UiBookmarksState.Loading
 
             getBooksWithNotesUseCase.execute().fold(
                 onSuccess = { books ->
+                    Timber.tag("voronin2").d("loadBooks: got ${books.size} books")
                     val uiBooks = mapper.mapBooksWithNotes(books)
+                    Timber.tag("voronin2").d("loadBooks: mapped to ${uiBooks.size} uiBooks")
                     if (uiBooks.isEmpty()) {
+                        Timber.tag("voronin2").d("loadBooks: state -> Empty")
                         _state.value = UiBookmarksState.Empty
                     } else {
+                        Timber.tag("voronin2").d("loadBooks: state -> BooksList")
                         _state.value = UiBookmarksState.BooksList(books = uiBooks)
                     }
                 },
                 onFailure = { error ->
-                    Timber.e(error, "Failed to load books with notes")
+                    Timber.tag("voronin2").e(error, "loadBooks: FAILED")
                     _state.value = UiBookmarksState.Error(
                         resourcesRepository.getString(R.string.books_error_loading)
                     )
@@ -179,26 +252,31 @@ class BookmarksViewModel @Inject constructor(
 
     private fun loadNotesForBook(bookId: String) {
         viewModelScope.launch {
+            Timber.tag("voronin2").d("loadNotesForBook: START, bookId=$bookId")
             _state.value = UiBookmarksState.Loading
 
             // Сначала получаем книгу
             val booksResult = getBooksWithNotesUseCase.execute()
             val book = booksResult.getOrNull()?.find { it.bookId == bookId }
+            Timber.tag("voronin2").d("loadNotesForBook: book found = ${book != null}")
 
             getNotesForBookUseCase.execute(bookId).fold(
                 onSuccess = { notes ->
+                    Timber.tag("voronin2").d("loadNotesForBook: got ${notes.size} notes")
                     val uiNotes = mapper.mapNotes(notes)
                     if (book != null) {
+                        Timber.tag("voronin2").d("loadNotesForBook: state -> BookNotes")
                         _state.value = UiBookmarksState.BookNotes(
                             book = mapper.mapBookWithNotes(book),
                             notes = uiNotes
                         )
                     } else {
+                        Timber.tag("voronin2").d("loadNotesForBook: state -> NotesList")
                         _state.value = UiBookmarksState.NotesList(notes = uiNotes)
                     }
                 },
                 onFailure = { error ->
-                    Timber.e(error, "Failed to load notes for book: $bookId")
+                    Timber.tag("voronin2").e(error, "loadNotesForBook: FAILED")
                     _state.value = UiBookmarksState.Error(
                         resourcesRepository.getString(R.string.books_error_loading)
                     )
@@ -297,6 +375,7 @@ sealed class BookmarksAction {
     object OnBackClick : BookmarksAction()
     object OnToggleViewMode : BookmarksAction()
     object OnRetryClick : BookmarksAction()
+    object LoadData : BookmarksAction()
     data class OnNoteClick(val note: UiBookmarkNote) : BookmarksAction()
     data class OnBookCardClick(val note: UiBookmarkNote) : BookmarksAction()
     data class OnDeleteNoteRequest(val note: UiBookmarkNote) : BookmarksAction()
@@ -310,6 +389,9 @@ sealed class BookmarksAction {
 
     /** Сбросить выбор заметки (master-detail на планшетах) */
     object OnNoteDeselect : BookmarksAction()
+
+    /** Установить фильтр по книге */
+    data class SetBookFilter(val bookFileUri: String, val bookTitle: String?) : BookmarksAction()
 }
 
 /**

@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +43,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -164,14 +167,12 @@ fun NoteItem(
                 },
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surfaceVariant,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            onClick = if (note.bookFileUri != null) onClick else onBookClick
         ) {
             NoteItemContent(
                 note = note,
                 showBookInfo = showBookInfo,
-                hasBookFile = note.bookFileUri != null,
-                onClick = onClick,
-                onBookClick = onBookClick,
                 onShareClick = onShareClick
             )
         }
@@ -185,9 +186,6 @@ fun NoteItem(
 private fun NoteItemContent(
     note: UiBookmarkNote,
     showBookInfo: Boolean,
-    hasBookFile: Boolean,
-    onClick: () -> Unit,
-    onBookClick: () -> Unit,
     onShareClick: () -> Unit,
 ) {
     Column(
@@ -200,25 +198,76 @@ private fun NoteItemContent(
                 bookCoverUrl = note.bookCoverUrl,
                 page = note.page
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // Текст заметки
+        // Текст с контекстом (единое предложение)
+        val annotatedText = buildAnnotatedString {
+            // Текст предложения до заметки (блёклый)
+            if (!note.sentenceBefore.isNullOrBlank()) {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                ) {
+                    append(note.sentenceBefore)
+                    append(" ")
+                }
+            }
+
+            // Текст заметки (выделенный жирным)
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                append(note.text)
+            }
+
+            // Текст предложения после заметки (блёклый)
+            if (!note.sentenceAfter.isNullOrBlank()) {
+                append(" ")
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                ) {
+                    append(note.sentenceAfter)
+                }
+            }
+        }
+
         Text(
-            text = note.text,
+            text = annotatedText,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(modifier = Modifier.weight(1f, fill = false))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Нижняя строка: кнопка "Перейти" или "К книге", "Поделиться" справа
-        NoteItemActions(
-            hasBookFile = hasBookFile,
-            onClick = onClick,
-            onBookClick = onBookClick,
-            onShareClick = onShareClick
-        )
+        // Нижняя строка: страница слева, "Поделиться" справа
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Страница слева
+            Text(
+                text = stringResource(R.string.bookmarks_page, note.page),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            // Поделиться справа
+            IconButton(onClick = onShareClick) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = stringResource(R.string.bookmarks_share),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }
 
@@ -252,13 +301,6 @@ private fun NoteBookInfo(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
-        )
-
-        // Страница
-        Text(
-            text = stringResource(R.string.bookmarks_page, page),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -303,42 +345,6 @@ private fun BookCoverSmall(
     )
 }
 
-/**
- * Кнопки действий в заметке
- */
-@Composable
-private fun NoteItemActions(
-    hasBookFile: Boolean,
-    onClick: () -> Unit,
-    onBookClick: () -> Unit,
-    onShareClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Показываем "Перейти" если книга есть, "К книге" если книга удалена
-        if (hasBookFile) {
-            OutlinedButton(onClick = onClick) {
-                Text(stringResource(R.string.bookmarks_go_to))
-            }
-        } else {
-            OutlinedButton(onClick = onBookClick) {
-                Text(stringResource(R.string.bookmarks_go_to_book))
-            }
-        }
-
-        IconButton(onClick = onShareClick) {
-            Icon(
-                imageVector = Icons.Default.Share,
-                contentDescription = stringResource(R.string.bookmarks_share),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
 //region Previews
 
 @Preview(showBackground = true)
@@ -362,7 +368,9 @@ private fun NoteItemPreview() {
                 startChar = 0,
                 endParagraph = 0,
                 endElement = 0,
-                endChar = 0
+                endChar = 0,
+                sentenceBefore = "Перед этим текстом было сказано, что",
+                sentenceAfter = "и это важный вывод."
             ),
             showBookInfo = true,
             onClick = {},
@@ -394,7 +402,9 @@ private fun NoteItemWithoutBookInfoPreview() {
                 startChar = 0,
                 endParagraph = 0,
                 endElement = 0,
-                endChar = 0
+                endChar = 0,
+                sentenceBefore = null,
+                sentenceAfter = null
             ),
             showBookInfo = false,
             onClick = {},

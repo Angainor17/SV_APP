@@ -632,16 +632,63 @@ class ReaderViewModel @Inject constructor(
     private fun addBookmark(bookmark: Storage.Bookmark) {
         val book = currentBook ?: return
 
+        Timber.tag("voronin2").d("========== СОЗДАНИЕ ЗАМЕТКИ ==========")
+        Timber.tag("voronin2").d("--- Поля Bookmark ---")
+        Timber.tag("voronin2").d("last (timestamp): ${bookmark.last}")
+        Timber.tag("voronin2").d("name: ${bookmark.name}")
+        Timber.tag("voronin2").d("text: ${bookmark.text}")
+        Timber.tag("voronin2").d("color: ${bookmark.color}")
+        Timber.tag("voronin2").d("start: paragraph=${bookmark.start.paragraphIndex}, element=${bookmark.start.elementIndex}, char=${bookmark.start.charIndex}")
+        Timber.tag("voronin2").d("end: paragraph=${bookmark.end.paragraphIndex}, element=${bookmark.end.elementIndex}, char=${bookmark.end.charIndex}")
+        Timber.tag("voronin2").d("coverUrl (до): ${bookmark.coverUrl}")
+        Timber.tag("voronin2").d("bookFileUri (до): ${bookmark.bookFileUri}")
+        Timber.tag("voronin2").d("sentenceBefore (до): ${bookmark.sentenceBefore}")
+        Timber.tag("voronin2").d("sentenceAfter (до): ${bookmark.sentenceAfter}")
+
+        Timber.tag("voronin2").d("--- Данные из книги ---")
+        Timber.tag("voronin2").d("book.info.coverUrl: ${book.info?.coverUrl}")
+        Timber.tag("voronin2").d("book.url: ${book.url}")
+
         // Сохраняем coverUrl книги в закладке на момент создания
         bookmark.coverUrl = book.info?.coverUrl
 
         // Сохраняем URI файла книги в закладке для навигации
         bookmark.bookFileUri = book.url?.toString()
 
+        // Извлекаем контекст предложения
+        val context = extractSentenceContext(bookmark)
+
+        Timber.tag("voronin2").d("--- После заполнения ---")
+        Timber.tag("voronin2").d("coverUrl (после): ${bookmark.coverUrl}")
+        Timber.tag("voronin2").d("bookFileUri (после): ${bookmark.bookFileUri}")
+        Timber.tag("voronin2").d("sentenceBefore (после): ${context?.first}")
+        Timber.tag("voronin2").d("sentenceAfter (после): ${context?.second}")
+
+        bookmark.sentenceBefore = context?.first
+        bookmark.sentenceAfter = context?.second
+
+        Timber.tag("voronin2").d("--- Финальные значения Bookmark ---")
+        Timber.tag("voronin2").d("sentenceBefore: ${bookmark.sentenceBefore}")
+        Timber.tag("voronin2").d("sentenceAfter: ${bookmark.sentenceAfter}")
+        Timber.tag("voronin2").d("======================================")
+
         book.info.bookmarks.add(bookmark)
         storage.save(book)
         fbReaderView?.bookmarksUpdate()
         savePosition()
+    }
+
+    /**
+     * Извлечь контекст предложения из выделения
+     * @return Pair<sentenceBefore, sentenceAfter> или null
+     */
+    private fun extractSentenceContext(bookmark: Storage.Bookmark): Pair<String, String?>? {
+        return try {
+            fbReaderView?.extractSentenceContext(bookmark)
+        } catch (e: Exception) {
+            Timber.tag("voronin").e(e, "Error extracting sentence context")
+            null
+        }
     }
 
     private fun deleteBookmark(bookmark: Storage.Bookmark) {
@@ -676,6 +723,88 @@ class ReaderViewModel @Inject constructor(
         // Обновляем состояние для рекомпозиции
         val currentState = _state.value as? ReaderState.Content ?: return
         _state.value = currentState.copy(book = book)
+    }
+
+    // ==================== Миграция заметок ====================
+
+    /**
+     * Миграция контекста для старых заметок
+     * Извлекает и сохраняет контекст предложения для заметок, у которых его нет.
+     *
+     * ВАЖНО: Должен вызываться ПОСЛЕ инициализации FBReaderView (после setWidget)
+     * ВНИМАНИЕ: Должен вызываться синхронно, т.к. extractSentenceContext работает с UI
+     */
+    fun migrateBookmarksContextAsync() {
+        // Проверяем есть ли заметки без контекста
+        val bookmarks = currentBook?.info?.bookmarks ?: return
+        val hasUnmigrated = bookmarks.any { it.sentenceBefore == null && it.sentenceAfter == null }
+
+        if (!hasUnmigrated) {
+            Timber.tag("voronin2").d("migrateBookmarksContextAsync: no bookmarks to migrate")
+            return
+        }
+
+        Timber.tag("voronin2").d("=== migrateBookmarksContextAsync START ===")
+        migrateBookmarksContext(currentBook)
+        Timber.tag("voronin2").d("=== migrateBookmarksContextAsync END ===")
+    }
+
+    private fun migrateBookmarksContext(book: Storage.Book?) {
+        if (book == null) {
+            Timber.tag("voronin2").d("migrateBookmarksContext: book is null")
+            return
+        }
+
+        // ВАЖНО: FBReaderView использует FBook.bookmarks, а не Book.bookmarks
+        // Нужно модифицировать именно тот список который используется FBReaderView
+        val fbookBookmarks = fbReaderView?.book?.info?.bookmarks
+        if (fbookBookmarks == null) {
+            Timber.tag("voronin2").d("migrateBookmarksContext: fbookBookmarks is null")
+            return
+        }
+        if (fbookBookmarks.isEmpty()) {
+            Timber.tag("voronin2").d("migrateBookmarksContext: fbookBookmarks is empty")
+            return
+        }
+
+        Timber.tag("voronin2").d("migrateBookmarksContext: found ${fbookBookmarks.size} bookmarks in FBook")
+        var needSave = false
+
+        fbookBookmarks.forEach { bookmark ->
+            // Если контекст уже есть - пропускаем
+            if (bookmark.sentenceBefore != null || bookmark.sentenceAfter != null) {
+                Timber.tag("voronin2").d("migrateBookmarksContext: skipping bookmark with existing context")
+                return@forEach
+            }
+
+            // Извлекаем контекст
+            try {
+                Timber.tag("voronin2").d("migrateBookmarksContext: extracting context for bookmark: ${bookmark.text?.take(30)}")
+                val context = fbReaderView?.extractSentenceContext(bookmark)
+                Timber.tag("voronin2").d("migrateBookmarksContext: extractSentenceContext result = $context")
+                if (context != null) {
+                    bookmark.sentenceBefore = context.first
+                    bookmark.sentenceAfter = context.second
+                    needSave = true
+                    Timber.tag("voronin2").d("Migrated bookmark context: sentenceBefore=${context.first}, sentenceAfter=${context.second}")
+                }
+            } catch (e: Exception) {
+                Timber.tag("voronin2").e(e, "Error migrating bookmark context")
+            }
+        }
+
+        // Сохраняем если были изменения
+        if (needSave) {
+            // Синхронизируем изменения обратно в currentBook
+            book.info.bookmarks = Storage.Bookmarks().apply {
+                addAll(fbookBookmarks)
+            }
+            storage.save(book)
+            fbReaderView?.bookmarksUpdate()
+            Timber.tag("voronin2").d("Saved ${fbookBookmarks.size} migrated bookmarks")
+        } else {
+            Timber.tag("voronin2").d("migrateBookmarksContext: no changes needed")
+        }
     }
 
     // ==================== Шрифты ====================

@@ -59,4 +59,9 @@
         <item quantity="other">%1$d заметок</item>
     </plurals>
 
+    <!-- Notes Block on Book Detail -->
+    <string name="notes_title_with_count">Заметки (%1$d)</string>
+    <string name="notes_loading">Загрузка заметок…</string>
+    <string name="notes_all_notes">Все заметки</string>
+
 </resources>

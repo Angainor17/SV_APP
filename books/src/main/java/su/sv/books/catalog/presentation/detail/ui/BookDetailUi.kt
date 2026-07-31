@@ -18,11 +18,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.axet.bookreader.screens.BookmarkPosition
 import com.github.axet.bookreader.screens.ReaderScreen
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.launch
+import su.sv.books.catalog.presentation.bookmarks.nav.BookmarksScreen
 import su.sv.books.catalog.presentation.detail.actions.DetailBookActions
 import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
@@ -117,6 +119,39 @@ private fun HandleEffects(
                         )
                     )
                 }
+            }
+
+            is BookDetailOneTimeEffect.OpenBookAtNote -> {
+                // Открываем книгу на позиции заметки
+                val uri = effect.book.fileUri
+                if (uri != null) {
+                    stackNavigation.forward(
+                        ReaderScreen(
+                            bookUri = uri,
+                            bookCoverUrl = effect.book.image,
+                            bookTitle = effect.book.title,
+                            bookAuthor = effect.book.author,
+                            bookmarkPosition = BookmarkPosition(
+                                startParagraph = effect.note.startParagraph,
+                                startElement = effect.note.startElement,
+                                startChar = effect.note.startChar,
+                                endParagraph = effect.note.endParagraph,
+                                endElement = effect.note.endElement,
+                                endChar = effect.note.endChar,
+                            ),
+                        )
+                    )
+                }
+            }
+
+            is BookDetailOneTimeEffect.OpenBookmarksForBook -> {
+                // Открываем экран заметок с фильтром по книге
+                stackNavigation.forward(
+                    BookmarksScreen(
+                        bookFileUri = effect.bookFileUri,
+                        bookTitle = effect.bookTitle,
+                    )
+                )
             }
 
             is BookDetailOneTimeEffect.ShowErrorSnackBar -> {

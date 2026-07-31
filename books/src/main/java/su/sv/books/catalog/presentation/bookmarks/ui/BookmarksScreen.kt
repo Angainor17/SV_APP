@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,12 +60,27 @@ import timber.log.Timber
 
 /**
  * Экран Заметки (закладки)
+ *
+ * @param filterBookFileUri Опциональный URI файла книги для фильтрации (вычислит MD5)
+ * @param filterBookTitle Опциональное название книги для заголовка
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookmarksContent(
+    filterBookFileUri: String? = null,
+    filterBookTitle: String? = null,
     viewModel: BookmarksViewModel = hiltViewModel(),
 ) {
+    // Устанавливаем фильтр если передан, иначе загружаем все заметки
+    LaunchedEffect(filterBookFileUri) {
+        if (filterBookFileUri != null) {
+            viewModel.onAction(BookmarksAction.SetBookFilter(filterBookFileUri, filterBookTitle))
+        } else {
+            // Загружаем все заметки при обычном открытии
+            viewModel.onAction(BookmarksAction.LoadData)
+        }
+    }
+
     val formFactor = LocalDeviceFormFactor.current
 
     // На планшетах (Expanded) используем master-detail layout

@@ -784,6 +784,15 @@ interface Plugin {
         }
 
         /**
+         * Получить полный текст страницы.
+         * @param pageNum Номер страницы (0-indexed)
+         * @return Текст страницы или null если не поддерживается
+         */
+        open fun getPageText(pageNum: Int): String? {
+            return null
+        }
+
+        /**
          * Возвращает страницу выделения.
          */
         open fun selectPage(start: ZLTextPosition, info: Reflow.Info?, w: Int, h: Int): Selection.Page {

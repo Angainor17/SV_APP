@@ -125,12 +125,25 @@ fun BookDetailInfoUiCompact(
                 modifier = Modifier.padding(
                     top = 4.dp,
                     start = 12.dp,
-                    bottom = 32.dp,
                     end = 12.dp,
                 ),
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 text = uiBook.description,
             )
+
+            // Блок заметок
+            NotesBlockUi(
+                state = state.notesBlockState,
+                onNoteClick = { note ->
+                    actionsHandler.onAction(DetailBookActions.OnNoteClick(uiBook, note))
+                },
+                onAllNotesClick = {
+                    actionsHandler.onAction(DetailBookActions.OnAllNotesClick(uiBook))
+                },
+                modifier = Modifier.padding(top = 16.dp, start = 12.dp, end = 12.dp),
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -212,6 +225,18 @@ fun BookDetailInfoUiTablet(
                 Text(
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                     text = uiBook.description,
+                )
+
+                // Блок заметок
+                NotesBlockUi(
+                    state = state.notesBlockState,
+                    onNoteClick = { note ->
+                        actionsHandler.onAction(DetailBookActions.OnNoteClick(uiBook, note))
+                    },
+                    onAllNotesClick = {
+                        actionsHandler.onAction(DetailBookActions.OnAllNotesClick(uiBook))
+                    },
+                    modifier = Modifier.padding(top = 16.dp),
                 )
             }
         }

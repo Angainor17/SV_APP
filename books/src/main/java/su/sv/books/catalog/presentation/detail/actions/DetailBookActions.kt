@@ -1,6 +1,7 @@
 package su.sv.books.catalog.presentation.detail.actions
 
 import su.sv.books.catalog.data.receivers.BookDownloadedActionHandler.BookState
+import su.sv.books.catalog.presentation.detail.model.UiNoteWithContext
 import su.sv.models.ui.book.UiBook
 
 sealed class DetailBookActions {
@@ -19,5 +20,16 @@ sealed class DetailBookActions {
     /** Получение уведомления о скачивании */
     data class OnBookStateHandle(
         val bookState: BookState,
+    ) : DetailBookActions()
+
+    /** Нажатие на заметку */
+    data class OnNoteClick(
+        val book: UiBook,
+        val note: UiNoteWithContext,
+    ) : DetailBookActions()
+
+    /** Нажатие на кнопку "Все заметки" */
+    data class OnAllNotesClick(
+        val book: UiBook,
     ) : DetailBookActions()
 }
