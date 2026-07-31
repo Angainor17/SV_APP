@@ -16,5 +16,7 @@ sealed class UiBookDetailState {
         val book: UiBook,
         val isActionLoading: Boolean,
         val actionText: String,
+        // Состояние блока заметок
+        val notesBlockState: UiNotesBlockState = UiNotesBlockState.Loading,
     ) : UiBookDetailState()
 }

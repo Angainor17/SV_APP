@@ -38,6 +38,8 @@ data class BookmarkData(
     val endParagraph: Int,
     val endElement: Int,
     val endChar: Int,
+    val sentenceBefore: String?,     // Контекст предложения до заметки
+    val sentenceAfter: String?,      // Контекст предложения после заметки
 )
 
 /**
@@ -72,23 +74,24 @@ class BookmarksRepository @Inject constructor(
     suspend fun getAllNotes(sortByDateAscending: Boolean = false): Result<List<BookmarkData>> {
         return withContext(dispatcherProvider.io) {
             runCatching {
+                Timber.tag("voronin2").d("getAllNotes: START")
                 val notes = mutableListOf<BookmarkData>()
 
                 // Сканируем JSON файлы напрямую из хранилища
                 val jsonFiles = listJsonFiles()
-                Timber.d("Found ${jsonFiles.size} JSON files in storage")
+                Timber.tag("voronin2").d("getAllNotes: Found ${jsonFiles.size} JSON files")
 
                 for (jsonFile in jsonFiles) {
                     try {
                         val bookNotes = loadNotesFromJsonUri(jsonFile.uri, jsonFile.bookId)
-                        Timber.d("Book ${jsonFile.bookId}: found ${bookNotes.size} notes")
+                        Timber.tag("voronin2").d("getAllNotes: Book ${jsonFile.bookId}: ${bookNotes.size} notes")
                         notes.addAll(bookNotes)
                     } catch (e: Exception) {
-                        Timber.e(e, "Error loading bookmarks from: ${jsonFile.uri}")
+                        Timber.tag("voronin2").e(e, "getAllNotes: Error loading from ${jsonFile.uri}")
                     }
                 }
 
-                Timber.d("Total notes loaded: ${notes.size}")
+                Timber.tag("voronin2").d("getAllNotes: Total ${notes.size} notes loaded")
 
                 if (sortByDateAscending) {
                     notes.sortedBy { it.createdAt }
@@ -369,6 +372,13 @@ class BookmarksRepository @Inject constructor(
                     // URI файла книги из закладки (сохранённый при создании), или fallback на URI книги
                     val noteBookFileUri = bookmarkJson.optString("bookFileUri", null) ?: bookFileUriFromBook
 
+                    val sentenceBefore = bookmarkJson.optString("sentenceBefore", null)
+                    val sentenceAfter = bookmarkJson.optString("sentenceAfter", null)
+                    val startParagraphIndex = startArray?.optInt(0) ?: 0
+
+                    Timber.d("Loading note: text=${text.take(30)}..., startParagraph=$startParagraphIndex, page=${calculatePageNumber(startParagraphIndex)}")
+                    Timber.d("  sentenceBefore=$sentenceBefore, sentenceAfter=$sentenceAfter")
+
                     notes.add(
                         BookmarkData(
                             id = "${bookId}_${bookmarkJson.optLong("last")}",
@@ -379,14 +389,16 @@ class BookmarksRepository @Inject constructor(
                             bookFileUri = noteBookFileUri,
                             text = text,
                             name = bookmarkJson.optString("name").takeIf { it.isNotEmpty() },
-                            page = calculatePageNumber(startArray?.optInt(0) ?: 0),
+                            page = calculatePageNumber(startParagraphIndex),
                             createdAt = bookmarkJson.optLong("last"),
-                            startParagraph = startArray?.optInt(0) ?: 0,
+                            startParagraph = startParagraphIndex,
                             startElement = startArray?.optInt(1) ?: 0,
                             startChar = startArray?.optInt(2) ?: 0,
                             endParagraph = endArray?.optInt(0) ?: 0,
                             endElement = endArray?.optInt(1) ?: 0,
                             endChar = endArray?.optInt(2) ?: 0,
+                            sentenceBefore = sentenceBefore,
+                            sentenceAfter = sentenceAfter,
                         )
                     )
                 } catch (e: Exception) {
@@ -555,7 +567,9 @@ class BookmarksRepository @Inject constructor(
     }
 
     private fun calculatePageNumber(paragraphIndex: Int): Int {
-        return (paragraphIndex / 30) + 1
+        // Для PDF paragraphIndex = номер страницы (0-indexed)
+        // Для EPUB/FB2 это номер параграфа, что также приемлемо для отображения
+        return paragraphIndex + 1
     }
 }
 

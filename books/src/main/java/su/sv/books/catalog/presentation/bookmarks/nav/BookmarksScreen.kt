@@ -11,14 +11,22 @@ import su.sv.books.catalog.presentation.bookmarks.ui.BookmarksContent
 
 /**
  * Modo Screen для экрана заметок
+ *
+ * @param bookFileUri Опциональный URI файла книги для фильтрации (вычислит MD5)
+ * @param bookTitle Опциональное название книги для заголовка
  */
 @Parcelize
 class BookmarksScreen(
     override val screenKey: ScreenKey = generateScreenKey(),
+    val bookFileUri: String? = null,
+    val bookTitle: String? = null,
 ) : Screen, Parcelable {
 
     @Composable
     override fun Content(modifier: Modifier) {
-        BookmarksContent()
+        BookmarksContent(
+            filterBookFileUri = bookFileUri,
+            filterBookTitle = bookTitle,
+        )
     }
 }

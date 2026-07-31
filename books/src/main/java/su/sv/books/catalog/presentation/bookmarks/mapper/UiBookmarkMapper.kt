@@ -2,9 +2,9 @@ package su.sv.books.catalog.presentation.bookmarks.mapper
 
 import su.sv.books.catalog.domain.model.BookWithNotes
 import su.sv.books.catalog.domain.model.BookmarkNote
-import su.sv.books.catalog.domain.model.cleanBookmarkText
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookWithNotes
 import su.sv.books.catalog.presentation.bookmarks.model.UiBookmarkNote
+import su.sv.commonarchitecture.utils.cleanBookmarkText
 import javax.inject.Inject
 
 class UiBookmarkMapper @Inject constructor() {
@@ -27,6 +27,8 @@ class UiBookmarkMapper @Inject constructor() {
             endParagraph = domain.endParagraph,
             endElement = domain.endElement,
             endChar = domain.endChar,
+            sentenceBefore = domain.sentenceBefore?.let { cleanBookmarkText(it) },
+            sentenceAfter = domain.sentenceAfter?.let { cleanBookmarkText(it) },
         )
     }
 

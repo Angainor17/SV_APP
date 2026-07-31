@@ -56,6 +56,8 @@ class BookmarksRepositoryImpl @Inject constructor(
         endParagraph = endParagraph,
         endElement = endElement,
         endChar = endChar,
+        sentenceBefore = sentenceBefore,
+        sentenceAfter = sentenceAfter,
     )
 
     private fun BookWithNotesData.toDomain() = BookWithNotes(

@@ -1046,6 +1046,32 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
             return null
         }
+
+        /**
+         * Получить полный текст страницы PDF
+         * @param pageNum Номер страницы (0-indexed)
+         * @return Текст страницы или null при ошибке
+         */
+        override fun getPageText(pageNum: Int): String? {
+            if (!initTextDoc()) {
+                Log.w(TAG, "NativeView.getPageText() pdfium not available")
+                return null
+            }
+
+            try {
+                Log.d(TAG, "NativeView.getPageText() getting text for page $pageNum")
+                val page = textDoc!!.openPage(pageNum)
+                val text = page.open()
+                val result = text.getText(0, text.count)
+                text.close()
+                page.close()
+                Log.d(TAG, "NativeView.getPageText() got ${result?.length ?: 0} chars")
+                return result
+            } catch (e: Throwable) {
+                Log.e(TAG, "NativeView.getPageText() error getting text for page $pageNum", e)
+            }
+            return null
+        }
     }
 
     class PdfiumPage : Plugin.Page {
@@ -1219,6 +1245,27 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 if (s.hasText(i)) return s
             }
             s.close()
+            return null
+        }
+
+        /**
+         * Получить полный текст страницы PDF
+         * @param pageNum Номер страницы (0-indexed)
+         * @return Текст страницы или null при ошибке
+         */
+        override fun getPageText(pageNum: Int): String? {
+            try {
+                Log.d(TAG, "PdfiumView.getPageText() getting text for page $pageNum")
+                val page = doc.openPage(pageNum)
+                val text = page.open()
+                val result = text.getText(0, text.count)
+                text.close()
+                page.close()
+                Log.d(TAG, "PdfiumView.getPageText() got ${result?.length ?: 0} chars")
+                return result
+            } catch (e: Throwable) {
+                Log.e(TAG, "PdfiumView.getPageText() error getting text for page $pageNum", e)
+            }
             return null
         }
     }
