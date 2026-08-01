@@ -61,8 +61,10 @@ dependencies {
     implementation(libs.axet.djvulibre) {
         exclude("org.apache.httpcomponents", "httpmime")
     }
-    implementation(libs.axet.pdfium) {
-        exclude("org.apache.httpcomponents", "httpmime")
+    implementation(libs.legere.pdfiumandroid) {
+        // Тянет более новый kotlin-stdlib, чем текущий Kotlin-компилятор проекта умеет
+        // читать (metadata version mismatch) — используем stdlib, разрешённый проектом.
+        exclude("org.jetbrains.kotlin", "kotlin-stdlib")
     }
     implementation(libs.axet.k2pdfopt) {
         exclude("org.apache.httpcomponents", "httpmime")
