@@ -836,7 +836,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             this.w = w
             this.h = h
             loadPageIndex(index)
-            loadPage() // Всегда загружаем страницу
+            loadPage()
             if (index == ZLViewEnums.PageIndex.current) {
                 renderPage()
             }
@@ -871,6 +871,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         private fun loadPage() {
             try {
                 page?.close()
+                page = null
                 page = doc.openPage(pageNumber)
                 pageBox = Plugin.Box(0, 0, page!!.width, page!!.height)
                 Log.d(TAG, "NativePage.loadPage() page=$pageNumber, size=${page!!.width}x${page!!.height}")
@@ -945,6 +946,11 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun draw(bitmap: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
             Log.d(TAG, "NativeView.draw() index=$index, w=$w, h=$h, config=$c")
             val curr = current as NativePage
+            // gotoPosition() открывает страницу через loadPage() → doc.openPage().
+            // PdfRenderer бросает IllegalStateException при повторном открытии той же страницы.
+            // Закрываем перед созданием NativePage, который снова откроет её в loadPage().
+            curr.page?.close()
+            curr.page = null
             val r = NativePage(curr, index, w, h)
             if (index == ZLViewEnums.PageIndex.current) current!!.updatePage(r)
             r.scale(w, h)

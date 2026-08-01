@@ -1092,16 +1092,21 @@ public class FBReaderView extends RelativeLayout {
     }
 
     void gotoPluginPosition(ZLTextPosition p) {
+        android.util.Log.d("voronin2", "gotoPluginPosition: p=" + p + ", paragraph=" + p.getParagraphIndex());
         if (p == null)
             return;
         if (widget instanceof ScrollWidget) {
+            android.util.Log.d("voronin2", "gotoPluginPosition: ScrollWidget mode");
             // Для центрирования или при наличии offset - используем scrollDelayed
             if (p.getElementIndex() != 0 || scrollCentered) {
                 scrollDelayed = p;
                 p = new ZLTextFixedPosition(p.getParagraphIndex(), 0, 0);
+                android.util.Log.d("voronin2", "gotoPluginPosition: scrollDelayed set, new p=" + p);
             }
         }
+        android.util.Log.d("voronin2", "gotoPluginPosition: calling pluginview.gotoPosition");
         pluginview.gotoPosition(p);
+        android.util.Log.d("voronin2", "gotoPluginPosition: pluginview.gotoPosition done");
     }
 
     public void gotoPosition(TOCTree.Reference p) {
