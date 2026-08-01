@@ -346,6 +346,16 @@ fun ReaderContent(
                                 val fbook = viewModel.getFBook()
                                 if (fbook != null) {
                                     try {
+                                        // Если есть позиция закладки — инжектируем её в fbook.info.position
+                                        // ДО вызова loadBook, чтобы библиотека навигировала туда синхронно
+                                        // (тот же путь что и "продолжить чтение" — работает корректно для PDF)
+                                        val savedPos = viewModel.getSavedPosition()
+                                        if (savedPos != null) {
+                                            viewModel.clearSavedPosition()
+                                            if (fbook.info == null) fbook.info = Storage.RecentInfo()
+                                            fbook.info.position = savedPos
+                                        }
+
                                         loadBook(fbook)
                                         // Устанавливаем режим просмотра
                                         val viewMode = currentState.viewMode
@@ -353,15 +363,6 @@ fun ReaderContent(
                                             if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
                                             else FBReaderView.Widgets.PAGING
                                         )
-
-                                        // Применяем сохранённую позицию (из заметки)
-                                        val savedPos = viewModel.getSavedPosition()
-                                        if (savedPos != null) {
-                                            Timber.d("Applying saved position from bookmark: $savedPos")
-                                            gotoPosition(savedPos)
-                                            // Сбрасываем savedPosition чтобы при следующем открытии использовалась сохранённая в файле
-                                            viewModel.clearSavedPosition()
-                                        }
 
                                         // Обновляем возможность смены шрифта
                                         viewModel.updateCanChangeFont()

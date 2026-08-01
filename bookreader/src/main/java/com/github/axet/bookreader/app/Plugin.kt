@@ -385,8 +385,16 @@ interface Plugin {
         open fun gotoPosition(p: ZLTextPosition?) {
             if (p == null)
                 return
-            if (current!!.pageNumber != p.getParagraphIndex() || current!!.pageOffset != p.elementIndex)
+            if (current!!.pageNumber != p.getParagraphIndex() || current!!.pageOffset != p.elementIndex) {
                 current!!.load(p)
+                // pageOffset как scroll offset должен быть < pageBox.h.
+                // Если нет — это char-индекс из текстового слоя PDF, попавший сюда из закладки.
+                // Char-индексы > pageBox.h дают отрицательный render.h → пустой экран.
+                val box = current!!.pageBox
+                if (box != null && current!!.pageOffset >= box.h) {
+                    current!!.pageOffset = 0
+                }
+            }
             if (reflower != null) {
                 if (reflower!!.page != p.getParagraphIndex()) {
                     reflower!!.reset()
