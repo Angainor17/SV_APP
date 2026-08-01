@@ -2442,7 +2442,7 @@ public class FBReaderView extends RelativeLayout {
                 }
             }
 
-            String text = fullText.toString().trim();
+            String text = normalizeExtractedText(fullText.toString().trim());
             android.util.Log.d("voronin", "extracted text length=" + text.length());
             android.util.Log.d("voronin", "extracted text preview=" + (text.length() > 100 ? text.substring(0, 100) + "..." : text));
 
@@ -2523,6 +2523,8 @@ public class FBReaderView extends RelativeLayout {
                 return null;
             }
 
+            pageText = normalizeExtractedText(pageText);
+
             android.util.Log.d("voronin2", "Page text length: " + pageText.length());
             android.util.Log.d("voronin2", "Page text preview: " + (pageText.length() > 100 ? pageText.substring(0, 100) + "..." : pageText));
 
@@ -2583,7 +2585,7 @@ public class FBReaderView extends RelativeLayout {
         int index = fromIndex - 1;
         while (index >= 0) {
             char c = text.charAt(index);
-            if (c == '.' || c == '!' || c == '?' || c == '\n') {
+            if (c == '.' || c == '!' || c == '?') {
                 return index + 1;
             }
             index--;
@@ -2601,11 +2603,23 @@ public class FBReaderView extends RelativeLayout {
             if (c == '.' || c == '!' || c == '?') {
                 return index + 1;
             }
-            if (c == '\n') {
-                return index;
-            }
             index++;
         }
         return text.length();
+    }
+
+    /**
+     * Нормализует сырой текст страницы перед поиском границ предложения.
+     * Text-слой PDF (и посимвольная модель EPUB/FB2) содержит '\n' на каждом
+     * визуальном переносе строки, а не только на границах абзаца — из-за этого
+     * findSentenceStart/findSentenceEnd раньше принимали перенос строки за конец
+     * предложения. Здесь перенос по слогам ("слово-\nпродолжение") склеивается
+     * обратно в слово, а оставшиеся переносы строк схлопываются в пробел, чтобы
+     * поиск границы предложения шёл по пунктуации, а не по вёрстке страницы.
+     */
+    private String normalizeExtractedText(String text) {
+        String dehyphenated = text.replaceAll("(\\p{L})-\\s*\\n\\s*(\\p{L})", "$1$2");
+        String flattened = dehyphenated.replaceAll("\\s*\\n\\s*", " ");
+        return flattened.replaceAll(" {2,}", " ");
     }
 }
