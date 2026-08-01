@@ -31,7 +31,7 @@ material = "1.12.0"
 
 djvulibre = "0.1.4"
 k2pdfopt = "0.1.6"
-pdfium = "2.0.16"
+pdfiumandroid = "2.0.0"
 wget = "1.7.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -107,7 +107,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", vers
 # Reader
 axet-wget = { module = "com.github.axet:wget", version.ref = "wget" }
 axet-djvulibre = { module = "com.github.axet:djvulibre", version.ref = "djvulibre" }
-axet-pdfium = { module = "com.github.axet:pdfium", version.ref = "pdfium" }
+legere-pdfiumandroid = { module = "io.legere:pdfiumandroid", version.ref = "pdfiumandroid" }
 axet-k2pdfopt = { module = "com.github.axet:k2pdfopt", version.ref = "k2pdfopt" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

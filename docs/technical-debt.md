@@ -187,9 +187,9 @@ tasks.register("checkDependencies") {
 
 ## Адаптивный UI для планшетов
 
-### 🔴 P0: Краш PDF на планшете
+### ✅ Краш PDF на планшете (решено 2026-08-01)
 
-**Проблема:** При открытии PDF книги на планшете происходит краш в нативной библиотеке.
+**Была проблема:** При открытии PDF книги на планшете происходил краш в нативной библиотеке.
 
 **Модуль:** bookreader / fbreader
 **Ошибка:** `Fatal signal 5 (SIGTRAP)` в `libmodpdfium.so`
@@ -201,15 +201,41 @@ tasks.register("checkDependencies") {
 ...
 ```
 
-**Возможные причины:**
-- Проблема с размером экрана/буфером
-- Несовместимость PDF плагина с планшетами
-- Проблема с memory allocation
+**Найденная причина:** `com.github.axet:pdfium:2.0.16` (последняя существующая версия) тянет
+`libmodpdfium.so`, собранную с ELF page-alignment **4 KB** (`objdump -p` → `align 2**12`).
+Планшеты всё чаще работают с **16 KB page size** (обязательное требование Android 15+ для
+Google Play с ноября 2025) — при несовпадении page size нативный аллокатор pdfium падает по
+CHECK-assert → `SIGTRAP`. У мейнтейнера библиотеки на GitLab с июля 2024 висит открытый,
+не исправленный issue "Requesting for 16kb alignment". Более новой версии `axet/pdfium` не
+существует, апгрейд был невозможен.
 
-**Решение:**
-1. Проверить на другом PDF файле
-2. Обновить axet/pdfium версию
-3. Добавить fallback для планшетов
+Более ранние попытки чинили это эвристикой "экран ≥7 дюймов → Android PdfRenderer вместо
+pdfium" — эвристика лечила симптом не для той причины (реальный триггер — page size
+устройства, а не диагональ экрана) и попутно ломала выделение текста, поиск, TOC и
+scroll/two-column режим на затронутых устройствах.
+
+**Решение:** Заменили `com.github.axet:pdfium` на `io.legere:pdfiumandroid:2.0.0` (обёртка над
+современной сборкой Google PDFium). Проверено напрямую через `objdump -p` на `.so` из `.aar`:
+`libpdfium.so`/`libpdfiumandroid.so` собраны с `align 2**14` (16 KB) на всех ABI. Дополнительно
+включили `android.experimental.enableNative16KbAlignment=true` в `gradle.properties`, чтобы
+сама упаковка APK тоже выравнивала нативные библиотеки на 16 KB (проверено на собранном
+`app-release-unsigned.apk`: смещение данных `.so` внутри zip кратно 16384 для каждого ABI).
+
+Весь PDF-код на pdfium теперь снова единый путь (без tablet/PdfRenderer-развилки) —
+`bookreader/src/main/java/com/github/axet/bookreader/app/PDFPlugin.kt`. Полный функционал
+(выделение, поиск, TOC) сохранён на всех устройствах.
+
+**Дополнительный фикс:** после замены библиотеки открытие PDF перестало падать, но всплыл второй
+краш при создании закладки — сначала `IllegalStateException: Already closed` (поймали конфигом
+`AlreadyClosedBehavior.IGNORE`), затем `SIGBUS` прямо в `FPDF_ClosePage` (реальный double-free:
+`Selection`/`SelectionPage` намеренно шарит один и тот же `PdfPage`/`PdfTextPage` между
+`startPage`/`endPage`/кэшем `map`, и закрывал его больше одного раза — старый pdfium это терпел
+молча, новый — нет). Исправлено в `Selection.close()`: закрывать native-ресурсы ровно один раз,
+только через `map`.
+
+**Подтверждено на реальном 16KB-устройстве** (эмулятор `sdk_gphone16k_arm64`, тот самый, где
+воспроизводился баг): открытие PDF, выделение текста и создание нескольких закладок подряд —
+без крашей.
 
 ---
 
