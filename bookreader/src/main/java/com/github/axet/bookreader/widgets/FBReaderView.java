@@ -774,6 +774,15 @@ public class FBReaderView extends RelativeLayout {
                         bm = new Storage.Bookmark(snippet.getText(), snippet.getStart(), snippet.getEnd());
                     }
 
+                    // Закрываем выделение сразу после того, как текст/позиции скопированы в bm
+                    // (как в SELECTION_COPY_TO_CLIPBOARD/SELECTION_SHARE), а не после тяжёлого
+                    // extractSentenceContext(). На ScrollWidget (телефон) отложенный колбэк
+                    // завершения жеста выделения может прислать SELECTION_SHOW_PANEL повторно,
+                    // если модель выделения (mySelection) к этому моменту ещё не очищена —
+                    // из-за чего панель "заметки" открывалась заново после её создания.
+                    app.BookTextView.clearSelection();
+                    selectionClose();
+
                     // === ЛОГИРОВАНИЕ СОЗДАНИЯ ЗАМЕТКИ ===
                     android.util.Log.d("voronin2", "========== СОЗДАНИЕ ЗАМЕТКИ (FBReaderView) ==========");
                     android.util.Log.d("voronin2", "--- Поля Bookmark до заполнения ---");
@@ -821,8 +830,6 @@ public class FBReaderView extends RelativeLayout {
                     bookmarksUpdate();
                     if (listener != null)
                         listener.onBookmarksUpdate();
-                    app.BookTextView.clearSelection();
-                    selectionClose();
                 }
             }
         });
