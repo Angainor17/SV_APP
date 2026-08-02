@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.wiki.presentation.decodeHtmlEntities
 import su.sv.wiki.presentation.root.model.UiExternalLink
 import su.sv.wiki.presentation.root.model.UiWikiLink
 import timber.log.Timber
@@ -109,14 +110,16 @@ private fun buildAnnotatedContent(
     onLinkClick: (String) -> Unit,
     onExternalLinkClick: (String) -> Unit,
 ) = buildAnnotatedString {
-    // Убираем HTML теги и оставляем текст
+    // Убираем HTML теги и оставляем текст.
+    // Таблицы (например, диаграммы триад "Бытие / ↓ ↑ = / Становление / Ничто" в статьях
+    // по гегелевской логике) сначала расплющиваем построчно: ячейки одной строки — на одной
+    // строке текста через отступ, между строками — перевод строки. Иначе после блокового
+    // удаления <table>/<tr>/<td> остаётся только "случайный" whitespace форматирования ответа
+    // API между тегами, и содержимое ячеек одной строки расползается по разным строкам.
     val plainText = htmlContent
+        .flattenWikiTables()
         .replace(Regex("<[^>]*>"), "")
-        .replace("&nbsp;", " ")
-        .replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", "\"")
+        .decodeHtmlEntities()
         .trim()
 
     // Собираем все позиции ссылок
@@ -209,6 +212,27 @@ private fun buildAnnotatedContent(
     if (currentIndex < plainText.length) {
         append(plainText.substring(currentIndex))
     }
+}
+
+private val wikiTableRegex = Regex("(?s)<table[^>]*>(.*?)</table>")
+private val wikiTableRowRegex = Regex("(?s)<tr[^>]*>(.*?)</tr>")
+private val wikiTableCellRegex = Regex("(?s)<td[^>]*>(.*?)</td>")
+
+/**
+ * Заменяет HTML-таблицы на построчный текст: ячейки одной строки соединяются отступом
+ * (как колонки), между строками — перевод строки. Ссылки/форматирование внутри ячеек
+ * не трогаем — они по-прежнему уйдут через обычную зачистку тегов и подстановку ссылок ниже.
+ */
+private fun String.flattenWikiTables(): String = wikiTableRegex.replace(this) { tableMatch ->
+    wikiTableRowRegex.findAll(tableMatch.groupValues[1])
+        .map { rowMatch ->
+            wikiTableCellRegex.findAll(rowMatch.groupValues[1])
+                .map { it.groupValues[1].trim() }
+                .filter { it.isNotEmpty() }
+                .joinToString("    ")
+        }
+        .filter { it.isNotBlank() }
+        .joinToString("\n")
 }
 
 // ============================================
