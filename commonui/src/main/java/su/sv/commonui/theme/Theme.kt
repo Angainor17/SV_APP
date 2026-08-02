@@ -181,6 +181,16 @@ val ColorScheme.bookDownloadIndicator: Color
     @ReadOnlyComposable
     get() = if (this == DarkColorScheme) DarkBookDownloadIndicator else LightBookDownloadIndicator
 
+/**
+ * Цвет индикатора загрузки в LoadingButton (кнопка "Скачать" на DetailBook).
+ * Отдельный от bookDownloadIndicator атрибут — тот используется в другом месте
+ * (карточка книги в списке) и не должен меняться вместе с этим.
+ */
+val ColorScheme.loadingButtonIndicator: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (this == DarkColorScheme) DarkLoadingButtonIndicator else LightLoadingButtonIndicator
+
 // ============================================================
 // COMPOSITION LOCAL
 // ============================================================
