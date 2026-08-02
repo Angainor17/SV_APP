@@ -2451,8 +2451,9 @@ public class FBReaderView extends RelativeLayout {
                 return null;
             }
 
-            // Находим заметку в тексте
-            String noteText = bookmark.text;
+            // Находим заметку в тексте (noteText нормализуем тем же способом, что и text,
+            // иначе выделение, пересекающее перенос слова/несколько предложений, не найдётся)
+            String noteText = normalizeExtractedText(bookmark.text);
             int noteIndex = text.indexOf(noteText);
 
             android.util.Log.d("voronin", "noteText=" + noteText);
@@ -2469,6 +2470,8 @@ public class FBReaderView extends RelativeLayout {
                 // Используем реальный текст из найденной позиции
                 noteText = text.substring(noteIndex, Math.min(noteIndex + noteText.length(), text.length()));
             }
+
+            bookmark.text = noteText;
 
             // Находим границы предложения
             int sentenceStart = findSentenceStart(text, noteIndex);
@@ -2535,6 +2538,14 @@ public class FBReaderView extends RelativeLayout {
                 return null;
             }
 
+            // Само выделение (bookmark.text) — это СЫРОЙ текст из pdfium, с теми же
+            // артефактами переноса строк, что и в pageText. Если выделение пересекает
+            // перенос слова по слогам (или просто идёт через несколько строк/предложений),
+            // несовпадение нормализации между noteText и уже нормализованным pageText
+            // ломает indexOf() — и контекст не добавляется вообще, а не только с "-".
+            // Нормализуем обе стороны одинаково, чтобы поиск был устойчив всегда.
+            noteText = normalizeExtractedText(noteText);
+
             android.util.Log.d("voronin2", "Looking for note text: " + noteText);
 
             int noteIndex = pageText.indexOf(noteText);
@@ -2552,6 +2563,11 @@ public class FBReaderView extends RelativeLayout {
             }
 
             android.util.Log.d("voronin2", "Found note at index: " + noteIndex);
+
+            // Обновляем сам текст заметки (жирная часть) той же нормализованной версией —
+            // иначе перенос слов остаётся только "починенным" в контексте до/после,
+            // а в самом выделенном тексте (если оно пересекает перенос) — нет.
+            bookmark.text = noteText;
 
             // Находим границы предложения
             int sentenceStart = findSentenceStart(pageText, noteIndex);
@@ -2610,15 +2626,23 @@ public class FBReaderView extends RelativeLayout {
 
     /**
      * Нормализует сырой текст страницы перед поиском границ предложения.
-     * Text-слой PDF (и посимвольная модель EPUB/FB2) содержит '\n' на каждом
-     * визуальном переносе строки, а не только на границах абзаца — из-за этого
-     * findSentenceStart/findSentenceEnd раньше принимали перенос строки за конец
-     * предложения. Здесь перенос по слогам ("слово-\nпродолжение") склеивается
-     * обратно в слово, а оставшиеся переносы строк схлопываются в пробел, чтобы
-     * поиск границы предложения шёл по пунктуации, а не по вёрстке страницы.
+     *
+     * 1. Перенос слова по слогам на разрыве строки. Проверено через logcat на
+     *    реальном pageText: pdfium (io.legere) кладёт между "образова" и "ние"
+     *    НЕ '-\n', а обычный дефис + ОДИН ПРОБЕЛ ("образова" + '-' + ' ' + "ние") —
+     *    переноса строки там нет вовсе. Поэтому признак переноса — это дефис,
+     *    после которого идёт пробел(ы), а затем СТРОЧНАЯ буква: строчная, потому
+     *    что продолжение слога всегда строчное, даже если перенесённое слово само
+     *    начиналось с заглавной (например "Ленинград-\nская" из "Ленинградская").
+     *    Настоящий дефис в слове (например "по-моему", "какой-то") пробела после
+     *    себя не имеет — такие места \\s+ не матчит и не трогает. Настоящее тире
+     *    как знак препинания в этой книге набрано типографским "—" (em dash), а
+     *    не ASCII-дефисом, поэтому с дефис+пробел+строчная буква не пересекается.
+     * 2. Оставшиеся переносы строк (перенос по ширине страницы, не абзац) схлопываются
+     *    в пробел, чтобы поиск границы предложения шёл по пунктуации, а не по вёрстке.
      */
     private String normalizeExtractedText(String text) {
-        String dehyphenated = text.replaceAll("(\\p{L})-\\s*\\n\\s*(\\p{L})", "$1$2");
+        String dehyphenated = text.replaceAll("(\\p{L})-\\s+(\\p{Ll})", "$1$2");
         String flattened = dehyphenated.replaceAll("\\s*\\n\\s*", " ");
         return flattened.replaceAll(" {2,}", " ");
     }
