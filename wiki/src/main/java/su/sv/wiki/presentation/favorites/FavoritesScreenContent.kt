@@ -51,6 +51,7 @@ import com.github.terrakok.modo.stack.forward
 import su.sv.commonui.theme.DeviceFormFactor
 import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalDeviceFormFactor
+import su.sv.wiki.presentation.decodeHtmlEntities
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
@@ -289,13 +290,8 @@ private fun extractPlainText(html: String): String {
     // 3. Удаляем HTML теги
     text = text.replace(Regex("<[^>]*>"), "")
 
-    // 4. Удаляем HTML entities
-    text = text
-        .replace("&nbsp;", " ")
-        .replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", "\"")
+    // 4. Декодируем HTML entities (numeric вроде "&#160;", именованные вроде "&nbsp;")
+    text = text.decodeHtmlEntities()
 
     // 5. Убираем лишние пробелы и пустые строки
     text = text.replace(Regex("\\s+"), " ").trim()
