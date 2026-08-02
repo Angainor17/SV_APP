@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import su.sv.commonui.theme.loadingButtonIndicator
 
 @Composable
 fun LoadingButton(
@@ -94,7 +95,7 @@ private fun LoadingContent(
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(18.dp),
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.loadingButtonIndicator,
             strokeWidth = 1.5f.dp,
             strokeCap = StrokeCap.Round,
         )

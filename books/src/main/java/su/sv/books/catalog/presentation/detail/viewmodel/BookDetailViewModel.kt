@@ -176,6 +176,13 @@ class BookDetailViewModel @Inject constructor(
         updateState { state ->
             uiMapper.createStateAfterDownload(state)
         }
+        // Книга только что скачана впервые — до этого notesBlockState оставался Loading,
+        // так как заметки грузятся только через LoadState (на входе на экран, когда книга
+        // ещё не скачана). Без повторного запуска здесь индикатор "Загрузка заметок..."
+        // висел бы вечно, даже если заметок нет вовсе.
+        (_state.value as? UiBookDetailState.Content)?.let { state ->
+            loadNotesIfBookDownloaded(state.book)
+        }
     }
 
     private fun showBookLoadingState(book: UiBook) {

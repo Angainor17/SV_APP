@@ -17,7 +17,8 @@ class UiDetailBookMapper @Inject constructor(
         return Content(
             book = book,
             isActionLoading = false,
-            actionText = book.getActionText()
+            actionText = book.getActionText(),
+            notesBlockState = previousState.notesBlockState,
         )
     }
 

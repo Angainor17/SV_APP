@@ -250,3 +250,23 @@ val LightBookDownloadIndicator = DarkOnPrimary
 
 /** Цвет индикатора загрузки книги - Dark (светлый для контраста) */
 val DarkBookDownloadIndicator = Color(0xFF40C4FF)  // Светлый для тёмного фона
+
+// ============================================================
+// LOADING BUTTON INDICATOR COLORS
+// ============================================================
+
+/**
+ * Цвет индикатора загрузки в LoadingButton (кнопка "Скачать" на DetailBook) - Light.
+ * Фон кнопки в светлой теме — LightPrimary (тёмно-коричневый), поэтому здесь
+ * специально берётся цвет DarkOnSurface (светлый), а не LightOnSurface — иначе
+ * тёмный индикатор на тёмном фоне плохо виден.
+ */
+val LightLoadingButtonIndicator = DarkOnSurface
+
+/**
+ * Цвет индикатора загрузки в LoadingButton (кнопка "Скачать" на DetailBook) - Dark.
+ * Фон кнопки в тёмной теме — DarkPrimary (светло-сиреневый), поэтому здесь
+ * специально берётся цвет LightOnSurface (тёмный) — светлый индикатор на светлом
+ * фоне был почти не виден, тёмный даёт хороший контраст.
+ */
+val DarkLoadingButtonIndicator = LightOnSurface
