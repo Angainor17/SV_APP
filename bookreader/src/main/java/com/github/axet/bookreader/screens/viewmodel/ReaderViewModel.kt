@@ -54,6 +54,9 @@ class ReaderViewModel @Inject constructor(
     // Timestamp последнего показа панели выделения (для debounce)
     private var lastSelectionShowTime: Long = 0L
 
+    // Timestamp последнего явного скрытия панели через кнопку действия (bookmark/copy/share/...)
+    private var lastSelectionExplicitHideTime: Long = 0L
+
     // Минимальное время между show и hide (миллисекунды)
     private companion object {
         const val SELECTION_DEBOUNCE_MS = 500L
@@ -486,6 +489,16 @@ class ReaderViewModel @Inject constructor(
             Timber.d("showSelection: already showing with same coordinates, skipping")
             return
         }
+        // Игнорируем показ, если панель только что была явно закрыта нажатием на действие
+        // (bookmark/copy/share/...). FBReader на ScrollWidget (телефон, continuous-режим)
+        // может прислать отложенный SELECTION_SHOW_PANEL от завершения жеста выделения уже
+        // после того, как действие выполнилось и панель закрылась — без этой защиты такая
+        // задержавшаяся команда открывает панель заново сразу после создания закладки.
+        val timeSinceExplicitHide = System.currentTimeMillis() - lastSelectionExplicitHideTime
+        if (timeSinceExplicitHide < SELECTION_DEBOUNCE_MS) {
+            Timber.d("showSelection: suppressed (explicitly hidden $timeSinceExplicitHide ms ago, minimum $SELECTION_DEBOUNCE_MS)")
+            return
+        }
         // Записываем время показа для debounce
         lastSelectionShowTime = System.currentTimeMillis()
         _state.value = currentState.copy(
@@ -535,6 +548,7 @@ class ReaderViewModel @Inject constructor(
      */
     private fun hideSelectionPanel() {
         val currentState = _state.value as? ReaderState.Content ?: return
+        lastSelectionExplicitHideTime = System.currentTimeMillis()
         _state.value = currentState.copy(showSelection = false)
         // Очищаем выделение в FBReaderView
         fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_CLEAR)
