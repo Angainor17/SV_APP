@@ -248,6 +248,61 @@ class MockDataProvider @Inject constructor(
         """.trimIndent()
 
     // =====================================
+    // Qa API Mocks (svremya.su/reports/*, svremya.su/qa)
+    // =====================================
+
+    /**
+     * Мок для успешной отправки репорта (опечатка/вопрос).
+     * Используется для POST /reports/typo и POST /reports/question
+     */
+    private val qaSubmitReportMock: String
+        get() = "{}"
+
+    /**
+     * Мок для получения списка отвеченных вопросов.
+     * Используется для GET /qa?since=
+     */
+    private val qaAnsweredQuestionsMock: String
+        get() = """
+        [
+            {
+                "id": "1",
+                "bookId": "0",
+                "bookTitle": "ОВЛ том №12",
+                "page": 42,
+                "selectedText": "Диктатура пролетариата есть особая форма классового союза пролетариата",
+                "authorName": "Иван Иванов",
+                "questionCreatedAt": ${System.currentTimeMillis() - 172_800_000},
+                "answerText": "Это понятие подробно раскрывается в главе 3 — см. также работы Маркса на эту тему.",
+                "answerUpdatedAt": ${System.currentTimeMillis() - 86_400_000},
+                "startParagraph": 10,
+                "startElement": 0,
+                "startChar": 0,
+                "endParagraph": 10,
+                "endElement": 5,
+                "endChar": 12
+            },
+            {
+                "id": "2",
+                "bookId": "1",
+                "bookTitle": "Научный социализм",
+                "page": 7,
+                "selectedText": "Научный социализм – это марксистско-ленинская теория развития человеческого общества",
+                "authorName": "Пётр Петров",
+                "questionCreatedAt": ${System.currentTimeMillis() - 259_200_000},
+                "answerText": "Уточнение опечатки принято, в следующем издании будет исправлено.",
+                "answerUpdatedAt": ${System.currentTimeMillis() - 3_600_000},
+                "startParagraph": 2,
+                "startElement": 0,
+                "startChar": 0,
+                "endParagraph": 2,
+                "endElement": 3,
+                "endChar": 8
+            }
+        ]
+        """.trimIndent()
+
+    // =====================================
     // Public Methods
     // =====================================
 
@@ -272,6 +327,29 @@ class MockDataProvider @Inject constructor(
             else -> {
                 Timber.d("MockDataProvider: Returning Wiki search mock")
                 wikiSearchMock
+            }
+        }
+
+        return createMockResponse(request, mockBody)
+    }
+
+    /**
+     * Возвращает мок-ответ для Qa API.
+     *
+     * @param request HTTP запрос
+     * @return Response с мок-данными
+     */
+    fun getQaMock(request: Request): Response {
+        val url = request.url.toString()
+
+        val mockBody = when {
+            url.contains("/qa?") -> {
+                Timber.d("MockDataProvider: Returning Qa answered questions mock")
+                qaAnsweredQuestionsMock
+            }
+            else -> {
+                Timber.d("MockDataProvider: Returning Qa submit report mock")
+                qaSubmitReportMock
             }
         }
 

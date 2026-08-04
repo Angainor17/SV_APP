@@ -36,6 +36,13 @@ class MockInterceptor @Inject constructor(
         Timber.d("MockInterceptor: Intercepting request to $url")
 
         return when {
+            // Qa API (svremya.su/reports/*, svremya.su/qa) — проверяется раньше общего Wiki-правила,
+            // так как оба API живут на одном хосте
+            url.contains("/reports/typo") || url.contains("/reports/question") || url.contains("/qa?") -> {
+                Timber.i("MockInterceptor: Serving Qa mock for $url")
+                mockDataProvider.getQaMock(request)
+            }
+
             // Wiki API (svremya.su)
             url.contains("svremya.su") -> {
                 Timber.i("MockInterceptor: Serving Wiki mock for $url")
