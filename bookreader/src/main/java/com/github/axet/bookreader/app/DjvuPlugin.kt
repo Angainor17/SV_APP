@@ -496,7 +496,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
     inner class DjvuSearch(val doc: DjvuLibre, val str: String) : Plugin.View.Search() {
         var all: ArrayList<DjvuSearchResult> = ArrayList()
-        var index: Int = -1
+        var matchIndex: Int = -1
         var initialPage: Int = -1
         val pages = SparseArray<DjvuSearchPage>()
 
@@ -549,7 +549,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                     rr.add(b)
                     hh.add(b)
                 }
-                if (index >= 0 && r == all[index]) {
+                if (matchIndex >= 0 && r == all[matchIndex]) {
                     bounds.highlight = hh.toTypedArray()
                 }
             }
@@ -559,50 +559,68 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun getCount(): Int = all.size
 
-        override fun next(): Int {
-            if (all.isEmpty()) return -1
-            if (index == -1 && initialPage != -1) {
+        /**
+         * Разрешает индекс текущего результата (первого совпадения на initialPage
+         * или ближайшего после неё), не сдвигая позицию, если она уже известна.
+         */
+        private fun resolveIndex() {
+            if (matchIndex == -1 && initialPage != -1) {
                 for (i in all.indices) {
                     if (all[i].page >= initialPage) {
-                        index = i
-                        return all[i].page
+                        matchIndex = i
+                        return
                     }
                 }
+                matchIndex = all.size - 1
             }
-            index++
-            if (index >= all.size) {
-                for (i in all[index - 1].page + 1 until doc.pagesCount) {
+        }
+
+        override fun getIndex(): Int {
+            if (all.isEmpty()) return -1
+            resolveIndex()
+            return matchIndex
+        }
+
+        override fun next(): Int {
+            if (all.isEmpty()) return -1
+            if (matchIndex == -1 && initialPage != -1) {
+                resolveIndex()
+                return all[matchIndex].page
+            }
+            matchIndex++
+            if (matchIndex >= all.size) {
+                for (i in all[matchIndex - 1].page + 1 until doc.pagesCount) {
                     all.addAll(search(i).rr)
-                    if (index < all.size) return all[index].page
+                    if (matchIndex < all.size) return all[matchIndex].page
                 }
-                index = all.size - 1
+                matchIndex = all.size - 1
             }
-            return all[index].page
+            return all[matchIndex].page
         }
 
         override fun prev(): Int {
             if (all.isEmpty()) return -1
-            if (index == -1 && initialPage != -1) {
+            if (matchIndex == -1 && initialPage != -1) {
                 for (i in all.size - 1 downTo 0) {
                     if (all[i].page <= initialPage) {
                         var j = i
                         while (j >= 0 && all[j].page == initialPage) j--
-                        index = j + 1
-                        return all[index].page
+                        matchIndex = j + 1
+                        return all[matchIndex].page
                     }
                 }
             }
-            index--
-            if (index < 0) {
+            matchIndex--
+            if (matchIndex < 0) {
                 val r = all[0]
                 for (i in r.page - 1 downTo 1) {
                     all.addAll(0, search(i).rr)
-                    index = all.indexOf(r) - 1
-                    if (index >= 0) return all[index].page
+                    matchIndex = all.indexOf(r) - 1
+                    if (matchIndex >= 0) return all[matchIndex].page
                 }
-                index = 0
+                matchIndex = 0
             }
-            return all[index].page
+            return all[matchIndex].page
         }
 
         override fun setPage(page: Int) {
@@ -612,6 +630,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             for (i in 0 until doc.pagesCount) {
                 all.addAll(search(Plugin.View.Selection.odd(page, i, doc.pagesCount)).rr)
             }
+            // pages are visited in "odd" order (near current page first), so
+            // sort results back into book order for correct navigation/indexing
+            all.sortWith(compareBy({ it.page }, { it.start }))
         }
     }
 

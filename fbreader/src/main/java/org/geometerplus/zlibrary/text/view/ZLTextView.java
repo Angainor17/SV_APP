@@ -73,6 +73,7 @@ public abstract class ZLTextView extends ZLTextViewBase {
     private float myCharWidth = -1f;
     private volatile ZLTextWord myCachedWord;
     private volatile ZLTextHyphenationInfo myCachedInfo;
+    private int mySearchMarkIndex = -1;
 
     public ZLTextView(ZLApplication application) {
         super(application);
@@ -236,18 +237,31 @@ public abstract class ZLTextView extends ZLTextViewBase {
         int count = myModel.search(text, startIndex, endIndex, ignoreCase);
         myPreviousPage.reset();
         myNextPage.reset();
+        mySearchMarkIndex = -1;
         if (!myCurrentPage.StartCursor.isNull()) {
             rebuildPaintInfo();
             if (count > 0) {
                 ZLTextMark mark = myCurrentPage.StartCursor.getMark();
-                gotoMark(wholeText ?
+                ZLTextMark target = wholeText ?
                         (backward ? myModel.getLastMark() : myModel.getFirstMark()) :
-                        (backward ? myModel.getPreviousMark(mark) : myModel.getNextMark(mark)));
+                        (backward ? myModel.getPreviousMark(mark) : myModel.getNextMark(mark));
+                gotoMark(target);
+                if (target != null) {
+                    mySearchMarkIndex = myModel.getMarks().indexOf(target);
+                }
             }
             Application.getViewWidget().reset();
             Application.getViewWidget().repaint();
         }
         return count;
+    }
+
+    /**
+     * Индекс марки, к которой курсор перешёл при последнем search()/findNext()/findPrevious(),
+     * среди всех найденных marks (0-based), либо -1 если ещё не определён.
+     */
+    public final int getSearchMarkIndex() {
+        return mySearchMarkIndex;
     }
 
     public boolean canFindNext() {
@@ -258,7 +272,11 @@ public abstract class ZLTextView extends ZLTextViewBase {
     public synchronized void findNext() {
         final ZLTextWordCursor end = myCurrentPage.EndCursor;
         if (!end.isNull()) {
-            gotoMark(myModel.getNextMark(end.getMark()));
+            ZLTextMark target = myModel.getNextMark(end.getMark());
+            gotoMark(target);
+            if (target != null) {
+                mySearchMarkIndex = myModel.getMarks().indexOf(target);
+            }
         }
     }
 
@@ -270,7 +288,11 @@ public abstract class ZLTextView extends ZLTextViewBase {
     public synchronized void findPrevious() {
         final ZLTextWordCursor start = myCurrentPage.StartCursor;
         if (!start.isNull()) {
-            gotoMark(myModel.getPreviousMark(start.getMark()));
+            ZLTextMark target = myModel.getPreviousMark(start.getMark());
+            gotoMark(target);
+            if (target != null) {
+                mySearchMarkIndex = myModel.getMarks().indexOf(target);
+            }
         }
     }
 

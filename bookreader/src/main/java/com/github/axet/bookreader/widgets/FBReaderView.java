@@ -134,6 +134,7 @@ public class FBReaderView extends RelativeLayout {
     Plugin.View.Search search;
     int searchPagePending;
     private int searchCurrentIndex = 0; // Track current search result index
+    private int searchTotalCount = 0; // Track total search result count (fb2/epub path)
 
     public FBReaderView(Context context) { // create child view
         super(context);
@@ -1396,6 +1397,7 @@ public class FBReaderView extends RelativeLayout {
         }
         searchPagePending = -1;
         searchCurrentIndex = 0;
+        searchTotalCount = 0;
     }
 
     /**
@@ -1417,8 +1419,8 @@ public class FBReaderView extends RelativeLayout {
             search = pluginview.search(pattern);
             search.setPage(getPosition().getParagraphIndex());
             int count = search.getCount();
-            searchCurrentIndex = 0;
-            Timber.tag("voronin").d("performSearch: pattern=%s, count=%d, currentPage=%d", pattern, count, getPosition().getParagraphIndex());
+            searchCurrentIndex = count > 0 ? Math.max(search.getIndex(), 0) : 0;
+            Timber.tag("voronin").d("performSearch: pattern=%s, count=%d, currentPage=%d, currentIndex=%d", pattern, count, getPosition().getParagraphIndex(), searchCurrentIndex);
             if (count > 0) {
                 if (widget instanceof ScrollWidget)
                     ((ScrollWidget) widget).updateOverlays();
@@ -1427,8 +1429,9 @@ public class FBReaderView extends RelativeLayout {
             }
             callback.onResult(count, searchCurrentIndex);
         } else {
-            int count = app.getTextView().search(pattern, true, false, false, false);
-            searchCurrentIndex = 0;
+            int count = app.BookTextView.search(pattern, true, false, false, false);
+            searchTotalCount = count;
+            searchCurrentIndex = count > 0 ? Math.max(app.BookTextView.getSearchMarkIndex(), 0) : 0;
             if (count > 0 && widget instanceof ScrollWidget) {
                 post(() -> reset());
             }
@@ -1458,7 +1461,8 @@ public class FBReaderView extends RelativeLayout {
             callback.onResult(count, searchCurrentIndex);
         } else {
             app.BookTextView.findNext();
-            callback.onResult(0, 0);
+            searchCurrentIndex = Math.max(app.BookTextView.getSearchMarkIndex(), 0);
+            callback.onResult(searchTotalCount, searchCurrentIndex);
         }
     }
 
@@ -1484,7 +1488,8 @@ public class FBReaderView extends RelativeLayout {
             callback.onResult(count, searchCurrentIndex);
         } else {
             app.BookTextView.findPrevious();
-            callback.onResult(0, 0);
+            searchCurrentIndex = Math.max(app.BookTextView.getSearchMarkIndex(), 0);
+            callback.onResult(searchTotalCount, searchCurrentIndex);
         }
     }
 
