@@ -1069,6 +1069,12 @@ interface Plugin {
             open fun prev(): Int = -1
 
             /**
+             * Возвращает индекс текущего результата среди всех найденных (0-based),
+             * не изменяя текущую позицию.
+             */
+            open fun getIndex(): Int = -1
+
+            /**
              * Устанавливает страницу для поиска.
              */
             open fun setPage(page: Int) {}
