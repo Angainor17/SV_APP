@@ -29,13 +29,16 @@ android {
         androidResources.localeFilters.add("ru")
     }
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
+            release {
+                isMinifyEnabled = false
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro",
+                )
+            }
+            debug {
+                applicationIdSuffix = ".debug"
+            }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -128,6 +131,7 @@ dependencies {
     androidTestImplementation(libs.bundles.androidTest)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(libs.leakcanary.android)
     kspAndroidTest(libs.hilt.android.compiler)
 }
 

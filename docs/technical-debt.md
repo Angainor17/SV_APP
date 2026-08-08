@@ -420,6 +420,371 @@ scroll/two-column режим на затронутых устройствах.
 
 ---
 
+## SharedPreferences → DataStore (двойная персистентность)
+
+### 🟠 P1: ThemeRepositoryImpl — dual persistence (SharedPreferences + DataStore)
+
+**Проблема:** Класс хранит `SharedPreferences` для синхронных читалок (тема до создания Activity) и отдельный DataStore для асинхронных Flow-читалок. Дублируются записи и поддержка двух слоёв.
+
+**Файлы:**
+- `managers/src/main/java/su/sv/managers/theme/ThemeRepositoryImpl.kt` (~40-60)
+
+**Решение:** Оставить один DataStore. Синхронное чтение темы вынести в `Application.onCreate()` — читать DataStore до `Activity`, устанавливать `AppCompatDelegate.setDefaultNightMode()` до `super.onCreate()`.
+
+---
+
+### 🟠 P1: bookreader — SharedPreferences в Compose (OnSharedPreferenceChangeListener)
+
+**Проблема:** `ReaderSettingsContent` — Composable-компонент — подписывается на `SharedPreferences.OnSharedPreferenceChangeListener` через `DisposableEffect`. Это нарушение реактивного паттерна: Compose требует `StateFlow`/`Flow`, а SharedPreferences даёт коллбеки.
+
+**Файлы:**
+- `bookreader/screens/ReaderSettingsContent.kt` (~50-100)
+- `bookreader/app/BookReaderInitializer.kt`
+- `bookreader/widgets/TTSPopup.kt` (~140)
+- `bookreader/app/Reflow.kt`
+- `bookreader/screens/viewmodel/ReaderViewModel.kt`
+
+**Решение:** Мигрировать `getDefaultSharedPreferences` на `preferencesDataStore`, заменить `OnSharedPreferenceChangeListener` на `collectAsStateWithLifecycle()`.
+
+---
+
+### 🟡 P2: BadgeManager — SharedPreferences вместо DataStore
+
+**Файл:** `main/src/main/java/su/sv/main/badge/BadgeManager.kt` (строки 14, 17)
+
+**Проблема:** `context.getSharedPreferences()` для хранения одного boolean-флага.
+
+---
+
+### 🟡 P2: BooksApiModule выдаёт SharedPreferences через Hilt
+
+**Файл:** `books/src/main/java/su/sv/books/catalog/di/BooksApiModule.kt`
+
+**Проблема:** DI-модуль предоставляет SharedPreferences вместо DataStore.
+
+---
+
+## Handler/Runnable → Coroutines
+
+### 🟠 P1: TTSPopup — Handler + Runnable (971 строка)
+
+**Проблема:** Много `Handler(Looper.getMainLooper())`, `Runnable`, `postDelayed`, `removeCallbacks`. Метод `updateGravity` (строка ~551) создаёт бесконечный цикл через `postDelayed`. Класс использует `java.util.Arrays`, `Collections` вместо Kotlin stdlib.
+
+**Файл:** `bookreader/widgets/TTSPopup.kt`
+
+**Решение:** Конвертировать в `LaunchedEffect` + Flow с `kotlinx.coroutines.delay`.
+
+**Дополнительно:**
+
+---
+
+### 🟡 P2: TimeAnimatorCompat — Handler.postDelayed для анимации
+
+**Файл:** `bookreader/widgets/TimeAnimatorCompat.kt` (строки 5, 15-18)
+
+**Проблема:** Handler-based animation loop на 24 FPS.
+
+**Решение:** `LaunchedEffect(remember { true })` + `delay(1000L / 24)`.
+
+---
+
+## android.util.Log → Timber
+
+### 🟡 P2: Use android.util.Log вместо Timber
+
+**Файлы:**
+- `managers/src/main/java/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` (~6, 56, 68, 74, 86, 91, 99) — `Log.e`, `Log.d`, `Log.w`
+- `main/src/main/java/su/sv/main/continuereading/ContinueReadingViewModel.kt` (~8 debug-вызовов)
+- `bookreader/app/PDFPlugin.kt` (3 `Log.e`)
+
+**Проблема:** Timber уже есть и используется в большинстве модулей, но в этих файлах — прямой `android.util.Log`.
+
+---
+
+## SparseArray → Kotlin Map
+
+### 🟢 P3: SparseArray в Java-style коде
+
+**Файлы:**
+- `bookreader/app/PDFPlugin.kt` — `SparseArray<SelectionPage>`, `SparseArray<ArrayList<SearchResult>>`
+- `bookreader/app/DjvuPlugin.kt` — `SparseArray<Page>`, `SparseArray<SelectionPage>`, `SparseArray<DjvuSearchPage>`
+
+**Решение:** Заменить на `Map<Int, T>` или `List<T>` с индексированным доступом.
+
+---
+
+## TODO/Stubs в коде
+
+### 🟠 P1: MockConfig — моки отключены для release
+
+**Файл:** `commonarchitecture/src/main/java/su/sv/commonarchitecture/mock/MockConfig.kt`
+
+**Проблема:** TODO-комментарий: «Не забудьте выключить моки перед release сборкой!». Нет автоматического выключения моков через flavour/build-variant.
+
+**Риск:** Моки могут попасть в production-сборку.
+
+---
+
+### 🟠 P1: RootNews — TODO open news (functional gap)
+
+**Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/RootNews.kt` (строка 193)
+
+**Проблема:** Effect `NewsListOneTimeEffect.OpenNewsItem` триггерится, но не реализован — ничего не происходит при нажатии на элемент новостей.
+
+---
+
+### 🟡 P2: GetInfoLinksUseCase — stub с искусственной задержкой
+
+**Файл:** `info/src/main/java/su/sv/info/domain/GetInfoLinksUseCase.kt` (строка 20)
+
+**Проблема:** `delay(500.milliseconds)` для симуляции сетевого запроса. Заготовка под бэкенд без репозитория.
+
+**Решение:** Либо реализовать репозиторий, либо удалить stub.
+
+---
+
+### 🟡 P2: GetLastReadBookUseCase — non-suspend use case блокирует корутину
+
+**Файл:** `bookreader/domain/GetLastReadBookUseCase.kt`
+
+**Проблема:** `operator fun invoke(): LastReadBookInfo?` без `suspend`. Вызывается из `viewModelScope.launch { }` — блокирует корутину.
+
+---
+
+### 🟢 P3: Badge support TODO в Navigation
+
+**Файлы:**
+- `commonui/src/main/java/su/sv/commonui/ui/adaptive/navigation/RailNavigation.kt`
+- `commonui/src/main/java/su/sv/commonui/ui/adaptive/navigation/CompactNavigation.kt`
+
+**Проблема:** `// TODO: Добавить поддержку badge` — `BadgeManager` не интегрирован в навигацию.
+
+---
+
+### 🟢 P3: ReaderSettingsContent — нереализованные настройки
+
+**Файл:** `bookreader/screens/ReaderSettingsContent.kt` (строки 178-182)
+
+**Проблема:** TODO-list с тремя нереализованными настройками: sync folder, TTS language, screen lock.
+
+---
+
+##findViewById (не ViewBinding не Compose)
+
+### 🟡 P2: TTSPopup — 4× findViewById
+
+**Файл:** `bookreader/widgets/TTSPopup.kt` (строки 228-236)
+
+**Решение:** ViewBinding (`TtsPopupBinding.inflate`).
+
+---
+
+### 🟢 P3: LoadableResultDialog — findViewById в AlertDialog
+
+**Файл:** `commonui/src/main/java/su/sv/commonui/ui/LoadableResultDialog.kt` (строка 23)
+
+**Решение:** М3 `AlertDialog` в Compose.
+
+---
+
+## Архитектурные потенциальные проблемы
+
+### 🟠 P1: Non-suspend Use Cases блокируют корутины
+
+**Файлы:**
+- `bookreader/domain/GetLastReadBookUseCase.kt`
+- `qa/src/main/java/su/sv/qa/domain/usecase/ObserveAnsweredQuestionsUseCase.kt`
+- `qa/src/main/java/su/sv/qa/domain/usecase/ObserveAnsweredQuestionsForBookUseCase.kt`
+- `wiki/src/main/java/su/sv/wiki/domain/usecase/GetFavoritesUseCase.kt`
+- `wiki/src/main/java/su/sv/wiki/domain/usecase/GetHistoryUseCase.kt`
+
+**Проблема:** Non-suspend `invoke()` возвращает результат напрямую. Если внутри — `withContext`, `room`, или блокирующий вызов — это блокирует диспетчер корутины.
+
+**Решение:** Добавить `suspend` к `operator fun invoke()`.
+
+---
+
+### 🟡 P2: lateinit без safe-инициализации
+
+**Файлы:**
+- `app/src/main/java/su/sv/app/MainActivity.kt` — `lateinit var customColorsRepository`
+- `books/.../BookDownloadBroadcastReceiver.kt` — два `lateinit var`
+
+**Проблема:** Риск NPE в тестах.
+
+---
+
+### 🟡 P2: Потенциальный crash при смене конфигурации
+
+**Файл:** `bookreader/CLAUDE.md` — `var fbReaderView: FBReaderView? = null` в `ReaderViewModel`
+
+**Проблема:** Ссылка на View в ViewModel — при ротации экрана ViewModel остаётся, но контекст может измениться. `ViewModel.onCleared()` освобождает ресурсы, но если `onSavedInstanceState` срабатывает преждевременно — возможна утечка.
+
+**Риск:** Memory leak при конфигурационных изменениях.
+
+---
+
+### 🟡 P2: Storage.java — MD5 как идентификатор книги
+
+**Файл:** `bookreader/app/Storage.java`
+
+**Проблема:** Обновление файла = смена MD5 ID = потеря истории чтения. Также обложки ищутся по MD5 в нескольких местах — fragile если логика кэширования изменится.
+
+---
+
+## Потенциальные баги (edge cases)
+
+### 🟠 P1: PDF-страница не применяется при открытии заметки
+
+**Файл:** `bookreader/screens/ReaderContent.kt` (~358-393)
+
+**Проблема:** `gotoPosition()` вызывается до инициализации `FBReaderView`. Есть fallback-логика (`factory` + `update`), но в некоторых сценариях (первое открытие) позиция не применяется.
+
+**Статус:** Частично исправлен fallback, но не полностью.
+
+---
+
+### 🟡 P2: Fullscreen flicker — race condition
+
+**Файл:** `bookreader/widgets/FBReaderView.java`, `screens/ReaderContent.kt`
+
+**Проблема:** `Window.decorView.setBackgroundColor()` + `AnimatedVisibility(fadein/fadeout)` не синхронизированы. На некоторых устройствах белый/чёрный flash перед появлением/скрытием TopBar.
+
+---
+
+### 🟡 P2: SELECTION_DEBOUNCE — race condition панели выделения
+
+**Файл:** `bookreader/screens/viewmodel/ReaderViewModel.kt`
+
+**Проблема:** Debounce 500мс для скрытия панели из-за асинхронности FBReader. Если пользователь быстро скрывает выделение после создания (<500ms), панель не закроется.
+
+---
+
+### 🟡 P2: На планшетах PdfRenderer.Page не закрывается после draw
+
+**Файл:** `bookreader/app/PDFPlugin.kt`
+
+**Проблема:** Страница закрывается только в начале следующего `draw()`. Если `getPageRect()` в `PagerWidget` вызывается между `draw` вызовами — может использовать уже закрытую страницу.
+
+---
+
+### 🟢 P3: Xiaomi/MIUI — не обновляются цвета при смене темы
+
+**Файл:** `memory/xiaomi-miui-theme-fix.md`
+
+**Проблема:** На некоторых Xiaomi активность перезапускается при смене темы, цвета не успевают обновиться.
+
+---
+
+## Утечки памяти (Memory Leaks)
+
+### ✅ LeakCanary в debug-сборке
+
+**Статус:** Добавлено 2026-08-08
+
+**Что сделано:**
+- Зависимость: `com.squareup.leakcanary:leakcanary-android:2.14` (только debug)
+- `app/src/debug/AndroidManifest.xml` — `android:name=".DebugSvApp"`
+- `app/src/debug/…/DebugSvApp.kt` — инициализация LeakCanary + дублирует Hilt/Coil от SvApp
+- `app/build.gradle.kts` — `debug { applicationIdSuffix = ".debug" }` и `debugImplementation(libs.leakcanary.android)`
+- Документация: `docs/memory-leak-detection.md`
+
+**Как использовать:**
+1. Собрать/debug APK (`./gradlew assembleDebug`)
+2. Установить на устройство
+3. Приложение запускается как `su.sv.app.debug` (вместо `su.sv.app`)
+4. При утечке Activity — уведомление с heap dump и MAL/Studio Profiler
+
+**Ограничения:**
+- LeakCanary автоматически ловит только Activity leaks после destroy()
+- Не интегрирован в.instrumentation-тесты (test runner держит референс на Activity)
+
+---
+
+### 🟠 P1: UI-тесты на утечки памяти
+
+**Файл:** `app/src/androidTest/java/su/sv/app/memory/MemoryLeakTest.kt`
+
+**Проблема:** UI-тесты `androidTest` не могут использовать LeakCanary напрямую — `Instrumentation` держит ссылку на Activity, даже после `finish()`. Heap dump в андроид-тесте взять нельзя.
+
+**Статус:** Заготовка создана, требует Robolectric или manual MAT-анализа.
+
+**План реализации:**
+
+1. **Рекомендуемый путь — Robolectric** (JVM-тесты, без Instrumentation interference):
+   ```kotlin
+   @RunWith(RobolectricTestRunner::class)
+   class ReaderScreenLeakTest {
+       @Test
+       fun `open and close reader should not leak`() {
+           val activity = Robolectric.buildActivity(MainActivity::class.java)
+               .create().resume().get()
+           // открыть книгу → закрыть
+           activity.finish()
+           Robolectric.processSync()
+           // проверить через LeakCanary или GC
+       }
+   }
+   ```
+
+2. **Альтернатива — ручная проверка** на эмуляторе:
+   - Запустить debug APK
+   - Открыть читалку → закрыть ← ждать 3 сек
+   - Проверить уведомление LeakCanary на предмет утечек
+
+**Что тестировать (очереди):**
+- [ ] Открытие читалки → закрытие (bookreader)
+- [ ] Навигация по Modo stack (назад-вперёд → проверка stack clean)
+- [ ] Bookmark creation/deletion
+- [ ] Тест скачивания книги → отмена → повторное скачивание
+- [ ] Тест переключения темы (recreate MainActivity)
+- [ ] News infinite scroll (LazyColumn/Flow — no stale references)
+- [ ] TTS popup open → close
+- [ ] Selection panel open → close (race condition SELECTION_DEBOUNCE)
+- [ ] Fullscreen toggle (enter/exit → race condition в toggleFullscreen)
+
+**Зависимости:**
+- Добавить `org.robolectric:robolectric` для JVM-тестов
+- Настроить Robolectric config (`sdk = [34]`, `qualifiers = "w1080dp-h1920dp"` для coverage)
+
+---
+
+### 🟠 P1: Фактические утечки в коде (требуется ручная проверка)
+
+**Места, где утечки вероятнее всего:**
+
+1. **`ReaderViewModel.fbReaderView`** — View reference в ViewModel. 
+   `ViewModel.onCleared()` освобождает ресурсы, но при ротации экрана — risk.
+   Файл: `bookreader/screens/viewmodel/ReaderViewModel.kt`
+
+2. **`TTSPopup`** — 971 строка с Handler/Runnable. `updateGravity` создаёт бесконечный `postDelayed` цикл. Если Popup не закрыт корректно — утечка Handler + Runnable.
+   Файл: `bookreader/widgets/TTSPopup.kt`
+
+3. **`OneTimeEffect` в MainActivity** — `recreate()` при смене темы. Если эффект срабатывает дважды — двойной recreate.
+
+4. **`Modeo.onRootScreenFinished`** в `MainActivity.onDestroy()` — если `recreate()` вызывается в процессе, ` onDestroy` не вызывает `onRootScreenFinished` (проверка `isFinishing`). Но после `recreate()` — ViewModel уничтожаются и пересоздаются, Modo stack должен быть clean.
+
+---
+
+## Что уже современное (хорошие новости)
+
+- **Нет AsyncTask** нигде в основном коде
+- **Нет Picasso/Glide** — используется Coil
+- **Нет System.out.println**
+- **viewModelScope** используется консистентно во всех ViewModels
+- **Dispatchers.IO** только в `BugReportViewModel` — изолирован правильно
+- **Paging 3** используется (news module)
+- **Hilt DI** настроен правильно (@AndroidEntryPoint, @HiltViewModel, @Inject)
+- **@Parcelize** используется (UiBook.kt)
+- **Sealed classes** —广泛用于 state/actions/effects (MVI pattern)
+- **Jetpack Compose** — основной UI-паттерн
+- **Нет runBlocking** в main source
+- **Нет synchronized/@Synchronized**
+- **Нет магических чисел** — большинство значений вынесены в именованные константы
+- **Нет manual Adapter/ViewHolder** — Paging 3 + Lazy lists
+
+---
+
 ## Как добавить задачу
 
 1. Определите приоритет (P0-P3)
