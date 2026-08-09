@@ -291,7 +291,7 @@ private fun ColorAttributeList(
     customColors: CustomThemeColors,
     onColorClick: (CustomColorAttribute) -> Unit
 ) {
-    val groupedAttributes = CustomColorAttribute.groupedByCategory()
+    val groupedAttributes = remember { CustomColorAttribute.groupedByCategory() }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -308,7 +308,7 @@ private fun ColorAttributeList(
             }
 
             // Элементы группы
-            items(attributes) { attribute ->
+            items(attributes, key = { it.attributeName }) { attribute ->
                 ColorAttributeItem(
                     attribute = attribute,
                     originalColor = getOriginalColor(attribute, themeMode),
