@@ -10,6 +10,9 @@ data class NewsItem(
     /** Идентификатор для хранения */
     val id: String?,
 
+    /** Идентификатор владельца стены VK */
+    val ownerId: Int?,
+
     /** Дата публикации */
     val date: LocalDateTime?,
 

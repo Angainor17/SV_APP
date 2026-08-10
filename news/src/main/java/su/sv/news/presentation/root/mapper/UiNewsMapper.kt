@@ -28,7 +28,19 @@ class UiNewsMapper @Inject constructor(
             allMedia = domain.mediaItems.map {
                 mediaMapper.fromDomainToUi(it)
             },
+            vkPostUrl = buildVkPostUrl(domain.ownerId, domain.id),
         )
+    }
+
+    /**
+     * Строит URL поста VK из owner_id и post_id.
+     * Формат: https://vk.com/wall{owner_id}_{post_id}
+     */
+    private fun buildVkPostUrl(ownerId: Int?, postId: String?): String {
+        val oid = ownerId?.toString() ?: return ""
+        val pid = postId ?: return ""
+        if (oid.isEmpty() || pid.isEmpty()) return ""
+        return "https://vk.com/wall${oid}_${pid}"
     }
 
     private fun formatDate(date: LocalDateTime?): String {

@@ -25,8 +25,8 @@ class MockInterceptor @Inject constructor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        // Если мок-режим выключен — пропускаем запрос дальше
-        if (!MockConfig.IS_MOCK_ENABLED) {
+        // В release-сборке моки принудительно отключены
+        if (!MockConfig.isMockAllowed() || !MockConfig.IS_MOCK_ENABLED) {
             return chain.proceed(chain.request())
         }
 

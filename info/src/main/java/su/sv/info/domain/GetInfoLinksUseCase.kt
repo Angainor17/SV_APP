@@ -17,8 +17,10 @@ import kotlin.time.Duration.Companion.milliseconds
 class GetInfoLinksUseCase @Inject constructor() {
 
     /**
-     * TODO
-     * Заготовка под наличие запроса к беку для получения данных
+     * Возвращает список ссылок на внешние ресурсы (магазин, соцсети, каналы).
+     *
+     * В данный момент данные захардкожены. В будущем планируется загрузка
+     * с бэкенда через API для возможности обновления ссылок без релиза приложения.
      */
     suspend fun execute(): Result<List<LinkItem>> {
         delay(500.milliseconds)

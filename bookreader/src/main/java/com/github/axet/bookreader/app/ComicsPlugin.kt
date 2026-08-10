@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.ParcelFileDescriptor
+import androidx.core.graphics.createBitmap
 import com.github.axet.androidlibrary.app.RarSAF
 import com.github.axet.androidlibrary.app.ZipSAF
 import com.github.axet.androidlibrary.services.StorageProvider
@@ -94,7 +95,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
         val ratio = CacheImagesAdapter.COVER_SIZE.toDouble() / m
         val w = (view.current!!.pageBox!!.w * ratio).toInt()
         val h = (view.current!!.pageBox!!.h * ratio).toInt()
-        val bm = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565)
+        val bm = createBitmap(w, h, Bitmap.Config.RGB_565)
         val canvas = Canvas(bm)
         view.drawWallpaper(canvas)
         view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)

@@ -29,4 +29,7 @@ data class UiNewsItem(
 
     /** Список картинок и видео Может быть пустым */
     val allMedia: List<UiNewsMedia>,
+
+    /** URL поста в VK для открытия в браузере */
+    val vkPostUrl: String,
 ) : Parcelable

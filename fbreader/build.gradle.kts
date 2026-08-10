@@ -45,6 +45,9 @@ dependencies {
     // Модули-фичи
     api(project(":util"))
 
+    // AndroidX
+    api(libs.androidx.core.ktx)
+
     api("com.github.axet:pdfparse-lib:1.0")
     api("com.googlecode.json-simple:json-simple:1.1.1") {
         exclude(group = "junit")

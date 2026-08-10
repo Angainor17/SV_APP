@@ -25,8 +25,8 @@ class InfoUiMapper @Inject constructor() {
     )
 
     private fun LinkItem.getLogo() = when (this) {
-        is BuyBook -> R.drawable.ic_sv // TODO: размеры и тип картинки
-        is DownloadBook -> R.drawable.ic_fra // TODO: размеры и тип картинки
+        is BuyBook -> R.drawable.ic_sv
+        is DownloadBook -> R.drawable.ic_fra
         is VkGroupSV, is WinScience, is RedUniversity, is VkLobbyo -> R.drawable.ic_vk
         is YouTubeLobbyo -> R.drawable.ic_youtube
         is DzenSv -> R.drawable.ic_dzen

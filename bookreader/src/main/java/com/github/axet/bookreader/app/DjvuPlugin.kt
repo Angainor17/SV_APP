@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.util.SparseArray
+import androidx.core.graphics.createBitmap
 import com.github.axet.androidlibrary.app.Natives
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.widgets.FBReaderView
@@ -105,8 +106,10 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
     override fun readCover(file: ZLFile): ZLImage {
         val view = DjvuView(file)
-        view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
-        val bm = Bitmap.createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
+        val currentPage = checkNotNull(view.current) { "DjvuView.current is null in readCover" }
+        val pageBox = checkNotNull(currentPage.pageBox) { "DjvuPage.pageBox is null in readCover" }
+        currentPage.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
+        val bm = createBitmap(pageBox.w, pageBox.h, Bitmap.Config.RGB_565)
         val canvas = Canvas(bm)
         view.drawWallpaper(canvas)
         view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)
@@ -138,7 +141,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 continue
             }
             if (b.level > level) {
-                val c = loadTOC(i, b.level, bb, last!!)
+                val parent = checkNotNull(last) { "last TOCTree is null for level ${b.level} > parent level $level" }
+                val c = loadTOC(i, b.level, bb, parent)
                 i += c
                 count += c
             } else if (b.level < level) {
@@ -187,19 +191,25 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             this.text = p.text
         }
 
-        fun getText(b: Int): String = text!!.text[b]
+        fun getText(b: Int): String {
+            val t = checkNotNull(text) { "text is null in getText" }
+            return t.text[b]
+        }
 
         fun find(point: Plugin.View.Selection.Point): Int {
-            if (text == null) return -1
-            for (i in text!!.bounds.indices) {
-                val b = text!!.bounds[i]
+            val t = text ?: return -1
+            for (i in t.bounds.indices) {
+                val b = t.bounds[i]
                 if (b.contains(point.x, point.y)) return i
             }
             return -1
         }
 
         fun first(): Int = 0
-        fun last(): Int = text!!.bounds.size - 1
+        fun last(): Int {
+            val t = checkNotNull(text) { "text is null in last()" }
+            return t.bounds.size - 1
+        }
     }
 
     inner class Selection : Plugin.View.Selection {
@@ -211,24 +221,30 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         constructor(doc: DjvuLibre, page: Page, point: Point) {
             this.doc = doc
             val p = open(page)
-            val convertedPoint = toPage(p.info!!, page.w, page.h, point)
+            val info = checkNotNull(p.info) { "SelectionPage.info is null in Selection constructor" }
+            val convertedPoint = toPage(info, page.w, page.h, point)
             selectWord(p, convertedPoint)
         }
 
         constructor(doc: DjvuLibre, start: ZLTextPosition, end: ZLTextPosition) {
             this.doc = doc
-            this.start = open(start.paragraphIndex)
-            this.start!!.index = start.elementIndex
-            this.end = open(end.paragraphIndex)
-            this.end!!.index = end.elementIndex
+            val startPage = open(start.paragraphIndex)
+            checkNotNull(startPage) { "start SelectionPage is null" }.index = start.elementIndex
+            this.start = startPage
+            val endPage = open(end.paragraphIndex)
+            checkNotNull(endPage) { "end SelectionPage is null" }.index = end.elementIndex
+            this.end = endPage
         }
 
         constructor(doc: DjvuLibre, page: Int) {
             this.doc = doc
-            this.start = open(page)
-            this.start!!.index = 0
-            this.end = open(page)
-            this.end!!.index = this.end!!.text!!.text.size
+            val startPage = open(page)
+            checkNotNull(startPage) { "start SelectionPage is null" }.index = 0
+            this.start = startPage
+            val endPage = open(page)
+            this.end = endPage
+            val endText = checkNotNull(endPage.text) { "end SelectionPage.text is null" }
+            checkNotNull(endPage) { "end SelectionPage is null" }.index = endText.text.size
         }
 
         fun open(page: Page): SelectionPage {
@@ -247,7 +263,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 pp.info = doc.getPageInfo(page)
                 for (type in TYPES) {
                     pp.text = doc.getText(page, type)
-                    if (pp.text != null && pp.text!!.bounds.isNotEmpty()) break
+                    val text = pp.text
+                    if (text != null && text.bounds.isNotEmpty()) break
                 }
             }
             return SelectionPage(pp)
@@ -292,7 +309,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun setStart(page: Page, point: Point) {
             val pp = open(page)
-            val convertedPoint = toPage(pp.info!!, page.w, page.h, point)
+            val ppInfo = checkNotNull(pp.info) { "SelectionPage.info is null in setStart" }
+            val convertedPoint = toPage(ppInfo, page.w, page.h, point)
             val b = pp.find(convertedPoint)
             if (b == -1) return
             pp.index = b
@@ -301,7 +319,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun setEnd(page: Page, point: Point) {
             val pp = open(page)
-            val convertedPoint = toPage(pp.info!!, page.w, page.h, point)
+            val ppInfo = checkNotNull(pp.info) { "SelectionPage.info is null in setEnd" }
+            val convertedPoint = toPage(ppInfo, page.w, page.h, point)
             val b = pp.find(convertedPoint)
             if (b == -1) return
             pp.index = b
@@ -324,9 +343,11 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun getBoundsAll(page: Page): Array<Rect> {
             val pp = open(page)
-            val rr = arrayOfNulls<Rect>(pp.text!!.bounds.size)
+            val ppText = checkNotNull(pp.text) { "SelectionPage.text is null in getBoundsAll" }
+            val ppInfo = checkNotNull(pp.info) { "SelectionPage.info is null in getBoundsAll" }
+            val rr = arrayOfNulls<Rect>(ppText.bounds.size)
             for (i in rr.indices) {
-                rr[i] = toDevice(pp.info!!, page.w, page.h, pp.text!!.bounds[i])
+                rr[i] = toDevice(ppInfo, page.w, page.h, ppText.bounds[i])
             }
             @Suppress("UNCHECKED_CAST")
             return rr as Array<Rect>
@@ -339,9 +360,12 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             bounds.start = b.first
             bounds.end = b.last
             val rr = ArrayList<Rect>()
+            val bPage = checkNotNull(b.page) { "SelectionBounds.page is null in getBounds" }
+            val bPageInfo = checkNotNull(bPage.info) { "SelectionPage.info is null in getBounds" }
+            val bPageText = checkNotNull(bPage.text) { "SelectionPage.text is null in getBounds" }
             var i = b.ss
             while (i != b.ee) {
-                rr.add(toDevice(b.page!!.info!!, b.page!!.w, b.page!!.h, b.page!!.text!!.bounds[i]))
+                rr.add(toDevice(bPageInfo, bPage.w, bPage.h, bPageText.bounds[i]))
                 i++
             }
             bounds.rr = rr.toTypedArray()
@@ -351,11 +375,13 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun inBetween(page: Page, start: Point, end: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.s.page < page.page && page.page < b.e.page) return true
-            val p1 = toPage(b.page!!.info!!, page.w, page.h, start)
-            val i1 = b.page!!.find(p1)
+            val bPage = checkNotNull(b.page) { "SelectionBounds.page is null in inBetween" }
+            val bPageInfo = checkNotNull(bPage.info) { "SelectionPage.info is null in inBetween" }
+            val p1 = toPage(bPageInfo, page.w, page.h, start)
+            val i1 = bPage.find(p1)
             if (i1 == -1) return null
-            val p2 = toPage(b.page!!.info!!, page.w, page.h, end)
-            val i2 = b.page!!.find(p2)
+            val p2 = toPage(bPageInfo, page.w, page.h, end)
+            val i2 = bPage.find(p2)
             if (i2 == -1) return null
             if (i2 < i1) return null
             return i1 <= b.ss && b.ss <= i2 || i1 <= b.ll && b.ll <= i2
@@ -363,7 +389,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun isValid(page: Page, point: Point): Boolean {
             val pp = open(page)
-            val convertedPoint = toPage(pp.info!!, page.w, page.h, point)
+            val ppInfo = checkNotNull(pp.info) { "SelectionPage.info is null in isValid" }
+            val convertedPoint = toPage(ppInfo, page.w, page.h, point)
             return pp.find(convertedPoint) != -1
         }
 
@@ -375,8 +402,10 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun isAbove(page: Page, point: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.s.page < page.page) return true
-            val convertedPoint = toPage(b.page!!.info!!, page.w, page.h, point)
-            val index = b.page!!.find(convertedPoint)
+            val bPage = checkNotNull(b.page) { "SelectionBounds.page is null in isAbove" }
+            val bPageInfo = checkNotNull(bPage.info) { "SelectionPage.info is null in isAbove" }
+            val convertedPoint = toPage(bPageInfo, page.w, page.h, point)
+            val index = bPage.find(convertedPoint)
             if (index == -1) return null
             return b.ss < index || b.ll < index
         }
@@ -384,8 +413,10 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun isBelow(page: Page, point: Point): Boolean? {
             val b = SelectionBounds(page)
             if (b.e.page > page.page) return true
-            val convertedPoint = toPage(b.page!!.info!!, page.w, page.h, point)
-            val index = b.page!!.find(convertedPoint)
+            val bPage = checkNotNull(b.page) { "SelectionBounds.page is null in isBelow" }
+            val bPageInfo = checkNotNull(bPage.info) { "SelectionPage.info is null in isBelow" }
+            val convertedPoint = toPage(bPageInfo, page.w, page.h, point)
+            val index = bPage.find(convertedPoint)
             if (index == -1) return null
             return index < b.ss || index < b.ll
         }
@@ -416,36 +447,38 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
 
             constructor(p: Int) : this() {
-                if (s.page == e.page) {
-                    page = s
-                    ss = s.index
-                    ee = e.index
+                val startPage = checkNotNull(this.s) { "s (start) SelectionPage is null" }
+                val endPage = checkNotNull(this.e) { "e (end) SelectionPage is null" }
+                if (startPage.page == endPage.page) {
+                    page = startPage
+                    ss = startPage.index
+                    ee = endPage.index
                     first = true
                     last = true
                     if (reverse) ss++
-                } else if (s.page == p) {
-                    page = s
-                    ss = s.index
-                    ee = s.last()
+                } else if (startPage.page == p) {
+                    page = startPage
+                    ss = startPage.index
+                    ee = startPage.last()
                     first = true
                     if (reverse) ss++
-                } else if (e.page == p) {
-                    page = e
-                    ss = e.first()
-                    ee = e.index
+                } else if (endPage.page == p) {
+                    page = endPage
+                    ss = endPage.first()
+                    ee = endPage.index
                     last = true
                 } else {
                     page = SelectionPage(open(p))
-                    ss = page!!.first()
-                    ee = page!!.last()
+                    ss = checkNotNull(page) { "page SelectionPage is null" }.first()
+                    ee = checkNotNull(page) { "page SelectionPage is null" }.last()
                 }
                 ll = ee
                 ee++
             }
 
             constructor() {
-                val sp = end!!
-                val ep = start!!
+                val sp = checkNotNull(end) { "end SelectionPage is null in SelectionBounds" }
+                val ep = checkNotNull(start) { "start SelectionPage is null in SelectionBounds" }
                 if (sp.page > ep.page) {
                     reverse = true
                     s = ep
@@ -467,8 +500,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
             fun getText(): String {
                 val bb = StringBuilder()
+                val p = checkNotNull(page) { "page SelectionPage is null in getText" }
                 for (b in ss until ee) {
-                    bb.append(page!!.getText(b))
+                    bb.append(p.getText(b))
                 }
                 return bb.toString()
             }
@@ -517,14 +551,16 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             pp.info = doc.getPageInfo(page)
             for (type in TYPES) {
                 pp.text = doc.getText(page, type)
-                if (pp.text != null && pp.text!!.bounds.isNotEmpty()) break
+                val text = pp.text
+                if (text != null && text.bounds.isNotEmpty()) break
             }
             if (pp.text == null) return pp
             val find = str.lowercase(Locale.US)
             val b = StringBuilder()
-            for (i in pp.text!!.text.indices) {
+            val ppText = checkNotNull(pp.text) { "pp.text is null in search" }
+            for (i in ppText.text.indices) {
                 val s = b.length
-                b.append(pp.text!!.text[i])
+                b.append(ppText.text[i])
                 val e = b.length
                 pp.map.add(DjvuSearchMap(i, s, e))
             }
@@ -541,11 +577,13 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun getBounds(page: Plugin.View.Selection.Page): Bounds? {
             val bounds = Bounds()
             val p = pages.get(page.page) ?: return null
+            val pInfo = checkNotNull(p.info) { "DjvuSearchPage.info is null in getBounds" }
+            val pText = checkNotNull(p.text) { "DjvuSearchPage.text is null in getBounds" }
             val rr = ArrayList<Rect>()
             for (r in p.rr) {
                 val hh = ArrayList<Rect>()
                 for (k in r.start until r.end) {
-                    val b = toDevice(p.info!!, page.w, page.h, p.text!!.bounds[k])
+                    val b = toDevice(pInfo, page.w, page.h, pText.bounds[k])
                     rr.add(b)
                     hh.add(b)
                 }
@@ -694,8 +732,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun render(w: Int, h: Int, page: Int, c: Bitmap.Config): Bitmap? {
             val r = DjvuPage(doc, page, w, h)
             r.scale(w * 2, h * 2)
-            val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
-            doc.renderPage(bm, r.pageNumber, 0, 0, r.pageBox!!.w, r.pageBox!!.h, 0, 0, r.pageBox!!.w, r.pageBox!!.h)
+            val box = checkNotNull(r.pageBox) { "DjvuPage.pageBox is null in render" }
+            val bm = createBitmap(box.w, box.h, c)
+            doc.renderPage(bm, r.pageNumber, 0, 0, box.w, box.h, 0, 0, box.w, box.h)
             bm.density = r.dpi
             return bm
         }
@@ -703,13 +742,18 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun draw(canvas: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
             val curr = current as DjvuPage
             val r = DjvuPage(curr, index, w, h)
-            if (index == ZLViewEnums.PageIndex.current) current!!.updatePage(r)
+            if (index == ZLViewEnums.PageIndex.current) {
+                checkNotNull(current) { "current is null in draw" }.updatePage(r)
+            }
             r.scale(w, h)
             val render = r.renderRect()
-            val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
+            val box = checkNotNull(r.pageBox) { "DjvuPage.pageBox is null in draw" }
+            val bm = createBitmap(box.w, box.h, c)
             bm.eraseColor(FBReaderView.PAGE_PAPER_COLOR)
-            doc.renderPage(bm, r.pageNumber, 0, 0, r.pageBox!!.w, r.pageBox!!.h, render.x, render.y, render.w, render.h)
-            canvas.drawBitmap(bm, render.src!!, render.dst!!, paint)
+            doc.renderPage(bm, r.pageNumber, 0, 0, box.w, box.h, render.x, render.y, render.w, render.h)
+            val src = checkNotNull(render.src) { "render.src is null in draw" }
+            val dst = checkNotNull(render.dst) { "render.dst is null in draw" }
+            canvas.drawBitmap(bm, src, dst, paint)
             bm.recycle()
         }
 

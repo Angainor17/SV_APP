@@ -36,6 +36,7 @@ pdfiumandroid = "2.0.0"
 wget = "1.7.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
+mockk = "1.13.13"
 espressoCore = "3.6.1"
 coroutinesTest = "1.10.1"
 hiltTesting = "2.60.1"
@@ -114,6 +115,7 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
@@ -179,6 +181,7 @@ test = [
     "junit",
     "kotlinx-coroutines-test",
     "androidx-junit",
+    "mockk",
 ]
 
 androidTest = [
