@@ -24,7 +24,13 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel для экрана чтения книги
+ * ViewModel для экрана чтения книги.
+ *
+ * Использует делегаты для разделения ответственности:
+ * - [ReaderSelectionDelegate] — выделение текста
+ * - [ReaderBookmarksDelegate] — закладки
+ * - [ReaderSearchDelegate] — поиск
+ * - [ReaderDisplayDelegate] — режимы отображения
  */
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
@@ -39,37 +45,62 @@ class ReaderViewModel @Inject constructor(
     private var currentBook: Storage.Book? = null
     private var currentFBook: Storage.FBook? = null
 
-    // Ссылка на FBReaderView (управляется из Compose)
+    /** Ссылка на FBReaderView (управляется из Compose) */
     var fbReaderView: FBReaderView? = null
 
-    // Сохранённая позиция для восстановления при пересоздании FBReaderView
+    /** Сохранённая позиция для восстановления при пересоздании FBReaderView */
     private var savedPosition: FBReaderView.ZLTextIndexPosition? = null
 
-    // Настройки
-    private val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    /** Настройки */
+    val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    // Флаг для управления клавишами громкости
+    /** Флаг для управления клавишами громкости */
     var volumeKeysEnabled: Boolean = true
 
-    // Timestamp последнего показа панели выделения (для debounce)
-    private var lastSelectionShowTime: Long = 0L
+    // ==================== Делегаты ====================
 
-    // Timestamp последнего явного скрытия панели через кнопку действия (bookmark/copy/share/...)
-    private var lastSelectionExplicitHideTime: Long = 0L
+    private val selectionDelegate = ReaderSelectionDelegate(
+        getState = { _state.value as? ReaderState.Content },
+        updateState = { _state.value = it },
+        getFBReaderView = { fbReaderView },
+    )
 
-    // Минимальное время между show и hide (миллисекунды)
-    private companion object {
-        const val SELECTION_DEBOUNCE_MS = 500L
-    }
+    private val bookmarksDelegate = ReaderBookmarksDelegate(
+        getState = { _state.value as? ReaderState.Content },
+        updateState = { _state.value = it },
+        getFBReaderView = { fbReaderView },
+        getCurrentBook = { currentBook },
+        getStorage = { storage },
+        onSavePosition = { savePosition() },
+    )
 
-    /**
-     * Получить менеджер для обработки действий с книгой
-     */
+    val searchDelegate = ReaderSearchDelegate(
+        getState = { _state.value as? ReaderState.Content },
+        updateState = { _state.value = it },
+        getFBReaderView = { fbReaderView },
+    )
+
+    private val displayDelegate = ReaderDisplayDelegate(
+        getState = { _state.value as? ReaderState.Content },
+        updateState = { _state.value = it },
+        getFBReaderView = { fbReaderView },
+        sharedPreferences = shared,
+        onHideSelectionPanel = { selectionDelegate.hidePanel() },
+    )
+
+    // ==================== Публичный API ====================
+
     fun getOnBookPagerManager(): OnBookPagerManager = onBookPagerManager
 
-    /**
-     * Обновляет возможность смены шрифта после создания FBReaderView
-     */
+    fun getFBook(): Storage.FBook? = currentFBook
+    fun getCurrentBook(): Storage.Book? = currentBook
+
+    fun getSavedPosition(): FBReaderView.ZLTextIndexPosition? = savedPosition
+
+    fun clearSavedPosition() {
+        savedPosition = null
+    }
+
     fun updateCanChangeFont() {
         val canChange = fbReaderView?.canChangeFont() ?: true
         val currentState = _state.value as? ReaderState.Content ?: return
@@ -78,9 +109,8 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Обработка действий пользователя
-     */
+    // ==================== Actions ====================
+
     fun onAction(action: ReaderActions) {
         when (action) {
             // Загрузка книги
@@ -95,12 +125,12 @@ class ReaderViewModel @Inject constructor(
             is ReaderActions.GoToPosition -> goToPosition(action.position)
             is ReaderActions.GoToBookmark -> goToBookmark(action.bookmark)
 
-            // Отображение
-            ReaderActions.ToggleFullscreen -> toggleFullscreen()
-            ReaderActions.ToggleViewMode -> toggleViewMode()
-            ReaderActions.ToggleReflow -> toggleReflow()
-            ReaderActions.MarkControlsHintShown -> markControlsHintShown()
-            is ReaderActions.SetFullscreen -> setFullscreen(action.isFullscreen)
+            // Отображение — делегировано
+            ReaderActions.ToggleFullscreen -> displayDelegate.toggleFullscreen()
+            ReaderActions.ToggleViewMode -> displayDelegate.toggleViewMode()
+            ReaderActions.ToggleReflow -> displayDelegate.toggleReflow()
+            ReaderActions.MarkControlsHintShown -> displayDelegate.markControlsHintShown()
+            is ReaderActions.SetFullscreen -> displayDelegate.setFullscreen(action.isFullscreen)
 
             // Диалоги
             ReaderActions.ToggleToc -> toggleToc()
@@ -110,24 +140,22 @@ class ReaderViewModel @Inject constructor(
             is ReaderActions.GoToPage -> goToPage(action.page)
             ReaderActions.HideDialogs -> hideDialogs()
 
-            // Выделение текста
-            is ReaderActions.ShowSelection -> showSelection(action.startY, action.endY)
+            // Выделение — делегировано
+            is ReaderActions.ShowSelection -> selectionDelegate.show(action.startY, action.endY)
             ReaderActions.HideSelection -> {
-                // Очищаем выделение в FBReaderView
-                // hideSelection() вызывается автоматически через SELECTION_HIDE_PANEL
                 fbReaderView?.app?.runAction(ActionCode.SELECTION_CLEAR)
             }
-            ReaderActions.SelectionCopy -> selectionCopy()
-            ReaderActions.SelectionShare -> selectionShare()
-            ReaderActions.SelectionBookmark -> selectionBookmark()
-            ReaderActions.SelectionQuestion -> selectionQuestion()
-            ReaderActions.SelectionAlert -> selectionAlert()
+            ReaderActions.SelectionCopy -> selectionDelegate.copy()
+            ReaderActions.SelectionShare -> selectionDelegate.share()
+            ReaderActions.SelectionBookmark -> selectionDelegate.bookmark()
+            ReaderActions.SelectionQuestion -> selectionDelegate.question()
+            ReaderActions.SelectionAlert -> selectionDelegate.alert()
 
-            // Закладки
-            is ReaderActions.EditBookmark -> editBookmark(action.bookmark)
-            is ReaderActions.SaveBookmarkEdit -> saveBookmarkEdit(action.bookmark, action.name, action.color)
-            is ReaderActions.AddBookmark -> addBookmark(action.bookmark)
-            is ReaderActions.DeleteBookmark -> deleteBookmark(action.bookmark)
+            // Закладки — делегировано
+            is ReaderActions.EditBookmark -> bookmarksDelegate.edit(action.bookmark)
+            is ReaderActions.SaveBookmarkEdit -> bookmarksDelegate.saveEdit(action.bookmark, action.name, action.color)
+            is ReaderActions.AddBookmark -> bookmarksDelegate.add(action.bookmark)
+            is ReaderActions.DeleteBookmark -> bookmarksDelegate.delete(action.bookmark)
 
             // Шрифты
             is ReaderActions.SetFontSize -> setFontSize(action.size)
@@ -135,11 +163,11 @@ class ReaderViewModel @Inject constructor(
             is ReaderActions.SetFontFamily -> setFontFamily(action.family)
             is ReaderActions.SetIgnoreEmbeddedFonts -> setIgnoreEmbeddedFonts(action.ignore)
 
-            // Поиск
-            is ReaderActions.Search -> search(action.query)
-            ReaderActions.SearchNext -> searchNext()
-            ReaderActions.SearchPrevious -> searchPrevious()
-            ReaderActions.SearchClose -> searchClose()
+            // Поиск — делегирован
+            is ReaderActions.Search -> searchDelegate.search(action.query)
+            ReaderActions.SearchNext -> searchDelegate.next()
+            ReaderActions.SearchPrevious -> searchDelegate.previous()
+            ReaderActions.SearchClose -> searchDelegate.close()
 
             // Zoom
             is ReaderActions.ZoomUpdate -> zoomUpdate(action.scale, action.pivotX, action.pivotY)
@@ -151,29 +179,18 @@ class ReaderViewModel @Inject constructor(
 
     private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?, bookCoverUrl: String?, bookTitle: String?, bookAuthor: String?) {
         Timber.tag("voronin").d("=== loadBook START ===")
-        Timber.tag("voronin").d("uri=$uri")
-        Timber.tag("voronin").d("position=$position")
-        Timber.tag("voronin").d("bookCoverUrl=$bookCoverUrl, bookTitle=$bookTitle, bookAuthor=$bookAuthor")
+        Timber.tag("voronin").d("uri=$uri, position=$position")
 
         viewModelScope.launch {
             _state.value = ReaderState.Loading
-
-            // Сохраняем переданную позицию для применения после загрузки книги
-            if (position != null) {
-                savedPosition = position
-                Timber.tag("voronin").d("Saved initial position from bookmark: $position")
-            }
+            if (position != null) savedPosition = position
 
             try {
-                Timber.tag("voronin").d("Checking file accessibility...")
-                // Проверяем доступность файла
                 val inputStream = try {
                     context.contentResolver.openInputStream(uri)
                 } catch (e: SecurityException) {
                     Timber.tag("voronin").e(e, "Security exception accessing file: $uri")
-                    _state.value = ReaderState.Error(
-                        context.getString(R.string.sv_error_file_access)
-                    )
+                    _state.value = ReaderState.Error(context.getString(R.string.sv_error_file_access))
                     return@launch
                 } catch (e: Exception) {
                     Timber.tag("voronin").e(e, "Error accessing file: $uri")
@@ -181,64 +198,30 @@ class ReaderViewModel @Inject constructor(
                 }
 
                 if (inputStream == null) {
-                    Timber.tag("voronin").e("Input stream is null - file not found")
-                    _state.value = ReaderState.Error(
-                        context.getString(R.string.sv_error_file_not_found)
-                    )
+                    _state.value = ReaderState.Error(context.getString(R.string.sv_error_file_not_found))
                     return@launch
                 }
-
                 inputStream.close()
-                Timber.tag("voronin").d("File accessibility check passed")
 
-                Timber.tag("voronin").d("Loading book info via storage.load(uri)...")
-                // Загружаем информацию о книге
                 currentBook = storage.load(uri)
-                Timber.tag("voronin").d("Book loaded: url=${currentBook?.url}, title=${currentBook?.info?.title}")
+                if (bookCoverUrl != null) currentBook?.info?.coverUrl = bookCoverUrl
+                if (bookTitle != null) currentBook?.info?.title = bookTitle
+                if (bookAuthor != null) currentBook?.info?.authors = bookAuthor
 
-                // Сохраняем URL обложки из API если передан
-                if (bookCoverUrl != null) {
-                    currentBook?.info?.coverUrl = bookCoverUrl
-                }
-
-                // Сохраняем название и автора из API если переданы (перезаписываем метаданные файла)
-                if (bookTitle != null) {
-                    currentBook?.info?.title = bookTitle
-                }
-                if (bookAuthor != null) {
-                    currentBook?.info?.authors = bookAuthor
-                }
-
-                Timber.tag("voronin").d("Opening book file via storage.read(currentBook)...")
-                // Открываем файл книги
                 currentFBook = storage.read(currentBook)
-                Timber.tag("voronin").d("storage.read() completed, fbook=${currentFBook != null}")
-
-                // Создаём обложку если её нет
-                Timber.tag("voronin").d("Creating cover if needed...")
                 ensureCoverCreated(currentBook, currentFBook)
-                Timber.tag("voronin").d("Cover creation done")
 
-                // Определяем возможность смены шрифта после создания FBReaderView
-                // (canChangeFont требует pluginview который создаётся позже)
-
-                // Обновляем состояние
-                Timber.tag("voronin").d("Updating state to Content...")
-                val currentState = ReaderState.Content(
+                _state.value = ReaderState.Content(
                     book = currentBook!!,
                     positionText = "",
                     isFullscreen = false,
-                    viewMode = getViewModeFromPrefs(),
+                    viewMode = displayDelegate.getViewModeFromPrefs(),
                 )
-                _state.value = currentState
-                Timber.tag("voronin").d("State updated, book loaded: ${currentBook?.info?.title}, savedPosition=$savedPosition")
             } catch (e: Exception) {
                 Timber.tag("voronin").e(e, "=== loadBook FAILED ===")
                 val errorMessage = when {
-                    e.message?.contains("EACCES") == true ->
-                        context.getString(R.string.sv_error_file_access)
-                    e.message?.contains("ENOENT") == true ||
-                    e.message?.contains("No such file") == true ->
+                    e.message?.contains("EACCES") == true -> context.getString(R.string.sv_error_file_access)
+                    e.message?.contains("ENOENT") == true || e.message?.contains("No such file") == true ->
                         context.getString(R.string.sv_error_file_not_found)
                     else -> e.message ?: context.getString(R.string.sv_error_open_book)
                 }
@@ -247,16 +230,10 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Создаёт обложку книги если её нет и сохраняет путь в book.info.coverUrl и bookFileUri
-     */
     private fun ensureCoverCreated(book: Storage.Book?, fbook: Storage.FBook?) {
         if (book == null || fbook == null) return
-
         try {
             var needSave = false
-
-            // Создаём файл обложки только если её нет
             if (book.info?.coverUrl == null) {
                 val coverFile = Storage.coverFile(context, book)
                 if (coverFile != null && !coverFile.exists()) {
@@ -265,22 +242,13 @@ class ReaderViewModel @Inject constructor(
                 if (coverFile?.exists() == true) {
                     book.info?.coverUrl = coverFile.absolutePath
                     needSave = true
-                    Timber.d("Cover created: ${coverFile.absolutePath}")
                 }
             }
-
-            // Всегда сохраняем bookFileUri если он не установлен
             if (book.info?.bookFileUri == null && book.url != null) {
                 book.info?.bookFileUri = book.url.toString()
                 needSave = true
-                Timber.d("bookFileUri saved: ${book.url}")
             }
-
-            // Сохраняем если что-то изменилось
-            if (needSave) {
-                storage.save(book)
-                Timber.d("Book info saved with coverUrl=${book.info?.coverUrl}, bookFileUri=${book.info?.bookFileUri}")
-            }
+            if (needSave) storage.save(book)
         } catch (e: Exception) {
             Timber.e(e, "Failed to create cover or save bookFileUri")
         }
@@ -294,9 +262,7 @@ class ReaderViewModel @Inject constructor(
         val fbBook = fb.book ?: return
 
         try {
-            // Сохраняем позицию для восстановления при пересоздании FBReaderView
             savedPosition = fb.position as? FBReaderView.ZLTextIndexPosition
-
             val save = Storage.RecentInfo(fbBook.info)
             save.position = fb.position
 
@@ -304,23 +270,19 @@ class ReaderViewModel @Inject constructor(
             if (Storage.exists(context, uri)) {
                 try {
                     val info = Storage.RecentInfo(context, uri)
-                    // Проверяем конфликты при синхронизации
                     if (info.position != null && save.position != null &&
                         save.position!!.samePositionAs(info.position)) {
                         if (save.fontsize == null || info.fontsize != null && save.fontsize == info.fontsize) {
                             if (save.equals(info.fontsizes)) {
                                 if (save.bookmarks == null || info.bookmarks != null && save.bookmarks == info.bookmarks) {
-                                    return // Нечего сохранять
+                                    return
                                 }
                             }
                         }
                     }
-
-                    // Файл изменился между сохранениями?
                     if (book.info.last != info.last) {
                         storage.move(uri, storage.storagePath)
                     }
-
                     save.merge(info.fontsizes, info.last)
                 } catch (e: RuntimeException) {
                     Timber.d(e, "Unable to load JSON")
@@ -335,18 +297,6 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Получить сохранённую позицию для восстановления при пересоздании FBReaderView
-     */
-    fun getSavedPosition(): FBReaderView.ZLTextIndexPosition? = savedPosition
-
-    /**
-     * Сбросить сохранённую позицию после применения
-     */
-    fun clearSavedPosition() {
-        savedPosition = null
-    }
-
     // ==================== Навигация ====================
 
     private fun goToPosition(position: ZLTextPosition) {
@@ -354,471 +304,60 @@ class ReaderViewModel @Inject constructor(
     }
 
     private fun goToBookmark(bookmark: Storage.Bookmark) {
-        fbReaderView?.gotoPosition(
-            FBReaderView.ZLTextIndexPosition(bookmark.start, bookmark.end)
-        )
-    }
-
-    // ==================== Отображение ====================
-
-    private fun toggleFullscreen() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(isFullscreen = !currentState.isFullscreen)
-    }
-
-    private fun toggleViewMode() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        val newMode = if (currentState.viewMode == ViewMode.PAGING) {
-            ViewMode.CONTINUOUS
-        } else {
-            ViewMode.PAGING
-        }
-
-        // Скрываем панель выделения при смене режима просмотра
-        hideSelectionPanel()
-
-        // Сохраняем в prefs
-        shared.edit {
-            putString(ReaderPreferences.PREFERENCE_VIEW_MODE, newMode.toString())
-        }
-
-        // Применяем к FBReaderView
-        fbReaderView?.setWidget(
-            if (newMode == ViewMode.CONTINUOUS) FBReaderView.Widgets.CONTINUOUS
-            else FBReaderView.Widgets.PAGING
-        )
-
-        _state.value = currentState.copy(viewMode = newMode)
-    }
-
-    private fun toggleReflow() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-
-        // Скрываем панель выделения при переключении reflow
-        hideSelectionPanel()
-
-        fbReaderView?.setReflow(!fbReaderView!!.isReflow)
-        val newReflow = !currentState.isReflow
-        // При переключении reflow обновляем возможность смены шрифта
-        val canChange = fbReaderView?.canChangeFont() ?: true
-        _state.value = currentState.copy(
-            isReflow = newReflow,
-            canChangeFont = canChange
-        )
-    }
-
-    /**
-     * Отметить что подсказки зон касания были показаны
-     */
-    private fun markControlsHintShown() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        if (!currentState.hasShownControlsHint) {
-            _state.value = currentState.copy(hasShownControlsHint = true)
-        }
-    }
-
-    /**
-     * Установить состояние fullscreen режима (вызывается из FBReaderView listener)
-     */
-    private fun setFullscreen(isFullscreen: Boolean) {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        Timber.tag("voronin").d("=== ViewModel: setFullscreen($isFullscreen) ===")
-        Timber.tag("voronin").d("Previous isFullscreen: ${currentState.isFullscreen}")
-        Timber.tag("voronin").d("New isFullscreen: $isFullscreen")
-        if (currentState.isFullscreen != isFullscreen) {
-            _state.value = currentState.copy(isFullscreen = isFullscreen)
-            Timber.tag("voronin").d("State updated - Scaffold topBar will be: ${!isFullscreen}")
-        }
+        fbReaderView?.gotoPosition(FBReaderView.ZLTextIndexPosition(bookmark.start, bookmark.end))
     }
 
     // ==================== Диалоги ====================
 
     private fun toggleToc() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            showToc = !currentState.showToc,
-            showBookmarks = false,
-            showFontSettings = false
-        )
+        val s = _state.value as? ReaderState.Content ?: return
+        _state.value = s.copy(showToc = !s.showToc, showBookmarks = false, showFontSettings = false)
     }
 
     private fun toggleBookmarks() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            showToc = false,
-            showBookmarks = !currentState.showBookmarks,
-            showFontSettings = false,
-            showNavigation = false
-        )
+        val s = _state.value as? ReaderState.Content ?: return
+        _state.value = s.copy(showToc = false, showBookmarks = !s.showBookmarks, showFontSettings = false, showNavigation = false)
     }
 
     private fun toggleNavigation() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            showToc = false,
-            showBookmarks = false,
-            showFontSettings = false,
-            showNavigation = !currentState.showNavigation
+        val s = _state.value as? ReaderState.Content ?: return
+        _state.value = s.copy(showToc = false, showBookmarks = false, showFontSettings = false, showNavigation = !s.showNavigation)
+    }
+
+    private fun toggleFontSettings() {
+        val s = _state.value as? ReaderState.Content ?: return
+        _state.value = s.copy(showToc = false, showBookmarks = false, showFontSettings = !s.showFontSettings, showNavigation = false)
+    }
+
+    fun hideDialogs() {
+        val s = _state.value as? ReaderState.Content ?: return
+        _state.value = s.copy(
+            showToc = false, showBookmarks = false, showFontSettings = false,
+            showBookmarkEdit = false, showNavigation = false, editingBookmark = null
         )
     }
 
     private fun goToPage(page: Int) {
         fbReaderView?.let { view ->
-            val textView = view.app?.getTextView()
-            if (textView != null) {
-                if (page == 1) {
-                    textView.gotoHome()
-                } else {
-                    textView.gotoPage(page)
-                }
-                view.app?.getViewWidget()?.reset()
-                view.app?.getViewWidget()?.repaint()
-            }
+            val textView = view.app?.getTextView() ?: return
+            if (page == 1) textView.gotoHome() else textView.gotoPage(page)
+            view.app?.getViewWidget()?.reset()
+            view.app?.getViewWidget()?.repaint()
         }
     }
 
-    // === Selection methods ===
+    // ==================== Выделение (прокси к делегату) ====================
 
-    private fun showSelection(startY: Int, endY: Int) {
-        Timber.d("showSelection called: startY=$startY, endY=$endY")
-        val currentState = _state.value as? ReaderState.Content ?: return
-        // Не обновляем если панель уже показана с теми же координатами (избегаем мерцания)
-        if (currentState.showSelection &&
-            currentState.selectionStartY == startY &&
-            currentState.selectionEndY == endY) {
-            Timber.d("showSelection: already showing with same coordinates, skipping")
-            return
-        }
-        // Игнорируем показ, если панель только что была явно закрыта нажатием на действие
-        // (bookmark/copy/share/...). FBReader на ScrollWidget (телефон, continuous-режим)
-        // может прислать отложенный SELECTION_SHOW_PANEL от завершения жеста выделения уже
-        // после того, как действие выполнилось и панель закрылась — без этой защиты такая
-        // задержавшаяся команда открывает панель заново сразу после создания закладки.
-        val timeSinceExplicitHide = System.currentTimeMillis() - lastSelectionExplicitHideTime
-        if (timeSinceExplicitHide < SELECTION_DEBOUNCE_MS) {
-            Timber.d("showSelection: suppressed (explicitly hidden $timeSinceExplicitHide ms ago, minimum $SELECTION_DEBOUNCE_MS)")
-            return
-        }
-        // Записываем время показа для debounce
-        lastSelectionShowTime = System.currentTimeMillis()
-        _state.value = currentState.copy(
-            showSelection = true,
-            selectionStartY = startY,
-            selectionEndY = endY
-        )
-    }
+    fun hideSelection() = selectionDelegate.hide()
 
-    fun hideSelection() {
-        Timber.d("hideSelection called")
-        val currentState = _state.value as? ReaderState.Content ?: return
+    // ==================== Закладки (прокси к делегату) ====================
 
-        // Debounce: не скрывать панель если она была показана менее SELECTION_DEBOUNCE_MS назад
-        // Это предотвращает race condition когда hide вызывается сразу после show
-        val timeSinceShow = System.currentTimeMillis() - lastSelectionShowTime
-        if (timeSinceShow < SELECTION_DEBOUNCE_MS) {
-            Timber.d("hideSelection: debounced (shown $timeSinceShow ms ago, minimum $SELECTION_DEBOUNCE_MS)")
-            return
-        }
-
-        _state.value = currentState.copy(
-            showSelection = false
-        )
-        // SELECTION_HIDE_PANEL вызывается автоматически из FBReaderView при SELECTION_CLEAR
-        // Не вызываем SELECTION_CLEAR здесь, чтобы избежать цикла
-    }
-
-    private fun selectionCopy() {
-        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_COPY_TO_CLIPBOARD)
-        hideSelectionPanel()
-    }
-
-    private fun selectionShare() {
-        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_SHARE)
-        hideSelectionPanel()
-    }
-
-    private fun selectionBookmark() {
-        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_BOOKMARK)
-        // Скрываем панель выделения после создания закладки
-        hideSelectionPanel()
-    }
-
-    /**
-     * Скрывает панель выделения текста (без debounce)
-     */
-    private fun hideSelectionPanel() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        lastSelectionExplicitHideTime = System.currentTimeMillis()
-        _state.value = currentState.copy(showSelection = false)
-        // Очищаем выделение в FBReaderView
-        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.SELECTION_CLEAR)
-    }
-
-    private fun selectionQuestion() {
-        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.ASK_QUESTION)
-        hideSelectionPanel()
-    }
-
-    private fun selectionAlert() {
-        fbReaderView?.app?.runAction(org.geometerplus.fbreader.fbreader.ActionCode.TEL_ABOUT_MISSPELL)
-        hideSelectionPanel()
-    }
-
-    private fun toggleFontSettings() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            showToc = false,
-            showBookmarks = false,
-            showFontSettings = !currentState.showFontSettings,
-            showNavigation = false
-        )
-    }
-
-    private fun hideDialogs() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            showToc = false,
-            showBookmarks = false,
-            showFontSettings = false,
-            showBookmarkEdit = false,
-            showNavigation = false,
-            editingBookmark = null
-        )
-    }
-
-    // ==================== Закладки ====================
-
-    /**
-     * Синхронизировать закладки из FBook и обновить состояние
-     */
-    fun syncBookmarksFromFBook() {
-        val book = currentBook ?: return
-        val fbookBookmarks = fbReaderView?.book?.info?.bookmarks
-        if (fbookBookmarks != null) {
-            book.info.bookmarks = fbookBookmarks
-        }
-        // Триггерим обновление состояния для рекомпозиции диалога
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(book = book)
-        storage.save(book)
-    }
-
-    /**
-     * Открыть редактирование закладки
-     */
-    private fun editBookmark(bookmark: Storage.Bookmark) {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            showBookmarkEdit = true,
-            editingBookmark = bookmark,
-            showToc = false,
-            showBookmarks = false,
-            showFontSettings = false
-        )
-    }
-
-    /**
-     * Сохранить изменения закладки
-     */
-    private fun saveBookmarkEdit(bookmark: Storage.Bookmark, name: String, color: Int) {
-        // Обновляем данные в закладке
-        bookmark.name = name.ifBlank { null }
-        bookmark.color = color
-        bookmark.last = System.currentTimeMillis()
-
-        // Обновляем в FBook если есть
-        val fbBookmark = fbReaderView?.book?.info?.bookmarks?.find { it.start.samePositionAs(bookmark.start) }
-        if (fbBookmark != null) {
-            fbBookmark.name = bookmark.name
-            fbBookmark.color = bookmark.color
-            fbBookmark.last = bookmark.last
-        }
-
-        // Сохраняем и обновляем отображение
-        currentBook?.let { storage.save(it) }
-        fbReaderView?.bookmarksUpdate()
-        syncBookmarksFromFBook()
-
-        // Закрываем диалог
-        hideDialogs()
-    }
-
-    private fun addBookmark(bookmark: Storage.Bookmark) {
-        val book = currentBook ?: return
-
-        Timber.tag("voronin2").d("========== СОЗДАНИЕ ЗАМЕТКИ ==========")
-        Timber.tag("voronin2").d("--- Поля Bookmark ---")
-        Timber.tag("voronin2").d("last (timestamp): ${bookmark.last}")
-        Timber.tag("voronin2").d("name: ${bookmark.name}")
-        Timber.tag("voronin2").d("text: ${bookmark.text}")
-        Timber.tag("voronin2").d("color: ${bookmark.color}")
-        Timber.tag("voronin2").d("start: paragraph=${bookmark.start.paragraphIndex}, element=${bookmark.start.elementIndex}, char=${bookmark.start.charIndex}")
-        Timber.tag("voronin2").d("end: paragraph=${bookmark.end.paragraphIndex}, element=${bookmark.end.elementIndex}, char=${bookmark.end.charIndex}")
-        Timber.tag("voronin2").d("coverUrl (до): ${bookmark.coverUrl}")
-        Timber.tag("voronin2").d("bookFileUri (до): ${bookmark.bookFileUri}")
-        Timber.tag("voronin2").d("sentenceBefore (до): ${bookmark.sentenceBefore}")
-        Timber.tag("voronin2").d("sentenceAfter (до): ${bookmark.sentenceAfter}")
-
-        Timber.tag("voronin2").d("--- Данные из книги ---")
-        Timber.tag("voronin2").d("book.info.coverUrl: ${book.info?.coverUrl}")
-        Timber.tag("voronin2").d("book.url: ${book.url}")
-
-        // Сохраняем coverUrl книги в закладке на момент создания
-        bookmark.coverUrl = book.info?.coverUrl
-
-        // Сохраняем URI файла книги в закладке для навигации
-        bookmark.bookFileUri = book.url?.toString()
-
-        // Извлекаем контекст предложения
-        val context = extractSentenceContext(bookmark)
-
-        Timber.tag("voronin2").d("--- После заполнения ---")
-        Timber.tag("voronin2").d("coverUrl (после): ${bookmark.coverUrl}")
-        Timber.tag("voronin2").d("bookFileUri (после): ${bookmark.bookFileUri}")
-        Timber.tag("voronin2").d("sentenceBefore (после): ${context?.first}")
-        Timber.tag("voronin2").d("sentenceAfter (после): ${context?.second}")
-
-        bookmark.sentenceBefore = context?.first
-        bookmark.sentenceAfter = context?.second
-
-        Timber.tag("voronin2").d("--- Финальные значения Bookmark ---")
-        Timber.tag("voronin2").d("sentenceBefore: ${bookmark.sentenceBefore}")
-        Timber.tag("voronin2").d("sentenceAfter: ${bookmark.sentenceAfter}")
-        Timber.tag("voronin2").d("======================================")
-
-        book.info.bookmarks.add(bookmark)
-        storage.save(book)
-        fbReaderView?.bookmarksUpdate()
-        savePosition()
-    }
-
-    /**
-     * Извлечь контекст предложения из выделения
-     * @return Pair<sentenceBefore, sentenceAfter> или null
-     */
-    private fun extractSentenceContext(bookmark: Storage.Bookmark): Pair<String, String?>? {
-        return try {
-            fbReaderView?.extractSentenceContext(bookmark)
-        } catch (e: Exception) {
-            Timber.tag("voronin").e(e, "Error extracting sentence context")
-            null
-        }
-    }
-
-    private fun deleteBookmark(bookmark: Storage.Bookmark) {
-        val book = currentBook ?: return
-
-        // Удаляем из Storage.Book по позиции и создаём новый список
-        val index = book.info.bookmarks.indexOfFirst {
-            it.start.samePositionAs(bookmark.start) && it.end.samePositionAs(bookmark.end)
-        }
-        if (index >= 0) {
-            book.info.bookmarks.removeAt(index)
-        }
-        // Создаём новый объект списка для триггера рекомпозиции
-        val newBookmarks = Storage.Bookmarks()
-        newBookmarks.addAll(book.info.bookmarks)
-        book.info.bookmarks = newBookmarks
-
-        // Удаляем из FBook по позиции
-        val fbBookmarks = fbReaderView?.book?.info?.bookmarks
-        if (fbBookmarks != null) {
-            val fbIndex = fbBookmarks.indexOfFirst {
-                it.start.samePositionAs(bookmark.start) && it.end.samePositionAs(bookmark.end)
-            }
-            if (fbIndex >= 0) {
-                fbBookmarks.removeAt(fbIndex)
-            }
-        }
-
-        fbReaderView?.bookmarksUpdate()
-        storage.save(book)
-
-        // Обновляем состояние для рекомпозиции
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(book = book)
-    }
-
-    // ==================== Миграция заметок ====================
-
-    /**
-     * Миграция контекста для старых заметок
-     * Извлекает и сохраняет контекст предложения для заметок, у которых его нет.
-     *
-     * ВАЖНО: Должен вызываться ПОСЛЕ инициализации FBReaderView (после setWidget)
-     * ВНИМАНИЕ: Должен вызываться синхронно, т.к. extractSentenceContext работает с UI
-     */
+    fun syncBookmarksFromFBook() = bookmarksDelegate.syncFromFBook()
     fun migrateBookmarksContextAsync() {
-        // Проверяем есть ли заметки без контекста
         val bookmarks = currentBook?.info?.bookmarks ?: return
         val hasUnmigrated = bookmarks.any { it.sentenceBefore == null && it.sentenceAfter == null }
-
-        if (!hasUnmigrated) {
-            Timber.tag("voronin2").d("migrateBookmarksContextAsync: no bookmarks to migrate")
-            return
-        }
-
-        Timber.tag("voronin2").d("=== migrateBookmarksContextAsync START ===")
-        migrateBookmarksContext(currentBook)
-        Timber.tag("voronin2").d("=== migrateBookmarksContextAsync END ===")
-    }
-
-    private fun migrateBookmarksContext(book: Storage.Book?) {
-        if (book == null) {
-            Timber.tag("voronin2").d("migrateBookmarksContext: book is null")
-            return
-        }
-
-        // ВАЖНО: FBReaderView использует FBook.bookmarks, а не Book.bookmarks
-        // Нужно модифицировать именно тот список который используется FBReaderView
-        val fbookBookmarks = fbReaderView?.book?.info?.bookmarks
-        if (fbookBookmarks == null) {
-            Timber.tag("voronin2").d("migrateBookmarksContext: fbookBookmarks is null")
-            return
-        }
-        if (fbookBookmarks.isEmpty()) {
-            Timber.tag("voronin2").d("migrateBookmarksContext: fbookBookmarks is empty")
-            return
-        }
-
-        Timber.tag("voronin2").d("migrateBookmarksContext: found ${fbookBookmarks.size} bookmarks in FBook")
-        var needSave = false
-
-        fbookBookmarks.forEach { bookmark ->
-            // Если контекст уже есть - пропускаем
-            if (bookmark.sentenceBefore != null || bookmark.sentenceAfter != null) {
-                Timber.tag("voronin2").d("migrateBookmarksContext: skipping bookmark with existing context")
-                return@forEach
-            }
-
-            // Извлекаем контекст
-            try {
-                Timber.tag("voronin2").d("migrateBookmarksContext: extracting context for bookmark: ${bookmark.text?.take(30)}")
-                val context = fbReaderView?.extractSentenceContext(bookmark)
-                Timber.tag("voronin2").d("migrateBookmarksContext: extractSentenceContext result = $context")
-                if (context != null) {
-                    bookmark.sentenceBefore = context.first
-                    bookmark.sentenceAfter = context.second
-                    needSave = true
-                    Timber.tag("voronin2").d("Migrated bookmark context: sentenceBefore=${context.first}, sentenceAfter=${context.second}")
-                }
-            } catch (e: Exception) {
-                Timber.tag("voronin2").e(e, "Error migrating bookmark context")
-            }
-        }
-
-        // Сохраняем если были изменения
-        if (needSave) {
-            // Синхронизируем изменения обратно в currentBook
-            book.info.bookmarks = Storage.Bookmarks().apply {
-                addAll(fbookBookmarks)
-            }
-            storage.save(book)
-            fbReaderView?.bookmarksUpdate()
-            Timber.tag("voronin2").d("Saved ${fbookBookmarks.size} migrated bookmarks")
-        } else {
-            Timber.tag("voronin2").d("migrateBookmarksContext: no changes needed")
-        }
+        if (!hasUnmigrated) return
+        bookmarksDelegate.migrateContext()
     }
 
     // ==================== Шрифты ====================
@@ -843,150 +382,21 @@ class ReaderViewModel @Inject constructor(
         fbReaderView?.setIgnoreCssFonts(ignore)
     }
 
-    // ==================== Поиск ====================
-
-    private fun search(query: String) {
-        val currentState = _state.value as? ReaderState.Content ?: return
-
-        // Update search state - only search if query has at least 2 characters
-        val shouldSearch = query.length >= 2
-        _state.value = currentState.copy(
-            searchState = currentState.searchState.copy(
-                isActive = true,
-                query = query,
-                resultsCount = 0,
-                currentResultIndex = 0,
-                isLoading = shouldSearch
-            )
-        )
-
-        // Perform search only if query has at least 2 characters
-        if (shouldSearch) {
-            fbReaderView?.performSearch(query) { count, index ->
-                // Callback after search completes
-                val state = _state.value as? ReaderState.Content
-                if (state != null) {
-                    _state.value = state.copy(
-                        searchState = state.searchState.copy(
-                            resultsCount = count,
-                            currentResultIndex = index,
-                            isLoading = false
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    private fun searchNext() {
-        fbReaderView?.performSearchNext { count, newIndex ->
-            val state = _state.value as? ReaderState.Content
-            if (state != null) {
-                _state.value = state.copy(
-                    searchState = state.searchState.copy(
-                        resultsCount = count,
-                        currentResultIndex = newIndex,
-                        isLoading = false
-                    )
-                )
-            }
-        }
-    }
-
-    private fun searchPrevious() {
-        fbReaderView?.performSearchPrevious { count, newIndex ->
-            val state = _state.value as? ReaderState.Content
-            if (state != null) {
-                _state.value = state.copy(
-                    searchState = state.searchState.copy(
-                        resultsCount = count,
-                        currentResultIndex = newIndex,
-                        isLoading = false
-                    )
-                )
-            }
-        }
-    }
-
-    private fun searchClose() {
-        val currentState = _state.value as? ReaderState.Content ?: return
-
-        _state.value = currentState.copy(
-            searchState = SearchState()
-        )
-
-        fbReaderView?.searchClose()
-    }
-
-    /**
-     * Обновить результаты поиска (вызывается из FBReaderView listener)
-     */
-    fun updateSearchResults(count: Int, currentIndex: Int) {
-        val currentState = _state.value as? ReaderState.Content ?: return
-
-        _state.value = currentState.copy(
-            searchState = currentState.searchState.copy(
-                resultsCount = count,
-                currentResultIndex = currentIndex
-            )
-        )
-    }
-
-    // ==================== Вспомогательные методы ====================
-
-    private fun getViewModeFromPrefs(): ViewMode {
-        val mode = shared.getString(ReaderPreferences.PREFERENCE_VIEW_MODE, "") ?: ""
-        return if (mode == FBReaderView.Widgets.CONTINUOUS.toString()) {
-            ViewMode.CONTINUOUS
-        } else {
-            ViewMode.PAGING
-        }
-    }
-
     // ==================== Zoom ====================
 
-    /**
-     * Обновить zoom scale
-     */
     private fun zoomUpdate(scale: Float, pivotX: Float, pivotY: Float) {
-        val currentState = _state.value as? ReaderState.Content ?: return
-        _state.value = currentState.copy(
-            zoomScale = scale,
-            zoomPivotX = pivotX,
-            zoomPivotY = pivotY,
-            isInZoom = scale > 1.0f
-        )
-        Timber.tag("voronin").d("ViewModel: zoomUpdate scale=$scale pivot=$pivotX,$pivotY")
+        val s = _state.value as? ReaderState.Content ?: return
+        _state.value = s.copy(zoomScale = scale, zoomPivotX = pivotX, zoomPivotY = pivotY, isInZoom = scale > 1.0f)
     }
 
-    /**
-     * Сбросить zoom (вернуть к 1.0)
-     */
     private fun zoomReset() {
-        val currentState = _state.value as? ReaderState.Content ?: return
+        val s = _state.value as? ReaderState.Content ?: return
         fbReaderView?.resetZoom()
-        _state.value = currentState.copy(
-            zoomScale = 1.0f,
-            zoomPivotX = 0f,
-            zoomPivotY = 0f,
-            isInZoom = false
-        )
-        Timber.tag("voronin").d("ViewModel: zoomReset")
+        _state.value = s.copy(zoomScale = 1.0f, zoomPivotX = 0f, zoomPivotY = 0f, isInZoom = false)
     }
 
-    /**
-     * Получить FBook для передачи в FBReaderView
-     */
-    fun getFBook(): Storage.FBook? = currentFBook
+    // ==================== Жизненный цикл ====================
 
-    /**
-     * Получить текущую книгу
-     */
-    fun getCurrentBook(): Storage.Book? = currentBook
-
-    /**
-     * Закрыть книгу при выходе
-     */
     fun closeBook() {
         savePosition()
         fbReaderView?.closeBook()

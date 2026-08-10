@@ -220,16 +220,3 @@ data class CustomTypography(
  * CompositionLocal для доступа к кастомной типографике
  */
 val LocalCustomTypography = staticCompositionLocalOf { CustomTypography.Default }
-
-// ============================================================
-// LEGACY SUPPORT
-// ============================================================
-
-/**
- * @deprecated Use AppTypography instead
- */
-@Deprecated(
-    message = "Use AppTypography instead",
-    replaceWith = ReplaceWith("AppTypography")
-)
-val Typography: Typography = AppTypography

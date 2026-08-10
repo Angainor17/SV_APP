@@ -159,6 +159,9 @@ val FunctionalDanger = Color(0xFFB3261E)
 /** Цвет избранного (красный для обеих тем) */
 val FavoriteColor = Color(0xFFE53935)
 
+/** Белый цвет для обеих тем */
+val White = Color(0xFFFFFFFF)
+
 // ============================================================
 // LINK COLORS
 // ============================================================
@@ -171,36 +174,6 @@ val DarkLinkColor = Color(0xFF64B5F6)
 
 /** Цвет ссылок в тексте (для совместимости) */
 val LinkInTextColor = Color(0xFF1976D2)
-
-// ============================================================
-// LEGACY COLORS (для совместимости)
-// ============================================================
-
-@Deprecated("Use LightPrimary instead", ReplaceWith("LightPrimary"))
-val Purple80 = Color(0xFFD0BCFF)
-
-@Deprecated("Use DarkTertiary instead", ReplaceWith("DarkTertiary"))
-val Pink80 = Color(0xFFEFB8C8)
-
-@Deprecated("Use DarkSecondary instead", ReplaceWith("DarkSecondary"))
-val Grey80 = Color(0xFFB2ACB2)
-
-@Deprecated("Use DarkPrimaryContainer instead", ReplaceWith("DarkPrimaryContainer"))
-val PurpleGrey40 = Color(0x66448AFF)
-
-@Deprecated("Use LightPrimary instead", ReplaceWith("LightPrimary"))
-val DarkBlue40 = Color(0xFF3F51B5)
-
-@Deprecated("Use LightTertiary instead", ReplaceWith("LightTertiary"))
-val Pink40 = Color(0xFF7D5260)
-
-@Deprecated("Use LightSecondary instead", ReplaceWith("LightSecondary"))
-val Grey40 = Color(0xFFCAC7DC)
-
-@Deprecated("Use DarkPrimaryContainer instead", ReplaceWith("DarkPrimaryContainer"))
-val PurpleGrey80 = Color(0xFF285191)
-
-val White = Color(0xFFFFFFFF)
 
 // ============================================================
 // CARD COLORS

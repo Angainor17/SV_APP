@@ -193,7 +193,7 @@ private fun HandleEffects(
     OneTimeEffect(viewModel.oneTimeEffect) { effect ->
         when (effect) {
             is NewsListOneTimeEffect.OpenNewsItem -> {
-                // TODO open news
+                context.openUrl(effect.newItem.vkPostUrl)
             }
 
             is NewsListOneTimeEffect.ShowErrorSnackBar -> {
@@ -221,6 +221,13 @@ private fun Context.openVideo(item: UiNewsMedia.ItemVideo) {
     val customTabsIntent: CustomTabsIntent = builder.build()
 
     customTabsIntent.launchUrl(this, item.link.toUri())
+}
+
+private fun Context.openUrl(url: String) {
+    if (url.isEmpty()) return
+    val builder: CustomTabsIntent.Builder = CustomTabsIntent.Builder()
+    val customTabsIntent: CustomTabsIntent = builder.build()
+    customTabsIntent.launchUrl(this, url.toUri())
 }
 
 @Composable

@@ -8,8 +8,11 @@ import su.sv.api.data.response.VkResponseNewsAttachment
  */
 class ApiNewsItem(
 
-    /** Идентификатор для хранения */
+    /** Идентификатор поста */
     @SerializedName("id") val id: Int?,
+
+    /** Идентификатор владельца стены */
+    @SerializedName("owner_id") val ownerId: Int?,
 
     @SerializedName("date") val dateSeconds: Long?,
 

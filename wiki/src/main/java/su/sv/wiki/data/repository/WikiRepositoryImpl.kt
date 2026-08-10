@@ -57,7 +57,9 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 else -> {
-                    val searchResults = response.body()!!.query!!.search!!
+                    val body = checkNotNull(response.body()) { "Body was null despite passing null checks" }
+                    val query = checkNotNull(body.query) { "Query was null despite passing null checks" }
+                    val searchResults = checkNotNull(query.search) { "Search results were null despite passing null checks" }
                     val searchItem = searchResults.first()
                     Timber.tag("voronin").d("searchArticle: query='$query', results=${searchResults.size}, first='${searchItem.title}'")
                     WikiResult.Success(
@@ -99,7 +101,7 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 response.body()?.error != null -> {
-                    val error = response.body()!!.error!!
+                    val error = checkNotNull(response.body()?.error) { "Error body was null despite null check" }
                     if (error.code == "missingtitle") {
                         WikiResult.NotFound
                     } else {
@@ -118,7 +120,7 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 else -> {
-                    val parseData = response.body()!!.parse!!
+                    val parseData = checkNotNull(response.body()?.parse) { "Parse data was null despite null check" }
                     val rawHtmlContent = parseData.text?.content.orEmpty()
                     val articleTitle = parseData.title.orEmpty()
                     val imageUrl = extractImageUrl(rawHtmlContent)
@@ -165,7 +167,8 @@ class WikiRepositoryImpl @Inject constructor(
                 return emptyList()
             }
 
-            val results = response.body()!!.query!!.search!!.map { item ->
+            val searchData = checkNotNull(response.body()?.query?.search) { "Search data was null despite null check" }
+            val results = searchData.map { item ->
                 WikiSearchSuggestion(title = item.title.orEmpty())
             }
             Timber.tag("voronin").d("getSearchSuggestions: query='$query', results=${results.size}, titles=${results.map { it.title }}")

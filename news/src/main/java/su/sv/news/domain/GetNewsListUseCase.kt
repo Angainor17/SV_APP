@@ -32,6 +32,7 @@ class GetNewsListUseCase @Inject constructor(
         val attachments = attachments.orEmpty()
         return NewsItem(
             id = prevId?.toString() + id?.toString(),
+            ownerId = ownerId,
             date = getDate(),
             description = text.orEmpty(),
             images = attachments

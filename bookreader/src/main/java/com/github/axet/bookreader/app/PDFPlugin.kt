@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.util.SparseArray
+import androidx.core.graphics.createBitmap
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.widgets.FBReaderView
 import com.github.axet.bookreader.widgets.ScrollWidget
@@ -105,7 +106,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     override fun readCover(f: ZLFile): ZLImage {
         val view = PdfiumView(f)
         view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
-        val bm = Bitmap.createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
+        val bm = createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
         val canvas = Canvas(bm)
         view.drawWallpaper(canvas)
         view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)
@@ -735,7 +736,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
             val r = PdfiumPage(document, page, w, h)
             r.scale(w * scaleMultiplier, h * scaleMultiplier)
-            val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
+            val bm = createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
             val p = document.openPage(r.pageNumber)!!
             p.renderPageBitmap(bm, 0, 0, bm.width, bm.height, renderAnnot = false, textMask = false)
             p.close()
@@ -750,7 +751,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             r.scale(w, h)
             val render = r.renderRect()
             val p = document.openPage(r.pageNumber)!!
-            val bm = Bitmap.createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
+            val bm = createBitmap(r.pageBox!!.w, r.pageBox!!.h, c)
             bm.eraseColor(FBReaderView.PAGE_PAPER_COLOR)
             p.renderPageBitmap(bm, 0, 0, bm.width, bm.height, renderAnnot = false, textMask = false)
             p.close()

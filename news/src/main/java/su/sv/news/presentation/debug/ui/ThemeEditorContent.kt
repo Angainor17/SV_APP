@@ -226,30 +226,32 @@ fun ThemeEditorContent(
         }
 
         // Диалог выбора цвета
-        if (showColorPicker && selectedAttribute != null) {
-            val originalColor = getOriginalColor(selectedAttribute!!, state.themeMode)
-            val currentColor = state.customColors.getColor(selectedAttribute!!.attributeName)
-                ?: originalColor
+        if (showColorPicker) {
+            selectedAttribute?.let { attr ->
+                val originalColor = getOriginalColor(attr, state.themeMode)
+                val currentColor = state.customColors.getColor(attr.attributeName)
+                    ?: originalColor
 
-            // Логирование для отладки
-            Timber.tag("ThemeEditor").d(
-                "Dialog: customColors size=%d, attr=%s, currentColor=%s",
-                state.customColors.colors.size,
-                selectedAttribute?.attributeName,
-                currentColor
-            )
+                // Логирование для отладки
+                Timber.tag("ThemeEditor").d(
+                    "Dialog: customColors size=%d, attr=%s, currentColor=%s",
+                    state.customColors.colors.size,
+                    attr.attributeName,
+                    currentColor
+                )
 
-            ColorPickerDialog(
-                attributeName = selectedAttribute!!.attributeName,
-                originalColor = originalColor,
-                currentColor = currentColor,
-                onColorSelected = { color ->
-                    Timber.tag("ThemeEditor").d("Color selected: %s = %s", selectedAttribute?.attributeName, color)
-                    viewModel.setColor(selectedAttribute!!, color)
-                    showColorPicker = false
-                },
-                onDismiss = { showColorPicker = false }
-            )
+                ColorPickerDialog(
+                    attributeName = attr.attributeName,
+                    originalColor = originalColor,
+                    currentColor = currentColor,
+                    onColorSelected = { color ->
+                        Timber.tag("ThemeEditor").d("Color selected: %s = %s", attr.attributeName, color)
+                        viewModel.setColor(attr, color)
+                        showColorPicker = false
+                    },
+                    onDismiss = { showColorPicker = false }
+                )
+            }
         }
     }
 }

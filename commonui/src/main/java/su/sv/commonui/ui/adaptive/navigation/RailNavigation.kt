@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
@@ -80,10 +82,17 @@ private fun RailNavigationIcon(
     label: String,
     showBadge: Boolean,
 ) {
-    // TODO: Добавить поддержку badge
-    Icon(
-        imageVector = icon,
-        contentDescription = label,
-        modifier = Modifier.size(24.dp),
-    )
+    BadgedBox(
+        badge = {
+            if (showBadge) {
+                Badge()
+            }
+        }
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            modifier = Modifier.size(24.dp),
+        )
+    }
 }

@@ -48,4 +48,7 @@ dependencies {
     // Room
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
+
+    // ========== Test ==========
+    testImplementation(libs.bundles.test)
 }
