@@ -1,7 +1,7 @@
 package su.sv.main.continuereading
 
 import android.net.Uri
-import android.util.Log
+import timber.log.Timber
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.axet.bookreader.domain.GetLastReadBookUseCase
@@ -64,22 +64,24 @@ class ContinueReadingViewModel @Inject constructor(
     fun loadAndCheck() {
         // Не показывать snackbar если пользователь уже взаимодействовал с ним
         if (wasInteracted) {
-            Log.d(TAG, "loadAndCheck: already interacted, skipping")
+            Timber.d(TAG, "loadAndCheck: already interacted, skipping")
             return
         }
 
+        Timber.d(TAG, "loadAndCheck: loading last read book")
+
         viewModelScope.launch {
-            Log.d(TAG, "loadAndCheck: loading last read book")
+            Timber.d(TAG, "loadAndCheck: fetching last read book, wasInteracted=$wasInteracted")
 
             val bookInfo = getLastReadBookUseCase()
 
             if (bookInfo == null) {
-                Log.d(TAG, "loadAndCheck: no last read book found")
+                Timber.d(TAG, "loadAndCheck: no last read book found, setting Hidden")
                 _state.value = ContinueReadingState.Hidden
                 return@launch
             }
 
-            Log.d(TAG, "loadAndCheck: found book: ${bookInfo.title}")
+            Timber.d(TAG, "loadAndCheck: found book='${bookInfo.title}': uri=${bookInfo.bookFileUri}")
             _state.value = ContinueReadingState.Visible(bookInfo)
         }
     }
@@ -91,7 +93,7 @@ class ContinueReadingViewModel @Inject constructor(
         val currentState = _state.value as? ContinueReadingState.Visible ?: return
         val bookInfo = currentState.bookInfo
 
-        Log.d(TAG, "onContinueClick: opening book: ${bookInfo.title}")
+        Timber.d(TAG, "onContinueClick: opening book='${bookInfo.title}', uri=${bookInfo.bookFileUri}")
 
         viewModelScope.launch {
             _effect.emit(
@@ -111,7 +113,7 @@ class ContinueReadingViewModel @Inject constructor(
      * Закрыть snackbar.
      */
     fun onDismissClick() {
-        Log.d(TAG, "onDismissClick: hiding snackbar")
+        Timber.d(TAG, "onDismissClick: hiding snackbar")
         hideSnackbar()
     }
 
