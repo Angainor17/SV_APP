@@ -1,7 +1,6 @@
 package su.sv.managers.theme
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import su.sv.commonui.theme.CustomThemeColors
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,7 +53,7 @@ class CustomColorsRepositoryImpl @Inject constructor(
                 try {
                     gson.fromJson(jsonString, CustomThemeColors::class.java)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error decoding custom colors for $themeMode", e)
+                    Timber.e(e, "Error decoding custom colors for $themeMode")
                     null
                 }
             }
@@ -65,13 +65,13 @@ class CustomColorsRepositoryImpl @Inject constructor(
             "LIGHT" -> PreferencesKeys.CUSTOM_COLORS_LIGHT
             "DARK" -> PreferencesKeys.CUSTOM_COLORS_DARK
             else -> {
-                Log.w(TAG, "Unknown theme mode: ${colors.themeMode}")
+                    Timber.w(TAG, "Unknown theme mode: ${colors.themeMode}")
                 return
             }
         }
 
         val jsonString = gson.toJson(colors)
-        Log.d(TAG, "Saving custom colors for ${colors.themeMode}: ${colors.colors.size} colors")
+        Timber.d(TAG, "Saving custom colors for ${colors.themeMode}: ${colors.colors.size} colors")
 
         context.customColorsDataStore.edit { preferences ->
             preferences[key] = jsonString
@@ -83,12 +83,12 @@ class CustomColorsRepositoryImpl @Inject constructor(
             "LIGHT" -> PreferencesKeys.CUSTOM_COLORS_LIGHT
             "DARK" -> PreferencesKeys.CUSTOM_COLORS_DARK
             else -> {
-                Log.w(TAG, "Unknown theme mode: $themeMode")
+                Timber.w(TAG, "Unknown theme mode: $themeMode")
                 return
             }
         }
 
-        Log.d(TAG, "Clearing custom colors for $themeMode")
+        Timber.d(TAG, "Clearing custom colors for $themeMode")
 
         context.customColorsDataStore.edit { preferences ->
             preferences.remove(key)
@@ -96,7 +96,7 @@ class CustomColorsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearAll() {
-        Log.d(TAG, "Clearing all custom colors")
+        Timber.d(TAG, "Clearing all custom colors")
 
         context.customColorsDataStore.edit { preferences ->
             preferences.remove(PreferencesKeys.CUSTOM_COLORS_LIGHT)
