@@ -171,7 +171,8 @@ fun ImageCarouselPreview() {
             )
         ),
         videos = listOf(video),
-        allMedia = listOf(video)
+        allMedia = listOf(video),
+        vkPostUrl = "https://vk.com/post"
     )
 
     SVAPPThemeLightPreview {

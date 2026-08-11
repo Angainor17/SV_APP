@@ -175,7 +175,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             sorted = s.sorted
         }
 
-        constructor(document: PdfDocument, selPage: Plugin.View.Selection.Page) :
+        constructor(document: PdfDocument, selPage: PluginView.Selection.Page) :
             this(selPage.page, document.openPage(selPage.page)!!, selPage.w, selPage.h)
 
         constructor(document: PdfDocument, pageNum: Int) :
@@ -213,7 +213,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
     }
 
-    inner class Selection : Plugin.View.Selection {
+    inner class Selection : PluginView.Selection {
         var document: PdfDocument
         var startPage: SelectionPage? = null
         var endPage: SelectionPage? = null
@@ -518,7 +518,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         fun end(): Int = start + count
     }
 
-    inner class PdfSearch(val document: PdfDocument, val str: String) : Plugin.View.Search() {
+    inner class PdfSearch(val document: PdfDocument, val str: String) : PluginView.Search() {
         var all: ArrayList<SearchResult> = ArrayList()
         var pages: SparseArray<ArrayList<SearchResult>> = SparseArray()
         var matchIndex: Int = -1
@@ -555,7 +555,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return rr
         }
 
-        override fun getBounds(page: Plugin.View.Selection.Page): Bounds? {
+        override fun getBounds(page: PluginView.Selection.Page): Bounds? {
             val bounds = Bounds()
             val list = pages.get(page.page) ?: return null
             val p = document.openPage(page.page)!!
@@ -651,7 +651,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             if (str.isEmpty()) return
             // Search all pages in the book (no limit)
             for (i in 0 until document.getPageCount()) {
-                all.addAll(search(Plugin.View.Selection.odd(page, i, document.getPageCount())))
+                all.addAll(search(PluginView.Selection.odd(page, i, document.getPageCount())))
             }
             // pages are visited in "odd" order (near current page first), so
             // sort results back into book order for correct navigation/indexing
@@ -674,7 +674,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
-        constructor(d: PdfDocument, page: Int, w: Int, h: Int) {
+        constructor(d: PdfDocument, page: Int, w: Int, h: Int) : super() {
             document = d
             this.w = w
             this.h = h
@@ -684,7 +684,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             renderPage()
         }
 
-        constructor(d: PdfDocument) {
+        constructor(d: PdfDocument) : super() {
             document = d
             load()
         }
@@ -759,7 +759,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             bm.recycle()
         }
 
-        override fun select(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Plugin.View.Selection? {
+        override fun select(page: PluginView.Selection.Page, point: PluginView.Selection.Point): PluginView.Selection? {
             val start = SelectionPage(document, page)
             if (start.count > 0) {
                 val s = Selection(document, start, point)
@@ -770,19 +770,19 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return null
         }
 
-        override fun select(start: ZLTextPosition, end: ZLTextPosition): Plugin.View.Selection? {
+        override fun select(start: ZLTextPosition, end: ZLTextPosition): PluginView.Selection? {
             val s = Selection(document, start, end)
             if (s.isEmpty()) { s.close(); return null }
             return s
         }
 
-        override fun select(page: Int): Plugin.View.Selection? {
+        override fun select(page: Int): PluginView.Selection? {
             val s = Selection(document, page)
             if (s.isEmpty()) { s.close(); return null }
             return s
         }
 
-        override fun getLinks(page: Plugin.View.Selection.Page): Array<Link>? {
+        override fun getLinks(page: PluginView.Selection.Page): Array<Link>? {
             val p = document.openPage(page.page)!!
             val ll = p.getPageLinks()
             val links = Array(ll.size) { i ->

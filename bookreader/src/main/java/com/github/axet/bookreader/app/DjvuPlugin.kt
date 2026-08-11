@@ -56,16 +56,16 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         @JvmStatic
-        fun toPage(info: LibDjvu.Page, w: Int, h: Int, point: Plugin.View.Selection.Point): Plugin.View.Selection.Point {
-            return Plugin.View.Selection.Point(
+        fun toPage(info: LibDjvu.Page, w: Int, h: Int, point: PluginView.Selection.Point): PluginView.Selection.Point {
+            return PluginView.Selection.Point(
                 point.x * info.width / w,
                 info.height - point.y * info.height / h
             )
         }
 
         @JvmStatic
-        fun toDevice(info: LibDjvu.Page, w: Int, h: Int, point: Plugin.View.Selection.Point): Plugin.View.Selection.Point {
-            return Plugin.View.Selection.Point(
+        fun toDevice(info: LibDjvu.Page, w: Int, h: Int, point: PluginView.Selection.Point): PluginView.Selection.Point {
+            return PluginView.Selection.Point(
                 point.x * w / info.width,
                 (info.height - point.y) * h / info.height
             )
@@ -73,8 +73,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         @JvmStatic
         fun toDevice(info: LibDjvu.Page, w: Int, h: Int, rect: Rect): Rect {
-            val p1 = toDevice(info, w, h, Plugin.View.Selection.Point(rect.left, rect.top))
-            val p2 = toDevice(info, w, h, Plugin.View.Selection.Point(rect.right, rect.bottom))
+            val p1 = toDevice(info, w, h, PluginView.Selection.Point(rect.left, rect.top))
+            val p2 = toDevice(info, w, h, PluginView.Selection.Point(rect.right, rect.bottom))
             return Rect(p1.x, p2.y, p2.x, p1.y)
         }
     }
@@ -196,7 +196,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return t.text[b]
         }
 
-        fun find(point: Plugin.View.Selection.Point): Int {
+        fun find(point: PluginView.Selection.Point): Int {
             val t = text ?: return -1
             for (i in t.bounds.indices) {
                 val b = t.bounds[i]
@@ -212,7 +212,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
     }
 
-    inner class Selection : Plugin.View.Selection {
+    inner class Selection : PluginView.Selection {
         var doc: DjvuLibre
         var start: SelectionPage? = null
         var end: SelectionPage? = null
@@ -528,7 +528,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
     class DjvuSearchMap(val index: Int, val start: Int, val end: Int)
 
-    inner class DjvuSearch(val doc: DjvuLibre, val str: String) : Plugin.View.Search() {
+    inner class DjvuSearch(val doc: DjvuLibre, val str: String) : PluginView.Search() {
         var all: ArrayList<DjvuSearchResult> = ArrayList()
         var matchIndex: Int = -1
         var initialPage: Int = -1
@@ -564,7 +564,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 val e = b.length
                 pp.map.add(DjvuSearchMap(i, s, e))
             }
-            var txt = b.toString().lowercase(Locale.US)
+            val txt = b.toString().lowercase(Locale.US)
             var start = txt.indexOf(find)
             while (start != -1) {
                 val end = start + find.length
@@ -574,7 +574,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return pp
         }
 
-        override fun getBounds(page: Plugin.View.Selection.Page): Bounds? {
+        override fun getBounds(page: PluginView.Selection.Page): Bounds? {
             val bounds = Bounds()
             val p = pages.get(page.page) ?: return null
             val pInfo = checkNotNull(p.info) { "DjvuSearchPage.info is null in getBounds" }
@@ -666,7 +666,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             if (str.isEmpty()) return
             // Search all pages in the book (no limit)
             for (i in 0 until doc.pagesCount) {
-                all.addAll(search(Plugin.View.Selection.odd(page, i, doc.pagesCount)).rr)
+                all.addAll(search(PluginView.Selection.odd(page, i, doc.pagesCount)).rr)
             }
             // pages are visited in "odd" order (near current page first), so
             // sort results back into book order for correct navigation/indexing
@@ -689,7 +689,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
-        constructor(d: DjvuLibre, page: Int, w: Int, h: Int) {
+        constructor(d: DjvuLibre, page: Int, w: Int, h: Int) : super() {
             doc = d
             this.w = w
             this.h = h
@@ -699,7 +699,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             renderPage()
         }
 
-        constructor(d: DjvuLibre) { doc = d; load() }
+        constructor(d: DjvuLibre) : super() { doc = d; load() }
 
         override fun load() {
             val p = doc.getPageInfo(pageNumber)
@@ -757,19 +757,19 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             bm.recycle()
         }
 
-        override fun select(page: Plugin.View.Selection.Page, point: Plugin.View.Selection.Point): Plugin.View.Selection? {
+        override fun select(page: PluginView.Selection.Page, point: PluginView.Selection.Point): PluginView.Selection? {
             val s = Selection(doc, page, point)
             if (s.isEmpty()) return null
             return s
         }
 
-        override fun select(start: ZLTextPosition, end: ZLTextPosition): Plugin.View.Selection? {
+        override fun select(start: ZLTextPosition, end: ZLTextPosition): PluginView.Selection? {
             val s = Selection(doc, start, end)
             if (s.isEmpty()) return null
             return s
         }
 
-        override fun select(page: Int): Plugin.View.Selection? {
+        override fun select(page: Int): PluginView.Selection? {
             val s = Selection(doc, page)
             if (s.isEmpty()) return null
             return s

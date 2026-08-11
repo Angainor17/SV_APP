@@ -43,6 +43,8 @@ import com.github.axet.androidlibrary.preferences.AboutPreferenceCompat;
 import com.github.axet.androidlibrary.widgets.ThemeUtils;
 import com.github.axet.bookreader.R;
 import com.github.axet.bookreader.app.Plugin;
+import com.github.axet.bookreader.app.PluginPage;
+import com.github.axet.bookreader.app.PluginView;
 import com.github.axet.bookreader.app.ReaderPreferences;
 import com.github.axet.bookreader.app.Reflow;
 import com.github.axet.bookreader.app.Storage;
@@ -120,7 +122,7 @@ public class FBReaderView extends RelativeLayout {
     public ZLViewWidget widget;
     public int battery;
     public Storage.FBook book;
-    public Plugin.View pluginview;
+    public PluginView pluginview;
     public Listener listener;
     public TTSPopup tts;
     String title;
@@ -131,7 +133,7 @@ public class FBReaderView extends RelativeLayout {
     boolean scrollCentered; // центрировать позицию при прокрутке
     private boolean isFullscreenMode = false; // track fullscreen state
     DrawerLayout drawer;
-    Plugin.View.Search search;
+    PluginView.Search search;
     int searchPagePending;
     private int searchCurrentIndex = 0; // Track current search result index
     private int searchTotalCount = 0; // Track total search result count (fb2/epub path)
@@ -376,7 +378,7 @@ public class FBReaderView extends RelativeLayout {
                     RecyclerView.ViewHolder h = ((ScrollWidget) widget).findViewHolderForAdapterPosition(first);
                     ScrollWidget.ScrollAdapter.PageView p = (ScrollWidget.ScrollAdapter.PageView) h.itemView;
                     ScrollWidget.ScrollAdapter.PageCursor c = ((ScrollWidget) widget).adapter.pages.get(first);
-                    Plugin.Page info = pluginview.getPageInfo(p.getWidth(), p.getHeight(), c);
+                    PluginPage info = pluginview.getPageInfo(p.getWidth(), p.getHeight(), c);
                     if (p.info != null) { // reflow can be true but reflower == null
                         ArrayList<Rect> rr = new ArrayList<>(p.info.dst.keySet());
                         Collections.sort(rr, new SelectionView.UL());
@@ -1199,7 +1201,7 @@ public class FBReaderView extends RelativeLayout {
             pluginview.reflower.index = 0;
     }
 
-    public void selectionOpen(Plugin.View.Selection s) {
+    public void selectionOpen(PluginView.Selection s) {
         // Закрываем предыдущее выделение без уведомления listener
         // (мы сразу покажем новое, поэтому SELECTION_HIDE_PANEL не нужен)
         if (selection != null) {
@@ -1867,12 +1869,12 @@ public class FBReaderView extends RelativeLayout {
         public ArrayList<View> links = new ArrayList<>();
         FBReaderView fb;
 
-        public LinksView(final FBReaderView view, Plugin.View.Link[] ll, Reflow.Info info) {
+        public LinksView(final FBReaderView view, PluginView.Link[] ll, Reflow.Info info) {
             this.fb = view;
             if (ll == null)
                 return;
             for (int i = 0; i < ll.length; i++) {
-                final Plugin.View.Link l = ll[i];
+                final PluginView.Link l = ll[i];
                 Rect[] rr;
                 if (fb.pluginview.reflow) {
                     rr = fb.pluginview.boundsUpdate(new Rect[]{l.rect}, info);
@@ -1939,7 +1941,7 @@ public class FBReaderView extends RelativeLayout {
         FBReaderView fb;
         int clip;
 
-        public BookmarksView(final FBReaderView view, Plugin.View.Selection.Page page, Storage.Bookmarks bms, Reflow.Info info) {
+        public BookmarksView(final FBReaderView view, PluginView.Selection.Page page, Storage.Bookmarks bms, Reflow.Info info) {
             this.fb = view;
             if (fb.widget instanceof ScrollWidget)
                 clip = ((ScrollWidget) fb.widget).getMainAreaHeight();
@@ -1953,10 +1955,10 @@ public class FBReaderView extends RelativeLayout {
             for (int i = 0; i < ll.size(); i++) {
                 final ArrayList<View> bmv = new ArrayList<>();
                 final Storage.Bookmark l = ll.get(i);
-                Plugin.View.Selection s = fb.pluginview.select(l.start, l.end);
+                PluginView.Selection s = fb.pluginview.select(l.start, l.end);
                 if (s == null)
                     return;
-                Plugin.View.Selection.Bounds bb = s.getBounds(page);
+                PluginView.Selection.Bounds bb = s.getBounds(page);
                 s.close();
                 Rect[] rr;
                 if (fb.pluginview.reflow)
@@ -2039,7 +2041,7 @@ public class FBReaderView extends RelativeLayout {
     }
 
     public static class TTSView extends BookmarksView {
-        public TTSView(final FBReaderView view, Plugin.View.Selection.Page page, Reflow.Info info) {
+        public TTSView(final FBReaderView view, PluginView.Selection.Page page, Reflow.Info info) {
             super(view, page, view.tts.marks, info);
         }
 
@@ -2057,7 +2059,7 @@ public class FBReaderView extends RelativeLayout {
         int clip;
 
         @SuppressWarnings("unchecked")
-        public SearchView(FBReaderView view, Plugin.View.Search.Bounds bb, Reflow.Info info) {
+        public SearchView(FBReaderView view, PluginView.Search.Bounds bb, Reflow.Info info) {
             this.fb = view;
             if (fb.widget instanceof ScrollWidget)
                 clip = ((ScrollWidget) fb.widget).getMainAreaHeight();

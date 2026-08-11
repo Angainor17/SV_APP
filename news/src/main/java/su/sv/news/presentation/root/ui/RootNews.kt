@@ -90,9 +90,6 @@ fun RootNews(
 
     HandleEffects(viewModel, snackbarHostState)
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val hasItems = lazyPagingItems.itemSnapshotList.isNotEmpty()
-
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)

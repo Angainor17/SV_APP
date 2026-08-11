@@ -6,6 +6,8 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import com.github.axet.bookreader.app.Plugin
+import com.github.axet.bookreader.app.PluginPage
+import com.github.axet.bookreader.app.PluginView
 import com.github.axet.bookreader.app.Reflow
 import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.fbreader.fbreader.options.PageTurningOptions
@@ -132,7 +134,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                 info = Reflow.Info(fb.pluginview!!.reflower!!, position.elementIndex)
                 infos.put(position, info)
             } else {
-                val old = object : Plugin.Page(fb.pluginview!!.current!!) {
+                val old = object : PluginPage(fb.pluginview!!.current!!) {
                     override fun load() {}
                     override fun getPagesCount(): Int = fb.pluginview!!.current!!.getPagesCount()
                 }
@@ -390,7 +392,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                             x += getInfo()!!.margin.left
                         fb.selection.update(fb.selection.getChildAt(0) as SelectionView.PageView, x, y)
                     }
-                    val setter = object : Plugin.View.Selection.Setter {
+                    val setter = object : PluginView.Selection.Setter {
                         override fun setStart(x: Int, y: Int) {
                             val point = fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
                             if (point != null)
@@ -405,7 +407,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                             run()
                         }
 
-                        override fun getBounds(): Plugin.View.Selection.Bounds {
+                        override fun getBounds(): PluginView.Selection.Bounds {
                             val bounds = s.getBounds(page)!!
                             if (fb.pluginview!!.reflow) {
                                 bounds.rr = fb.pluginview!!.boundsUpdate(bounds.rr!!, getInfo()!!)

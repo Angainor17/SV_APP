@@ -11,6 +11,10 @@ android {
     namespace = "su.sv.commonarchitecture"
     compileSdk = 37
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         minSdk = 24
 

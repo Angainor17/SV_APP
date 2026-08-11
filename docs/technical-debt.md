@@ -1,7 +1,7 @@
 # Технический долг SV APP
 
 **Дата создания:** 2026-07-27
-**Последнее обновление:** 2026-07-27
+**Последнее обновление:** 2026-08-11
 
 ---
 
@@ -64,29 +64,32 @@ android.defaults.buildfeatures.resvalues=true
 android.sdk.defaultTargetSdkToCompileSdkIfUnset=false
 android.enableAppCompileTimeRClass=false
 android.usesSdkInManifest.disallowed=false
-android.builtInKotlin=false
-android.newDsl=false
 android.r8.optimizedResourceShrinking=false
 ```
+
+**Уже удалены (AGP 9.0 built-in Kotlin):**
+- `android.builtInKotlin=false`
+- `android.newDsl=false`
 
 **Блокирует:** Миграция на AGP 10.0
 
 ---
 
-### 🟡 P2: Обновить версии зависимостей
+### ✅ Обновление версий зависимостей (2026-08-11)
 
-**Текущие версии vs актуальные:**
+Все основные зависимости обновлены до актуальных версий:
 
-| Зависимость | Текущая | Актуальная |
-|-------------|---------|------------|
+| Зависимость | Было | Стало |
+|-------------|------|-------|
 | AGP | 9.2.0 | 9.3.1 |
 | Kotlin | 2.2.20 | 2.4.10 |
 | Compose BOM | 2025.06.01 | 2026.06.01 |
 | Core KTX | 1.17.0 | 1.19.0 |
 | Lifecycle | 2.9.1 | 2.11.0 |
 | Hilt | 2.59.2 | 2.60.1 |
-
-**Риски:** Breaking changes, API изменения
+| ktlint | 12.2.0 | 14.2.0 |
+| OkHttp | 4.12.0 | 5.4.0 |
+| Navigation | — | 2.9.8 (2.10.0-alpha) |
 
 ---
 
@@ -144,14 +147,19 @@ android {
 
 ---
 
-### 🟡 P2: Включить Gradle оптимизации
+### 🟡 P2: Gradle оптимизации — оставшиеся
 
-**Не включены:**
+**Уже включено:**
 ```properties
-org.gradle.parallel=true          # Параллельная сборка
-org.gradle.caching=true           # Build cache
-org.gradle.vfs.watch=true         # File system watching
-kotlin.incremental=true           # Kotlin incremental
+org.gradle.parallel=true        # Параллельная сборка
+org.gradle.caching=true         # Build cache
+org.gradle.configuration-cache=true  # Configuration cache
+```
+
+**Ещё не включено:**
+```properties
+kotlin.incremental=true          # Kotlin incremental (может быть включён по умолчанию)
+org.gradle.vfs.watch=true        # File system watching
 ```
 
 **Риски:** Может не работать с текущей версией AGP
@@ -379,9 +387,25 @@ scroll/two-column режим на затронутых устройствах.
 - Удалены устаревшие ссылки
 - Добавлены новые компоненты
 
-### ✅ Локализация (2026-07-27)
+### ✅ AGP 9.0 built-in Kotlin + общий конфиг + тесты (2026-08-11)
 
-- Настроена локализация только на русский: `resConfigs("ru")`
+- **AGP 9.0 built-in Kotlin миграция:**
+  - Убран `kotlin-android` плагин из всех 16 модулей
+  - Убраны `android.builtInKotlin=false` и `android.newDsl=false` из `gradle.properties`
+  - JVM target задаётся верхнеуровневым блоком `kotlin { compilerOptions { jvmTarget } }` (предоставляется AGP)
+  - Исправлен `Plugin.Page` → `PluginPage` (2 Java файла)
+  - Исправлен `manualResumePause` → убран (modo 0.12.0)
+- **Единые SDK-версии:** `buildSrc/ProjectConfig.kt` (compileSdk=37, minSdk=24, targetSdk=37)
+- **Общий Android-конфиг:** вынесен в `subprojects` корневого `build.gradle.kts` — убрано 11 `apply(from = ...)` и удалён `android_feature_commons.kts`
+- **Стабильный API:** `androidResources.localeFilters.add()` (@Incubating) → `resourceConfigurations += "ru"`
+- **Тесты:**
+  - `WikiRepositoryImplTest` — исправлены именованные параметры `getPage(title=)` и `search(query=, what=)`
+  - `commonui` — добавлен `testImplementation(libs.bundles.test)`
+- **Версии:** ktlint 14.2.0, OkHttp 5.4.0, material-icons-extended добавлен в 3 модуля, timber в 1 модуль
+
+### ✅ Настройки Gradle (2026-08-11)
+
+- `resConfigs("ru")` — только русская локализация
 
 ### ✅ Адаптивный UI для планшетов (2026-07-27)
 

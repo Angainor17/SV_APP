@@ -407,7 +407,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
             }
         }
 
-        constructor(d: Decoder, page: Int, w: Int, h: Int) {
+        constructor(d: Decoder, page: Int, w: Int, h: Int) : super() {
             this.doc = d
             this.w = w
             this.h = h
@@ -417,7 +417,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
             renderPage()
         }
 
-        constructor(d: Decoder) {
+        constructor(d: Decoder) : super() {
             doc = d
             load()
         }

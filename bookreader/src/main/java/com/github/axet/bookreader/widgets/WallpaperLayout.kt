@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.github.axet.bookreader.app.Plugin
+import com.github.axet.bookreader.app.PluginView
 
 /**
  * Layout с фоновым изображением (обоями).
@@ -16,7 +17,7 @@ class WallpaperLayout @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val bg = Plugin.View()
+    private val bg = PluginView()
 
     override fun dispatchDraw(canvas: Canvas) {
         bg.drawWallpaper(canvas)

@@ -1411,7 +1411,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
             return -1;
         }
 
-        public ArrayList<Bookmark> getBookmarks(Plugin.View.Selection.Page page) {
+        public ArrayList<Bookmark> getBookmarks(PluginView.Selection.Page page) {
             ArrayList<Bookmark> list = new ArrayList<>();
             for (Bookmark b : this) {
                 if (b.start.getParagraphIndex() == page.page || b.end.getParagraphIndex() == page.page)

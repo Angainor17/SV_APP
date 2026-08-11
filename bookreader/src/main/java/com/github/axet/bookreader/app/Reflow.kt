@@ -232,7 +232,7 @@ class Reflow(
     /**
      * Рисует исходный bitmap с выделенным прямоугольником.
      */
-    fun drawSrc(pluginview: Plugin.View, info: Info, r: Rect): Bitmap {
+    fun drawSrc(pluginview: PluginView, info: Info, r: Rect): Bitmap {
         val bm = drawSrc(pluginview, info)
         val c = Canvas(bm)
         val paint = Paint().apply {
@@ -248,7 +248,7 @@ class Reflow(
     /**
      * Рисует исходный bitmap с выделенной точкой.
      */
-    fun drawSrc(pluginview: Plugin.View, info: Info, p: Point): Bitmap {
+    fun drawSrc(pluginview: PluginView, info: Info, p: Point): Bitmap {
         val bm = drawSrc(pluginview, info)
         val c = Canvas(bm)
         val paint = Paint().apply {
@@ -264,7 +264,7 @@ class Reflow(
     /**
      * Рисует исходный bitmap с разметкой регионов.
      */
-    fun drawSrc(pluginview: Plugin.View, info: Info): Bitmap {
+    fun drawSrc(pluginview: PluginView, info: Info): Bitmap {
         val b = pluginview.render(w, h, this.page)!!
         val canvas = Canvas(b)
         draw(canvas, info.src.keys)
