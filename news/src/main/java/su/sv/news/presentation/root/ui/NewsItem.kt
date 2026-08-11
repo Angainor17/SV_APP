@@ -424,6 +424,7 @@ private fun MediaGrid(
                 onItemClick = onItemClick,
             )
         }
+
         3 -> {
             // Одно большое слева, два маленьких справа сверху вниз
             Row(
@@ -456,6 +457,7 @@ private fun MediaGrid(
                 }
             }
         }
+
         4 -> {
             // Сетка 2x2
             Column(modifier = Modifier.fillMaxWidth()) {

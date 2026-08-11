@@ -245,7 +245,8 @@ fun ThemeEditorContent(
                     originalColor = originalColor,
                     currentColor = currentColor,
                     onColorSelected = { color ->
-                        Timber.tag("ThemeEditor").d("Color selected: %s = %s", attr.attributeName, color)
+                        Timber.tag("ThemeEditor")
+                            .d("Color selected: %s = %s", attr.attributeName, color)
                         viewModel.setColor(attr, color)
                         showColorPicker = false
                     },
@@ -380,7 +381,9 @@ private fun ColorAttributeItem(
                 // Кастомный цвет (или null)
                 ColorBox(
                     color = customColor ?: MaterialTheme.colorScheme.surfaceVariant,
-                    label = if (customColor != null) stringResource(R.string.color_label_new) else stringResource(R.string.color_label_not_set),
+                    label = if (customColor != null) stringResource(R.string.color_label_new) else stringResource(
+                        R.string.color_label_not_set
+                    ),
                     onClick = onClick,
                     isCustom = true
                 )

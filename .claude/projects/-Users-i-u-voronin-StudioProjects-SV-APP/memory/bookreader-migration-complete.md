@@ -12,24 +12,29 @@ metadata:
 ## Выполненные работы
 
 ### Этап 1: Подготовка ✅
+
 - Создан `BookReaderInitializer` для инициализации без Application класса
 - Созданы `ReaderScreen` и `ReaderContent` (Compose)
 
 ### Этап 2: Миграция ReaderFragment ✅
+
 - Создан `ReaderViewModel` с Hilt
 - Создан `ReaderState` и `ReaderActions`
 - Реализован `ReaderContent` с FBReaderView через AndroidView
 - Создан `ReaderTopBar` с действиями (TOC, закладки, шрифты)
 
 ### Этап 3: Интеграция ✅
+
 - Изменена навигация в `books` модуле
 - Удалена `BookReaderMainActivity`
 - `SvApp` больше не наследуется от `BookApplication`
 
 ### Этап 4: Settings ✅
+
 - Создан `ReaderSettingsScreen` и `ReaderSettingsContent` (Compose)
 
 ### Этап 5: Очистка и тестирование ✅
+
 - Удалены неиспользуемые Activities и Fragments
 - Удалены неиспользуемые layout файлы (12 файлов)
 - Удалены неиспользуемые menu файлы (3 файла)

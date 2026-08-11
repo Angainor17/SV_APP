@@ -3,11 +3,13 @@
 ## Исправленная ошибка
 
 **Проблема**: Hilt не мог предоставить `WikiRepository`
+
 ```
 su.sv.wiki.domain.repository.WikiRepository cannot be provided without an @Provides-annotated method.
 ```
 
 **Решение**: Добавлена привязка в `WikiApiModule.kt`:
+
 ```kotlin
 @Binds
 @Singleton
@@ -91,32 +93,38 @@ wiki/src/main/java/su/sv/wiki/
 ## Реализованный функционал
 
 ### ✅ Поиск статей
+
 - Поле поиска с Material 3 стилем
 - Индикатор загрузки
 - Обработка "ничего не найдено"
 
 ### ✅ Блок просмотра статьи
+
 - Заголовок статьи
 - Контент с кликабельными ссылками
 - Кнопка добавления в избранное
 
 ### ✅ Навигация по ссылкам
+
 - Клик по ссылке загружает новую статью
 - Ссылки подсвечены и подчёркнуты
 
 ### ✅ Избранное
+
 - Добавление статьи в избранное
 - Удаление из избранного
 - Snackbar уведомления
 - Сохранение в Room
 
 ### ✅ История поиска
+
 - Список последних запросов
 - Клик по элементу загружает статью
 - Кнопка очистки истории
 - Автоудаление старых записей (хранится 50)
 
 ### ✅ Обработка ошибок
+
 - Ошибка сети
 - Страница не найдена
 - Кнопка "Повторить"
@@ -125,14 +133,14 @@ wiki/src/main/java/su/sv/wiki/
 
 ## Технологии
 
-| Категория | Технология |
-|-----------|------------|
-| UI | Jetpack Compose + Material 3 |
-| DI | Hilt |
-| Network | Retrofit + Gson |
-| Database | Room |
-| Architecture | MVVM + Clean Architecture |
-| Async | Coroutines + Flow |
+| Категория    | Технология                   |
+|--------------|------------------------------|
+| UI           | Jetpack Compose + Material 3 |
+| DI           | Hilt                         |
+| Network      | Retrofit + Gson              |
+| Database     | Room                         |
+| Architecture | MVVM + Clean Architecture    |
+| Async        | Coroutines + Flow            |
 
 ---
 
@@ -140,10 +148,10 @@ wiki/src/main/java/su/sv/wiki/
 
 **Базовый URL**: `https://svremya.su/`
 
-| Endpoint | Описание |
-|----------|----------|
-| `action=query&list=search` | Поиск статей |
-| `action=parse` | Получение содержимого страницы |
+| Endpoint                   | Описание                       |
+|----------------------------|--------------------------------|
+| `action=query&list=search` | Поиск статей                   |
+| `action=parse`             | Получение содержимого страницы |
 
 ---
 

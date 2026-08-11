@@ -10,10 +10,13 @@ metadata:
 # Fullscreen Flicker Issue (ScrollWidget)
 
 ## Status
+
 **Open** - отложено на потом
 
 ## Problem Description
-При переходе в полноэкранный режим в **ScrollWidget** (непрерывный режим) происходит мерцание тёмного фона. Цвет мерцания совпадает с тулбаром.
+
+При переходе в полноэкранный режим в **ScrollWidget** (непрерывный режим) происходит мерцание
+тёмного фона. Цвет мерцания совпадает с тулбаром.
 
 В **PagerWidget** (постраничный режим) - мерцание отсутствует.
 
@@ -22,6 +25,7 @@ metadata:
 ### Heights Comparison из логов
 
 **ENTER fullscreen (21:02:19):**
+
 ```
 DecorView size: 1080x2400
 FBReaderView size: 1080x2037  ← height НЕ full (учитывает toolbar)
@@ -29,6 +33,7 @@ ScrollWidget mainAreaHeight: 2016  ← height НЕ full
 ```
 
 **EXIT fullscreen (21:02:22):**
+
 ```
 FBReaderView size: 1080x2400  ← height теперь full (+363px)
 ScrollWidget mainAreaHeight: 2379  ← height теперь full (+363px)
@@ -37,6 +42,7 @@ ScrollWidget mainAreaHeight: 2379  ← height теперь full (+363px)
 ### Problem
 
 При ENTER fullscreen:
+
 1. System bars скрываются (native)
 2. Scaffold topBar скрывается (Compose)
 3. **НО**: FBReaderView и ScrollWidget heights НЕ обновляются сразу
@@ -59,6 +65,7 @@ Heights обновляются только при **EXIT** fullscreen, не п�
 ## Technical Details
 
 ### View Hierarchy
+
 ```
 DecorView (1080x2400)
 └── FBReaderView (1080x2037 → 1080x2400 при EXIT)
@@ -67,9 +74,12 @@ DecorView (1080x2400)
 ```
 
 ### Why PagerWidget Works
-PagerWidget вероятно имеет другой layout mechanism который правильно обновляет heights при fullscreen transition.
+
+PagerWidget вероятно имеет другой layout mechanism который правильно обновляет heights при
+fullscreen transition.
 
 ### Why ScrollWidget Fails
+
 ScrollWidget использует RecyclerView с `mainAreaHeight` который не обновляется сразу при fullscreen.
 
 ## Possible Solutions

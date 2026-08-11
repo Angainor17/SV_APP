@@ -70,10 +70,14 @@ class ReaderIntegrationTest {
         launchReader()
         waitForTopBar()
 
-        composeRule.onNodeWithTag(ReaderTestTags.TopBar.BACK_BUTTON, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(ReaderTestTags.TopBar.SEARCH_BUTTON, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(ReaderTestTags.TopBar.TOC_BUTTON, useUnmergedTree = true).assertExists()
-        composeRule.onNodeWithTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(ReaderTestTags.TopBar.BACK_BUTTON, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(ReaderTestTags.TopBar.SEARCH_BUTTON, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(ReaderTestTags.TopBar.TOC_BUTTON, useUnmergedTree = true)
+            .assertExists()
+        composeRule.onNodeWithTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON, useUnmergedTree = true)
+            .assertExists()
     }
 
     // ==================== TOC ====================
@@ -84,7 +88,8 @@ class ReaderIntegrationTest {
         launchReader()
         waitForTopBar()
 
-        composeRule.onNodeWithTag(ReaderTestTags.TopBar.TOC_BUTTON, useUnmergedTree = true).performClick()
+        composeRule.onNodeWithTag(ReaderTestTags.TopBar.TOC_BUTTON, useUnmergedTree = true)
+            .performClick()
         composeRule.waitForIdle()
 
         composeRule.onNodeWithTag(ReaderTestTags.Toc.DIALOG, useUnmergedTree = true).assertExists()
@@ -98,10 +103,12 @@ class ReaderIntegrationTest {
         launchReader()
         waitForTopBar()
 
-        composeRule.onNodeWithTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON, useUnmergedTree = true).performClick()
+        composeRule.onNodeWithTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON, useUnmergedTree = true)
+            .performClick()
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithTag(ReaderTestTags.Bookmarks.DIALOG, useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(ReaderTestTags.Bookmarks.DIALOG, useUnmergedTree = true)
+            .assertExists()
     }
 
     // ==================== Helper Methods ====================

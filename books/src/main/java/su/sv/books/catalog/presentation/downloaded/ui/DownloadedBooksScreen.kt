@@ -123,7 +123,10 @@ private fun DownloadedBooksContent(
     if (deleteDialogState.isVisible && deleteDialogState.book != null) {
         AppAlertDialog(
             title = stringResource(R.string.books_downloaded_delete_dialog_title),
-            text = stringResource(R.string.books_downloaded_delete_dialog_message, deleteDialogState.book.title),
+            text = stringResource(
+                R.string.books_downloaded_delete_dialog_message,
+                deleteDialogState.book.title
+            ),
             onDismiss = { onAction(DownloadedBookActions.OnDeleteCancel) },
             onConfirm = { onAction(DownloadedBookActions.OnDeleteConfirm) },
             confirmText = stringResource(R.string.books_downloaded_delete_dialog_yes),

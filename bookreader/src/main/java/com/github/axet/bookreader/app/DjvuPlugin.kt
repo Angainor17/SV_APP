@@ -56,7 +56,12 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         @JvmStatic
-        fun toPage(info: LibDjvu.Page, w: Int, h: Int, point: PluginView.Selection.Point): PluginView.Selection.Point {
+        fun toPage(
+            info: LibDjvu.Page,
+            w: Int,
+            h: Int,
+            point: PluginView.Selection.Point
+        ): PluginView.Selection.Point {
             return PluginView.Selection.Point(
                 point.x * info.width / w,
                 info.height - point.y * info.height / h
@@ -64,7 +69,12 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         @JvmStatic
-        fun toDevice(info: LibDjvu.Page, w: Int, h: Int, point: PluginView.Selection.Point): PluginView.Selection.Point {
+        fun toDevice(
+            info: LibDjvu.Page,
+            w: Int,
+            h: Int,
+            point: PluginView.Selection.Point
+        ): PluginView.Selection.Point {
             return PluginView.Selection.Point(
                 point.x * w / info.width,
                 (info.height - point.y) * h / info.height
@@ -99,10 +109,12 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     }
 
     @Throws(BookReadingException::class)
-    override fun readUids(book: AbstractBook) {}
+    override fun readUids(book: AbstractBook) {
+    }
 
     @Throws(BookReadingException::class)
-    override fun detectLanguageAndEncoding(book: AbstractBook) {}
+    override fun detectLanguageAndEncoding(book: AbstractBook) {
+    }
 
     override fun readCover(file: ZLFile): ZLImage {
         val view = DjvuView(file)
@@ -141,7 +153,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 continue
             }
             if (b.level > level) {
-                val parent = checkNotNull(last) { "last TOCTree is null for level ${b.level} > parent level $level" }
+                val parent =
+                    checkNotNull(last) { "last TOCTree is null for level ${b.level} > parent level $level" }
                 val c = loadTOC(i, b.level, bb, parent)
                 i += c
                 count += c
@@ -221,7 +234,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         constructor(doc: DjvuLibre, page: Page, point: Point) {
             this.doc = doc
             val p = open(page)
-            val info = checkNotNull(p.info) { "SelectionPage.info is null in Selection constructor" }
+            val info =
+                checkNotNull(p.info) { "SelectionPage.info is null in Selection constructor" }
             val convertedPoint = toPage(info, page.w, page.h, point)
             selectWord(p, convertedPoint)
         }
@@ -423,8 +437,11 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun close() {}
 
-        override fun getStart(): ZLTextPosition? = start?.let { ZLTextFixedPosition(it.page, it.index, 0) }
-        override fun getEnd(): ZLTextPosition? = end?.let { ZLTextFixedPosition(it.page, it.index, 0) }
+        override fun getStart(): ZLTextPosition? =
+            start?.let { ZLTextFixedPosition(it.page, it.index, 0) }
+
+        override fun getEnd(): ZLTextPosition? =
+            end?.let { ZLTextFixedPosition(it.page, it.index, 0) }
 
         inner class SelectionBounds {
             var page: SelectionPage? = null
@@ -677,7 +694,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     class DjvuPage : Plugin.Page {
         var doc: DjvuLibre
 
-        constructor(r: DjvuPage) : super(r) { doc = r.doc }
+        constructor(r: DjvuPage) : super(r) {
+            doc = r.doc
+        }
 
         constructor(r: DjvuPage, index: ZLViewEnums.PageIndex, w: Int, h: Int) : this(r) {
             this.w = w
@@ -699,7 +718,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             renderPage()
         }
 
-        constructor(d: DjvuLibre) : super() { doc = d; load() }
+        constructor(d: DjvuLibre) : super() {
+            doc = d; load()
+        }
 
         override fun load() {
             val p = doc.getPageInfo(pageNumber)
@@ -724,8 +745,13 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
-        override fun getPageInfo(w: Int, h: Int, c: ScrollWidget.ScrollAdapter.PageCursor): Plugin.Page? {
-            val page: Int = if (c.start == null) c.end.paragraphIndex - 1 else c.start.paragraphIndex
+        override fun getPageInfo(
+            w: Int,
+            h: Int,
+            c: ScrollWidget.ScrollAdapter.PageCursor
+        ): Plugin.Page? {
+            val page: Int =
+                if (c.start == null) c.end.paragraphIndex - 1 else c.start.paragraphIndex
             return DjvuPage(doc, page, w, h)
         }
 
@@ -739,7 +765,13 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return bm
         }
 
-        override fun draw(canvas: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
+        override fun draw(
+            canvas: Canvas,
+            w: Int,
+            h: Int,
+            index: ZLViewEnums.PageIndex,
+            c: Bitmap.Config
+        ) {
             val curr = current as DjvuPage
             val r = DjvuPage(curr, index, w, h)
             if (index == ZLViewEnums.PageIndex.current) {
@@ -750,14 +782,28 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val box = checkNotNull(r.pageBox) { "DjvuPage.pageBox is null in draw" }
             val bm = createBitmap(box.w, box.h, c)
             bm.eraseColor(FBReaderView.PAGE_PAPER_COLOR)
-            doc.renderPage(bm, r.pageNumber, 0, 0, box.w, box.h, render.x, render.y, render.w, render.h)
+            doc.renderPage(
+                bm,
+                r.pageNumber,
+                0,
+                0,
+                box.w,
+                box.h,
+                render.x,
+                render.y,
+                render.w,
+                render.h
+            )
             val src = checkNotNull(render.src) { "render.src is null in draw" }
             val dst = checkNotNull(render.dst) { "render.dst is null in draw" }
             canvas.drawBitmap(bm, src, dst, paint)
             bm.recycle()
         }
 
-        override fun select(page: PluginView.Selection.Page, point: PluginView.Selection.Point): PluginView.Selection? {
+        override fun select(
+            page: PluginView.Selection.Page,
+            point: PluginView.Selection.Point
+        ): PluginView.Selection? {
             val s = Selection(doc, page, point)
             if (s.isEmpty()) return null
             return s
@@ -798,6 +844,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             override fun iterator(): ZLTextParagraph.EntryIterator? = null
             override fun getKind(): Byte = ZLTextParagraph.Kind.END_OF_TEXT_PARAGRAPH
         }
+
         override fun removeAllMarks() {}
         override fun getFirstMark(): ZLTextMark? = null
         override fun getLastMark(): ZLTextMark? = null
@@ -806,6 +853,11 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun getMarks(): List<ZLTextMark> = ArrayList()
         override fun getTextLength(index: Int): Int = index
         override fun findParagraphByTextLength(length: Int): Int = 0
-        override fun search(text: String, startIndex: Int, endIndex: Int, ignoreCase: Boolean): Int = 0
+        override fun search(
+            text: String,
+            startIndex: Int,
+            endIndex: Int,
+            ignoreCase: Boolean
+        ): Int = 0
     }
 }

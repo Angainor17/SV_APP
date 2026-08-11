@@ -155,8 +155,10 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
      */
     interface ArchiveFile {
         val path: String
+
         @Throws(IOException::class)
         fun open(): InputStream
+
         @Throws(IOException::class)
         fun copy(os: OutputStream)
         val length: Long
@@ -225,7 +227,8 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
                 val n = f.parentFile
                 if (n != null) {
                     val fn = n.name
-                    val level = n.path.split(Pattern.quote(File.separator)).dropLastWhile { it.isEmpty() }.size - 1
+                    val level = n.path.split(Pattern.quote(File.separator))
+                        .dropLastWhile { it.isEmpty() }.size - 1
                     if (last != fn) {
                         toc.add(ArchiveToc(fn, i, level))
                         last = fn
@@ -448,7 +451,11 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
             current = ComicsPage(doc!!)
         }
 
-        override fun getPageInfo(w: Int, h: Int, c: ScrollWidget.ScrollAdapter.PageCursor): Plugin.Page {
+        override fun getPageInfo(
+            w: Int,
+            h: Int,
+            c: ScrollWidget.ScrollAdapter.PageCursor
+        ): Plugin.Page {
             val page = if (c.start == null)
                 c.end.paragraphIndex - 1
             else
@@ -463,7 +470,13 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
             return bm
         }
 
-        override fun draw(canvas: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
+        override fun draw(
+            canvas: Canvas,
+            w: Int,
+            h: Int,
+            index: ZLViewEnums.PageIndex,
+            c: Bitmap.Config
+        ) {
             val r = ComicsPage(current as ComicsPage, index, w, h)
             if (index == ZLViewEnums.PageIndex.current)
                 current!!.updatePage(r)
@@ -507,6 +520,11 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
 
         override fun getTextLength(index: Int): Int = index
         override fun findParagraphByTextLength(length: Int): Int = 0
-        override fun search(text: String, startIndex: Int, endIndex: Int, ignoreCase: Boolean): Int = 0
+        override fun search(
+            text: String,
+            startIndex: Int,
+            endIndex: Int,
+            ignoreCase: Boolean
+        ): Int = 0
     }
 }

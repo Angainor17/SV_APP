@@ -91,13 +91,15 @@ class ScreenActions(private val rule: ComposeTestRule) {
 
     /** Добавление текущей статьи в избранное */
     fun addToWikiFavorites() {
-        rule.onNodeWithTag(TestTags.WikiArticle.FAVORITE_BUTTON, useUnmergedTree = true).performClick()
+        rule.onNodeWithTag(TestTags.WikiArticle.FAVORITE_BUTTON, useUnmergedTree = true)
+            .performClick()
         rule.waitForIdle()
     }
 
     /** Переход в избранное Wiki */
     fun openWikiFavorites() {
-        rule.onNodeWithTag(TestTags.WikiRoot.FAVORITES_BUTTON, useUnmergedTree = true).performClick()
+        rule.onNodeWithTag(TestTags.WikiRoot.FAVORITES_BUTTON, useUnmergedTree = true)
+            .performClick()
         rule.waitForIdle()
     }
 
@@ -198,7 +200,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
 
     /** Открытие диалога закладок */
     fun openBookmarksDialog() {
-        rule.onNodeWithTag(TestTags.Reader.BOOKMARKS_LIST_BUTTON, useUnmergedTree = true).performClick()
+        rule.onNodeWithTag(TestTags.Reader.BOOKMARKS_LIST_BUTTON, useUnmergedTree = true)
+            .performClick()
         rule.waitForIdle()
     }
 
@@ -210,7 +213,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
         rule.onNodeWithTag(TestTags.Reader.BOOKMARK_TITLE_FIELD, useUnmergedTree = true)
             .performTextInput(title)
 
-        rule.onNodeWithTag(TestTags.Reader.BOOKMARK_SAVE_BUTTON, useUnmergedTree = true).performClick()
+        rule.onNodeWithTag(TestTags.Reader.BOOKMARK_SAVE_BUTTON, useUnmergedTree = true)
+            .performClick()
         rule.waitForIdle()
     }
 

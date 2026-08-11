@@ -55,9 +55,15 @@ object TestBookProvider {
             BookFormat.EPUB -> {
                 val book = copyFromAssets(context, ASSET_BOOK_EPUB, INTERNAL_BOOK_EPUB)
                 if (book != null) {
-                    return TestBook(Uri.fromFile(book), "Moby Dick", "Herman Melville", BookFormat.EPUB)
+                    return TestBook(
+                        Uri.fromFile(book),
+                        "Moby Dick",
+                        "Herman Melville",
+                        BookFormat.EPUB
+                    )
                 }
             }
+
             BookFormat.PDF -> {
                 // PDF берём из Downloads если есть
                 val pdfFile = findInDownloads(context, ".pdf")
@@ -68,6 +74,7 @@ object TestBookProvider {
                     }
                 }
             }
+
             BookFormat.FB2 -> {
                 val fb2File = findInDownloads(context, ".fb2")
                 if (fb2File != null) {
@@ -77,6 +84,7 @@ object TestBookProvider {
                     }
                 }
             }
+
             BookFormat.UNKNOWN -> {}
         }
 

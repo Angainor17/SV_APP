@@ -2,7 +2,9 @@
 
 ## Что такое Debroid
 
-**Debroid** — headless CLI-отладчик через JDWP. Позволяет AI-агенту отлаживать живое Android-приложение из терминала: ставить брейкпойнты, инспектить переменные, степпить, менять значения на лету.
+**Debroid** — headless CLI-отладчик через JDWP. Позволяет AI-агенту отлаживать живое
+Android-приложение из терминала: ставить брейкпойнты, инспектить переменные, степпить, менять
+значения на лету.
 
 ## Быстрый старт
 
@@ -20,6 +22,7 @@ export PATH="$HOME/.local/bin:$HOME/Library/Android/sdk/platform-tools:$PATH"
 ## Основные команды
 
 ### Запуск и подключение
+
 ```bash
 # Запуск демона (фоном)
 debroid daemon &
@@ -33,6 +36,7 @@ debroid resume <session_id>
 ```
 
 ### Брейкпойнты
+
 ```bash
 # Установить брейкпойнт на строку файла (всегда с --package!)
 debroid break <session_id> <FileName.kt> <line> --package su.sv.app
@@ -45,6 +49,7 @@ debroid points <session_id>
 ```
 
 ### Инспекция
+
 ```bash
 # Получить состояние на текущей точке останова
 debroid pause-state <session_id> <thread_id>
@@ -60,6 +65,7 @@ debroid set-var <session_id> <thread_id> <varName> <newValue>
 ```
 
 ### Управление выполнением
+
 ```bash
 # Поллинг событий (всегда с --with-stacktrace)
 debroid poll <session_id> 0 --with-stacktrace
@@ -98,14 +104,14 @@ debroid stop
 
 ## Особенности нашего проекта
 
-| Параметр | Значение |
-|----------|----------|
-| App ID | `su.sv.app` |
+| Параметр         | Значение          |
+|------------------|-------------------|
+| App ID           | `su.sv.app`       |
 | Главная Activity | `MainActivity.kt` |
-| Пакет | `su.sv.app` |
-| Compose | Да, везде |
-| DI | Hilt |
-| Навигация | Modo |
+| Пакет            | `su.sv.app`       |
+| Compose          | Да, везде         |
+| DI               | Hilt              |
+| Навигация        | Modo              |
 
 ## Полезные брейкпойнты для расследования белого экрана
 

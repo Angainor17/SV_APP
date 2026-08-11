@@ -31,6 +31,7 @@ LeakCanary only detects Activity leaks that are **not** referenced after destroy
 It needs a heap dump (takes RAM) and ~2 seconds to detect.
 
 For UI tests (androidTest), LeakCanary detection is unreliable because:
+
 - `finish()` is called in the test
 - The test process still holds references
 - No heap dump can be taken while test runner is alive
@@ -61,9 +62,9 @@ because the test runner holds a reference to the Activity through `Instrumentati
    ```
 
 3. **Manual LeakCanary check** in emulator:
-   - Run debug APK on emulator
-   - Open reader → close reader → wait 3s
-   - Check LeakCanary notification for leak reports
+    - Run debug APK on emulator
+    - Open reader → close reader → wait 3s
+    - Check LeakCanary notification for leak reports
 
 ## CI integration
 

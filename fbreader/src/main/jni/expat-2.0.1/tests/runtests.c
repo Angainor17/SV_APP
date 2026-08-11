@@ -810,7 +810,8 @@ END_TEST
 /* Test that no error is reported for unknown entities if we don't
    read an external subset.  This was fixed in Expat 1.95.5.
 */
-START_TEST(test_wfc_undeclared_entity_unread_external_subset){
+START_TEST(test_wfc_undeclared_entity_unread_external_subset)
+        {
             char *text =
                     "<!DOCTYPE doc SYSTEM 'foo'>\n"
                     "<doc>&entity;</doc>";
@@ -823,7 +824,8 @@ END_TEST
 /* Test that an error is reported for unknown entities if we don't
    have an external subset.
 */
-START_TEST(test_wfc_undeclared_entity_no_external_subset){
+START_TEST(test_wfc_undeclared_entity_no_external_subset)
+        {
             expect_failure("<doc>&entity;</doc>",
                            XML_ERROR_UNDEFINED_ENTITY,
                            "Parser did not report undefined entity w/out a DTD.");
@@ -833,7 +835,8 @@ END_TEST
 /* Test that an error is reported for unknown entities if we don't
    read an external subset, but have been declared standalone.
 */
-START_TEST(test_wfc_undeclared_entity_standalone){
+START_TEST(test_wfc_undeclared_entity_standalone)
+        {
             char *text =
                     "<?xml version='1.0' encoding='us-ascii' standalone='yes'?>\n"
                     "<!DOCTYPE doc SYSTEM 'foo'>\n"
@@ -875,7 +878,8 @@ XML_STATUS_OK;
 /* Test that an error is reported for unknown entities if we have read
    an external subset, and standalone is true.
 */
-START_TEST(test_wfc_undeclared_entity_with_external_subset_standalone){
+START_TEST(test_wfc_undeclared_entity_with_external_subset_standalone)
+        {
             char *text =
                     "<?xml version='1.0' encoding='us-ascii' standalone='yes'?>\n"
                     "<!DOCTYPE doc SYSTEM 'foo'>\n"
@@ -895,7 +899,8 @@ END_TEST
 /* Test that no error is reported for unknown entities if we have read
    an external subset, and standalone is false.
 */
-START_TEST(test_wfc_undeclared_entity_with_external_subset){
+START_TEST(test_wfc_undeclared_entity_with_external_subset)
+        {
             char *text =
                     "<?xml version='1.0' encoding='us-ascii'?>\n"
                     "<!DOCTYPE doc SYSTEM 'foo'>\n"

@@ -4,11 +4,13 @@
 
 ## Обзор
 
-Модуль `main` отвечает за навигацию между основными разделами приложения и отображение нижней панели навигации (Bottom Navigation).
+Модуль `main` отвечает за навигацию между основными разделами приложения и отображение нижней панели
+навигации (Bottom Navigation).
 
 ## Основные классы
 
 ### Screens
+
 Определение маршрутов экранов:
 
 ```kotlin
@@ -21,6 +23,7 @@ sealed class Screens(val route: String) {
 ```
 
 ### BottomNavigationItem
+
 Элемент нижней навигации:
 
 ```kotlin
@@ -32,9 +35,11 @@ data class BottomNavigationItem(
 ```
 
 ### BottomNavigationUi
+
 Compose-компонент нижней навигации.
 
 ### BottomNavScreen
+
 Главный экран с нижней навигацией:
 
 ```kotlin
@@ -45,6 +50,7 @@ fun BottomNavScreen(
 ```
 
 ### BooksVector
+
 Векторные иконки для раздела книг.
 
 ## Навигация

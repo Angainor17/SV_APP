@@ -15,10 +15,17 @@ class GetBookFiltersUseCase @Inject constructor() {
      */
     private companion object {
         const val MAX_FILTERS = 19
+
         // Паттерны для определения серий: "том 1", "тома 1-2", "книга 1", "книги 1-2"
         val SERIES_PATTERNS = listOf(
-            Regex(",\\s*(том|тома|т\\.|книга|книги|кн\\.)\\s*[\\d\\-]+\\s*$", RegexOption.IGNORE_CASE),
-            Regex("\\s+(том|тома|т\\.|книга|книги|кн\\.)\\s*[\\d\\-]+\\s*$", RegexOption.IGNORE_CASE),
+            Regex(
+                ",\\s*(том|тома|т\\.|книга|книги|кн\\.)\\s*[\\d\\-]+\\s*$",
+                RegexOption.IGNORE_CASE
+            ),
+            Regex(
+                "\\s+(том|тома|т\\.|книга|книги|кн\\.)\\s*[\\d\\-]+\\s*$",
+                RegexOption.IGNORE_CASE
+            ),
         )
     }
 

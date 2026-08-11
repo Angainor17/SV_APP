@@ -13,7 +13,9 @@ metadata:
 
 ## Что было сделано
 
-Удалено ~40 Activity файлов и ~20 layout файлов из модуля fbreader. Это был legacy код от оригинального FBReader, который не использовался в текущей архитектуре (Activity не были зарегистрированы в манифесте).
+Удалено ~40 Activity файлов и ~20 layout файлов из модуля fbreader. Это был legacy код от
+оригинального FBReader, который не использовался в текущей архитектуре (Activity не были
+зарегистрированы в манифесте).
 
 ## Причина удаления
 
@@ -24,6 +26,7 @@ metadata:
 ## Что нужно восстановить (приоритет)
 
 ### Приоритет 1 (для полноценной читалки)
+
 1. TOCActivity → Compose BottomSheet с оглавлением
 2. BookmarksActivity → Compose экран закладок
 3. EditBookmarkActivity → Compose Dialog для закладки
@@ -31,6 +34,7 @@ metadata:
 5. ImageViewActivity → Compose просмотр изображений
 
 ### Приоритет 2
+
 1. LibrarySearchActivity → Поиск в библиотеке
 2. BookInfoActivity → Информация о книге
 3. ProcessHyperlinkAction → Обработка сносок

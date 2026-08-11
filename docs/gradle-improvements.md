@@ -8,11 +8,13 @@
 ## Текущее состояние
 
 Проект использует:
+
 - **AGP:** 9.2.0
 - **Kotlin:** 2.2.20
 - **Gradle:** 9.4.1
 
 Включены:
+
 - Configuration cache ✅
 - Parallel GC ✅
 
@@ -58,16 +60,19 @@ kotlin.incremental.useClasspathSnapshot=true
 ### 3. Улучшить JVM настройки
 
 Текущие:
+
 ```
 org.gradle.jvmargs=-Xmx6g -XX:-HeapDumpOnOutOfMemoryError -XX:+PrintGC -XX:+UseParallelGC
 ```
 
 Рекомендуемые:
+
 ```
 org.gradle.jvmargs=-Xmx6g -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8
 ```
 
 Убраны:
+
 - `-XX:-HeapDumpOnOutOfMemoryError` - не нужен при стабильной сборке
 - `-XX:+PrintGC` - создаёт лишний лог
 
@@ -76,6 +81,7 @@ org.gradle.jvmargs=-Xmx6g -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.enco
 AGP 9.0+ имеет встроенную поддержку Kotlin. Плагин `org.jetbrains.kotlin.android` больше не нужен.
 
 В каждом модуле заменить:
+
 ```kotlin
 // Было:
 plugins {

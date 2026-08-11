@@ -39,9 +39,11 @@ fun AppAlertDialog(
         title = {
             Text(text = title)
         },
-        text = text?.let { {
-            Text(text = it)
-        } },
+        text = text?.let {
+            {
+                Text(text = it)
+            }
+        },
         confirmButton = {
             if (onConfirm != null) {
                 TextButton(onClick = onConfirm) {

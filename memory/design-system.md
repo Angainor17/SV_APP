@@ -12,6 +12,7 @@ metadata:
 ## Статус миграции
 
 ✅ Все экраны мигрированы на дизайн-систему (2026-06-25):
+
 - News — завершено
 - Books — завершено
 - Wiki — завершено
@@ -23,6 +24,7 @@ metadata:
 Дизайн-система реализована в модуле `commonui/src/main/java/su/sv/commonui/`:
 
 ### Тема (`theme/`)
+
 - `Color.kt` — полная цветовая палитра для светлой/тёмной темы
 - `Dimensions.kt` — отступы, размеры, доступ через `LocalAppDimensions`
 - `Shape.kt` — формы (радиусы скругления), доступ через `LocalAppShapes`
@@ -31,6 +33,7 @@ metadata:
 - `ThemeConfig.kt` — конфигурация темы, `ThemeRepository` интерфейс
 
 ### Компоненты (`ui/components/`)
+
 - `AppCard.kt` — базовая карточка с цветами из темы
 - `AppButton.kt` — кнопки (FILLED/OUTLINED/TEXT/TONAL)
 - `AppLoadingIndicator.kt` — индикатор загрузки
@@ -76,6 +79,7 @@ override fun Content(modifier: Modifier) {
 ## Почему
 
 Единая дизайн-система обеспечивает:
+
 - Цельный внешний вид приложения
 - Лёгкое изменение темы в одном месте
 - Поддержку светлой/тёмной темы
@@ -84,6 +88,7 @@ override fun Content(modifier: Modifier) {
 ## Как применять
 
 При создании новых экранов:
+
 1. Использовать цвета из `MaterialTheme.colorScheme`
 2. Использовать отступы из `LocalAppDimensions.current`
 3. Использовать типографику из `MaterialTheme.typography`

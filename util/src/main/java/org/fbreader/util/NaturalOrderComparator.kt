@@ -106,8 +106,9 @@ class NaturalOrderComparator : Comparator<String> {
         // Если строки содержат разные регистры и не равны без учёта регистра,
         // сравниваем в нижнем регистре
         if ((!a.lowercase().equals(a, ignoreCase = true) ||
-             !b.lowercase().equals(b, ignoreCase = true)) &&
-             !a.equals(b, ignoreCase = true)) {
+                    !b.lowercase().equals(b, ignoreCase = true)) &&
+            !a.equals(b, ignoreCase = true)
+        ) {
             return compare(a.lowercase(), b.lowercase())
         }
 

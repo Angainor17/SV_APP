@@ -2,25 +2,30 @@
 
 ## Статус выполнения
 
-| Этап | Статус | Дата завершения |
-|------|--------|-----------------|
-| **1. Подготовка** | ✅ ЗАВЕРШЁН | 2026-06-19 |
-| **2. Миграция ReaderFragment** | ✅ ЗАВЕРШЁН | 2026-06-19 |
-| **3. Интеграция** | ✅ ЗАВЕРШЁН | 2026-06-20 |
-| **4. Settings** | ✅ ЗАВЕРШЁН | 2026-06-20 |
-| **5. Очистка и тестирование** | ✅ ЗАВЕРШЁН | 2026-06-20 |
+| Этап                           | Статус     | Дата завершения |
+|--------------------------------|------------|-----------------|
+| **1. Подготовка**              | ✅ ЗАВЕРШЁН | 2026-06-19      |
+| **2. Миграция ReaderFragment** | ✅ ЗАВЕРШЁН | 2026-06-19      |
+| **3. Интеграция**              | ✅ ЗАВЕРШЁН | 2026-06-20      |
+| **4. Settings**                | ✅ ЗАВЕРШЁН | 2026-06-20      |
+| **5. Очистка и тестирование**  | ✅ ЗАВЕРШЁН | 2026-06-20      |
 
 ---
 
 ## Проблема
 
 Текущая архитектура имеет следующие проблемы:
-1. **Два Application класса**: `SvApp` наследуется от `BookApplication`, что создаёт нежелательную связность
-2. **Несколько Activity**: `MainActivity` (основное приложение) и `BookReaderMainActivity` (читалка книг)
-3. **Смешивание стилей**: Основное приложение использует Jetpack Compose + MVVM + Hilt, а bookreader использует Fragments + XML
+
+1. **Два Application класса**: `SvApp` наследуется от `BookApplication`, что создаёт нежелательную
+   связность
+2. **Несколько Activity**: `MainActivity` (основное приложение) и `BookReaderMainActivity` (читалка
+   книг)
+3. **Смешивание стилей**: Основное приложение использует Jetpack Compose + MVVM + Hilt, а bookreader
+   использует Fragments + XML
 4. **Сложность навигации**: Переход между экранами требует запуска новой Activity через Intent
 
-> **Примечание**: Модуль `bookreader` уже интегрирован в проект (не является внешней библиотекой) и находится в `bookreader/`. Модуль `fbreader/` содержит ядро FBReader (644 файла).
+> **Примечание**: Модуль `bookreader` уже интегрирован в проект (не является внешней библиотекой) и
+> находится в `bookreader/`. Модуль `fbreader/` содержит ядро FBReader (644 файла).
 
 ---
 
@@ -29,15 +34,18 @@
 ## 1.1 Создание BookReaderInitializer
 
 ### Подэтап 1.1.1: Создание базового класса инициализатора
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/app/BookReaderInitializer.kt`
 
 **Задачи**:
+
 - [ ] Создать `object BookReaderInitializer` (singleton)
 - [ ] Добавить приватные поля: `zlib: ZLAndroidApplication?`, `ttf: TTFManager?`
 - [ ] Добавить публичное поле: `isInitialized: Boolean`
 - [ ] Создать метод `init(context: Context): Boolean`
 
 **Код**:
+
 ```kotlin
 object BookReaderInitializer {
     private var zlib: ZLAndroidApplication? = null
@@ -55,9 +63,11 @@ object BookReaderInitializer {
 ```
 
 ### Подэтап 1.1.2: Перенос логики из BookApplication.onCreate()
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/app/BookApplication.kt`
 
 **Перенести в BookReaderInitializer**:
+
 ```kotlin
 // Из BookApplication.onCreate():
 zlib = object : ZLAndroidApplication() {
@@ -78,9 +88,11 @@ ttf.preloadFonts()
 ```
 
 ### Подэтап 1.1.3: Обновление BookApplication для использования BookReaderInitializer
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/app/BookApplication.kt`
 
 **Изменения**:
+
 ```kotlin
 open class BookApplication : MainApplication() {
     val ttf: TTFManager? get() = BookReaderInitializer.getTTFManager()
@@ -93,9 +105,11 @@ open class BookApplication : MainApplication() {
 ```
 
 ### Подэтап 1.1.4: Создание Hilt модуля для BookReaderInitializer (опционально)
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/di/BookReaderModule.kt`
 
 **Задачи**:
+
 - [ ] Создать `@Module` и `@InstallIn(SingletonComponent::class)`
 - [ ] Предоставить `TTFManager` через `@Provides`
 - [ ] Предоставить `SharedPreferences` для настроек читалки
@@ -105,9 +119,11 @@ open class BookApplication : MainApplication() {
 ## 1.2 Создание ReaderScreen (Modo Screen)
 
 ### Подэтап 1.2.1: Создание пакета для новых экранов
+
 **Путь**: `bookreader/src/main/java/com/github/axet/bookreader/screens/`
 
 **Структура**:
+
 ```
 screens/
 ├── ReaderScreen.kt              # Modo Screen
@@ -126,9 +142,11 @@ screens/
 ```
 
 ### Подэтап 1.2.2: Создание ReaderScreen
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ReaderScreen.kt`
 
 **Код**:
+
 ```kotlin
 @Parcelize
 class ReaderScreen(
@@ -151,9 +169,11 @@ class ReaderScreen(
 ```
 
 ### Подэтап 1.2.3: Создание заглушки ReaderContent
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ReaderContent.kt`
 
 **Код**:
+
 ```kotlin
 @Composable
 fun ReaderContent(
@@ -178,9 +198,11 @@ fun ReaderContent(
 ## 2.1 Создание ReaderViewModel
 
 ### Подэтап 2.1.1: Определение состояний (ReaderState)
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/viewmodel/ReaderState.kt`
 
 **Код**:
+
 ```kotlin
 sealed class ReaderState {
     object Loading : ReaderState()
@@ -205,9 +227,11 @@ enum class ViewMode {
 ```
 
 ### Подэтап 2.1.2: Определение действий (ReaderActions)
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/viewmodel/ReaderActions.kt`
 
 **Код**:
+
 ```kotlin
 sealed class ReaderActions {
     data class LoadBook(val uri: Uri, val position: ZLTextIndexPosition?) : ReaderActions()
@@ -228,9 +252,11 @@ sealed class ReaderActions {
 ```
 
 ### Подэтап 2.1.3: Создание ReaderViewModel
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/viewmodel/ReaderViewModel.kt`
 
 **Задачи**:
+
 - [ ] Создать `@HiltViewModel`
 - [ ] Инжектировать `Storage`, `Context`
 - [ ] Реализовать `StateFlow<ReaderState>`
@@ -239,6 +265,7 @@ sealed class ReaderActions {
 - [ ] Реализовать загрузку книги
 
 **Ключевые методы для миграции из ReaderFragment**:
+
 ```kotlin
 // Из ReaderFragment:
 - loadBook() -> ViewModel.loadBook()
@@ -251,9 +278,11 @@ sealed class ReaderActions {
 ## 2.2 Создание ReaderContent (Compose UI)
 
 ### Подэтап 2.2.1: Интеграция FBReaderView через AndroidView
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ReaderContent.kt`
 
 **Код**:
+
 ```kotlin
 @Composable
 fun ReaderContent(
@@ -305,6 +334,7 @@ fun ReaderContent(
 ```
 
 ### Подэтап 2.2.2: Создание ReaderTopBar
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/ReaderTopBar.kt`
 
 **Элементы меню (из menu/main.xml)**:
@@ -320,6 +350,7 @@ fun ReaderContent(
 | action_tts | - | Text-to-Speech |
 
 **Код**:
+
 ```kotlin
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -373,31 +404,38 @@ fun ReaderTopBar(
 ### Подэтап 2.2.3: Создание компонентов диалогов
 
 #### BookmarksDialog Compose
-**Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/components/BookmarksDialog.kt`
+
+**Файл**:
+`bookreader/src/main/java/com/github/axet/bookreader/screens/ui/components/BookmarksDialog.kt`
 
 **Миграция из**: `widgets/BookmarksDialog.kt`
 
 **Задачи**:
+
 - [ ] Создать `@Composable fun BookmarksDialog()`
 - [ ] Использовать `LazyColumn` вместо `TreeRecyclerView`
 - [ ] Реализовать контекстное меню (редактировать, удалить, поделиться)
 
 #### TocDialog Compose
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/components/TocDialog.kt`
 
 **Миграция из**: `ReaderFragment.showTOC()` и `TOCAdapter`
 
 **Задачи**:
+
 - [ ] Создать `@Composable fun TocDialog()`
 - [ ] Использовать `LazyColumn` с вложенностью
 - [ ] Реализовать переход к главе
 
 #### FontsPopup Compose
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/components/FontsPopup.kt`
 
 **Миграция из**: `widgets/FontsPopup.kt`
 
 **Задачи**:
+
 - [ ] Создать `@Composable fun FontsBottomSheet()`
 - [ ] Слайдер для размера шрифта
 - [ ] Список шрифтов из `TTFManager`
@@ -408,11 +446,13 @@ fun ReaderTopBar(
 ## 2.3 Обработка жестов и клавиш
 
 ### Подэтап 2.3.1: Обработка клавиш громкости
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ReaderContent.kt`
 
 **Миграция из**: `ReaderFragment.onKeyDown()/onKeyUp()`
 
 **Код**:
+
 ```kotlin
 @Composable
 fun ReaderContent(...) {
@@ -445,7 +485,9 @@ fun ReaderContent(...) {
 ```
 
 ### Подэтап 2.3.2: Сохранение позиции при выходе
+
 **Задачи**:
+
 - [ ] Вызвать `viewModel.savePosition()` в `DisposableEffect`
 - [ ] Сохранять позицию каждые 60 секунд (как в ReaderFragment)
 
@@ -456,9 +498,11 @@ fun ReaderContent(...) {
 ## 3.1 Изменение навигации в books модуле
 
 ### Подэтап 3.1.1: Создание навигационного интерфейса
+
 **Файл**: `managers/src/main/java/su/sv/managers/BookNavigator.kt`
 
 **Код**:
+
 ```kotlin
 interface BookNavigator {
     fun openBook(uri: Uri, position: ZLTextIndexPosition? = null)
@@ -466,9 +510,11 @@ interface BookNavigator {
 ```
 
 ### Подэтап 3.1.2: Изменение BookDetailUi
+
 **Файл**: `books/src/main/java/su/sv/books/catalog/presentation/detail/ui/BookDetailUi.kt`
 
 **До**:
+
 ```kotlin
 private fun openBook(context: Context, uiBook: UiBook) {
     val intent = Intent(context, BookReaderMainActivity::class.java).apply {
@@ -480,6 +526,7 @@ private fun openBook(context: Context, uiBook: UiBook) {
 ```
 
 **После**:
+
 ```kotlin
 private fun openBook(navController: NavController, uiBook: UiBook) {
     navController.forward(ReaderScreen(bookUri = uiBook.fileUri))
@@ -487,6 +534,7 @@ private fun openBook(navController: NavController, uiBook: UiBook) {
 ```
 
 ### Подэтап 3.1.3: Изменение RootBooksCatalog
+
 **Файл**: `books/src/main/java/su/sv/books/catalog/presentation/root/ui/RootBooksCatalog.kt`
 
 **Аналогичные изменения** для открытия книг из списка.
@@ -496,9 +544,11 @@ private fun openBook(navController: NavController, uiBook: UiBook) {
 ## 3.2 Удаление BookReaderMainActivity
 
 ### Подэтап 3.2.1: Удаление из манифеста
+
 **Файл**: `bookreader/src/main/AndroidManifest.xml`
 
 **Удалить**:
+
 ```xml
 <activity
     android:name=".activities.BookReaderMainActivity"
@@ -512,6 +562,7 @@ private fun openBook(navController: NavController, uiBook: UiBook) {
 ```
 
 ### Подэтап 3.2.2: Удаление файла
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/activities/BookReaderMainActivity.kt`
 
 **Статус**: Удалить файл полностью
@@ -523,15 +574,18 @@ private fun openBook(navController: NavController, uiBook: UiBook) {
 ## 3.3 Удаление наследования SvApp от BookApplication
 
 ### Подэтап 3.3.1: Изменение SvApp
+
 **Файл**: `app/src/main/java/su/sv/app/SvApp.kt`
 
 **До**:
+
 ```kotlin
 @HiltAndroidApp
 class SvApp : BookApplication(), SingletonImageLoader.Factory, HasTracerConfiguration {
 ```
 
 **После**:
+
 ```kotlin
 @HiltAndroidApp
 class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguration {
@@ -548,15 +602,19 @@ class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguratio
 ```
 
 ### Подэтап 3.3.2: Проверка всех использований BookApplication.from()
+
 **Команда**:
+
 ```bash
 grep -r "BookApplication.from\|BookApplication\." --include="*.kt" .
 ```
 
 **Заменить на**:
+
 - `BookApplication.from(context)?.ttf` → `BookReaderInitializer.getTTFManager()`
 
 ### Подэтап 3.3.3: Удаление или депрекация BookApplication
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/app/BookApplication.kt`
 
 **Вариант 1**: Удалить файл (рекомендуется)
@@ -569,16 +627,20 @@ grep -r "BookApplication.from\|BookApplication\." --include="*.kt" .
 ## 4.1 Анализ настроек
 
 ### Подэтап 4.1.1: Изучить PreferenceScreen
+
 **Файл**: `bookreader/src/main/res/xml/pref*.xml`
 
 **Найти**:
+
 - [ ] Список всех настроек
 - [ ] Ключи настроек (используются в `BookApplication.PREFERENCE_*`)
 
 ### Подэтап 4.1.2: Создать модель настроек
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/settings/ReaderSettings.kt`
 
 **Код**:
+
 ```kotlin
 data class ReaderSettings(
     val theme: Theme = Theme.System,
@@ -595,12 +657,16 @@ data class ReaderSettings(
 ## 4.2 Создание SettingsScreen
 
 ### Подэтап 4.2.1: Создать ReaderSettingsScreen
+
 **Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/ReaderSettingsScreen.kt`
 
 ### Подэтап 4.2.2: Создать ReaderSettingsContent
-**Файл**: `bookreader/src/main/java/com/github/axet/bookreader/screens/settings/ReaderSettingsContent.kt`
+
+**Файл**:
+`bookreader/src/main/java/com/github/axet/bookreader/screens/settings/ReaderSettingsContent.kt`
 
 **Элементы**:
+
 - [ ] Выбор темы (Light/Dark/System)
 - [ ] Размер шрифта (слайдер)
 - [ ] Семейство шрифта (dropdown)
@@ -616,27 +682,34 @@ data class ReaderSettings(
 ## 5.1 Удаление неиспользуемого кода
 
 ### Подэтап 5.1.1: Удалить LibraryFragment
+
 **Причина**: Не используется в SvApp (каталог книг находится в модуле `books`)
 
 **Файлы для удаления**:
+
 - `bookreader/src/main/java/com/github/axet/bookreader/fragments/LibraryFragment.kt`
 - `bookreader/src/main/res/layout/fragment_library.xml`
 - `bookreader/src/main/res/layout/book_item.xml`
 - `bookreader/src/main/res/layout/book_list_item.xml`
 
 ### Подэтап 5.1.2: Удалить FullscreenActivity
+
 **Причина**: Полноэкранный режим будет управляться через ViewModel
 
 **Файлы для удаления**:
+
 - `bookreader/src/main/java/com/github/axet/bookreader/activities/FullscreenActivity.kt`
 
 ### Подэтап 5.1.3: Удалить SettingsActivity
+
 **Причина**: Заменён на Compose SettingsScreen
 
 **Файлы для удаления**:
+
 - `bookreader/src/main/java/com/github/axet/bookreader/activities/SettingsActivity.kt`
 
 ### Подэтап 5.1.4: Очистить манифест
+
 **Файл**: `bookreader/src/main/AndroidManifest.xml`
 
 **Удалить все Activity** (кроме провайдеров)
@@ -646,6 +719,7 @@ data class ReaderSettings(
 ## 5.2 Чек-лист тестирования
 
 ### Функциональное тестирование
+
 - [ ] Открытие книги из списка книг
 - [ ] Открытие книги из деталей книги
 - [ ] Отображение контента книги
@@ -667,11 +741,13 @@ data class ReaderSettings(
 - [ ] Тема (Light/Dark)
 
 ### Тестирование навигации
+
 - [ ] Назад из читалки → возврат в список книг
 - [ ] Открытие читалки → корректный стек навигации
 - [ ] Deeplink на книгу → корректное открытие
 
 ### Тестирование на устройствах
+
 - [ ] Телефон (портрет)
 - [ ] Телефон (ландшафт)
 - [ ] Планшет
@@ -683,13 +759,13 @@ data class ReaderSettings(
 
 ## Риски и митигация
 
-| Риск | Вероятность | Влияние | Митигация |
-|------|-------------|---------|-----------|
-| FBReaderView не работает в AndroidView | Средняя | Высокое | Создать промежуточный FragmentWrapper |
-| Потеря состояния при повороте | Средняя | Среднее | Использовать ViewModel + rememberSaveable |
-| Проблемы с жестами в Compose | Низкая | Среднее | Тестирование на разных устройствах |
-| Регрессия в функциональности | Средняя | Высокое | Чек-лист тестирования после каждого этапа |
-| TTFManager требует Context приложения | Высокая | Низкое | Передавать Application context в init() |
+| Риск                                   | Вероятность | Влияние | Митигация                                 |
+|----------------------------------------|-------------|---------|-------------------------------------------|
+| FBReaderView не работает в AndroidView | Средняя     | Высокое | Создать промежуточный FragmentWrapper     |
+| Потеря состояния при повороте          | Средняя     | Среднее | Использовать ViewModel + rememberSaveable |
+| Проблемы с жестами в Compose           | Низкая      | Среднее | Тестирование на разных устройствах        |
+| Регрессия в функциональности           | Средняя     | Высокое | Чек-лист тестирования после каждого этапа |
+| TTFManager требует Context приложения  | Высокая     | Низкое  | Передавать Application context в init()   |
 
 ---
 
@@ -717,20 +793,20 @@ data class ReaderSettings(
 
 ## Оценка времени
 
-| Этап | Подэтапы | Время |
-|------|----------|-------|
-| 1.1 | BookReaderInitializer | 4-6 часов |
-| 1.2 | ReaderScreen заглушка | 2-3 часа |
-| 2.1 | ReaderViewModel | 1-2 дня |
-| 2.2 | ReaderContent + TopBar | 1-2 дня |
-| 2.3 | Диалоги (Bookmarks, TOC, Fonts) | 1 день |
-| 2.4 | Жесты и клавиши | 4-6 часов |
-| 3.1 | Навигация books | 2-4 часа |
-| 3.2 | Удаление BookReaderMainActivity | 1 час |
-| 3.3 | SvApp без BookApplication | 2-4 часа |
-| 4 | Settings | 1-2 дня |
-| 5 | Очистка + тестирование | 2-3 дня |
-| **Итого** | | **9-15 дней** |
+| Этап      | Подэтапы                        | Время         |
+|-----------|---------------------------------|---------------|
+| 1.1       | BookReaderInitializer           | 4-6 часов     |
+| 1.2       | ReaderScreen заглушка           | 2-3 часа      |
+| 2.1       | ReaderViewModel                 | 1-2 дня       |
+| 2.2       | ReaderContent + TopBar          | 1-2 дня       |
+| 2.3       | Диалоги (Bookmarks, TOC, Fonts) | 1 день        |
+| 2.4       | Жесты и клавиши                 | 4-6 часов     |
+| 3.1       | Навигация books                 | 2-4 часа      |
+| 3.2       | Удаление BookReaderMainActivity | 1 час         |
+| 3.3       | SvApp без BookApplication       | 2-4 часа      |
+| 4         | Settings                        | 1-2 дня       |
+| 5         | Очистка + тестирование          | 2-3 дня       |
+| **Итого** |                                 | **9-15 дней** |
 
 ---
 

@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Используем стандартное Hilt тестовое приложение -->
-    <application
-        android:name="dagger.hilt.android.testing.HiltTestApplication" />
+    <application android:name="dagger.hilt.android.testing.HiltTestApplication" />
 
 </manifest>

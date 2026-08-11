@@ -5,13 +5,11 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
@@ -31,7 +29,6 @@ import su.sv.wiki.data.local.entity.ArticleCacheEntity
 import su.sv.wiki.data.local.entity.FavoriteEntity
 import su.sv.wiki.data.local.entity.HistoryEntity
 import su.sv.wiki.domain.model.WikiArticle
-import su.sv.wiki.domain.model.WikiSearchResult
 import su.sv.wiki.domain.repository.WikiResult
 
 /**
@@ -119,7 +116,12 @@ class WikiRepositoryImplTest {
     fun `searchArticle returns Error when exception occurs`() = runTest {
         val query = "Тест"
 
-        coEvery { api.search(query = query, what = "title") } throws RuntimeException("Network failure")
+        coEvery {
+            api.search(
+                query = query,
+                what = "title"
+            )
+        } throws RuntimeException("Network failure")
 
         val result = repository.searchArticle(query)
 
@@ -202,7 +204,10 @@ class WikiRepositoryImplTest {
         val title = "Статья"
 
         coEvery { articleCacheDao.getArticleByTitle(title) } returns null
-        coEvery { api.getPage(title = title) } returns Response.error(500, "Server Error".toResponseBody())
+        coEvery { api.getPage(title = title) } returns Response.error(
+            500,
+            "Server Error".toResponseBody()
+        )
 
         val result = repository.getArticle(title)
 

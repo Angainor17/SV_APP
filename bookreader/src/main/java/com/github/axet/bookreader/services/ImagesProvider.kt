@@ -41,7 +41,8 @@ class ImagesProvider : StorageProvider() {
         @JvmStatic
         fun getImageSize(image: ZLFileImage): Long {
             return try {
-                val aa = AssetsDexLoader.getPrivateField(image.javaClass, "myLengths")[image] as IntArray
+                val aa =
+                    AssetsDexLoader.getPrivateField(image.javaClass, "myLengths")[image] as IntArray
                 var c = 0
                 for (a in aa)
                     c += a
@@ -80,6 +81,7 @@ class ImagesProvider : StorageProvider() {
                         cols[i] = OpenableColumns.DISPLAY_NAME
                         values[i++] = uri.lastPathSegment // содержит оригинальное имя
                     }
+
                     OpenableColumns.SIZE -> {
                         cols[i] = OpenableColumns.SIZE
                         values[i++] = getImageSize(image)

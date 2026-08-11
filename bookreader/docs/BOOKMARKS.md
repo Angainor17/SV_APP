@@ -2,13 +2,16 @@
 
 ## Обзор
 
-В проекте термины "закладка" и "заметка" используются для одного и того же объекта `Storage.Bookmark`. Закладка = выделенный текст с опциональным именем и цветом. Хранится в JSON-файле рядом с книгой.
+В проекте термины "закладка" и "заметка" используются для одного и того же объекта
+`Storage.Bookmark`. Закладка = выделенный текст с опциональным именем и цветом. Хранится в
+JSON-файле рядом с книгой.
 
 ---
 
 ## Storage.Bookmark (Storage.java)
 
 Поля:
+
 ```java
 public long last;               // timestamp создания/изменения (также ID для ключа)
 public String name;             // имя закладки (может быть null)
@@ -29,6 +32,7 @@ public String sentenceAfter;    // предложение после замет�
 **Для EPUB/FB2**: `paragraphIndex` = номер параграфа, `elementIndex` = индекс элемента.
 
 ### Storage.Bookmarks
+
 Расширяет `ArrayList<Bookmark>`. Сериализуется в JSON внутри `RecentInfo`.
 
 ---
@@ -38,6 +42,7 @@ public String sentenceAfter;    // предложение после замет�
 Файл: `domain/BookmarksRepository.kt`
 
 Каждая книга имеет JSON-файл `{md5}.json` в хранилище:
+
 ```json
 {
     "title": "Название книги",
@@ -63,6 +68,7 @@ public String sentenceAfter;    // предложение после замет�
 ```
 
 ### Методы репозитория
+
 - `getAllNotes(sortByDateAscending)` — все заметки из всех книг
 - `getNotesForBook(bookId)` — заметки конкретной книги
 - `getBooksWithNotes()` — список книг с заметками и метаданными
@@ -70,6 +76,7 @@ public String sentenceAfter;    // предложение после замет�
 - `findBookFileUri(bookId)` — ищет файл книги по MD5
 
 ### Поиск JSON-файлов
+
 Репозиторий сканирует хранилище напрямую (не завися от наличия файла книги):
 
 ```kotlin
@@ -83,7 +90,9 @@ private fun listJsonFiles(): List<JsonFileInfo> {
 ```
 
 ### Обложки
+
 Поиск обложки (по приоритету):
+
 1. `coverUrl` из JSON (если сохранён при создании заметки)
 2. `CacheImagesAdapter.cacheUri(context, uri)` — кэш по URI книги
 3. Поиск файла в `externalCacheDir` и `filesDir` по MD5
@@ -95,6 +104,7 @@ private fun listJsonFiles(): List<JsonFileInfo> {
 Файл: `domain/BookmarkTextUtils.kt`
 
 FBReader вставляет специальные символы в текст:
+
 - `U+FFFE` (65534) — маркер переноса слов
 - `U+FFFF` (65535) — аналогичный маркер
 - Управляющие символы (0x00-0x1F)
@@ -114,6 +124,7 @@ fun cleanBookmarkText(text: String): String {
 ```
 
 Используется везде где отображается текст заметки:
+
 - `BookmarksComposeDialog.kt` — список заметок
 - `BookmarkBottomSheet.kt` — редактирование заметки
 - В модуле `books` (screens/ui/NoteItem.kt и др.)
@@ -131,6 +142,7 @@ suspend fun getNoteContext(bookUri, position, noteText): Result<NoteContextResul
 ```
 
 Алгоритм:
+
 1. `storage.load(bookUri)` → `Storage.Book`
 2. `storage.read(storageBook)` → `Storage.FBook`
 3. `Storage.getPlugin(info, fbook)` → форматный плагин
@@ -140,10 +152,12 @@ suspend fun getNoteContext(bookUri, position, noteText): Result<NoteContextResul
 7. `extractSentenceWithContext(fullText, noteText)` — ищет заметку, находит границы предложения
 
 Границы предложения:
+
 - Начало: ищет назад до `.`, `!`, `?`, `\n`
 - Конец: ищет вперёд до `.`, `!`, `?`, `\n`
 
 Результат (`NoteContextResult`):
+
 - `sentenceBefore` — текст до заметки в пределах предложения
 - `noteText` — сам выделенный текст
 - `sentenceAfter` — текст после заметки в пределах предложения
@@ -176,6 +190,7 @@ open class ZLBookmark(view: FBView, val b: Storage.Bookmark)
 ## Навигация к закладке
 
 ### Из диалога BookmarksComposeDialog
+
 ```kotlin
 fbReaderView?.apply {
     val position = ZLTextFixedPosition(bookmark.start.paragraphIndex, 0, 0)
@@ -191,9 +206,11 @@ fbReaderView?.apply {
 }
 ```
 
-**Важно**: Используется `paragraphIndex` с `elementIndex = 0`, игнорируя точное смещение. Это навигирует к началу страницы/параграфа, не к точной позиции заметки.
+**Важно**: Используется `paragraphIndex` с `elementIndex = 0`, игнорируя точное смещение. Это
+навигирует к началу страницы/параграфа, не к точной позиции заметки.
 
 ### Из модуля books (открытие книги на заметке)
+
 ```kotlin
 // Вызывающий код в модуле books
 stackNavigation.forward(
@@ -212,6 +229,7 @@ stackNavigation.forward(
 ```
 
 В `ReaderContent.factory{}`:
+
 ```kotlin
 val savedPos = viewModel.getSavedPosition()
 if (savedPos != null) {
@@ -221,11 +239,15 @@ if (savedPos != null) {
 ```
 
 `gotoPosition()` в FBReaderView:
+
 - Для Plugin: `pluginview.gotoPosition(p)` → `current.load(p.paragraphIndex, p.elementIndex)`
 - Для FBReader: `app.BookTextView.gotoPosition(p)`
 
 ### Известная проблема навигации к заметке
-Баг задокументирован в `memory/bookmark-navigation-bug.md`. При открытии заметки PDF страница может не отображаться корректно. Применённые исправления:
+
+Баг задокументирован в `memory/bookmark-navigation-bug.md`. При открытии заметки PDF страница может
+не отображаться корректно. Применённые исправления:
+
 1. Навигация в `factory` через `post{}` (чтобы дождаться инициализации)
 2. Fallback в `update{}` если view уже имеет ширину
 
@@ -238,6 +260,7 @@ if (savedPos != null) {
 BottomSheet для редактирования/создания закладки.
 
 Поля:
+
 - `bookmarkText` — выделенный текст (read-only, очищенный через `cleanBookmarkText`)
 - `name` — TextField для имени
 - `selectedColor` — выбор цвета из 7 предустановленных
@@ -255,12 +278,14 @@ BottomSheet для редактирования/создания закладк�
 AlertDialog со списком закладок книги.
 
 Каждый элемент:
+
 - Номер страницы: `bookmark.start.paragraphIndex + 1`
 - Текст: `cleanBookmarkText(bookmark.text).take(100)`
 - Имя (если есть)
 - Кнопка удаления
 
-Кнопка удаления использует локальный список `bookmarksState` для анимации удаления (`animateContentSize`) — удаление мгновенное в UI, callback `onDelete()` обновляет реальные данные.
+Кнопка удаления использует локальный список `bookmarksState` для анимации удаления (
+`animateContentSize`) — удаление мгновенное в UI, callback `onDelete()` обновляет реальные данные.
 
 Ключ для LazyColumn: `it.last` (timestamp уникален для каждой закладки).
 
@@ -269,6 +294,7 @@ AlertDialog со списком закладок книги.
 ## Жизненный цикл закладки
 
 ### Создание
+
 ```
 1. Пользователь выделяет текст
 2. SelectionComposePanel → onBookmark
@@ -290,9 +316,11 @@ AlertDialog со списком закладок книги.
 ```
 
 ### Сохранение
+
 `storage.save(book)` → записывает JSON через `Storage` → файл `{md5}.json` в хранилище.
 
 ### Удаление
+
 ```
 1. BookmarksComposeDialog → onDelete(bookmark)
 2. ViewModel.onAction(DeleteBookmark)
@@ -306,7 +334,9 @@ AlertDialog со списком закладок книги.
 ```
 
 ### Миграция контекста (старые заметки)
-Заметки созданные до версии с `sentenceBefore/After` не имеют контекста. При открытии книги запускается `migrateBookmarksContextAsync()`:
+
+Заметки созданные до версии с `sentenceBefore/After` не имеют контекста. При открытии книги
+запускается `migrateBookmarksContextAsync()`:
 
 ```kotlin
 fun migrateBookmarksContextAsync() {
@@ -324,7 +354,8 @@ fun migrateBookmarksContextAsync() {
 
 ## Синхронизация bookmarks (ViewModel ↔ FBook)
 
-FBReader хранит закладки в `FBook.info.bookmarks`. `Storage.Book` хранит их же, но это разные объекты. При изменении нужна синхронизация:
+FBReader хранит закладки в `FBook.info.bookmarks`. `Storage.Book` хранит их же, но это разные
+объекты. При изменении нужна синхронизация:
 
 ```kotlin
 fun syncBookmarksFromFBook() {
@@ -337,4 +368,5 @@ fun syncBookmarksFromFBook() {
 }
 ```
 
-Вызывается из `listener.onBookmarksUpdate()` → когда FBReader обновляет закладки сам (например после `SELECTION_BOOKMARK`).
+Вызывается из `listener.onBookmarksUpdate()` → когда FBReader обновляет закладки сам (например после
+`SELECTION_BOOKMARK`).

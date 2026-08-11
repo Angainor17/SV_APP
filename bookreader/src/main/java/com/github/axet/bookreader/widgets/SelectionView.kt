@@ -11,7 +11,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import com.github.axet.androidlibrary.widgets.ThemeUtils
-import com.github.axet.bookreader.app.Plugin
 import com.github.axet.bookreader.app.PluginView
 import org.geometerplus.zlibrary.core.library.ZLibrary
 import org.geometerplus.zlibrary.core.view.SelectionCursor
@@ -76,7 +75,13 @@ open class SelectionView(
          * Рисует маркер выделения.
          */
         @JvmStatic
-        fun drawHandle(canvas: Canvas, which: SelectionCursor.Which, x: Int, y: Int, handles: Paint) {
+        fun drawHandle(
+            canvas: Canvas,
+            which: SelectionCursor.Which,
+            x: Int,
+            y: Int,
+            handles: Paint
+        ) {
             val dpi = ZLibrary.Instance().displayDPI
             val unit = dpi / 120
             val xCenter = if (which == SelectionCursor.Which.Left) x - unit - 1 else x + unit + 1
@@ -88,9 +93,19 @@ open class SelectionView(
                 handles
             )
             if (which == SelectionCursor.Which.Left)
-                canvas.drawCircle(xCenter.toFloat(), (y - dpi / 8).toFloat(), (unit * 6).toFloat(), handles)
+                canvas.drawCircle(
+                    xCenter.toFloat(),
+                    (y - dpi / 8).toFloat(),
+                    (unit * 6).toFloat(),
+                    handles
+                )
             else
-                canvas.drawCircle(xCenter.toFloat(), (y + dpi / 8).toFloat(), (unit * 6).toFloat(), handles)
+                canvas.drawCircle(
+                    xCenter.toFloat(),
+                    (y + dpi / 8).toFloat(),
+                    (unit * 6).toFloat(),
+                    handles
+                )
         }
 
         /**
@@ -213,7 +228,8 @@ open class SelectionView(
     var startRect = HandleRect()
     var endRect = HandleRect()
     val handles: Paint = Paint()
-    @JvmField var margin: Rect? = null // абсолютные координаты
+    @JvmField
+    var margin: Rect? = null // абсолютные координаты
     var clip: Int = 0
 
     init {
@@ -319,8 +335,10 @@ open class SelectionView(
             lastPage = firstPage
         }
 
-        val left = rectHandle(SelectionCursor.Which.Left, first!!.left, first.top + first.height() / 2)
-        val right = rectHandle(SelectionCursor.Which.Right, last!!.right, last.top + last.height() / 2)
+        val left =
+            rectHandle(SelectionCursor.Which.Left, first!!.left, first.top + first.height() / 2)
+        val right =
+            rectHandle(SelectionCursor.Which.Right, last!!.right, last.top + last.height() / 2)
 
         if (reverse) {
             startRect.rect = right
@@ -388,7 +406,8 @@ open class SelectionView(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        Timber.tag("voronin").d("SelectionView onTouchEvent: action=${event.action}, dragState=$_dragState")
+        Timber.tag("voronin")
+            .d("SelectionView onTouchEvent: action=${event.action}, dragState=$_dragState")
 
         // Если margin null, выделение повреждено - не обрабатываем
         if (margin == null) {
@@ -402,7 +421,12 @@ open class SelectionView(
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> handleDragStart(x, y)
             MotionEvent.ACTION_MOVE -> handleDragMove(x, y)
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> handleDragEnd(x, y, event.action == MotionEvent.ACTION_CANCEL)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> handleDragEnd(
+                x,
+                y,
+                event.action == MotionEvent.ACTION_CANCEL
+            )
+
             else -> super.onTouchEvent(event)
         }
     }
@@ -468,7 +492,12 @@ open class SelectionView(
     /**
      * Проверяет попадание touch в маркер.
      */
-    private fun checkHandleHit(handleRect: HandleRect, x: Int, y: Int, handleType: HandleType): HandleTouchResult {
+    private fun checkHandleHit(
+        handleRect: HandleRect,
+        x: Int,
+        y: Int,
+        handleType: HandleType
+    ): HandleTouchResult {
         val hotRect = handleRect.rect?.rect ?: return HandleTouchResult.NO_HIT
         val hotRectRef = handleRect.rect ?: return HandleTouchResult.NO_HIT
 
@@ -487,7 +516,13 @@ open class SelectionView(
     /**
      * Начинает drag операцию.
      */
-    private fun startDrag(handle: HandleType, offsetX: Int, offsetY: Int, startX: Int, startY: Int) {
+    private fun startDrag(
+        handle: HandleType,
+        offsetX: Int,
+        offsetY: Int,
+        startX: Int,
+        startY: Int
+    ) {
         Timber.d("Starting drag: handle=$handle, offset=($offsetX, $offsetY)")
         _dragState = DragState.Dragging(handle, offsetX, offsetY, startX, startY)
         callbacks.onDragStart(handle)
@@ -557,7 +592,8 @@ open class SelectionView(
             return
         }
 
-        Timber.tag("voronin").d("SelectionView hideHandles: hiding entire selection view for page change")
+        Timber.tag("voronin")
+            .d("SelectionView hideHandles: hiding entire selection view for page change")
         _handlesVisible = false
 
         // Сохраняем текущие данные для восстановления
@@ -578,7 +614,8 @@ open class SelectionView(
             return
         }
 
-        Timber.tag("voronin").d("SelectionView restoreHandles: restoring entire selection view, savedData=${_savedSelectionData != null}")
+        Timber.tag("voronin")
+            .d("SelectionView restoreHandles: restoring entire selection view, savedData=${_savedSelectionData != null}")
         _handlesVisible = true
 
         // Восстанавливаем данные если есть
@@ -645,7 +682,8 @@ open class SelectionView(
             marginRect = Rect(margin),
         )
 
-        Timber.tag("voronin").d("SelectionView saveSelectionData: saved - margin=${margin}, startWhich=${startRect.which}, endWhich=${endRect.which}")
+        Timber.tag("voronin")
+            .d("SelectionView saveSelectionData: saved - margin=${margin}, startWhich=${startRect.which}, endWhich=${endRect.which}")
     }
 
     /**

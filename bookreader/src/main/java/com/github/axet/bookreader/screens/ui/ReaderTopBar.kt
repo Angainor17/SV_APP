@@ -88,7 +88,9 @@ fun ReaderTopBar(
                     if (searchState.isLoading) {
                         CircularProgressIndicator(
                             strokeWidth = 2.dp,
-                            modifier = Modifier.width(16.dp).height(16.dp)
+                            modifier = Modifier
+                                .width(16.dp)
+                                .height(16.dp)
                         )
                     } else if (searchState.resultsCount > 0) {
                         Text(

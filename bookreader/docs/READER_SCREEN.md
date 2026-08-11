@@ -19,6 +19,7 @@ class ReaderScreen(
 ```
 
 ### BookmarkPosition
+
 ```kotlin
 @Parcelize
 data class BookmarkPosition(
@@ -31,7 +32,8 @@ data class BookmarkPosition(
 ) : Parcelable
 ```
 
-Содержит полный адрес позиции в книге (аналог `ZLTextPosition`). Передаётся через Parcel чтобы не зависеть от FBReader-типов в публичном API.
+Содержит полный адрес позиции в книге (аналог `ZLTextPosition`). Передаётся через Parcel чтобы не
+зависеть от FBReader-типов в публичном API.
 
 ---
 
@@ -42,6 +44,7 @@ data class BookmarkPosition(
 Главный Compose-контент читалки. Занимает ~950 строк.
 
 ### Параметры
+
 ```kotlin
 @Composable
 fun ReaderContent(
@@ -144,24 +147,26 @@ AndroidView(
 )
 ```
 
-**Критически важно**: позиция закладки применяется через `post{}` в factory, а не в update. Это гарантирует, что view имеет размеры и книга загружена.
+**Критически важно**: позиция закладки применяется через `post{}` в factory, а не в update. Это
+гарантирует, что view имеет размеры и книга загружена.
 
 ### FBReaderView.Listener в ReaderContent
 
-| Callback | Действие |
-|---|---|
-| `onScrollingFinished` | `viewModel.savePosition()` |
-| `onBookmarksUpdate` | `viewModel.syncBookmarksFromFBook()` |
-| `ttsStatus(speaking)` | `viewModel.volumeKeysEnabled = !speaking` |
-| `onEditBookmark` | `viewModel.onAction(EditBookmark)` |
-| `onFullscreenToggle` | `viewModel.onAction(SetFullscreen)` |
-| `onNavigationRequest` | `viewModel.onAction(ToggleNavigation)` |
-| `onSelectionShow` | `viewModel.onAction(ShowSelection(startY, endY))` |
-| `onSelectionHide` | `viewModel.hideSelection()` |
+| Callback              | Действие                                          |
+|-----------------------|---------------------------------------------------|
+| `onScrollingFinished` | `viewModel.savePosition()`                        |
+| `onBookmarksUpdate`   | `viewModel.syncBookmarksFromFBook()`              |
+| `ttsStatus(speaking)` | `viewModel.volumeKeysEnabled = !speaking`         |
+| `onEditBookmark`      | `viewModel.onAction(EditBookmark)`                |
+| `onFullscreenToggle`  | `viewModel.onAction(SetFullscreen)`               |
+| `onNavigationRequest` | `viewModel.onAction(ToggleNavigation)`            |
+| `onSelectionShow`     | `viewModel.onAction(ShowSelection(startY, endY))` |
+| `onSelectionHide`     | `viewModel.hideSelection()`                       |
 
 ### TocComposeDialog
 
 Диалог оглавления с раскрываемой иерархией:
+
 - `collectExpandableTocItems()` — рекурсивно собирает все элементы TOC
 - `ExpandableTocItem(id, title, position, level, hasChildren, parentId)`
 - `expandedStates: SnapshotStateList<String>` — список раскрытых элементов
@@ -171,16 +176,21 @@ AndroidView(
 ### FontsComposeBottomSheet
 
 BottomSheet настроек шрифтов:
+
 - Slider для размера шрифта (8..48)
 - LazyColumn со списком шрифтов (200dp высота)
 - Switch "Игнорировать встроенные шрифты"
 - Список шрифтов: системные (`sans-serif`, `serif`, `monospace`) + из `TTFManager`
 
 ### BatteryReceiver
-`DisposableEffect` регистрирует `BroadcastReceiver` для `ACTION_BATTERY_CHANGED`. Обновляет `fbReaderView.battery` и `fbReaderView.invalidateFooter()`.
+
+`DisposableEffect` регистрирует `BroadcastReceiver` для `ACTION_BATTERY_CHANGED`. Обновляет
+`fbReaderView.battery` и `fbReaderView.invalidateFooter()`.
 
 ### VolumeKeysHandler
+
 `DisposableEffect` устанавливает `View.OnKeyListener` если `PREFERENCE_VOLUME_KEYS = true`:
+
 - `VOLUME_DOWN` → `VOLUME_KEY_SCROLL_FORWARD`
 - `VOLUME_UP` → `VOLUME_KEY_SCROLL_BACK`
 - Не работает если TTS активен (`viewModel.volumeKeysEnabled = false`)
@@ -200,6 +210,7 @@ class ReaderViewModel @Inject constructor(
 ```
 
 ### Поля состояния
+
 ```kotlin
 private val _state = MutableStateFlow<ReaderState>(ReaderState.Loading)
 val state: StateFlow<ReaderState>
@@ -214,6 +225,7 @@ private var lastSelectionShowTime: Long  // для debounce
 ```
 
 ### Загрузка книги (loadBook)
+
 ```kotlin
 viewModelScope.launch {
     _state.value = ReaderState.Loading
@@ -243,6 +255,7 @@ viewModelScope.launch {
 ```
 
 ### Сохранение позиции (savePosition)
+
 ```kotlin
 fun savePosition() {
     savedPosition = fb.position as? ZLTextIndexPosition  // сохраняем для восстановления
@@ -266,6 +279,7 @@ fun savePosition() {
 ```
 
 ### goToBookmark
+
 ```kotlin
 private fun goToBookmark(bookmark: Storage.Bookmark) {
     fbReaderView?.gotoPosition(
@@ -277,7 +291,9 @@ private fun goToBookmark(bookmark: Storage.Bookmark) {
 Использует `ZLTextIndexPosition` который содержит и start и end позиции заметки.
 
 ### Debounce для showSelection
-Константа `SELECTION_DEBOUNCE_MS = 500` мс — минимальное время между show и hide. Предотвращает мигание панели при создании выделения (сначала идёт hide от предыдущего, потом show для нового).
+
+Константа `SELECTION_DEBOUNCE_MS = 500` мс — минимальное время между show и hide. Предотвращает
+мигание панели при создании выделения (сначала идёт hide от предыдущего, потом show для нового).
 
 ---
 
@@ -319,7 +335,9 @@ sealed class ReaderState {
 enum class ViewMode { PAGING, CONTINUOUS }
 ```
 
-**Важно**: Только один диалог может быть открыт одновременно. При открытии каждого диалога остальные закрываются:
+**Важно**: Только один диалог может быть открыт одновременно. При открытии каждого диалога остальные
+закрываются:
+
 ```kotlin
 private fun toggleBookmarks() {
     _state.value = currentState.copy(
@@ -340,6 +358,7 @@ private fun toggleBookmarks() {
 Полный список действий:
 
 **Загрузка и навигация:**
+
 - `LoadBook(uri, position?, bookCoverUrl?, bookTitle?, bookAuthor?)`
 - `SavePosition`
 - `GoToPosition(position)`
@@ -348,6 +367,7 @@ private fun toggleBookmarks() {
 - `GoToBookmark(bookmark)`
 
 **Отображение:**
+
 - `ToggleFullscreen`
 - `SetFullscreen(isFullscreen)`
 - `ToggleViewMode`
@@ -355,6 +375,7 @@ private fun toggleBookmarks() {
 - `MarkControlsHintShown`
 
 **Диалоги:**
+
 - `ToggleToc`
 - `ToggleBookmarks`
 - `ToggleFontSettings`
@@ -363,6 +384,7 @@ private fun toggleBookmarks() {
 - `HideDialogs`
 
 **Выделение:**
+
 - `ShowSelection(startY, endY)`
 - `HideSelection`
 - `SelectionCopy`
@@ -372,24 +394,28 @@ private fun toggleBookmarks() {
 - `SelectionAlert`
 
 **Закладки:**
+
 - `EditBookmark(bookmark)`
 - `SaveBookmarkEdit(bookmark, name, color)`
 - `AddBookmark(bookmark)`
 - `DeleteBookmark(bookmark)`
 
 **Шрифты:**
+
 - `SetFontSize(size)`
 - `SetReflowFontSize(size)`
 - `SetFontFamily(family)`
 - `SetIgnoreEmbeddedFonts(ignore)`
 
 **Поиск:**
+
 - `Search(query)` — запускает поиск (мин. 2 символа)
 - `SearchNext`
 - `SearchPrevious`
 - `SearchClose`
 
 **Zoom:**
+
 - `ZoomUpdate(scale, pivotX, pivotY)`
 - `ZoomReset`
 
@@ -409,7 +435,8 @@ data class SearchState(
 )
 ```
 
-Поиск запускается при `query.length >= 2`. При `query < 2` символов поиск не выполняется, `isLoading = false`.
+Поиск запускается при `query.length >= 2`. При `query < 2` символов поиск не выполняется,
+`isLoading = false`.
 
 ---
 
@@ -418,12 +445,14 @@ data class SearchState(
 Файл: `screens/ui/ReaderTopBar.kt`
 
 Два режима:
+
 1. **Normal**: title книги + кнопки (Search, TOC, Bookmarks, Font, More)
 2. **Search**: поле поиска + счётчик результатов + стрелки вперёд/назад
 
 Кнопка Шрифт показывается только если `state.canChangeFont = true` (false для PDF без reflow).
 
 Меню "More" содержит:
+
 - Переключение режима просмотра (Paging ↔ Continuous)
 - Переключение Reflow (Original ↔ Reflow text)
 - Настройки
@@ -435,6 +464,7 @@ data class SearchState(
 Файлы: `screens/ReaderSettingsScreen.kt`, `screens/ReaderSettingsContent.kt`
 
 Экран настроек читалки (отдельный Modo Screen). Содержит настройки:
+
 - Папка шрифтов
 - Блокировка экрана
 - Клавиши громкости

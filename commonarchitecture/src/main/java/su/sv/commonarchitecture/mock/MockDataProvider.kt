@@ -320,10 +320,12 @@ class MockDataProvider @Inject constructor(
                 Timber.d("MockDataProvider: Returning Wiki page mock")
                 wikiPageMock
             }
+
             url.contains("action=opensearch") -> {
                 Timber.d("MockDataProvider: Returning Wiki opensearch mock")
                 wikiOpenSearchMock
             }
+
             else -> {
                 Timber.d("MockDataProvider: Returning Wiki search mock")
                 wikiSearchMock
@@ -347,6 +349,7 @@ class MockDataProvider @Inject constructor(
                 Timber.d("MockDataProvider: Returning Qa answered questions mock")
                 qaAnsweredQuestionsMock
             }
+
             else -> {
                 Timber.d("MockDataProvider: Returning Qa submit report mock")
                 qaSubmitReportMock
@@ -381,6 +384,7 @@ class MockDataProvider @Inject constructor(
                 Timber.d("MockDataProvider: Returning VK video mock")
                 vkVideoMock
             }
+
             else -> {
                 Timber.d("MockDataProvider: Returning VK posts mock")
                 vkPostsMock

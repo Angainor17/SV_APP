@@ -2,7 +2,9 @@
 
 ## Обзор
 
-Выделение текста работает по-разному для PDF/DjVu (plugin mode) и EPUB/FB2 (FBReader mode). В обоих случаях конечным результатом является `SelectionView` с маркерами и `SelectionComposePanel` с кнопками действий.
+Выделение текста работает по-разному для PDF/DjVu (plugin mode) и EPUB/FB2 (FBReader mode). В обоих
+случаях конечным результатом является `SelectionView` с маркерами и `SelectionComposePanel` с
+кнопками действий.
 
 ---
 
@@ -11,6 +13,7 @@
 ### 1. Начало выделения (long press)
 
 **Plugin mode (PDF/DjVu):**
+
 ```
 PagerWidget.onLongClick(v)
     └── pluginview.select(pos, info, dst.w, dst.h, x, y)
@@ -76,7 +79,8 @@ app.addAction(ActionCode.SELECTION_SHOW_PANEL, new FBAction(app) {
 })
 ```
 
-`listener.onSelectionShow(startY, endY)` → `viewModel.onAction(ShowSelection(startY, endY))` → `_state = state.copy(showSelection = true, selectionStartY, selectionEndY)`
+`listener.onSelectionShow(startY, endY)` → `viewModel.onAction(ShowSelection(startY, endY))` →
+`_state = state.copy(showSelection = true, selectionStartY, selectionEndY)`
 
 ### 5. SelectionComposePanel появляется
 
@@ -129,6 +133,7 @@ SelectionView.onTouchEvent(ACTION_UP)
 ### 7. Действия с выделением
 
 **Копировать:**
+
 ```kotlin
 // ViewModel
 private fun selectionCopy() {
@@ -138,6 +143,7 @@ private fun selectionCopy() {
 ```
 
 **Создать закладку:**
+
 ```kotlin
 private fun selectionBookmark() {
     fbReaderView?.app?.runAction(ActionCode.SELECTION_BOOKMARK)
@@ -149,6 +155,7 @@ private fun selectionBookmark() {
 ```
 
 **Скрыть выделение:**
+
 ```kotlin
 // HideSelection action:
 fbReaderView?.app?.runAction(ActionCode.SELECTION_CLEAR)
@@ -174,6 +181,7 @@ enum class HandleType { LEFT, RIGHT }
 ```
 
 Вспомогательные данные:
+
 - `HandleTouchResult(hit, handleType, offsetX, offsetY)` — результат проверки hit test
 - `SavedSelectionData(startRectData, endRectData, marginRect)` — сохранённые данные при скрытии
 
@@ -182,11 +190,13 @@ enum class HandleType { LEFT, RIGHT }
 ## SelectionCoordinates.kt
 
 Три системы координат:
+
 1. **Device** — абсолютные координаты экрана
 2. **Page** — относительно страницы PDF (в PDF: origin снизу-слева, Y инвертирован)
 3. **View** — относительно SelectionView
 
 Преобразование PDF-координат в device происходит через:
+
 - `ppage.toDevice(0, 0, w, h, 0, rect)` — метод pdfium
 - `toDevice(info, w, h, rect)` — метод DjvuPlugin
 
@@ -195,6 +205,7 @@ enum class HandleType { LEFT, RIGHT }
 ## SelectionView.kt — как рисуется
 
 ### PageView.onDraw()
+
 ```kotlin
 override fun onDraw(canvas: Canvas) {
     for (r in lines!!)
@@ -203,6 +214,7 @@ override fun onDraw(canvas: Canvas) {
 ```
 
 `lines` — список прямоугольников, объединённых по строкам через `SelectionView.lines()`:
+
 ```kotlin
 fun lines(rr: List<Rect>): List<Rect> {
     // Объединяет прямоугольники если они пересекаются по вертикали (одна строка)
@@ -211,7 +223,9 @@ fun lines(rr: List<Rect>): List<Rect> {
 ```
 
 ### SelectionView.onDraw()
+
 Рисует маркеры (handles) поверх `PageView`:
+
 ```kotlin
 fun drawHandle(canvas, which: SelectionCursor.Which, rect: HandleRect) {
     val dpi = ZLibrary.Instance().displayDPI
@@ -230,6 +244,7 @@ fun drawHandle(canvas, which: SelectionCursor.Which, rect: HandleRect) {
 Файл: `screens/ui/SelectionComposePanel.kt`
 
 Compose-панель с 6 кнопками:
+
 1. **Закладка** — `FbreaderR.drawable.ic_bookmark_outline_white`
 2. **Поделиться** — `FbreaderR.drawable.ic_share_white`
 3. **Копировать** — `FbreaderR.drawable.ic_content_copy_white`
@@ -240,6 +255,7 @@ Compose-панель с 6 кнопками:
 Иконки берутся из модуля fbreader (`FbreaderR`).
 
 Позиционирование:
+
 ```kotlin
 // Если выделение снизу (selectionEndY > selectionStartY) → панель снизу
 val showAtBottom = currentState.selectionEndY > currentState.selectionStartY
@@ -250,6 +266,7 @@ val showAtBottom = currentState.selectionEndY > currentState.selectionStartY
 ## Разница PDF vs FB2/EPUB
 
 ### PDF (Plugin mode)
+
 - Выделение через `pdfium.Text` — по индексам символов
 - `startPage.index` / `endPage.index` — индексы символов в документе
 - Координаты в PDF-системе (origin снизу-слева), конвертируются через `ppage.toDevice()`
@@ -257,6 +274,7 @@ val showAtBottom = currentState.selectionEndY > currentState.selectionStartY
 - На планшетах (NativeView) pdfium инициализируется лениво только для текстовых операций
 
 ### FB2/EPUB (FBReader mode)
+
 - Выделение через `ZLTextWordCursor` / `ZLTextElementArea`
 - Координаты в view-пространстве FBReader
 - `ZLTextHighlighting` — для подсветки выделения
@@ -267,7 +285,9 @@ val showAtBottom = currentState.selectionEndY > currentState.selectionStartY
 ## Известные проблемы выделения
 
 ### 1. Debounce для ShowSelection/HideSelection
-Есть race condition: при создании выделения сначала срабатывает SELECTION_HIDE_PANEL (из предыдущего состояния), затем SELECTION_SHOW_PANEL. Защита:
+
+Есть race condition: при создании выделения сначала срабатывает SELECTION_HIDE_PANEL (из предыдущего
+состояния), затем SELECTION_SHOW_PANEL. Защита:
 
 ```kotlin
 // ViewModel
@@ -282,10 +302,18 @@ fun hideSelection() {
 ```
 
 ### 2. SelectionView.margin может быть null
-Если выделение "повреждено" (PageView удалён до обновления), margin становится null. В этом случае touch events игнорируются.
+
+Если выделение "повреждено" (PageView удалён до обновления), margin становится null. В этом случае
+touch events игнорируются.
 
 ### 3. Выделение при смене страницы (paging mode)
-SelectionView скрывается (INVISIBLE) при переходе на другую страницу, но не закрывается. `selectionPage` в PagerWidget помнит страницу выделения. При возврате на ту же страницу SelectionView восстанавливается.
+
+SelectionView скрывается (INVISIBLE) при переходе на другую страницу, но не закрывается.
+`selectionPage` в PagerWidget помнит страницу выделения. При возврате на ту же страницу
+SelectionView восстанавливается.
 
 ### 4. Координаты после fullscreen
-После входа/выхода из fullscreen координаты маркеров могут сместиться (status bar появляется/исчезает). В `FBReaderView.toggleFullscreen()` вызывается `updateSelectionAfterFullscreenChange()`.
+
+После входа/выхода из fullscreen координаты маркеров могут сместиться (status bar
+появляется/исчезает). В `FBReaderView.toggleFullscreen()` вызывается
+`updateSelectionAfterFullscreenChange()`.

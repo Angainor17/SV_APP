@@ -1,6 +1,7 @@
 package su.sv.commonarchitecture.mock
 
 import su.sv.commonarchitecture.BuildConfig
+import su.sv.commonarchitecture.mock.MockConfig.isMockAllowed
 
 /**
  * Конфигурация мок-режима для сетевых запросов.

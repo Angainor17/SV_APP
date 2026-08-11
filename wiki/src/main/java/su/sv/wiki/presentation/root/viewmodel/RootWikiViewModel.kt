@@ -168,9 +168,11 @@ class RootWikiViewModel @Inject constructor(
                 is WikiResult.Success -> {
                     loadArticle(result.data.title, addToHistory = true)
                 }
+
                 is WikiResult.NotFound -> {
                     _state.value = UiWikiState.NotFound
                 }
+
                 is WikiResult.Error -> {
                     _state.value = UiWikiState.Error(result.message)
                 }
@@ -205,9 +207,11 @@ class RootWikiViewModel @Inject constructor(
                         addHistoryUseCase.execute(title)
                     }
                 }
+
                 is WikiResult.NotFound -> {
                     _state.value = UiWikiState.NotFound
                 }
+
                 is WikiResult.Error -> {
                     _state.value = UiWikiState.Error(result.message)
                 }

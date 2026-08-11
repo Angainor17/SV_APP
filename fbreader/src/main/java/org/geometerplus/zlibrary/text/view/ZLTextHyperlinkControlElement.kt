@@ -25,5 +25,6 @@ class ZLTextHyperlinkControlElement(
     type: Byte,
     id: String
 ) : ZLTextControlElement(kind, true) {
-    @JvmField val Hyperlink = ZLTextHyperlink(type, id)
+    @JvmField
+    val Hyperlink = ZLTextHyperlink(type, id)
 }

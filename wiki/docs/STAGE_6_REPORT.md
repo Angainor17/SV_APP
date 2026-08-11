@@ -3,29 +3,34 @@
 ## Выполненные задачи
 
 ### 1. Создан WikiSearchBar
+
 - Поле ввода для поиска
 - Material 3 OutlinedTextField
 - Label и placeholder
 
 ### 2. Создан ArticleView
+
 - Карточка статьи с заголовком
 - Кнопка избранного (добавить/удалить)
 - Контент с кликабельными ссылками
 - Парсинг HTML и подсветка ссылок
 
 ### 3. Создан HistoryList
+
 - Заголовок "История поиска"
 - Список элементов истории
 - Кнопка очистки истории
 - Состояние "История пуста"
 
 ### 4. Обновлён RootWiki
+
 - Интеграция всех UI-компонентов
 - Обработка состояний (Initial, Loading, Content, NotFound, Error)
 - Обработка одноразовых эффектов (Snackbar)
 - Поле поиска в верхней части
 
 ### 5. Созданы строковые ресурсы
+
 ```
 wiki/src/main/res/values/strings.xml
 ```
@@ -52,16 +57,16 @@ wiki/src/main/java/su/sv/wiki/
 
 ## Строковые ресурсы
 
-| Ключ | Значение |
-|------|----------|
-| wiki_search_label | Поиск |
+| Ключ                    | Значение                 |
+|-------------------------|--------------------------|
+| wiki_search_label       | Поиск                    |
 | wiki_search_placeholder | Введите слово или фразу… |
-| wiki_loading | Загрузка… |
-| wiki_not_found | Ничего не найдено |
-| wiki_history_title | История поиска |
-| wiki_history_empty | История пуста |
-| wiki_add_favorite | Добавить в избранное |
-| wiki_remove_favorite | Удалить из избранного |
+| wiki_loading            | Загрузка…                |
+| wiki_not_found          | Ничего не найдено        |
+| wiki_history_title      | История поиска           |
+| wiki_history_empty      | История пуста            |
+| wiki_add_favorite       | Добавить в избранное     |
+| wiki_remove_favorite    | Удалить из избранного    |
 
 ---
 

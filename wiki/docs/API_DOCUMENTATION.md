@@ -1,6 +1,7 @@
 # Документация API MediaWiki для svremya.su
 
 ## Базовый URL
+
 ```
 https://svremya.su/api.php
 ```
@@ -15,24 +16,26 @@ https://svremya.su/api.php
 
 ### Параметры запроса
 
-| Параметр | Тип | Обязательный | Описание |
-|----------|-----|--------------|----------|
-| `action` | string | ✅ | `query` |
-| `list` | string | ✅ | `search` |
-| `srsearch` | string | ✅ | Поисковый запрос (URL-encoded) |
-| `srwhat` | string | ❌ | `text` (по умолчанию), `title` (по заголовкам), `nearmatch` (точное совпадение) |
-| `srlimit` | int | ❌ | Максимальное количество результатов (по умолчанию 10) |
-| `format` | string | ✅ | `json` |
-| `utf8` | string | ❌ | Пустая строка для включения UTF-8 |
+| Параметр   | Тип    | Обязательный | Описание                                                                        |
+|------------|--------|--------------|---------------------------------------------------------------------------------|
+| `action`   | string | ✅            | `query`                                                                         |
+| `list`     | string | ✅            | `search`                                                                        |
+| `srsearch` | string | ✅            | Поисковый запрос (URL-encoded)                                                  |
+| `srwhat`   | string | ❌            | `text` (по умолчанию), `title` (по заголовкам), `nearmatch` (точное совпадение) |
+| `srlimit`  | int    | ❌            | Максимальное количество результатов (по умолчанию 10)                           |
+| `format`   | string | ✅            | `json`                                                                          |
+| `utf8`     | string | ❌            | Пустая строка для включения UTF-8                                               |
 
 ### Примеры запросов
 
 #### Поиск по тексту
+
 ```
 GET https://svremya.su/api.php?action=query&list=search&srsearch=маркс&format=json&utf8=
 ```
 
 #### Точное совпадение по заголовку (рекомендуется)
+
 ```
 GET https://svremya.su/api.php?action=query&list=search&srsearch=Конечное&srwhat=nearmatch&format=json&utf8=
 ```
@@ -40,6 +43,7 @@ GET https://svremya.su/api.php?action=query&list=search&srsearch=Конечно�
 ### Формат ответа
 
 #### Успешный поиск (найдены результаты)
+
 ```json
 {
   "batchcomplete": "",
@@ -63,6 +67,7 @@ GET https://svremya.su/api.php?action=query&list=search&srsearch=Конечно�
 ```
 
 #### Ничего не найдено
+
 ```json
 {
   "batchcomplete": "",
@@ -77,16 +82,16 @@ GET https://svremya.su/api.php?action=query&list=search&srsearch=Конечно�
 
 ### Поля ответа
 
-| Поле | Тип | Описание |
-|------|-----|----------|
-| `totalhits` | int | Общее количество найденных результатов |
-| `ns` | int | Namespace (0 = основное пространство) |
-| `title` | string | Заголовок статьи |
-| `pageid` | int | ID страницы |
-| `size` | int | Размер в байтах |
-| `wordcount` | int | Количество слов |
-| `snippet` | string | Фрагмент текста с подсветкой |
-| `timestamp` | string | Дата последнего изменения (ISO 8601) |
+| Поле        | Тип    | Описание                               |
+|-------------|--------|----------------------------------------|
+| `totalhits` | int    | Общее количество найденных результатов |
+| `ns`        | int    | Namespace (0 = основное пространство)  |
+| `title`     | string | Заголовок статьи                       |
+| `pageid`    | int    | ID страницы                            |
+| `size`      | int    | Размер в байтах                        |
+| `wordcount` | int    | Количество слов                        |
+| `snippet`   | string | Фрагмент текста с подсветкой           |
+| `timestamp` | string | Дата последнего изменения (ISO 8601)   |
 
 ---
 
@@ -98,14 +103,15 @@ GET https://svremya.su/api.php?action=query&list=search&srsearch=Конечно�
 
 ### Параметры запроса
 
-| Параметр | Тип | Обязательный | Описание |
-|----------|-----|--------------|----------|
-| `action` | string | ✅ | `parse` |
-| `page` | string | ✅ | Заголовок страницы (URL-encoded) |
-| `prop` | string | ✅ | `text` (HTML), `links` (ссылки), `displaytitle` (заголовок) |
-| `format` | string | ✅ | `json` |
+| Параметр | Тип    | Обязательный | Описание                                                    |
+|----------|--------|--------------|-------------------------------------------------------------|
+| `action` | string | ✅            | `parse`                                                     |
+| `page`   | string | ✅            | Заголовок страницы (URL-encoded)                            |
+| `prop`   | string | ✅            | `text` (HTML), `links` (ссылки), `displaytitle` (заголовок) |
+| `format` | string | ✅            | `json`                                                      |
 
 ### Пример запроса
+
 ```
 GET https://svremya.su/api.php?action=parse&page=Конечное&prop=text|links|displaytitle&format=json
 ```
@@ -113,6 +119,7 @@ GET https://svremya.su/api.php?action=parse&page=Конечное&prop=text|link
 ### Формат ответа
 
 #### Успешный ответ
+
 ```json
 {
   "parse": {
@@ -139,6 +146,7 @@ GET https://svremya.su/api.php?action=parse&page=Конечное&prop=text|link
 ```
 
 #### Страница не существует
+
 ```json
 {
   "error": {
@@ -150,15 +158,15 @@ GET https://svremya.su/api.php?action=parse&page=Конечное&prop=text|link
 
 ### Поля ответа
 
-| Поле | Тип | Описание |
-|------|-----|----------|
-| `title` | string | Заголовок страницы |
-| `pageid` | int | ID страницы |
-| `text["*"]` | string | HTML-содержимое |
-| `links` | array | Массив ссылок на другие статьи |
-| `links[].ns` | int | Namespace ссылки |
+| Поле             | Тип    | Описание                              |
+|------------------|--------|---------------------------------------|
+| `title`          | string | Заголовок страницы                    |
+| `pageid`         | int    | ID страницы                           |
+| `text["*"]`      | string | HTML-содержимое                       |
+| `links`          | array  | Массив ссылок на другие статьи        |
+| `links[].ns`     | int    | Namespace ссылки                      |
 | `links[].exists` | string | Пустая строка, если статья существует |
-| `links[].*` | string | Заголовок связанной статьи |
+| `links[].*`      | string | Заголовок связанной статьи            |
 
 ---
 
@@ -170,19 +178,21 @@ GET https://svremya.su/api.php?action=parse&page=Конечное&prop=text|link
 
 ### Параметры запроса
 
-| Параметр | Тип | Обязательный | Описание |
-|----------|-----|--------------|----------|
-| `action` | string | ✅ | `opensearch` |
-| `search` | string | ✅ | Поисковый запрос |
-| `limit` | int | ❌ | Максимальное количество результатов |
-| `format` | string | ✅ | `json` |
+| Параметр | Тип    | Обязательный | Описание                            |
+|----------|--------|--------------|-------------------------------------|
+| `action` | string | ✅            | `opensearch`                        |
+| `search` | string | ✅            | Поисковый запрос                    |
+| `limit`  | int    | ❌            | Максимальное количество результатов |
+| `format` | string | ✅            | `json`                              |
 
 ### Пример запроса
+
 ```
 GET https://svremya.su/api.php?action=opensearch&search=конеч&limit=5&format=json
 ```
 
 ### Формат ответа
+
 ```json
 [
   "конеч",
@@ -193,6 +203,7 @@ GET https://svremya.su/api.php?action=opensearch&search=конеч&limit=5&forma
 ```
 
 ### Структура ответа (массив из 4 элементов)
+
 1. `[0]` - Поисковый запрос
 2. `[1]` - Массив заголовков
 3. `[2]` - Массив описаний (обычно пустые)
@@ -203,16 +214,19 @@ GET https://svremya.su/api.php?action=opensearch&search=конеч&limit=5&forma
 ## 4. Рекомендуемые стратегии поиска
 
 ### Стратегия 1: Поиск с переходом к статье
+
 1. Использовать `srwhat=nearmatch` для точного совпадения
 2. Если найдено → загрузить статью через `action=parse`
 3. Если не найдено → показать "Ничего не найдено"
 
 ### Стратегия 2: Поиск с выбором из списка
+
 1. Использовать обычный поиск (`srwhat=text`)
 2. Показать список результатов
 3. При выборе → загрузить статью
 
 ### Рекомендуемая стратегия для данного проекта
+
 Использовать **Стратегию 1** с fallback на `opensearch` для автодополнения при вводе.
 
 ---
@@ -220,16 +234,19 @@ GET https://svremya.su/api.php?action=opensearch&search=конеч&limit=5&forma
 ## 5. Формат HTML-ссылок
 
 ### Структура ссылки в HTML
+
 ```html
 <a href="/%D0%9D%D0%B5%D1%87%D1%82%D0%BE" title="Нечто">нечто</a>
 ```
 
 ### Парсинг ссылки
+
 - `href` - URL-encoded путь к статье (без домена)
 - `title` - Заголовок статьи (tooltip)
 - Текст между тегами - отображаемый текст
 
 ### Пример обработки
+
 ```kotlin
 // Регулярное выражение для поиска ссылок
 val linkRegex = """<a href="/([^"]+)" title="([^"]+)">([^<]+)</a>""".toRegex()
@@ -249,14 +266,15 @@ matches.forEach { match ->
 
 ### Коды ошибок
 
-| Код | Описание | Действие |
-|-----|----------|----------|
-| `missingtitle` | Страница не существует | Показать "Ничего не найдено" |
-| `invalidtitle` | Некорректный заголовок | Показать ошибку ввода |
-| HTTP 5xx | Ошибка сервера | Показать ошибку с кнопкой повтора |
-| Timeout | Превышено время ожидания | Показать ошибку сети |
+| Код            | Описание                 | Действие                          |
+|----------------|--------------------------|-----------------------------------|
+| `missingtitle` | Страница не существует   | Показать "Ничего не найдено"      |
+| `invalidtitle` | Некорректный заголовок   | Показать ошибку ввода             |
+| HTTP 5xx       | Ошибка сервера           | Показать ошибку с кнопкой повтора |
+| Timeout        | Превышено время ожидания | Показать ошибку сети              |
 
 ### Пример обработки
+
 ```kotlin
 when {
     response.isSuccessful -> {
@@ -278,6 +296,7 @@ when {
 ## 7. Примеры полного цикла
 
 ### Пример 1: Поиск статьи "Конечное"
+
 ```
 1. GET /api.php?action=query&list=search&srsearch=Конечное&srwhat=nearmatch&format=json
    → Найдена статья с title="Конечное", pageid=223
@@ -289,6 +308,7 @@ when {
 ```
 
 ### Пример 2: Переход по ссылке
+
 ```
 1. Пользователь кликает на ссылку "нечто" (href="/Нечто")
 

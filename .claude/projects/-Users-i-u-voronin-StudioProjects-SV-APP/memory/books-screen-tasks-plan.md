@@ -26,6 +26,7 @@ metadata:
 **Запрос:** `https://svremya.org/appws/appws.php`
 
 **Статистика:**
+
 - Всего книг: 34
 
 **Категории (4 уникальные):**
@@ -45,7 +46,8 @@ metadata:
 | 2 | Долгов В. Г. |
 | 2 | Ельмеев В. Я. |
 
-**Вывод:** Категорий всего 4, авторов 16. Вместе с chip "Все" — максимум 21 элемент. Ограничение в 20 элементов требует алгоритма выбора наиболее частых.
+**Вывод:** Категорий всего 4, авторов 16. Вместе с chip "Все" — максимум 21 элемент. Ограничение в
+20 элементов требует алгоритма выбора наиболее частых.
 
 ---
 
@@ -91,6 +93,7 @@ data class UiBookFilter(
 ### 1.3 Алгоритм формирования списка фильтров
 
 **Правила:**
+
 1. Всегда первый chip — "Все"
 2. Формируем карту частот: категории + авторы (разбивка по запятой)
 3. Сортируем по убыванию частоты
@@ -139,6 +142,7 @@ class BookFiltersMapper {
 ### 1.4 Логика фильтрации
 
 **Правила:**
+
 1. При выборе chip "Все" — сброс всех фильтров, показ всех книг
 2. При выборе любого другого chip — фильтрация на месте (без сети)
 3. Выбранный chip перемещается в начало списка (кроме "Все")
@@ -147,6 +151,7 @@ class BookFiltersMapper {
 6. У выбранных chip (кроме "Все") отображается крестик для удаления
 
 **Алгоритм пересечения:**
+
 ```kotlin
 fun getAvailableFilters(
     allFilters: List<UiBookFilter>,
@@ -183,24 +188,26 @@ fun getAvailableFilters(
 ### 1.5 UI компоненты
 
 **BookFiltersChips.kt:**
+
 - Использовать `LazyRow` для горизонтального списка
 - Material3 `FilterChip` или `InputChip` (для крестика)
 - Анимация появления/исчезновения при скролле (связано с TopAppBar)
 
 **Интеграция с TopAppBar:**
+
 - Использовать `TopAppBarDefaults.enterAlwaysScrollBehavior()`
 - Скрывать chips вместе с TopAppBar при скролле вниз
 - Показывать при свайпе вниз (PullToRefresh) или скролле вверх
 
 ### 1.6 Изменения в существующих файлах
 
-| Файл | Изменение |
-|------|-----------|
-| `UiRootBooksState.kt` | Добавить поля: `allBooks`, `filteredBooks`, `filters`, `selectedFilters` |
-| `RootBooksCatalogViewModel.kt` | Добавить логику фильтрации, действия для выбора фильтров |
-| `RootBookActions.kt` | Добавить `OnFilterSelect(filter: BookFilter)`, `OnFilterRemove(filter: BookFilter)` |
-| `BookList.kt` | Добавить `BookFiltersChips` над списком, интеграция со скроллом |
-| `BooksListOneTimeEffect.kt` | Не требуется изменений |
+| Файл                           | Изменение                                                                           |
+|--------------------------------|-------------------------------------------------------------------------------------|
+| `UiRootBooksState.kt`          | Добавить поля: `allBooks`, `filteredBooks`, `filters`, `selectedFilters`            |
+| `RootBooksCatalogViewModel.kt` | Добавить логику фильтрации, действия для выбора фильтров                            |
+| `RootBookActions.kt`           | Добавить `OnFilterSelect(filter: BookFilter)`, `OnFilterRemove(filter: BookFilter)` |
+| `BookList.kt`                  | Добавить `BookFiltersChips` над списком, интеграция со скроллом                     |
+| `BooksListOneTimeEffect.kt`    | Не требуется изменений                                                              |
 
 ---
 
@@ -285,16 +292,19 @@ class GetDownloadedBooksUseCase @Inject constructor(
 ### 2.4 UI компоненты
 
 **DownloadedBooksScreen.kt:**
+
 - TopAppBar с кнопкой "Назад" (стрелочка)
 - Список `LazyColumn` с карточками
 
 **DownloadedBookItem.kt:**
+
 - Card с обложкой слева
 - Текстовые поля справа: название, автор, категория, страница
 - Кнопка "Читать"
 - Свайп влево для удаления
 
 **Свайп для удаления:**
+
 ```kotlin
 @Composable
 fun DownloadedBookItem(
@@ -343,6 +353,7 @@ AlertDialog(
 ### 2.6 Удаление книги
 
 **Требуется добавить в BookDownloadRepository:**
+
 ```kotlin
 fun deleteBook(uri: Uri): Boolean {
     return try {
@@ -358,6 +369,7 @@ fun deleteBook(uri: Uri): Boolean {
 ### 2.7 Анимация подсказки свайпа
 
 **Логика:**
+
 1. При первом открытии экрана — показать анимацию свайпа на первой карточке
 2. После показа AlertDialog — сохранить флаг в SharedPreferences
 3. Если флаг уже установлен — не показывать анимацию
@@ -409,6 +421,7 @@ is BooksListOneTimeEffect.OpenDownloadedBooks -> {
 ### 2.10 Удаление старого экрана
 
 **Файлы для удаления (если существуют):**
+
 - `bookreader/src/main/java/com/github/axet/bookreader/fragments/LibraryFragment.kt`
 - Связанные XML layouts
 
@@ -419,6 +432,7 @@ is BooksListOneTimeEffect.OpenDownloadedBooks -> {
 ### 3.1 Изменения
 
 **BookItem.kt:**
+
 ```kotlin
 @Composable
 private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions) {
@@ -444,6 +458,7 @@ private fun BoxScope.BookDownloadStatus(item: UiBook, actions: RootBooksActions)
 ### 3.2 Новое действие
 
 **RootBookActions.kt:**
+
 ```kotlin
 sealed class RootBookActions {
     // ...
@@ -454,6 +469,7 @@ sealed class RootBookActions {
 ### 3.3 Обработка в ViewModel
 
 **RootBooksCatalogViewModel.kt:**
+
 ```kotlin
 override fun onAction(action: RootBookActions) {
     when (action) {
@@ -476,12 +492,14 @@ override fun onAction(action: RootBookActions) {
 ## Порядок реализации
 
 ### Этап 1: Задача 3 (простая)
+
 1. Добавить действие `OnOpenDownloadedBook`
 2. Изменить обработку клика в `BookItem.kt`
 3. Добавить обработку в ViewModel
 4. Протестировать открытие читалки
 
 ### Этап 2: Задача 2 (экран "Ваши книги")
+
 1. Создать модели данных
 2. Реализовать `GetDownloadedBooksUseCase`
 3. Создать ViewModel
@@ -493,6 +511,7 @@ override fun onAction(action: RootBookActions) {
 9. Удалить старый экран библиотеки
 
 ### Этап 3: Задача 1 (фильтры)
+
 1. Создать модели фильтров
 2. Реализовать `BookFiltersMapper`
 3. Добавить фильтры в состояние экрана
@@ -507,6 +526,7 @@ override fun onAction(action: RootBookActions) {
 ## Зависимости
 
 ### Новые зависимости не требуются
+
 - Material3 Chip уже доступен
 - SwipeToDismiss есть в Compose Material
 
@@ -515,8 +535,10 @@ override fun onAction(action: RootBookActions) {
 ## Риски и вопросы
 
 1. **Прогресс чтения:** Где хранится текущая страница? Требуется исследование хранилища FBReader.
-2. **Удаление книги:** Удаление через ContentResolver может не работать для файлов в Downloads. Может потребоваться другой подход.
-3. **Производительность:** Формирование списка фильтров при каждом обновлении списка книг. Можно кэшировать.
+2. **Удаление книги:** Удаление через ContentResolver может не работать для файлов в Downloads.
+   Может потребоваться другой подход.
+3. **Производительность:** Формирование списка фильтров при каждом обновлении списка книг. Можно
+   кэшировать.
 
 ---
 

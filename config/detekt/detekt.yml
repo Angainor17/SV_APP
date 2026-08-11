@@ -4,7 +4,7 @@
 complexity:
   LongMethod:
     allowedLines: 60
-    ignoreAnnotated: ['Composable']
+    ignoreAnnotated: [ 'Composable' ]
   LongParameterList:
     allowedFunctionParameters: 8
     allowedConstructorParameters: 8
@@ -13,7 +13,7 @@ complexity:
     allowedConditions: 5
   CyclomaticComplexMethod:
     allowedComplexity: 20
-    ignoreAnnotated: ['Composable']
+    ignoreAnnotated: [ 'Composable' ]
 
 coroutines:
   GlobalCoroutineUsage:
@@ -35,7 +35,7 @@ exceptions:
 
 naming:
   FunctionNaming:
-    ignoreAnnotated: ['Composable']
+    ignoreAnnotated: [ 'Composable' ]
   VariableNaming:
     active: true
   ClassNaming:
@@ -48,7 +48,7 @@ performance:
 style:
   MaxLineLength:
     maxLineLength: 120
-    ignoreAnnotated: ['Composable']
+    ignoreAnnotated: [ 'Composable' ]
   ForbiddenComment:
     active: false
   MagicNumber:

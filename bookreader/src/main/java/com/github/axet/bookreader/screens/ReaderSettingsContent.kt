@@ -83,10 +83,13 @@ fun ReaderSettingsContent(
             when (key) {
                 ReaderPreferences.PREFERENCE_VIEW_MODE ->
                     viewMode = sharedPreferences.getString(key, "PAGING") ?: "PAGING"
+
                 ReaderPreferences.PREFERENCE_VOLUME_KEYS ->
                     volumeKeys = sharedPreferences.getBoolean(key, false)
+
                 ReaderPreferences.PREFERENCE_SCREENLOCK ->
                     screenLock = sharedPreferences.getString(key, "0") ?: "0"
+
                 ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW ->
                     twoColumnView = when (sharedPreferences.getString(key, "auto")) {
                         "true" -> "true"
@@ -160,7 +163,12 @@ fun ReaderSettingsContent(
                             "true" -> "false"
                             else -> "auto"
                         }
-                        shared.edit { putString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, newValue) }
+                        shared.edit {
+                            putString(
+                                ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW,
+                                newValue
+                            )
+                        }
                     },
                 )
             }

@@ -9,10 +9,14 @@ import android.graphics.Rect
  * [Plugin.Box] оставлен как backward-compatible враппер.
  */
 open class PluginBox {
-    @JvmField var x: Int = 0 // нижний левый x
-    @JvmField var y: Int = 0 // нижний левый y
-    @JvmField var w: Int = 0 // x + w = верхний правый x
-    @JvmField var h: Int = 0 // y + h = верхний правый y
+    @JvmField
+    var x: Int = 0 // нижний левый x
+    @JvmField
+    var y: Int = 0 // нижний левый y
+    @JvmField
+    var w: Int = 0 // x + w = верхний правый x
+    @JvmField
+    var h: Int = 0 // y + h = верхний правый y
 
     constructor()
 
@@ -44,6 +48,8 @@ open class PluginBox {
  * Вынесен из [Plugin.RenderRect] для уменьшения размера Plugin.kt.
  */
 open class PluginRenderRect : PluginBox() {
-    @JvmField var src: Rect? = null
-    @JvmField var dst: Rect? = null
+    @JvmField
+    var src: Rect? = null
+    @JvmField
+    var dst: Rect? = null
 }

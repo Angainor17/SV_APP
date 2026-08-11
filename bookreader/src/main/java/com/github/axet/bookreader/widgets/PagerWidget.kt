@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import com.github.axet.bookreader.app.Plugin
 import com.github.axet.bookreader.app.PluginPage
 import com.github.axet.bookreader.app.PluginView
 import com.github.axet.bookreader.app.Reflow
@@ -21,9 +20,11 @@ import timber.log.Timber
 /**
  * Виджет для постраничного отображения книги.
  */
-class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), ZoomGestureHandler.ZoomListener {
+class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
+    ZoomGestureHandler.ZoomListener {
 
-    @JvmField val brightness: FBReaderView.BrightnessGesture
+    @JvmField
+    val brightness: FBReaderView.BrightnessGesture
     private val zoomHandler: ZoomGestureHandler
 
     private var x: Int = 0
@@ -43,7 +44,10 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
         }
         isFocusable = true
 
-        fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byTapAndFlick)
+        fb.config.setValue(
+            fb.app.PageTurningOptions.fingerScrolling,
+            PageTurningOptions.FingerScrollingType.byTapAndFlick
+        )
 
         brightness = FBReaderView.BrightnessGesture(fb)
         zoomHandler = ZoomGestureHandler(fb.context, this)
@@ -97,7 +101,8 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
         if (fb.pluginview!!.reflow) {
             dst = Rect(0, 0, width, height)
         } else {
-            val p = fb.pluginview!!.current!! // не использует current.renderRect() - показывает частичную страницу
+            val p =
+                fb.pluginview!!.current!! // не использует current.renderRect() - показывает частичную страницу
             if (p.pageOffset < 0) { // показываем пустое место в начале
                 val t = (-p.pageOffset / p.ratio).toInt()
                 dst = Rect(0, t, p.w, t + (p.pageBox!!.h / p.ratio).toInt())
@@ -126,11 +131,23 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
 
     override fun drawOnBitmap(bitmap: Bitmap, index: ZLViewEnums.PageIndex) {
         if (fb.pluginview != null) {
-            fb.pluginview!!.drawOnBitmap(context, bitmap, width, mainAreaHeight, index, fb.app.BookTextView as FBReaderView.CustomView, fb.book.info)
+            fb.pluginview!!.drawOnBitmap(
+                context,
+                bitmap,
+                width,
+                mainAreaHeight,
+                index,
+                fb.app.BookTextView as FBReaderView.CustomView,
+                fb.book.info
+            )
             var info: Reflow.Info? = null
             val position: ZLTextPosition
             if (fb.pluginview!!.reflow) {
-                position = ZLTextFixedPosition(fb.pluginview!!.reflower!!.page, fb.pluginview!!.reflower!!.index + fb.pluginview!!.reflower!!.pending, 0)
+                position = ZLTextFixedPosition(
+                    fb.pluginview!!.reflower!!.page,
+                    fb.pluginview!!.reflower!!.index + fb.pluginview!!.reflower!!.pending,
+                    0
+                )
                 info = Reflow.Info(fb.pluginview!!.reflower!!, position.elementIndex)
                 infos.put(position, info)
             } else {
@@ -171,7 +188,11 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
 
     private fun getPosition(): ZLTextFixedPosition {
         return if (fb.pluginview!!.reflow)
-            ZLTextFixedPosition(fb.pluginview!!.reflower!!.page, fb.pluginview!!.reflower!!.index, 0)
+            ZLTextFixedPosition(
+                fb.pluginview!!.reflower!!.page,
+                fb.pluginview!!.reflower!!.index,
+                0
+            )
         else
             ZLTextFixedPosition(fb.pluginview!!.current!!.pageNumber, 0, 0)
     }
@@ -292,14 +313,30 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                 fb.pluginview!!.reflower = null
             }
             if (fb.pluginview!!.reflower == null) {
-                fb.pluginview!!.reflower = Reflow(context, w, h, page, fb.app.BookTextView as FBReaderView.CustomView, fb.book.info)
-                val bm = fb.pluginview!!.render(fb.pluginview!!.reflower!!.rw, fb.pluginview!!.reflower!!.h, page)!!
+                fb.pluginview!!.reflower = Reflow(
+                    context,
+                    w,
+                    h,
+                    page,
+                    fb.app.BookTextView as FBReaderView.CustomView,
+                    fb.book.info
+                )
+                val bm = fb.pluginview!!.render(
+                    fb.pluginview!!.reflower!!.rw,
+                    fb.pluginview!!.reflower!!.h,
+                    page
+                )!!
                 fb.pluginview!!.reflower!!.load(bm, page, 0)
             }
             for (i in 0 until fb.pluginview!!.reflower!!.count()) {
                 val info = Reflow.Info(fb.pluginview!!.reflower!!, i)
                 val pos = ZLTextFixedPosition(page, i, 0)
-                val p = fb.pluginview!!.selectPage(pos, info, fb.pluginview!!.reflower!!.w, fb.pluginview!!.reflower!!.h)
+                val p = fb.pluginview!!.selectPage(
+                    pos,
+                    info,
+                    fb.pluginview!!.reflower!!.w,
+                    fb.pluginview!!.reflower!!.h
+                )
                 val bb = fb.search!!.getBounds(p)!!
                 if (bb.rr != null) {
                     bb.rr = fb.pluginview!!.boundsUpdate(bb.rr!!, info)
@@ -367,22 +404,40 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
     fun getInfo(): Reflow.Info? {
         if (fb.pluginview!!.reflower == null)
             return null
-        return infos[ZLTextFixedPosition(fb.pluginview!!.reflower!!.page, fb.pluginview!!.reflower!!.index, 0)]
+        return infos[ZLTextFixedPosition(
+            fb.pluginview!!.reflower!!.page,
+            fb.pluginview!!.reflower!!.index,
+            0
+        )]
     }
 
     override fun onLongClick(v: View): Boolean {
         if (fb.pluginview != null) {
             val dst = getPageRect()
             val pos = getPosition()
-            Timber.tag("voronin").d("PagerWidget onLongClick: attempting selection at position=%s, coords=(%d,%d)", pos, x, y)
-            val s = fb.pluginview!!.select(pos, getInfo(), dst.width(), dst.height(), x - dst.left, y - dst.top)
+            Timber.tag("voronin").d(
+                "PagerWidget onLongClick: attempting selection at position=%s, coords=(%d,%d)",
+                pos,
+                x,
+                y
+            )
+            val s = fb.pluginview!!.select(
+                pos,
+                getInfo(),
+                dst.width(),
+                dst.height(),
+                x - dst.left,
+                y - dst.top
+            )
             if (s != null) {
-                Timber.tag("voronin").d("PagerWidget onLongClick: selection created successfully at %s", pos)
+                Timber.tag("voronin")
+                    .d("PagerWidget onLongClick: selection created successfully at %s", pos)
                 if (fb.tts != null) {
                     fb.tts!!.selectionOpen(s)
                 } else {
                     selectionPage = pos
-                    Timber.tag("voronin").d("PagerWidget onLongClick: selectionPage set to %s", selectionPage!!)
+                    Timber.tag("voronin")
+                        .d("PagerWidget onLongClick: selectionPage set to %s", selectionPage!!)
                     fb.selectionOpen(s)
                     val page = fb.pluginview!!.selectPage(pos, getInfo(), dst.width(), dst.height())
                     val run = {
@@ -390,18 +445,24 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                         var y = dst.top
                         if (fb.pluginview!!.reflow)
                             x += getInfo()!!.margin.left
-                        fb.selection.update(fb.selection.getChildAt(0) as SelectionView.PageView, x, y)
+                        fb.selection.update(
+                            fb.selection.getChildAt(0) as SelectionView.PageView,
+                            x,
+                            y
+                        )
                     }
                     val setter = object : PluginView.Selection.Setter {
                         override fun setStart(x: Int, y: Int) {
-                            val point = fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
+                            val point =
+                                fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
                             if (point != null)
                                 s.setStart(page, point)
                             run()
                         }
 
                         override fun setEnd(x: Int, y: Int) {
-                            val point = fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
+                            val point =
+                                fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
                             if (point != null)
                                 s.setEnd(page, point)
                             run()
@@ -417,7 +478,11 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                             return bounds
                         }
                     }
-                    val view = SelectionView.PageView(context, fb.app.BookTextView as FBReaderView.CustomView, setter)
+                    val view = SelectionView.PageView(
+                        context,
+                        fb.app.BookTextView as FBReaderView.CustomView,
+                        setter
+                    )
                     fb.selection.add(view)
                     run()
                 }
@@ -453,7 +518,10 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context), Z
                     val k = ZLTextFixedPosition(key.paragraphIndex, l + 1, 0)
                     val kv = get(ZLTextFixedPosition(key.paragraphIndex + 1, 0, 0))
                     if (kv != null) {
-                        super.put(k, kv) // игнорируем результат, дублируем ключ для того же значения
+                        super.put(
+                            k,
+                            kv
+                        ) // игнорируем результат, дублируем ключ для того же значения
                         last.add(k) // (2,2,0) == (3,0,0) когда (2,1,0) последний
                     }
                 }

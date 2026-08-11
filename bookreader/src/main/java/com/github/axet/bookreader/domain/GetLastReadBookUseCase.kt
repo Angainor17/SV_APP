@@ -69,7 +69,8 @@ class GetLastReadBookUseCase @Inject constructor(
         // Берём первую книгу (последняя прочитанная)
         val lastBook = sortedBooks.first()
 
-        Timber.tag(TAG).d("invoke: last book = ${lastBook.info?.title}, last=${lastBook.info?.last}")
+        Timber.tag(TAG)
+            .d("invoke: last book = ${lastBook.info?.title}, last=${lastBook.info?.last}")
 
         // book.url - это URI файла книги (файл существует, т.к. Storage.list() его нашёл)
         val bookFileUri = lastBook.url.toString()

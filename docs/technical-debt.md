@@ -20,16 +20,19 @@
 
 **Модуль:** bookreader
 **Оставшиеся файлы:**
+
 - `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки
 - `widgets/ScrollWidget.java` (1717 строк) - много внутренних классов
 - `widgets/FBReaderView.java` (2158 строк) - декомпозируется
 
 **Сложности:**
+
 - Storage.java наследуется от `com.github.axet.androidlibrary.app.Storage`
 - Много статических методов, вызываемых из Kotlin
 - Внутренние классы: `Info`, `Progress`, `Bookmark`, etc.
 
 **Решение:**
+
 1. Создать обёртки для статических методов
 2. Добавить `@JvmStatic` для companion object методов
 3. Использовать `lateinit` для lazy-инициализации
@@ -43,6 +46,7 @@
 **Проблема:** Модули объявляют зависимости, которые приходят транзитивно.
 
 **Действия:**
+
 - [ ] Вынести общие зависимости в `api` блоки базовых модулей
 - [ ] Удалить дублирующиеся объявления из feature-модулей
 - [ ] Протестировать сборку после каждого изменения
@@ -58,6 +62,7 @@
 **Проблема:** В `gradle.properties` есть deprecated настройки.
 
 **Настройки для удаления (AGP 10.0):**
+
 ```properties
 android.enableJetifier=true
 android.defaults.buildfeatures.resvalues=true
@@ -68,6 +73,7 @@ android.r8.optimizedResourceShrinking=false
 ```
 
 **Уже удалены (AGP 9.0 built-in Kotlin):**
+
 - `android.builtInKotlin=false`
 - `android.newDsl=false`
 
@@ -79,17 +85,17 @@ android.r8.optimizedResourceShrinking=false
 
 Все основные зависимости обновлены до актуальных версий:
 
-| Зависимость | Было | Стало |
-|-------------|------|-------|
-| AGP | 9.2.0 | 9.3.1 |
-| Kotlin | 2.2.20 | 2.4.10 |
-| Compose BOM | 2025.06.01 | 2026.06.01 |
-| Core KTX | 1.17.0 | 1.19.0 |
-| Lifecycle | 2.9.1 | 2.11.0 |
-| Hilt | 2.59.2 | 2.60.1 |
-| ktlint | 12.2.0 | 14.2.0 |
-| OkHttp | 4.12.0 | 5.4.0 |
-| Navigation | — | 2.9.8 (2.10.0-alpha) |
+| Зависимость | Было       | Стало                |
+|-------------|------------|----------------------|
+| AGP         | 9.2.0      | 9.3.1                |
+| Kotlin      | 2.2.20     | 2.4.10               |
+| Compose BOM | 2025.06.01 | 2026.06.01           |
+| Core KTX    | 1.17.0     | 1.19.0               |
+| Lifecycle   | 2.9.1      | 2.11.0               |
+| Hilt        | 2.59.2     | 2.60.1               |
+| ktlint      | 12.2.0     | 14.2.0               |
+| OkHttp      | 4.12.0     | 5.4.0                |
+| Navigation  | —          | 2.9.8 (2.10.0-alpha) |
 
 ---
 
@@ -100,6 +106,7 @@ android.r8.optimizedResourceShrinking=false
 **Проблема:** Модуль `models` содержит только 2 файла и используется только в `books`.
 
 **Файлы:**
+
 - `UiBook.kt`
 - `UIBookState.kt`
 
@@ -114,6 +121,7 @@ android.r8.optimizedResourceShrinking=false
 **Проблема:** Модуль содержит разные типы менеджеров.
 
 **Предложение:**
+
 ```
 managers/
 ├── theme/          → theme-manager модуль
@@ -135,6 +143,7 @@ managers/
 **Проблема:** Build features включены по умолчанию во всех модулях.
 
 **Решение:** Отключить ненужные:
+
 ```kotlin
 android {
     buildFeatures {
@@ -150,6 +159,7 @@ android {
 ### 🟡 P2: Gradle оптимизации — оставшиеся
 
 **Уже включено:**
+
 ```properties
 org.gradle.parallel=true        # Параллельная сборка
 org.gradle.caching=true         # Build cache
@@ -157,6 +167,7 @@ org.gradle.configuration-cache=true  # Configuration cache
 ```
 
 **Ещё не включено:**
+
 ```properties
 kotlin.incremental=true          # Kotlin incremental (может быть включён по умолчанию)
 org.gradle.vfs.watch=true        # File system watching
@@ -173,6 +184,7 @@ org.gradle.vfs.watch=true        # File system watching
 **Проблема:** Строки "Книга", "Неизвестная книга" в domain слое.
 
 **Файлы:**
+
 - `GetLastReadBookUseCase.kt:81` — "Книга"
 - `BookmarksRepository.kt:141` — "Неизвестная книга"
 
@@ -203,6 +215,7 @@ tasks.register("checkDependencies") {
 **Ошибка:** `Fatal signal 5 (SIGTRAP)` в `libmodpdfium.so`
 
 **Стек:**
+
 ```
 #00 pc 0000000000333e2c  libmodpdfium.so
 #01 pc 0000000000335f94  libmodpdfium.so
@@ -253,17 +266,20 @@ scroll/two-column режим на затронутых устройствах.
 
 **Модуль:** bookreader
 **Файлы:**
+
 - `widgets/ScrollWidget.java` — legacy Java, требует декомпозиции
 - `widgets/FBReaderView.java` — legacy Java
 - `screens/ReaderScreen.kt` — интеграция
 
 **Решение:**
+
 1. Создать `TwoPageLayout.kt` компонент
 2. Модифицировать ScrollWidget для отображения двух страниц
 3. Добавить настройку в ReaderSettings для включения/выключения
 4. Активировать только для Expanded + landscape
 
 **Сложности:**
+
 - Требует изменений в legacy Java коде (ScrollWidget, FBReaderView)
 - Нужно синхронизировать скролл между двумя страницами
 - Управление состоянием (текущая страница, режим)
@@ -278,11 +294,13 @@ scroll/two-column режим на затронутых устройствах.
 
 **Модуль:** wiki
 **Файлы:**
+
 - `root/RootWiki.kt` — главный экран
 - `presentation/favorites/FavoritesScreen.kt` — список избранного
 - `presentation/article/ArticleScreen.kt` — статья
 
 **Решение:**
+
 1. Использовать `MasterDetailLayout` из commonui
 2. Создать адаптивную версию RootWiki для Expanded
 3. Слева: список избранного (35%)
@@ -290,6 +308,7 @@ scroll/two-column режим на затронутых устройствах.
 5. Синхронизация выбора с навигацией
 
 **Риски:**
+
 - Усложнение навигации (Modo + внутренний state)
 - Управление состоянием выбора статьи
 - Требует изменения ViewModel для поддержки двухпанельного режима
@@ -304,10 +323,12 @@ scroll/two-column режим на затронутых устройствах.
 
 **Модуль:** books/bookreader
 **Файлы:**
+
 - `bookreader/screens/ui/BookmarksComposeDialog.kt`
 - `books/catalog/presentation/bookmarks/`
 
 **Решение:**
+
 1. Master-detail layout для Expanded
 2. Слева: список заметок с текстом
 3. Справа: навигация к заметке или предпросмотр
@@ -322,10 +343,12 @@ scroll/two-column режим на затронутых устройствах.
 
 **Модуль:** books
 **Файлы:**
+
 - `books/catalog/presentation/downloaded/ui/DownloadedBooksScreen.kt`
 - `DownloadedBookItem.kt`
 
 **Решение:**
+
 1. Заменить список на плитку (grid) для планшетов
 2. Адаптивный layout для удаления (swipe → долгое нажатие или кнопка)
 3. На телефонах сохранить текущий список со swipe-to-delete
@@ -338,10 +361,12 @@ scroll/two-column режим на затронутых устройствах.
 
 **Модуль:** bugreport
 **Файлы:**
+
 - `bugreport/presentation/nav/BugReportScreen.kt`
 - `bugreport/presentation/bugreport/ui/BugReportContent.kt`
 
 **Решение:**
+
 1. Ограничить ширину формы (maxWidth = 600dp)
 2. Компактный layout для планшетов
 3. Центрировать форму на экране
@@ -355,6 +380,7 @@ scroll/two-column режим на затронутых устройствах.
 **Проблема:** Файл не обновлялся с момента создания.
 
 **Действия:**
+
 - [ ] Проверить актуальность схемы
 - [ ] Добавить новые модули
 - [ ] Обновить диаграммы
@@ -390,18 +416,23 @@ scroll/two-column режим на затронутых устройствах.
 ### ✅ AGP 9.0 built-in Kotlin + общий конфиг + тесты (2026-08-11)
 
 - **AGP 9.0 built-in Kotlin миграция:**
-  - Убран `kotlin-android` плагин из всех 16 модулей
-  - Убраны `android.builtInKotlin=false` и `android.newDsl=false` из `gradle.properties`
-  - JVM target задаётся верхнеуровневым блоком `kotlin { compilerOptions { jvmTarget } }` (предоставляется AGP)
-  - Исправлен `Plugin.Page` → `PluginPage` (2 Java файла)
-  - Исправлен `manualResumePause` → убран (modo 0.12.0)
+    - Убран `kotlin-android` плагин из всех 16 модулей
+    - Убраны `android.builtInKotlin=false` и `android.newDsl=false` из `gradle.properties`
+    - JVM target задаётся верхнеуровневым блоком `kotlin { compilerOptions { jvmTarget } }` (
+      предоставляется AGP)
+    - Исправлен `Plugin.Page` → `PluginPage` (2 Java файла)
+    - Исправлен `manualResumePause` → убран (modo 0.12.0)
 - **Единые SDK-версии:** `buildSrc/ProjectConfig.kt` (compileSdk=37, minSdk=24, targetSdk=37)
-- **Общий Android-конфиг:** вынесен в `subprojects` корневого `build.gradle.kts` — убрано 11 `apply(from = ...)` и удалён `android_feature_commons.kts`
-- **Стабильный API:** `androidResources.localeFilters.add()` (@Incubating) → `resourceConfigurations += "ru"`
+- **Общий Android-конфиг:** вынесен в `subprojects` корневого `build.gradle.kts` — убрано 11
+  `apply(from = ...)` и удалён `android_feature_commons.kts`
+- **Стабильный API:** `androidResources.localeFilters.add()` (@Incubating) →
+  `resourceConfigurations += "ru"`
 - **Тесты:**
-  - `WikiRepositoryImplTest` — исправлены именованные параметры `getPage(title=)` и `search(query=, what=)`
-  - `commonui` — добавлен `testImplementation(libs.bundles.test)`
-- **Версии:** ktlint 14.2.0, OkHttp 5.4.0, material-icons-extended добавлен в 3 модуля, timber в 1 модуль
+    - `WikiRepositoryImplTest` — исправлены именованные параметры `getPage(title=)` и
+      `search(query=, what=)`
+    - `commonui` — добавлен `testImplementation(libs.bundles.test)`
+- **Версии:** ktlint 14.2.0, OkHttp 5.4.0, material-icons-extended добавлен в 3 модуля, timber в 1
+  модуль
 
 ### ✅ Настройки Gradle (2026-08-11)
 
@@ -413,8 +444,8 @@ scroll/two-column режим на затронутых устройствах.
 - Создан `DeviceFormFactor` sealed class (Compact/Medium/Expanded)
 - Создан `AdaptiveDimensions` для размеров по форм-фактору
 - Реализована адаптивная навигация:
-  - Compact: BottomNavigation (без изменений)
-  - Medium/Expanded: NavigationRail
+    - Compact: BottomNavigation (без изменений)
+    - Medium/Expanded: NavigationRail
 - Адаптивные колонки в каталоге книг (2/3/4)
 - Master-detail компонент для планшетов
 - Ограничение ширины контента (Wiki, News, Info)
@@ -448,27 +479,35 @@ scroll/two-column режим на затронутых устройствах.
 
 ### 🟠 P1: ThemeRepositoryImpl — dual persistence (SharedPreferences + DataStore)
 
-**Проблема:** Класс хранит `SharedPreferences` для синхронных читалок (тема до создания Activity) и отдельный DataStore для асинхронных Flow-читалок. Дублируются записи и поддержка двух слоёв.
+**Проблема:** Класс хранит `SharedPreferences` для синхронных читалок (тема до создания Activity) и
+отдельный DataStore для асинхронных Flow-читалок. Дублируются записи и поддержка двух слоёв.
 
 **Файлы:**
+
 - `managers/src/main/java/su/sv/managers/theme/ThemeRepositoryImpl.kt` (~40-60)
 
-**Решение:** Оставить один DataStore. Синхронное чтение темы вынести в `Application.onCreate()` — читать DataStore до `Activity`, устанавливать `AppCompatDelegate.setDefaultNightMode()` до `super.onCreate()`.
+**Решение:** Оставить один DataStore. Синхронное чтение темы вынести в `Application.onCreate()` —
+читать DataStore до `Activity`, устанавливать `AppCompatDelegate.setDefaultNightMode()` до
+`super.onCreate()`.
 
 ---
 
 ### 🟠 P1: bookreader — SharedPreferences в Compose (OnSharedPreferenceChangeListener)
 
-**Проблема:** `ReaderSettingsContent` — Composable-компонент — подписывается на `SharedPreferences.OnSharedPreferenceChangeListener` через `DisposableEffect`. Это нарушение реактивного паттерна: Compose требует `StateFlow`/`Flow`, а SharedPreferences даёт коллбеки.
+**Проблема:** `ReaderSettingsContent` — Composable-компонент — подписывается на
+`SharedPreferences.OnSharedPreferenceChangeListener` через `DisposableEffect`. Это нарушение
+реактивного паттерна: Compose требует `StateFlow`/`Flow`, а SharedPreferences даёт коллбеки.
 
 **Файлы:**
+
 - `bookreader/screens/ReaderSettingsContent.kt` (~50-100)
 - `bookreader/app/BookReaderInitializer.kt`
 - `bookreader/widgets/TTSPopup.kt` (~140)
 - `bookreader/app/Reflow.kt`
 - `bookreader/screens/viewmodel/ReaderViewModel.kt`
 
-**Решение:** Мигрировать `getDefaultSharedPreferences` на `preferencesDataStore`, заменить `OnSharedPreferenceChangeListener` на `collectAsStateWithLifecycle()`.
+**Решение:** Мигрировать `getDefaultSharedPreferences` на `preferencesDataStore`, заменить
+`OnSharedPreferenceChangeListener` на `collectAsStateWithLifecycle()`.
 
 ---
 
@@ -492,7 +531,9 @@ scroll/two-column режим на затронутых устройствах.
 
 ### 🟠 P1: TTSPopup — Handler + Runnable (971 строка)
 
-**Проблема:** Много `Handler(Looper.getMainLooper())`, `Runnable`, `postDelayed`, `removeCallbacks`. Метод `updateGravity` (строка ~551) создаёт бесконечный цикл через `postDelayed`. Класс использует `java.util.Arrays`, `Collections` вместо Kotlin stdlib.
+**Проблема:** Много `Handler(Looper.getMainLooper())`, `Runnable`, `postDelayed`, `removeCallbacks`.
+Метод `updateGravity` (строка ~551) создаёт бесконечный цикл через `postDelayed`. Класс использует
+`java.util.Arrays`, `Collections` вместо Kotlin stdlib.
 
 **Файл:** `bookreader/widgets/TTSPopup.kt`
 
@@ -517,11 +558,14 @@ scroll/two-column режим на затронутых устройствах.
 ### 🟡 P2: Use android.util.Log вместо Timber
 
 **Файлы:**
-- `managers/src/main/java/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` (~6, 56, 68, 74, 86, 91, 99) — `Log.e`, `Log.d`, `Log.w`
+
+- `managers/src/main/java/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` (~6, 56, 68, 74, 86,
+  91, 99) — `Log.e`, `Log.d`, `Log.w`
 - `main/src/main/java/su/sv/main/continuereading/ContinueReadingViewModel.kt` (~8 debug-вызовов)
 - `bookreader/app/PDFPlugin.kt` (3 `Log.e`)
 
-**Проблема:** Timber уже есть и используется в большинстве модулей, но в этих файлах — прямой `android.util.Log`.
+**Проблема:** Timber уже есть и используется в большинстве модулей, но в этих файлах — прямой
+`android.util.Log`.
 
 ---
 
@@ -530,8 +574,11 @@ scroll/two-column режим на затронутых устройствах.
 ### 🟢 P3: SparseArray в Java-style коде
 
 **Файлы:**
-- `bookreader/app/PDFPlugin.kt` — `SparseArray<SelectionPage>`, `SparseArray<ArrayList<SearchResult>>`
-- `bookreader/app/DjvuPlugin.kt` — `SparseArray<Page>`, `SparseArray<SelectionPage>`, `SparseArray<DjvuSearchPage>`
+
+- `bookreader/app/PDFPlugin.kt` — `SparseArray<SelectionPage>`,
+  `SparseArray<ArrayList<SearchResult>>`
+- `bookreader/app/DjvuPlugin.kt` — `SparseArray<Page>`, `SparseArray<SelectionPage>`,
+  `SparseArray<DjvuSearchPage>`
 
 **Решение:** Заменить на `Map<Int, T>` или `List<T>` с индексированным доступом.
 
@@ -543,7 +590,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `commonarchitecture/src/main/java/su/sv/commonarchitecture/mock/MockConfig.kt`
 
-**Проблема:** TODO-комментарий: «Не забудьте выключить моки перед release сборкой!». Нет автоматического выключения моков через flavour/build-variant.
+**Проблема:** TODO-комментарий: «Не забудьте выключить моки перед release сборкой!». Нет
+автоматического выключения моков через flavour/build-variant.
 
 **Риск:** Моки могут попасть в production-сборку.
 
@@ -553,7 +601,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/RootNews.kt` (строка 193)
 
-**Проблема:** Effect `NewsListOneTimeEffect.OpenNewsItem` триггерится, но не реализован — ничего не происходит при нажатии на элемент новостей.
+**Проблема:** Effect `NewsListOneTimeEffect.OpenNewsItem` триггерится, но не реализован — ничего не
+происходит при нажатии на элемент новостей.
 
 ---
 
@@ -561,7 +610,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `info/src/main/java/su/sv/info/domain/GetInfoLinksUseCase.kt` (строка 20)
 
-**Проблема:** `delay(500.milliseconds)` для симуляции сетевого запроса. Заготовка под бэкенд без репозитория.
+**Проблема:** `delay(500.milliseconds)` для симуляции сетевого запроса. Заготовка под бэкенд без
+репозитория.
 
 **Решение:** Либо реализовать репозиторий, либо удалить stub.
 
@@ -571,13 +621,15 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/domain/GetLastReadBookUseCase.kt`
 
-**Проблема:** `operator fun invoke(): LastReadBookInfo?` без `suspend`. Вызывается из `viewModelScope.launch { }` — блокирует корутину.
+**Проблема:** `operator fun invoke(): LastReadBookInfo?` без `suspend`. Вызывается из
+`viewModelScope.launch { }` — блокирует корутину.
 
 ---
 
 ### 🟢 P3: Badge support TODO в Navigation
 
 **Файлы:**
+
 - `commonui/src/main/java/su/sv/commonui/ui/adaptive/navigation/RailNavigation.kt`
 - `commonui/src/main/java/su/sv/commonui/ui/adaptive/navigation/CompactNavigation.kt`
 
@@ -589,7 +641,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/screens/ReaderSettingsContent.kt` (строки 178-182)
 
-**Проблема:** TODO-list с тремя нереализованными настройками: sync folder, TTS language, screen lock.
+**Проблема:** TODO-list с тремя нереализованными настройками: sync folder, TTS language, screen
+lock.
 
 ---
 
@@ -616,13 +669,15 @@ scroll/two-column режим на затронутых устройствах.
 ### 🟠 P1: Non-suspend Use Cases блокируют корутины
 
 **Файлы:**
+
 - `bookreader/domain/GetLastReadBookUseCase.kt`
 - `qa/src/main/java/su/sv/qa/domain/usecase/ObserveAnsweredQuestionsUseCase.kt`
 - `qa/src/main/java/su/sv/qa/domain/usecase/ObserveAnsweredQuestionsForBookUseCase.kt`
 - `wiki/src/main/java/su/sv/wiki/domain/usecase/GetFavoritesUseCase.kt`
 - `wiki/src/main/java/su/sv/wiki/domain/usecase/GetHistoryUseCase.kt`
 
-**Проблема:** Non-suspend `invoke()` возвращает результат напрямую. Если внутри — `withContext`, `room`, или блокирующий вызов — это блокирует диспетчер корутины.
+**Проблема:** Non-suspend `invoke()` возвращает результат напрямую. Если внутри — `withContext`,
+`room`, или блокирующий вызов — это блокирует диспетчер корутины.
 
 **Решение:** Добавить `suspend` к `operator fun invoke()`.
 
@@ -631,6 +686,7 @@ scroll/two-column режим на затронутых устройствах.
 ### 🟡 P2: lateinit без safe-инициализации
 
 **Файлы:**
+
 - `app/src/main/java/su/sv/app/MainActivity.kt` — `lateinit var customColorsRepository`
 - `books/.../BookDownloadBroadcastReceiver.kt` — два `lateinit var`
 
@@ -642,7 +698,9 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/CLAUDE.md` — `var fbReaderView: FBReaderView? = null` в `ReaderViewModel`
 
-**Проблема:** Ссылка на View в ViewModel — при ротации экрана ViewModel остаётся, но контекст может измениться. `ViewModel.onCleared()` освобождает ресурсы, но если `onSavedInstanceState` срабатывает преждевременно — возможна утечка.
+**Проблема:** Ссылка на View в ViewModel — при ротации экрана ViewModel остаётся, но контекст может
+измениться. `ViewModel.onCleared()` освобождает ресурсы, но если `onSavedInstanceState` срабатывает
+преждевременно — возможна утечка.
 
 **Риск:** Memory leak при конфигурационных изменениях.
 
@@ -652,7 +710,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/app/Storage.java`
 
-**Проблема:** Обновление файла = смена MD5 ID = потеря истории чтения. Также обложки ищутся по MD5 в нескольких местах — fragile если логика кэширования изменится.
+**Проблема:** Обновление файла = смена MD5 ID = потеря истории чтения. Также обложки ищутся по MD5 в
+нескольких местах — fragile если логика кэширования изменится.
 
 ---
 
@@ -662,7 +721,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/screens/ReaderContent.kt` (~358-393)
 
-**Проблема:** `gotoPosition()` вызывается до инициализации `FBReaderView`. Есть fallback-логика (`factory` + `update`), но в некоторых сценариях (первое открытие) позиция не применяется.
+**Проблема:** `gotoPosition()` вызывается до инициализации `FBReaderView`. Есть fallback-логика (
+`factory` + `update`), но в некоторых сценариях (первое открытие) позиция не применяется.
 
 **Статус:** Частично исправлен fallback, но не полностью.
 
@@ -672,7 +732,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/widgets/FBReaderView.java`, `screens/ReaderContent.kt`
 
-**Проблема:** `Window.decorView.setBackgroundColor()` + `AnimatedVisibility(fadein/fadeout)` не синхронизированы. На некоторых устройствах белый/чёрный flash перед появлением/скрытием TopBar.
+**Проблема:** `Window.decorView.setBackgroundColor()` + `AnimatedVisibility(fadein/fadeout)` не
+синхронизированы. На некоторых устройствах белый/чёрный flash перед появлением/скрытием TopBar.
 
 ---
 
@@ -680,7 +741,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/screens/viewmodel/ReaderViewModel.kt`
 
-**Проблема:** Debounce 500мс для скрытия панели из-за асинхронности FBReader. Если пользователь быстро скрывает выделение после создания (<500ms), панель не закроется.
+**Проблема:** Debounce 500мс для скрытия панели из-за асинхронности FBReader. Если пользователь
+быстро скрывает выделение после создания (<500ms), панель не закроется.
 
 ---
 
@@ -688,7 +750,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `bookreader/app/PDFPlugin.kt`
 
-**Проблема:** Страница закрывается только в начале следующего `draw()`. Если `getPageRect()` в `PagerWidget` вызывается между `draw` вызовами — может использовать уже закрытую страницу.
+**Проблема:** Страница закрывается только в начале следующего `draw()`. Если `getPageRect()` в
+`PagerWidget` вызывается между `draw` вызовами — может использовать уже закрытую страницу.
 
 ---
 
@@ -696,7 +759,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `memory/xiaomi-miui-theme-fix.md`
 
-**Проблема:** На некоторых Xiaomi активность перезапускается при смене темы, цвета не успевают обновиться.
+**Проблема:** На некоторых Xiaomi активность перезапускается при смене темы, цвета не успевают
+обновиться.
 
 ---
 
@@ -707,19 +771,23 @@ scroll/two-column режим на затронутых устройствах.
 **Статус:** Добавлено 2026-08-08
 
 **Что сделано:**
+
 - Зависимость: `com.squareup.leakcanary:leakcanary-android:2.14` (только debug)
 - `app/src/debug/AndroidManifest.xml` — `android:name=".DebugSvApp"`
 - `app/src/debug/…/DebugSvApp.kt` — инициализация LeakCanary + дублирует Hilt/Coil от SvApp
-- `app/build.gradle.kts` — `debug { applicationIdSuffix = ".debug" }` и `debugImplementation(libs.leakcanary.android)`
+- `app/build.gradle.kts` — `debug { applicationIdSuffix = ".debug" }` и
+  `debugImplementation(libs.leakcanary.android)`
 - Документация: `docs/memory-leak-detection.md`
 
 **Как использовать:**
+
 1. Собрать/debug APK (`./gradlew assembleDebug`)
 2. Установить на устройство
 3. Приложение запускается как `su.sv.app.debug` (вместо `su.sv.app`)
 4. При утечке Activity — уведомление с heap dump и MAL/Studio Profiler
 
 **Ограничения:**
+
 - LeakCanary автоматически ловит только Activity leaks после destroy()
 - Не интегрирован в.instrumentation-тесты (test runner держит референс на Activity)
 
@@ -729,7 +797,8 @@ scroll/two-column режим на затронутых устройствах.
 
 **Файл:** `app/src/androidTest/java/su/sv/app/memory/MemoryLeakTest.kt`
 
-**Проблема:** UI-тесты `androidTest` не могут использовать LeakCanary напрямую — `Instrumentation` держит ссылку на Activity, даже после `finish()`. Heap dump в андроид-тесте взять нельзя.
+**Проблема:** UI-тесты `androidTest` не могут использовать LeakCanary напрямую — `Instrumentation`
+держит ссылку на Activity, даже после `finish()`. Heap dump в андроид-тесте взять нельзя.
 
 **Статус:** Заготовка создана, требует Robolectric или manual MAT-анализа.
 
@@ -752,11 +821,12 @@ scroll/two-column режим на затронутых устройствах.
    ```
 
 2. **Альтернатива — ручная проверка** на эмуляторе:
-   - Запустить debug APK
-   - Открыть читалку → закрыть ← ждать 3 сек
-   - Проверить уведомление LeakCanary на предмет утечек
+    - Запустить debug APK
+    - Открыть читалку → закрыть ← ждать 3 сек
+    - Проверить уведомление LeakCanary на предмет утечек
 
 **Что тестировать (очереди):**
+
 - [ ] Открытие читалки → закрытие (bookreader)
 - [ ] Навигация по Modo stack (назад-вперёд → проверка stack clean)
 - [ ] Bookmark creation/deletion
@@ -768,6 +838,7 @@ scroll/two-column режим на затронутых устройствах.
 - [ ] Fullscreen toggle (enter/exit → race condition в toggleFullscreen)
 
 **Зависимости:**
+
 - Добавить `org.robolectric:robolectric` для JVM-тестов
 - Настроить Robolectric config (`sdk = [34]`, `qualifiers = "w1080dp-h1920dp"` для coverage)
 
@@ -777,16 +848,20 @@ scroll/two-column режим на затронутых устройствах.
 
 **Места, где утечки вероятнее всего:**
 
-1. **`ReaderViewModel.fbReaderView`** — View reference в ViewModel. 
+1. **`ReaderViewModel.fbReaderView`** — View reference в ViewModel.
    `ViewModel.onCleared()` освобождает ресурсы, но при ротации экрана — risk.
    Файл: `bookreader/screens/viewmodel/ReaderViewModel.kt`
 
-2. **`TTSPopup`** — 971 строка с Handler/Runnable. `updateGravity` создаёт бесконечный `postDelayed` цикл. Если Popup не закрыт корректно — утечка Handler + Runnable.
+2. **`TTSPopup`** — 971 строка с Handler/Runnable. `updateGravity` создаёт бесконечный `postDelayed`
+   цикл. Если Popup не закрыт корректно — утечка Handler + Runnable.
    Файл: `bookreader/widgets/TTSPopup.kt`
 
-3. **`OneTimeEffect` в MainActivity** — `recreate()` при смене темы. Если эффект срабатывает дважды — двойной recreate.
+3. **`OneTimeEffect` в MainActivity** — `recreate()` при смене темы. Если эффект срабатывает
+   дважды — двойной recreate.
 
-4. **`Modeo.onRootScreenFinished`** в `MainActivity.onDestroy()` — если `recreate()` вызывается в процессе, ` onDestroy` не вызывает `onRootScreenFinished` (проверка `isFinishing`). Но после `recreate()` — ViewModel уничтожаются и пересоздаются, Modo stack должен быть clean.
+4. **`Modeo.onRootScreenFinished`** в `MainActivity.onDestroy()` — если `recreate()` вызывается в
+   процессе, ` onDestroy` не вызывает `onRootScreenFinished` (проверка `isFinishing`). Но после
+   `recreate()` — ViewModel уничтожаются и пересоздаются, Modo stack должен быть clean.
 
 ---
 

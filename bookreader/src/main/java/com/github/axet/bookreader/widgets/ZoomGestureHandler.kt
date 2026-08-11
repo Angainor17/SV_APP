@@ -99,40 +99,44 @@ class ZoomGestureHandler(
     }
 
     init {
-        scaleDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-                Timber.tag("voronin").d("ZoomGestureHandler: onScaleBegin focus=${detector.focusX},${detector.focusY}")
-                return true
-            }
-
-            override fun onScale(detector: ScaleGestureDetector): Boolean {
-                val scaleFactor = detector.scaleFactor
-                val newZoom = (currentZoom * scaleFactor).coerceIn(minZoom, maxZoom)
-
-                if (newZoom != currentZoom) {
-                    currentZoom = newZoom
-                    pivotX = detector.focusX
-                    pivotY = detector.focusY
-                    isInZoom = currentZoom > minZoom
-
-                    Timber.tag("voronin").d("ZoomGestureHandler: onScale zoom=$currentZoom pivot=$pivotX,$pivotY")
-                    listener.onZoomChange(currentZoom, pivotX, pivotY)
-
-                    // If zoom returns to 1.0, notify end
-                    if (currentZoom == minZoom && isInZoom) {
-                        isInZoom = false
-                        listener.onZoomEnd()
-                    }
+        scaleDetector = ScaleGestureDetector(
+            context,
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                    Timber.tag("voronin")
+                        .d("ZoomGestureHandler: onScaleBegin focus=${detector.focusX},${detector.focusY}")
+                    return true
                 }
-                return true
-            }
 
-            override fun onScaleEnd(detector: ScaleGestureDetector) {
-                Timber.tag("voronin").d("ZoomGestureHandler: onScaleEnd finalZoom=$currentZoom")
-                // If user ended gesture at zoom > 1.0, keep zoom state
-                // Zoom will be reset via back button or explicit reset
-            }
-        })
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    val scaleFactor = detector.scaleFactor
+                    val newZoom = (currentZoom * scaleFactor).coerceIn(minZoom, maxZoom)
+
+                    if (newZoom != currentZoom) {
+                        currentZoom = newZoom
+                        pivotX = detector.focusX
+                        pivotY = detector.focusY
+                        isInZoom = currentZoom > minZoom
+
+                        Timber.tag("voronin")
+                            .d("ZoomGestureHandler: onScale zoom=$currentZoom pivot=$pivotX,$pivotY")
+                        listener.onZoomChange(currentZoom, pivotX, pivotY)
+
+                        // If zoom returns to 1.0, notify end
+                        if (currentZoom == minZoom && isInZoom) {
+                            isInZoom = false
+                            listener.onZoomEnd()
+                        }
+                    }
+                    return true
+                }
+
+                override fun onScaleEnd(detector: ScaleGestureDetector) {
+                    Timber.tag("voronin").d("ZoomGestureHandler: onScaleEnd finalZoom=$currentZoom")
+                    // If user ended gesture at zoom > 1.0, keep zoom state
+                    // Zoom will be reset via back button or explicit reset
+                }
+            })
 
         // Quick scaling mode for smoother zoom
         scaleDetector.isQuickScaleEnabled = true
@@ -167,7 +171,8 @@ class ZoomGestureHandler(
                     translationX -= distanceX
                     translationY -= distanceY
 
-                    Timber.tag("voronin").d("ZoomGestureHandler: pan translation=$translationX,$translationY")
+                    Timber.tag("voronin")
+                        .d("ZoomGestureHandler: pan translation=$translationX,$translationY")
                     listener.onPanChange(translationX, translationY)
                     return true
                 }
@@ -196,20 +201,23 @@ class ZoomGestureHandler(
             if (actualPageWidth < screenWidth) {
                 // Simple formula: zoom to make page fill screen
                 fitWidthZoom = screenWidth.toFloat() / actualPageWidth.toFloat()
-                Timber.tag("voronin").d("ZoomGestureHandler: page smaller than screen, zoom=$fitWidthZoom")
+                Timber.tag("voronin")
+                    .d("ZoomGestureHandler: page smaller than screen, zoom=$fitWidthZoom")
             } else {
                 // Page fills or exceeds screen width
                 // Use content ratio to estimate actual text area
                 val contentRatio = 0.9f  // Assume 90% is content (small margins)
                 val contentWidth = actualPageWidth * contentRatio
                 fitWidthZoom = screenWidth.toFloat() / contentWidth.toFloat()
-                Timber.tag("voronin").d("ZoomGestureHandler: page larger than screen, zoom=$fitWidthZoom contentRatio=$contentRatio")
+                Timber.tag("voronin")
+                    .d("ZoomGestureHandler: page larger than screen, zoom=$fitWidthZoom contentRatio=$contentRatio")
             }
 
             // Clamp to reasonable range
             fitWidthZoom = fitWidthZoom.coerceIn(1.05f, maxFitWidthZoom)
 
-            Timber.tag("voronin").d("ZoomGestureHandler: fitWidthZoom=$fitWidthZoom (screen=$screenWidth, pageWidth=$actualPageWidth)")
+            Timber.tag("voronin")
+                .d("ZoomGestureHandler: fitWidthZoom=$fitWidthZoom (screen=$screenWidth, pageWidth=$actualPageWidth)")
         } else {
             // Default zoom when page width not available
             fitWidthZoom = 1.15f
@@ -220,7 +228,8 @@ class ZoomGestureHandler(
         val screenHeight = listener.getScreenHeight()
         val centerPivotY = screenHeight / 2f
 
-        Timber.tag("voronin").d("ZoomGestureHandler: centerPivot=$centerPivotX,$centerPivotY screen=$screenWidth,$screenHeight")
+        Timber.tag("voronin")
+            .d("ZoomGestureHandler: centerPivot=$centerPivotX,$centerPivotY screen=$screenWidth,$screenHeight")
         setZoom(fitWidthZoom, centerPivotX, centerPivotY)
     }
 
@@ -268,6 +277,7 @@ class ZoomGestureHandler(
         this.pivotY = pivotY
         isInZoom = currentZoom > minZoom
         listener.onZoomChange(currentZoom, pivotX, pivotY)
-        Timber.tag("voronin").d("ZoomGestureHandler: setZoom zoom=$currentZoom pivot=$pivotX,$pivotY")
+        Timber.tag("voronin")
+            .d("ZoomGestureHandler: setZoom zoom=$currentZoom pivot=$pivotX,$pivotY")
     }
 }

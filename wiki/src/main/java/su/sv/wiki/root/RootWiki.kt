@@ -131,7 +131,9 @@ fun WikiCompactScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .widthIn(max = adaptiveDims.contentMaxWidth ?: androidx.compose.ui.unit.Dp.Infinity)
+                    .widthIn(
+                        max = adaptiveDims.contentMaxWidth ?: androidx.compose.ui.unit.Dp.Infinity
+                    )
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -140,140 +142,140 @@ fun WikiCompactScreen(
                         focusManager.clearFocus()
                     },
             ) {
-            // Поле поиска с иконкой избранного
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val hints = remember {
-                    context.resources.getStringArray(R.array.wiki_search_hints).toList()
+                // Поле поиска с иконкой избранного
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    val hints = remember {
+                        context.resources.getStringArray(R.array.wiki_search_hints).toList()
+                    }
+
+                    WikiSearchBar(
+                        onSearch = { query ->
+                            if (query.length >= 3) {
+                                viewModel.onAction(WikiActions.OnSearch(query))
+                            }
+                        },
+                        onQueryChanged = { query ->
+                            viewModel.onAction(WikiActions.OnSearchQueryChanged(query))
+                        },
+                        onClearClick = {
+                            focusManager.clearFocus()
+                        },
+                        hints = hints,
+                        isSuggestionsVisible = suggestions.isNotEmpty(),
+                        selectedSuggestion = selectedSuggestion,
+                        onSuggestionApplied = {
+                            viewModel.onAction(WikiActions.OnSuggestionApplied)
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+
+                    // Иконка избранного с анимацией
+                    AnimatedVisibility(
+                        visible = hasFavorites,
+                        enter = fadeIn(
+                            animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        ) + scaleIn(
+                            animationSpec = tween(300, easing = FastOutSlowInEasing),
+                            initialScale = 0.8f,
+                        ),
+                        exit = fadeOut(
+                            animationSpec = tween(200, easing = FastOutSlowInEasing),
+                        ) + scaleOut(
+                            animationSpec = tween(200, easing = FastOutSlowInEasing),
+                            targetScale = 0.8f,
+                        ),
+                    ) {
+                        IconButton(
+                            onClick = {
+                                focusManager.clearFocus()
+                                stackNavigation.forward(FavoritesScreen())
+                            },
+                            modifier = Modifier.padding(end = dimensions.screenPaddingHorizontal / 2),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = stringResource(R.string.wiki_favorites),
+                                tint = MaterialTheme.colorScheme.favorite,
+                            )
+                        }
+                    }
                 }
 
-                WikiSearchBar(
-                    onSearch = { query ->
-                        if (query.length >= 3) {
-                            viewModel.onAction(WikiActions.OnSearch(query))
-                        }
-                    },
-                    onQueryChanged = { query ->
-                        viewModel.onAction(WikiActions.OnSearchQueryChanged(query))
-                    },
-                    onClearClick = {
-                        focusManager.clearFocus()
-                    },
-                    hints = hints,
-                    isSuggestionsVisible = suggestions.isNotEmpty(),
-                    selectedSuggestion = selectedSuggestion,
-                    onSuggestionApplied = {
-                        viewModel.onAction(WikiActions.OnSuggestionApplied)
-                    },
-                    modifier = Modifier.weight(1f),
-                )
+                // Подсказки поиска - фильтруем suggestion совпадающую с текущей статьёй
+                val currentArticleTitle = if (state is UiWikiState.Content) {
+                    (state as UiWikiState.Content).article.title
+                } else null
 
-                // Иконка избранного с анимацией
-                AnimatedVisibility(
-                    visible = hasFavorites,
-                    enter = fadeIn(
-                        animationSpec = tween(300, easing = FastOutSlowInEasing),
-                    ) + scaleIn(
-                        animationSpec = tween(300, easing = FastOutSlowInEasing),
-                        initialScale = 0.8f,
-                    ),
-                    exit = fadeOut(
-                        animationSpec = tween(200, easing = FastOutSlowInEasing),
-                    ) + scaleOut(
-                        animationSpec = tween(200, easing = FastOutSlowInEasing),
-                        targetScale = 0.8f,
-                    ),
-                ) {
-                    IconButton(
-                        onClick = {
+                val filteredSuggestions = suggestions.filter { suggestion ->
+                    // Не показываем suggestion если она совпадает с заголовком текущей статьи
+                    suggestion != currentArticleTitle
+                }
+
+                if (selectedSuggestion == null && filteredSuggestions.isNotEmpty()) {
+                    SearchSuggestions(
+                        suggestions = filteredSuggestions,
+                        onSuggestionClick = { title ->
                             focusManager.clearFocus()
-                            stackNavigation.forward(FavoritesScreen())
+                            viewModel.onAction(WikiActions.OnSuggestionClick(title))
                         },
-                        modifier = Modifier.padding(end = dimensions.screenPaddingHorizontal / 2),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = stringResource(R.string.wiki_favorites),
-                            tint = MaterialTheme.colorScheme.favorite,
+                    )
+                }
+
+                // Контент в зависимости от состояния
+                when (val currentState = state) {
+                    is UiWikiState.Initial -> {
+                        // Показываем историю
+                        HistoryList(
+                            history = history,
+                            onItemClick = { title ->
+                                focusManager.clearFocus()
+                                stackNavigation.forward(ArticleScreen(title = title))
+                            },
+                            onClearClick = {
+                                viewModel.onAction(WikiActions.OnClearHistory)
+                            },
+                        )
+                    }
+
+                    is UiWikiState.Loading -> {
+                        FullScreenLoading()
+                    }
+
+                    is UiWikiState.Content -> {
+                        ArticleView(
+                            article = currentState.article,
+                            isFavorite = currentState.isFavorite,
+                            onLinkClick = { title ->
+                                viewModel.onAction(WikiActions.OnLinkClick(title))
+                            },
+                            onExternalLinkClick = { url ->
+                                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                                context.startActivity(intent)
+                            },
+                            onFavoriteClick = { title, isFavorite ->
+                                if (isFavorite) {
+                                    viewModel.onAction(WikiActions.OnRemoveFavorite(title))
+                                } else {
+                                    viewModel.onAction(WikiActions.OnAddFavorite(title))
+                                }
+                            },
+                        )
+                    }
+
+                    is UiWikiState.NotFound -> {
+                        NotFoundContent()
+                    }
+
+                    is UiWikiState.Error -> {
+                        FullScreenError(
+                            onRetry = { viewModel.onAction(WikiActions.OnRetryClick) }
                         )
                     }
                 }
             }
-
-            // Подсказки поиска - фильтруем suggestion совпадающую с текущей статьёй
-            val currentArticleTitle = if (state is UiWikiState.Content) {
-                (state as UiWikiState.Content).article.title
-            } else null
-
-            val filteredSuggestions = suggestions.filter { suggestion ->
-                // Не показываем suggestion если она совпадает с заголовком текущей статьи
-                suggestion != currentArticleTitle
-            }
-
-            if (selectedSuggestion == null && filteredSuggestions.isNotEmpty()) {
-                SearchSuggestions(
-                    suggestions = filteredSuggestions,
-                    onSuggestionClick = { title ->
-                        focusManager.clearFocus()
-                        viewModel.onAction(WikiActions.OnSuggestionClick(title))
-                    },
-                )
-            }
-
-            // Контент в зависимости от состояния
-            when (val currentState = state) {
-                is UiWikiState.Initial -> {
-                    // Показываем историю
-                    HistoryList(
-                        history = history,
-                        onItemClick = { title ->
-                            focusManager.clearFocus()
-                            stackNavigation.forward(ArticleScreen(title = title))
-                        },
-                        onClearClick = {
-                            viewModel.onAction(WikiActions.OnClearHistory)
-                        },
-                    )
-                }
-
-                is UiWikiState.Loading -> {
-                    FullScreenLoading()
-                }
-
-                is UiWikiState.Content -> {
-                    ArticleView(
-                        article = currentState.article,
-                        isFavorite = currentState.isFavorite,
-                        onLinkClick = { title ->
-                            viewModel.onAction(WikiActions.OnLinkClick(title))
-                        },
-                        onExternalLinkClick = { url ->
-                            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                            context.startActivity(intent)
-                        },
-                        onFavoriteClick = { title, isFavorite ->
-                            if (isFavorite) {
-                                viewModel.onAction(WikiActions.OnRemoveFavorite(title))
-                            } else {
-                                viewModel.onAction(WikiActions.OnAddFavorite(title))
-                            }
-                        },
-                    )
-                }
-
-                is UiWikiState.NotFound -> {
-                    NotFoundContent()
-                }
-
-                is UiWikiState.Error -> {
-                    FullScreenError(
-                        onRetry = { viewModel.onAction(WikiActions.OnRetryClick) }
-                    )
-                }
-            }
-        }
         }
     }
 }

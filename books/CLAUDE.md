@@ -4,7 +4,8 @@
 
 ## Обзор
 
-Модуль `books` отвечает за отображение каталога книг, детальную информацию о книге, скачивание файлов и управление заметками.
+Модуль `books` отвечает за отображение каталога книг, детальную информацию о книге, скачивание
+файлов и управление заметками.
 
 ## Архитектура
 
@@ -45,6 +46,7 @@ catalog/
 ## Основные компоненты
 
 ### BooksApi
+
 API для получения списка книг:
 
 ```kotlin
@@ -54,6 +56,7 @@ interface BooksApi {
 ```
 
 ### RemoteBooksRepo
+
 Репозиторий для работы с книгами:
 
 ```kotlin
@@ -65,6 +68,7 @@ class RemoteBooksRepo @Inject constructor(
 ```
 
 ### BookDownloadRepository
+
 Управление скачиванием:
 
 ```kotlin
@@ -75,6 +79,7 @@ class BookDownloadRepository @Inject constructor() {
 ```
 
 ### RootBooksCatalogViewModel
+
 ViewModel списка книг:
 
 ```kotlin
@@ -85,6 +90,7 @@ class RootBooksCatalogViewModel : BaseBookViewModel() {
 ```
 
 ### BookDetailViewModel
+
 ViewModel детальной информации:
 
 ```kotlin
@@ -97,6 +103,7 @@ class BookDetailViewModel : BaseBookViewModel() {
 ## Модели
 
 ### Book
+
 Доменная модель книги:
 
 ```kotlin
@@ -113,6 +120,7 @@ data class Book(
 ```
 
 ### BookmarkNote
+
 Доменная модель заметки из книги:
 
 ```kotlin
@@ -137,6 +145,7 @@ data class BookmarkNote(
 ```
 
 ### UiBookDetailState
+
 Состояние экрана деталей:
 
 ```kotlin
@@ -152,6 +161,7 @@ sealed class UiBookDetailState {
 ### Функция очистки текста
 
 FBReader вставляет специальные символы в текст заметок:
+
 - `U+FFFE` (65534) — маркер переноса слов
 - Управляющие символы
 
@@ -191,6 +201,7 @@ fun mapNote(domain: BookmarkNote): UiBookmarkNote {
 ### Экран заметок
 
 Два режима отображения:
+
 - **LIST** — список всех заметок в хронологическом порядке
 - **BY_BOOK** — список книг с количеством заметок
 
@@ -334,10 +345,10 @@ override fun Content(modifier: Modifier) {
 
 ### Экраны с применённой темой
 
-| Экран | Файл |
-|-------|------|
-| Закладки | `bookmarks/nav/BookmarksScreen.kt` |
-| Детали книги | `detail/nav/BookDetailScreen.kt` |
+| Экран           | Файл                                     |
+|-----------------|------------------------------------------|
+| Закладки        | `bookmarks/nav/BookmarksScreen.kt`       |
+| Детали книги    | `detail/nav/BookDetailScreen.kt`         |
 | Скачанные книги | `downloaded/ui/DownloadedBooksScreen.kt` |
 
 ### Зависимости

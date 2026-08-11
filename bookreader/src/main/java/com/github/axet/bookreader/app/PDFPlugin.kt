@@ -106,7 +106,11 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     override fun readCover(f: ZLFile): ZLImage {
         val view = PdfiumView(f)
         view.current!!.scale(CacheImagesAdapter.COVER_SIZE, CacheImagesAdapter.COVER_SIZE)
-        val bm = createBitmap(view.current!!.pageBox!!.w, view.current!!.pageBox!!.h, Bitmap.Config.RGB_565)
+        val bm = createBitmap(
+            view.current!!.pageBox!!.w,
+            view.current!!.pageBox!!.h,
+            Bitmap.Config.RGB_565
+        )
         val canvas = Canvas(bm)
         view.drawWallpaper(canvas)
         view.draw(canvas, bm.width, bm.height, ZLViewEnums.PageIndex.current)
@@ -176,10 +180,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         constructor(document: PdfDocument, selPage: PluginView.Selection.Page) :
-            this(selPage.page, document.openPage(selPage.page)!!, selPage.w, selPage.h)
+                this(selPage.page, document.openPage(selPage.page)!!, selPage.w, selPage.h)
 
         constructor(document: PdfDocument, pageNum: Int) :
-            this(pageNum, document.openPage(pageNum)!!, 0, 0)
+                this(pageNum, document.openPage(pageNum)!!, 0, 0)
 
         constructor(p: Int, page: PdfPage, w: Int, h: Int) {
             this.page = p
@@ -199,7 +203,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 var idx: Int
                 do {
                     idx = text.textPageGetCharIndexAtPos(
-                        k.left.toDouble(), k.centerY().toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE,
+                        k.left.toDouble(),
+                        k.centerY().toDouble(),
+                        CHAR_INDEX_TOLERANCE,
+                        CHAR_INDEX_TOLERANCE,
                     )
                 } while (idx == -1 && ++k.left < k.right)
                 if (idx != -1) return idx
@@ -299,7 +306,12 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val sp = openSelPage(page)
             if (sp.count > 0) {
                 val p = sp.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
-                val idx = sp.text.textPageGetCharIndexAtPos(p.x.toDouble(), p.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE)
+                val idx = sp.text.textPageGetCharIndexAtPos(
+                    p.x.toDouble(),
+                    p.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                )
                 if (idx == -1) return
                 sp.index = idx
                 startPage = sp
@@ -310,7 +322,12 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val ep = openSelPage(page)
             if (ep.count > 0) {
                 val p = ep.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
-                val idx = ep.text.textPageGetCharIndexAtPos(p.x.toDouble(), p.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE)
+                val idx = ep.text.textPageGetCharIndexAtPos(
+                    p.x.toDouble(),
+                    p.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                )
                 if (idx == -1) return
                 ep.index = idx
                 endPage = ep
@@ -357,11 +374,22 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val b = SelectionBounds(page)
             if (b.s.page < page.page && page.page < b.e.page) return true
             if (b.page.count > 0) {
-                val p1 = b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, start.x, start.y)
-                val i1 = b.page.text.textPageGetCharIndexAtPos(p1.x.toDouble(), p1.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE)
+                val p1 =
+                    b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, start.x, start.y)
+                val i1 = b.page.text.textPageGetCharIndexAtPos(
+                    p1.x.toDouble(),
+                    p1.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                )
                 if (i1 == -1) return null
                 val p2 = b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, end.x, end.y)
-                val i2 = b.page.text.textPageGetCharIndexAtPos(p2.x.toDouble(), p2.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE)
+                val i2 = b.page.text.textPageGetCharIndexAtPos(
+                    p2.x.toDouble(),
+                    p2.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                )
                 if (i2 == -1) return null
                 if (i2 < i1) return null
                 return i1 <= b.ss && b.ss <= i2 || i1 <= b.ll && b.ll <= i2
@@ -372,8 +400,14 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun isValid(page: Page, point: Point): Boolean {
             val b = SelectionBounds(page)
             if (b.page.count > 0) {
-                val p = b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
-                return b.page.text.textPageGetCharIndexAtPos(p.x.toDouble(), p.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE) != -1
+                val p =
+                    b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
+                return b.page.text.textPageGetCharIndexAtPos(
+                    p.x.toDouble(),
+                    p.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                ) != -1
             }
             return false
         }
@@ -387,8 +421,14 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val b = SelectionBounds(page)
             if (b.s.page < page.page) return true
             if (b.page.count > 0) {
-                val p = b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
-                val idx = b.page.text.textPageGetCharIndexAtPos(p.x.toDouble(), p.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE)
+                val p =
+                    b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
+                val idx = b.page.text.textPageGetCharIndexAtPos(
+                    p.x.toDouble(),
+                    p.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                )
                 if (idx == -1) return null
                 return b.ss < idx || b.ll < idx
             }
@@ -399,8 +439,14 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val b = SelectionBounds(page)
             if (b.e.page > page.page) return true
             if (b.page.count > 0) {
-                val p = b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
-                val idx = b.page.text.textPageGetCharIndexAtPos(p.x.toDouble(), p.y.toDouble(), CHAR_INDEX_TOLERANCE, CHAR_INDEX_TOLERANCE)
+                val p =
+                    b.page.ppage.mapDeviceCoordsToPage(0, 0, page.w, page.h, 0, point.x, point.y)
+                val idx = b.page.text.textPageGetCharIndexAtPos(
+                    p.x.toDouble(),
+                    p.y.toDouble(),
+                    CHAR_INDEX_TOLERANCE,
+                    CHAR_INDEX_TOLERANCE
+                )
                 if (idx == -1) return null
                 return idx < b.ss || idx < b.ll
             }
@@ -419,9 +465,11 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             map.clear()
         }
 
-        override fun getStart(): ZLTextPosition? = startPage?.let { ZLTextFixedPosition(it.page, it.index, 0) }
+        override fun getStart(): ZLTextPosition? =
+            startPage?.let { ZLTextFixedPosition(it.page, it.index, 0) }
 
-        override fun getEnd(): ZLTextPosition? = endPage?.let { ZLTextFixedPosition(it.page, it.index, 0) }
+        override fun getEnd(): ZLTextPosition? =
+            endPage?.let { ZLTextFixedPosition(it.page, it.index, 0) }
 
         inner class SelectionBounds {
             var page: SelectionPage
@@ -662,7 +710,9 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     class PdfiumPage : Plugin.Page {
         var document: PdfDocument
 
-        constructor(r: PdfiumPage) : super(r) { document = r.document }
+        constructor(r: PdfiumPage) : super(r) {
+            document = r.document
+        }
 
         constructor(r: PdfiumPage, index: ZLViewEnums.PageIndex, w: Int, h: Int) : this(r) {
             this.w = w
@@ -691,7 +741,9 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun getPagesCount(): Int = document.getPageCount()
 
-        override fun load() { load(pageNumber) }
+        override fun load() {
+            load(pageNumber)
+        }
 
         internal fun load(index: Int) {
             val p = document.openPage(index)!!
@@ -721,11 +773,20 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun close() {
             document.close()
-            try { fd.close() } catch (e: IOException) { throw IllegalStateException(e) }
+            try {
+                fd.close()
+            } catch (e: IOException) {
+                throw IllegalStateException(e)
+            }
         }
 
-        override fun getPageInfo(w: Int, h: Int, c: ScrollWidget.ScrollAdapter.PageCursor): Plugin.Page? {
-            val page: Int = if (c.start == null) c.end.paragraphIndex - 1 else c.start.paragraphIndex
+        override fun getPageInfo(
+            w: Int,
+            h: Int,
+            c: ScrollWidget.ScrollAdapter.PageCursor
+        ): Plugin.Page? {
+            val page: Int =
+                if (c.start == null) c.end.paragraphIndex - 1 else c.start.paragraphIndex
             return PdfiumPage(document, page, w, h)
         }
 
@@ -744,7 +805,13 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return bm
         }
 
-        override fun draw(bitmap: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, c: Bitmap.Config) {
+        override fun draw(
+            bitmap: Canvas,
+            w: Int,
+            h: Int,
+            index: ZLViewEnums.PageIndex,
+            c: Bitmap.Config
+        ) {
             val curr = current as PdfiumPage
             val r = PdfiumPage(curr, index, w, h)
             if (index == ZLViewEnums.PageIndex.current) current!!.updatePage(r)
@@ -759,11 +826,16 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             bm.recycle()
         }
 
-        override fun select(page: PluginView.Selection.Page, point: PluginView.Selection.Point): PluginView.Selection? {
+        override fun select(
+            page: PluginView.Selection.Page,
+            point: PluginView.Selection.Point
+        ): PluginView.Selection? {
             val start = SelectionPage(document, page)
             if (start.count > 0) {
                 val s = Selection(document, start, point)
-                if (s.isEmpty()) { s.close(); return null }
+                if (s.isEmpty()) {
+                    s.close(); return null
+                }
                 return s
             }
             start.close()
@@ -772,13 +844,17 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         override fun select(start: ZLTextPosition, end: ZLTextPosition): PluginView.Selection? {
             val s = Selection(document, start, end)
-            if (s.isEmpty()) { s.close(); return null }
+            if (s.isEmpty()) {
+                s.close(); return null
+            }
             return s
         }
 
         override fun select(page: Int): PluginView.Selection? {
             val s = Selection(document, page)
-            if (s.isEmpty()) { s.close(); return null }
+            if (s.isEmpty()) {
+                s.close(); return null
+            }
             return s
         }
 
@@ -787,7 +863,11 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             val ll = p.getPageLinks()
             val links = Array(ll.size) { i ->
                 val l = ll[i]
-                Link(l.uri, l.destPageIdx ?: -1, p.mapRectToDevice(0, 0, page.w, page.h, 0, l.bounds))
+                Link(
+                    l.uri,
+                    l.destPageIdx ?: -1,
+                    p.mapRectToDevice(0, 0, page.w, page.h, 0, l.bounds)
+                )
             }
             p.close()
             return links
@@ -823,7 +903,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     }
 
     inner class PDFTextModel(f: ZLFile) : PdfiumView(f), ZLTextModel {
-        protected fun finalize() { close() }
+        protected fun finalize() {
+            close()
+        }
+
         override fun getId(): String? = null
         override fun getLanguage(): String? = null
         override fun getParagraphsNumber(): Int = document.getPageCount()
@@ -831,6 +914,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             override fun iterator(): ZLTextParagraph.EntryIterator? = null
             override fun getKind(): Byte = ZLTextParagraph.Kind.END_OF_TEXT_PARAGRAPH
         }
+
         override fun removeAllMarks() {}
         override fun getFirstMark(): ZLTextMark? = null
         override fun getLastMark(): ZLTextMark? = null
@@ -839,7 +923,12 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         override fun getMarks(): List<ZLTextMark> = ArrayList()
         override fun getTextLength(index: Int): Int = index
         override fun findParagraphByTextLength(length: Int): Int = 0
-        override fun search(text: String, startIndex: Int, endIndex: Int, ignoreCase: Boolean): Int = 0
+        override fun search(
+            text: String,
+            startIndex: Int,
+            endIndex: Int,
+            ignoreCase: Boolean
+        ): Int = 0
     }
 }
 

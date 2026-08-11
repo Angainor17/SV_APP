@@ -12,16 +12,26 @@ import timber.log.Timber
  * [Plugin.Page] оставлен как backward-compatible враппер.
  */
 abstract class PluginPage {
-    @JvmField var pageNumber: Int = 0
-    @JvmField var pageOffset: Int = 0 // размеры pageBox
-    @JvmField var pageBox: PluginBox? = null // размеры pageBox
-    @JvmField var w: Int = 0 // ширина отображения
-    @JvmField var h: Int = 0 // высота отображения
-    @JvmField var hh: Double = 0.0 // размеры pageBox, видимая высота
-    @JvmField var ratio: Double = 0.0
-    @JvmField var pageStep: Int = 0 // размеры pageBox, размер шага страницы
-    @JvmField var pageOverlap: Int = 0 // размеры pageBox, размер перекрытия страницы
-    @JvmField var dpi: Int = 0 // dpi pageBox, задаётся вручную
+    @JvmField
+    var pageNumber: Int = 0
+    @JvmField
+    var pageOffset: Int = 0 // размеры pageBox
+    @JvmField
+    var pageBox: PluginBox? = null // размеры pageBox
+    @JvmField
+    var w: Int = 0 // ширина отображения
+    @JvmField
+    var h: Int = 0 // высота отображения
+    @JvmField
+    var hh: Double = 0.0 // размеры pageBox, видимая высота
+    @JvmField
+    var ratio: Double = 0.0
+    @JvmField
+    var pageStep: Int = 0 // размеры pageBox, размер шага страницы
+    @JvmField
+    var pageOverlap: Int = 0 // размеры pageBox, размер перекрытия страницы
+    @JvmField
+    var dpi: Int = 0 // dpi pageBox, задаётся вручную
 
     constructor()
 
@@ -100,7 +110,8 @@ abstract class PluginPage {
     fun prev(): Boolean {
         var pageOffset = this.pageOffset - pageStep
         if (this.pageOffset > 0 && pageOffset < 0) { // происходит только при повороте экрана
-            this.pageOffset = pageOffset // синхронизация с верхом = 0 или сохранение отрицательного смещения
+            this.pageOffset =
+                pageOffset // синхронизация с верхом = 0 или сохранение отрицательного смещения
             return true
         } else if (pageOffset < 0) {
             var pageNumber = this.pageNumber - 1
@@ -125,14 +136,16 @@ abstract class PluginPage {
      */
     fun scale(w: Int, h: Int) {
         val ratio = w / pageBox!!.w.toDouble()
-        Timber.tag("voronin").d("PluginPage.scale() w=$w h=$h oldRatio=${this.ratio} newRatio=$ratio pageBox=${pageBox!!.w}x${pageBox!!.h} hh=$hh")
+        Timber.tag("voronin")
+            .d("PluginPage.scale() w=$w h=$h oldRatio=${this.ratio} newRatio=$ratio pageBox=${pageBox!!.w}x${pageBox!!.h} hh=$hh")
         this.hh *= ratio
         this.ratio *= ratio
         pageBox!!.w = w
         pageBox!!.h = (pageBox!!.h * ratio).toInt()
         pageOffset = (pageOffset * ratio).toInt()
         dpi = (dpi * ratio).toInt()
-        Timber.tag("voronin").d("PluginPage.scale() result: pageBox=${pageBox!!.w}x${pageBox!!.h} hh=$hh ratio=${this.ratio}")
+        Timber.tag("voronin")
+            .d("PluginPage.scale() result: pageBox=${pageBox!!.w}x${pageBox!!.h} hh=$hh ratio=${this.ratio}")
     }
 
     /**
@@ -144,7 +157,8 @@ abstract class PluginPage {
         render.x = 0
         render.w = pageBox!!.w
 
-        Timber.tag("voronin").d("PluginPage.renderRect() pageOffset=$pageOffset hh=$hh pageBox=${pageBox!!.w}x${pageBox!!.h} ratio=$ratio w=$w h=$h")
+        Timber.tag("voronin")
+            .d("PluginPage.renderRect() pageOffset=$pageOffset hh=$hh pageBox=${pageBox!!.w}x${pageBox!!.h} ratio=$ratio w=$w h=$h")
 
         if (pageOffset < 0) { // показываем пустое пространство в начале
             val tail = (pageBox!!.h - pageOffset - hh).toInt() // хвост для обрезки снизу
@@ -161,7 +175,8 @@ abstract class PluginPage {
             val t = ((hh - pageBox!!.h) / ratio / 2).toInt()
             render.h = pageBox!!.h
             render.dst = android.graphics.Rect(0, t, w, h - t)
-            Timber.tag("voronin").d("PluginPage.renderRect() case2: centered t=$t dst=${render.dst}")
+            Timber.tag("voronin")
+                .d("PluginPage.renderRect() case2: centered t=$t dst=${render.dst}")
         } else {
             render.h = hh.toInt()
             render.y = pageBox!!.h - render.h - pageOffset - 1

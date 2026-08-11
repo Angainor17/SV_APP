@@ -62,7 +62,7 @@ abstract class InternalUtil {
     }
 
     static void showSnackbarWithAction(@NonNull Activity activity, @NonNull String text,
-                                        @NonNull String actionText, @NonNull View.OnClickListener listener) {
+                                       @NonNull String actionText, @NonNull View.OnClickListener listener) {
         final View rootView = activity.findViewById(android.R.id.content);
         if (rootView != null) {
             Snackbar.make(rootView, text, Snackbar.LENGTH_LONG)

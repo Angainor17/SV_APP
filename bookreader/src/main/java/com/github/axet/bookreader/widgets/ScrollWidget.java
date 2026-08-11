@@ -1200,8 +1200,7 @@ public class ScrollWidget extends RecyclerView implements ZLViewWidget {
         }
 
         /**
-         * @Воронин
-         * Отображает текст на странице
+         * @Воронин Отображает текст на странице
          */
         public class PageView extends View {
             public PageHolder holder;

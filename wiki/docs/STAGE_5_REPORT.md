@@ -5,6 +5,7 @@
 ### 1. Созданы UI-модели
 
 **UiWikiState.kt:**
+
 - `Initial` - начальное состояние (показываем историю)
 - `Loading` - загрузка
 - `Content` - статья найдена
@@ -12,12 +13,14 @@
 - `Error` - ошибка
 
 **UiWikiArticle.kt:**
+
 - `UiWikiArticle` - модель статьи
 - `UiWikiLink` - модель ссылки
 
 ### 2. Созданы Actions
 
 **WikiActions.kt:**
+
 - `OnSearch(query)` - поиск статьи
 - `OnLinkClick(title)` - клик по ссылке
 - `OnAddFavorite(title)` - добавить в избранное
@@ -30,6 +33,7 @@
 ### 3. Созданы Effects
 
 **WikiOneTimeEffect.kt:**
+
 - `ShowErrorSnackBar` - показать ошибку
 - `ShowAddedToFavorites` - добавлено в избранное
 - `ShowRemovedFromFavorites` - удалено из избранного
@@ -37,12 +41,14 @@
 ### 4. Создан Mapper
 
 **UiWikiMapper.kt:**
+
 - Маппинг `WikiArticle` → `UiWikiArticle`
 - Маппинг `WikiLink` → `UiWikiLink`
 
 ### 5. Создана ViewModel
 
 **RootWikiViewModel.kt:**
+
 - Управление состоянием через `StateFlow`
 - Обработка всех Actions
 - Интеграция со всеми Use Cases

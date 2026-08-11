@@ -34,13 +34,15 @@ class ReaderBookmarksDelegate(
 
     fun edit(bookmark: Storage.Bookmark) {
         val currentState = getState() ?: return
-        updateState(currentState.copy(
-            showBookmarkEdit = true,
-            editingBookmark = bookmark,
-            showToc = false,
-            showBookmarks = false,
-            showFontSettings = false
-        ))
+        updateState(
+            currentState.copy(
+                showBookmarkEdit = true,
+                editingBookmark = bookmark,
+                showToc = false,
+                showBookmarks = false,
+                showFontSettings = false
+            )
+        )
     }
 
     fun saveEdit(bookmark: Storage.Bookmark, name: String, color: Int) {
@@ -67,8 +69,10 @@ class ReaderBookmarksDelegate(
         val book = getCurrentBook() ?: return
 
         Timber.tag("voronin2").d("========== СОЗДАНИЕ ЗАМЕТКИ ==========")
-        Timber.tag("voronin2").d("start: paragraph=${bookmark.start.paragraphIndex}, element=${bookmark.start.elementIndex}")
-        Timber.tag("voronin2").d("end: paragraph=${bookmark.end.paragraphIndex}, element=${bookmark.end.elementIndex}")
+        Timber.tag("voronin2")
+            .d("start: paragraph=${bookmark.start.paragraphIndex}, element=${bookmark.start.elementIndex}")
+        Timber.tag("voronin2")
+            .d("end: paragraph=${bookmark.end.paragraphIndex}, element=${bookmark.end.elementIndex}")
 
         bookmark.coverUrl = book.info?.coverUrl
         bookmark.bookFileUri = book.url?.toString()
@@ -122,7 +126,8 @@ class ReaderBookmarksDelegate(
         val fbookBookmarks = getFBReaderView()?.book?.info?.bookmarks ?: return
         if (fbookBookmarks.isEmpty()) return
 
-        Timber.tag("voronin2").d("=== migrateBookmarksContext START: ${fbookBookmarks.size} bookmarks ===")
+        Timber.tag("voronin2")
+            .d("=== migrateBookmarksContext START: ${fbookBookmarks.size} bookmarks ===")
         var needSave = false
 
         fbookBookmarks.forEach { bm ->
@@ -158,12 +163,14 @@ class ReaderBookmarksDelegate(
 
     private fun hideEditDialog() {
         val currentState = getState() ?: return
-        updateState(currentState.copy(
-            showBookmarkEdit = false,
-            editingBookmark = null,
-            showToc = false,
-            showBookmarks = false,
-            showFontSettings = false
-        ))
+        updateState(
+            currentState.copy(
+                showBookmarkEdit = false,
+                editingBookmark = null,
+                showToc = false,
+                showBookmarks = false,
+                showFontSettings = false
+            )
+        )
     }
 }

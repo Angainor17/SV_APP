@@ -10,9 +10,11 @@ metadata:
 # Mock System для сетевых запросов
 
 ## Расположение
+
 `commonarchitecture/src/main/java/su/sv/commonarchitecture/mock/`
 
 ## Файлы
+
 - **MockConfig.kt** — флаг `IS_MOCK_ENABLED` для включения/выключения моков
 - **MockInterceptor.kt** — OkHttp Interceptor для перехвата запросов
 - **MockDataProvider.kt** — провайдер мок-данных для всех API
@@ -20,12 +22,14 @@ metadata:
 ## Как использовать
 
 ### Включить моки (offline режим)
+
 ```kotlin
 // MockConfig.kt
 const val IS_MOCK_ENABLED = true
 ```
 
 ### Выключить моки (online режим)
+
 ```kotlin
 // MockConfig.kt
 const val IS_MOCK_ENABLED = false
@@ -33,13 +37,14 @@ const val IS_MOCK_ENABLED = false
 
 ## Поддерживаемые API
 
-| API | URL | Методы |
-|-----|-----|--------|
-| Wiki | svremya.su | search, getPage, openSearch |
-| Books | svremya.org | getBooks |
-| VK | api.vk.com | getPosts, getVideo |
+| API   | URL         | Методы                      |
+|-------|-------------|-----------------------------|
+| Wiki  | svremya.su  | search, getPage, openSearch |
+| Books | svremya.org | getBooks                    |
+| VK    | api.vk.com  | getPosts, getVideo          |
 
 ## Архитектура
+
 ```
 MockConfig (const)
     ↓

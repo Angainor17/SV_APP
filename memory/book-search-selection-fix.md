@@ -13,7 +13,8 @@ metadata:
 
 ### Баг выделения текста в paging mode
 
-**Описание:** При постраничном отображении (свайп страницы в бок) выделение текста остаётся на месте, а текст под ним двигается. Выделение не привязано к тексту.
+**Описание:** При постраничном отображении (свайп страницы в бок) выделение текста остаётся на
+месте, а текст под ним двигается. Выделение не привязано к тексту.
 
 **Работает:** Непрерывный просмотр с вертикальным скроллом (ScrollWidget)
 
@@ -30,6 +31,7 @@ if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
 ```
 
 **Проблема:**
+
 1. `selectionPage` хранит только одну позицию страницы
 2. При смене страницы - выделение закрывается вместо обновления
 3. Нет поддержки cross-page selection (выделение на нескольких страницах)
@@ -41,15 +43,15 @@ if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
 
 ### Файлы поиска
 
-| Файл | Назначение |
-|------|------------|
-| `TextSearchPopup.java` | UI popup с кнопками prev/next/close |
-| `ZLSearchUtil.java` | Алгоритм поиска текста |
-| `ZLSearchPattern.kt` | Паттерн поиска (case-insensitive) |
-| `Plugin.View.Search` | Абстрактный класс поиска для PDF/DJVU |
-| `FBReaderView.SearchView` | Отрисовка результатов поиска |
-| `PagerWidget.searchPage()` | Навигация к результату в paging mode |
-| `ScrollWidget.searchPage()` | Навигация к результату в scroll mode |
+| Файл                        | Назначение                            |
+|-----------------------------|---------------------------------------|
+| `TextSearchPopup.java`      | UI popup с кнопками prev/next/close   |
+| `ZLSearchUtil.java`         | Алгоритм поиска текста                |
+| `ZLSearchPattern.kt`        | Паттерн поиска (case-insensitive)     |
+| `Plugin.View.Search`        | Абстрактный класс поиска для PDF/DJVU |
+| `FBReaderView.SearchView`   | Отрисовка результатов поиска          |
+| `PagerWidget.searchPage()`  | Навигация к результату в paging mode  |
+| `ScrollWidget.searchPage()` | Навигация к результату в scroll mode  |
 
 ### Flow поиска
 
@@ -73,6 +75,7 @@ if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
 **Файл:** `SelectionCoordinates.kt`
 
 Три системы координат:
+
 - **Device** — абсолютные screen координаты
 - **Page** — относительно PDF страницы
 - **View** — относительно SelectionView
@@ -82,6 +85,7 @@ if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
 #### 1.2 Modify PagerWidget.kt
 
 **Заменить:**
+
 ```kotlin
 // OLD - закрывает выделение
 if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
@@ -90,6 +94,7 @@ if (selectionPage != null && !selectionPage!!.samePositionAs(position)) {
 ```
 
 **На:**
+
 ```kotlin
 // NEW - обновляет выделение для новой страницы
 if (selectionPage != null) {
@@ -342,28 +347,31 @@ fun `selection restores when returning to original page`() {
 
 ### Selection Panel Visibility
 
-| Событие | Panel | Handles | Selection Data |
-|---------|-------|---------|----------------|
-| Long press (create) | **SHOW** | SHOW | Created |
-| Swipe page (paging) | **HIDE** | HIDE | **Kept** |
-| Return to selection page | **SHOW** | SHOW | Restored |
-| Mode switch (paging ↔ scroll) | **HIDE** | HIDE | **Clear** |
-| **Fullscreen toggle** | - | - | **Recalculate coordinates** |
-| Close button click | HIDE | HIDE | Clear |
-| Bookmark/Copy/Share action | HIDE | HIDE | Clear |
+| Событие                       | Panel    | Handles | Selection Data              |
+|-------------------------------|----------|---------|-----------------------------|
+| Long press (create)           | **SHOW** | SHOW    | Created                     |
+| Swipe page (paging)           | **HIDE** | HIDE    | **Kept**                    |
+| Return to selection page      | **SHOW** | SHOW    | Restored                    |
+| Mode switch (paging ↔ scroll) | **HIDE** | HIDE    | **Clear**                   |
+| **Fullscreen toggle**         | -        | -       | **Recalculate coordinates** |
+| Close button click            | HIDE     | HIDE    | Clear                       |
+| Bookmark/Copy/Share action    | HIDE     | HIDE    | Clear                       |
 
 ### При смене режима (paging ↔ scroll)
 
-**Требование:** При переключении между paging и scroll mode - панель выделения должна скрываться, если она была видна.
+**Требование:** При переключении между paging и scroll mode - панель выделения должна скрываться,
+если она была видна.
 
 **Реализация:** В методе смены режима вызвать:
+
 ```kotlin
 fb.app.runAction(ActionCode.SELECTION_HIDE_PANEL)
 fb.selection?.hideHandles()
 fb.selection?.clearSavedSelection()
 ```
 
-**Причина:** 
+**Причина:**
+
 - Paging и scroll имеют разные coordinate systems
 - Selection position в paging mode не совпадает с scroll mode
 - Пользователь должен создать новое выделение в новом режиме
@@ -373,6 +381,7 @@ fb.selection?.clearSavedSelection()
 **Требование:** При переключении fullscreen - координаты выделения должны пересчитываться.
 
 **Реализация:** После fullscreen toggle вызвать:
+
 ```java
 // В FBReaderView.toggleFullscreen()
 post(() -> {
@@ -394,7 +403,8 @@ private void updateSelectionAfterFullscreenChange() {
 }
 ```
 
-**Причина:** 
+**Причина:**
+
 - `mainAreaHeight` меняется при fullscreen (без toolbar/footer)
 - SelectionView coordinates не пересчитываются автоматически
 - Подсвеченный текст смещается относительно реального текста
@@ -413,11 +423,11 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 1: Создание выделения
 
-| Шаг | Действие | Ожидаемый лог |
-|-----|----------|---------------|
-| 1 | Long press на тексте | `PagerWidget onLongClick: attempting selection at position=...` |
-| 2 | Появились маркеры | `PagerWidget onLongClick: selection created successfully at ...` |
-| 3 | | `PagerWidget onLongClick: selectionPage set to ...` |
+| Шаг | Действие             | Ожидаемый лог                                                    |
+|-----|----------------------|------------------------------------------------------------------|
+| 1   | Long press на тексте | `PagerWidget onLongClick: attempting selection at position=...`  |
+| 2   | Появились маркеры    | `PagerWidget onLongClick: selection created successfully at ...` |
+| 3   |                      | `PagerWidget onLongClick: selectionPage set to ...`              |
 
 **✅ Успех:** Маркеры появились, в Logcat 3 строки логов.
 
@@ -427,13 +437,14 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 2: Свайп на следующую страницу (panel + selection скрыты)
 
-| Шаг | Действие | Ожидаемый лог |
-|-----|----------|---------------|
-| 1 | Свайп вправо → следующая страница | `PagerWidget: page changed from [pos1] to [pos2] - hiding handles and panel` |
-| 2 | | `SelectionView hideHandles: hiding entire selection view` |
-| 3 | | `SelectionView hideHandles: visibility set to INVISIBLE` |
+| Шаг | Действие                          | Ожидаемый лог                                                                |
+|-----|-----------------------------------|------------------------------------------------------------------------------|
+| 1   | Свайп вправо → следующая страница | `PagerWidget: page changed from [pos1] to [pos2] - hiding handles and panel` |
+| 2   |                                   | `SelectionView hideHandles: hiding entire selection view`                    |
+| 3   |                                   | `SelectionView hideHandles: visibility set to INVISIBLE`                     |
 
-**✅ Успех:** 
+**✅ Успех:**
+
 - **Panel скрыта** (Compose panel исчезла)
 - **Выделение скрыто** (подсвеченный текст исчез)
 - В логах `visibility set to INVISIBLE`
@@ -444,11 +455,11 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 3: Возврат на страницу с выделением (panel + selection восстановлены)
 
-| Шаг | Действие | Ожидаемый лог |
-|-----|----------|---------------|
-| 1 | Свайп влево → предыдущая страница | `PagerWidget: returned to selection page - restoring handles and panel` |
-| 2 | | `SelectionView restoreHandles: restoring entire selection view` |
-| 3 | | `SelectionView restoreHandles: visibility set to VISIBLE` |
+| Шаг | Действие                          | Ожидаемый лог                                                           |
+|-----|-----------------------------------|-------------------------------------------------------------------------|
+| 1   | Свайп влево → предыдущая страница | `PagerWidget: returned to selection page - restoring handles and panel` |
+| 2   |                                   | `SelectionView restoreHandles: restoring entire selection view`         |
+| 3   |                                   | `SelectionView restoreHandles: visibility set to VISIBLE`               |
 
 **✅ Успех:** Panel и всё выделение восстановились.
 
@@ -458,14 +469,14 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 4: Много свайпов + возврат
 
-| Шаг | Действие | Ожидаемый результат |
-|-----|----------|---------------------|
-| 1 | Свайп → стр. 2 | Выделение скрыто |
-| 2 | Свайп → стр. 3 | Выделение скрыто |
-| 3 | Свайп → стр. 4 | Выделение скрыто |
-| 4 | Свайп ← стр. 3 | Выделение скрыто (selectionPage ≠ pos) |
-| 5 | Свайп ← стр. 2 | Выделение скрыто |
-| 6 | Свайп ← стр. 1 | **Выделение восстановлено** |
+| Шаг | Действие       | Ожидаемый результат                    |
+|-----|----------------|----------------------------------------|
+| 1   | Свайп → стр. 2 | Выделение скрыто                       |
+| 2   | Свайп → стр. 3 | Выделение скрыто                       |
+| 3   | Свайп → стр. 4 | Выделение скрыто                       |
+| 4   | Свайп ← стр. 3 | Выделение скрыто (selectionPage ≠ pos) |
+| 5   | Свайп ← стр. 2 | Выделение скрыто                       |
+| 6   | Свайп ← стр. 1 | **Выделение восстановлено**            |
 
 **✅ Успех:** После возврата на страницу 1 выделение восстановилось.
 
@@ -475,11 +486,11 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 5: Новое выделение после свайпа
 
-| Шаг | Действие | Ожидаемый результат |
-|-----|----------|---------------------|
-| 1 | На странице 2: long press | Новое выделение создано |
-| 2 | Свайп → стр. 3 | Новое выделение скрыто |
-| 3 | Свайп ← стр. 2 | Новое выделение восстановлено |
+| Шаг | Действие                  | Ожидаемый результат           |
+|-----|---------------------------|-------------------------------|
+| 1   | На странице 2: long press | Новое выделение создано       |
+| 2   | Свайп → стр. 3            | Новое выделение скрыто        |
+| 3   | Свайп ← стр. 2            | Новое выделение восстановлено |
 
 **✅ Успех:** Новое выделение работает по тому же принципу.
 
@@ -487,12 +498,12 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 6: Scroll mode (для сравнения)
 
-| Шаг | Действие | Ожидаемый результат |
-|-----|----------|---------------------|
-| 1 | Переключить в scroll mode | Vertical scrolling |
-| 2 | Long press → выделение | Маркеры появились |
-| 3 | Scroll вниз | **Выделение остаётся видимым** (это работало раньше) |
-| 4 | Scroll вверх к выделению | Маркеры на месте |
+| Шаг | Действие                  | Ожидаемый результат                                  |
+|-----|---------------------------|------------------------------------------------------|
+| 1   | Переключить в scroll mode | Vertical scrolling                                   |
+| 2   | Long press → выделение    | Маркеры появились                                    |
+| 3   | Scroll вниз               | **Выделение остаётся видимым** (это работало раньше) |
+| 4   | Scroll вверх к выделению  | Маркеры на месте                                     |
 
 **Примечание:** Это работало раньше — для сравнения.
 
@@ -500,12 +511,12 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 7: Смена режима (paging ↔ scroll)
 
-| Шаг | Действие | Ожидаемый лог |
-|-----|----------|---------------|
-| 1 | Paging mode: создать выделение | `PagerWidget onLongClick: selection created` |
-| 2 | Переключить в scroll mode | `FBReaderView setWidget: closing selection before mode switch` |
-| 3 | | Panel скрыта, выделение закрыто |
-| 4 | Переключить обратно в paging | Нет ошибки |
+| Шаг | Действие                       | Ожидаемый лог                                                  |
+|-----|--------------------------------|----------------------------------------------------------------|
+| 1   | Paging mode: создать выделение | `PagerWidget onLongClick: selection created`                   |
+| 2   | Переключить в scroll mode      | `FBReaderView setWidget: closing selection before mode switch` |
+| 3   |                                | Panel скрыта, выделение закрыто                                |
+| 4   | Переключить обратно в paging   | Нет ошибки                                                     |
 
 **✅ Успех:** Panel скрыта при смене режима, нет crash.
 
@@ -513,16 +524,16 @@ private void updateSelectionAfterFullscreenChange() {
 
 ### Сценарий 8: Fullscreen toggle (пересчёт координат)
 
-| Шаг | Действие | Ожидаемый лог |
-|-----|----------|---------------|
-| 1 | Paging mode: создать выделение | `selection created` |
-| 2 | Переключить в fullscreen | `Action: ENTER fullscreen` |
-| 3 | | `updateSelectionAfterFullscreenChange: updating selection coordinates` |
-| 4 | | `updateSelectionAfterFullscreenChange: selection updated successfully` |
-| 5 | Выделение на правильной позиции | ✅ |
-| 6 | Exit fullscreen | `Action: EXIT fullscreen` |
-| 7 | | `updateSelectionAfterFullscreenChange: updating...` |
-| 8 | Выделение на правильной позиции | ✅ |
+| Шаг | Действие                        | Ожидаемый лог                                                          |
+|-----|---------------------------------|------------------------------------------------------------------------|
+| 1   | Paging mode: создать выделение  | `selection created`                                                    |
+| 2   | Переключить в fullscreen        | `Action: ENTER fullscreen`                                             |
+| 3   |                                 | `updateSelectionAfterFullscreenChange: updating selection coordinates` |
+| 4   |                                 | `updateSelectionAfterFullscreenChange: selection updated successfully` |
+| 5   | Выделение на правильной позиции | ✅                                                                      |
+| 6   | Exit fullscreen                 | `Action: EXIT fullscreen`                                              |
+| 7   |                                 | `updateSelectionAfterFullscreenChange: updating...`                    |
+| 8   | Выделение на правильной позиции | ✅                                                                      |
 
 **✅ Успех:** Выделение не смещается при fullscreen toggle.
 
@@ -557,27 +568,27 @@ adb logcat -s voronin:D | grep "PagerWidget\|SelectionView\|FBReaderView"
 
 ### Selection fix
 
-| Файл | Изменение |
-|------|-----------|
-| `PagerWidget.kt:221-224` | Заменить close на hide handles |
-| `PagerWidget.kt:352-412` | Поддержка multi-page selection |
-| `SelectionView.kt` | Добавить hideHandles(), restoreHandles() |
-| `SelectionManager.kt` | **NEW** — общий менеджер выделения |
-| `SelectionCoordinates.kt` | Пересчёт при pageOffset |
+| Файл                      | Изменение                                |
+|---------------------------|------------------------------------------|
+| `PagerWidget.kt:221-224`  | Заменить close на hide handles           |
+| `PagerWidget.kt:352-412`  | Поддержка multi-page selection           |
+| `SelectionView.kt`        | Добавить hideHandles(), restoreHandles() |
+| `SelectionManager.kt`     | **NEW** — общий менеджер выделения       |
+| `SelectionCoordinates.kt` | Пересчёт при pageOffset                  |
 
 ### Search UI
 
-| Файл | Изменение |
-|------|-----------|
-| `SearchComposePanel.kt` | **NEW** — Compose UI panel |
-| `ReaderContent.kt` | Добавить search state и panel |
-| `SearchState.kt` | **NEW** — state data class |
-| `BookSearchEngine.kt` | **NEW** — interface для поиска |
+| Файл                    | Изменение                      |
+|-------------------------|--------------------------------|
+| `SearchComposePanel.kt` | **NEW** — Compose UI panel     |
+| `ReaderContent.kt`      | Добавить search state и panel  |
+| `SearchState.kt`        | **NEW** — state data class     |
+| `BookSearchEngine.kt`   | **NEW** — interface для поиска |
 
 ### Remove legacy
 
-| Файл | Действие |
-|------|----------|
+| Файл                   | Действие                       |
+|------------------------|--------------------------------|
 | `TextSearchPopup.java` | Заменить на SearchComposePanel |
 
 ---

@@ -11,7 +11,8 @@ metadata:
 
 ## Проблема
 
-При выделении текста панель с действиями (bookmark, translate, share, copy, question, alert) мерцала и пропадала вместе с выделением.
+При выделении текста панель с действиями (bookmark, translate, share, copy, question, alert) мерцала
+и пропадала вместе с выделением.
 
 ## Причина мерцания
 
@@ -33,14 +34,16 @@ metadata:
 ### ScrollWidget.onLongPress
 
 1. `onLongPress()` вызывал `onFingerReleaseAfterLongPress()` сразу после `onFingerLongPress()`
-2. При реальном `ACTION_UP` → `onReleaseCheck()` → `onFingerRelease()` → `SELECTION_SHOW_PANEL` снова
+2. При реальном `ACTION_UP` → `onReleaseCheck()` → `onFingerRelease()` → `SELECTION_SHOW_PANEL`
+   снова
 3. Двойной показ панели
 
 ## Решение
 
 ### 1. FBView.onFingerLongPress() - КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
 
-Убран вызов `SELECTION_HIDE_PANEL`. Панель должна скрываться только при нажатии на маркер (через `onFingerPress`):
+Убран вызов `SELECTION_HIDE_PANEL`. Панель должна скрываться только при нажатии на маркер (через
+`onFingerPress`):
 
 ```java
 case startSelecting:
@@ -97,7 +100,8 @@ fb.app.BookTextView.onFingerLongPress(x, y);
 
 ### Новые файлы
 
-- `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/SelectionComposePanel.kt` - Compose панель
+- `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/SelectionComposePanel.kt` -
+  Compose панель
 
 ## Flow выделения текста (после исправления)
 
@@ -126,4 +130,6 @@ fb.app.BookTextView.onFingerLongPress(x, y);
 
 **Why:** Миграция на Compose UI и исправление бага мерцания панели выделения
 
-**How to apply:** При работе с выделением текста использовать ReaderActions и ReaderState.showSelection. SELECTION_HIDE_PANEL вызывается только в onFingerPress при нажатии на маркер.
+**How to apply:** При работе с выделением текста использовать ReaderActions и
+ReaderState.showSelection. SELECTION_HIDE_PANEL вызывается только в onFingerPress при нажатии на
+маркер.

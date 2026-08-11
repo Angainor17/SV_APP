@@ -57,6 +57,7 @@ sealed class ReaderState {
 enum class ViewMode {
     /** Постраничный просмотр */
     PAGING,
+
     /** Непрерывная прокрутка */
     CONTINUOUS
 }

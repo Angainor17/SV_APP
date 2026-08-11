@@ -40,11 +40,11 @@
 
 ### Почему так эффективнее
 
-| Подход | Токены | Ошибки | Время |
-|--------|--------|--------|-------|
-| Claude пишет весь файл | 50,000+ | 20-50 | 30+ мин |
-| Android Studio конвертирует | 0 | 5-10 | 2 мин |
-| **Партнёрство** | 5,000 | 0-5 | 5-10 мин |
+| Подход                      | Токены  | Ошибки | Время    |
+|-----------------------------|---------|--------|----------|
+| Claude пишет весь файл      | 50,000+ | 20-50  | 30+ мин  |
+| Android Studio конвертирует | 0       | 5-10   | 2 мин    |
+| **Партнёрство**             | 5,000   | 0-5    | 5-10 мин |
 
 ---
 
@@ -157,13 +157,13 @@ var start: ZLTextPosition? = null  // оставить nullable
 
 ## Типичные ошибки и решения
 
-| Ошибка | Причина | Решение |
-|--------|---------|---------|
-| `This type is final` | Класс наследуется | `open class` |
-| `Cannot access` | Неправильный import | Проверить package |
-| `Unresolved reference` | Нет @JvmStatic | Добавить |
-| `Nullable type mismatch` | Kotlin nullable vs Java platform type | `!!` или `?.` |
-| `No accessor` | Поле private | `@JvmField` |
+| Ошибка                   | Причина                               | Решение           |
+|--------------------------|---------------------------------------|-------------------|
+| `This type is final`     | Класс наследуется                     | `open class`      |
+| `Cannot access`          | Неправильный import                   | Проверить package |
+| `Unresolved reference`   | Нет @JvmStatic                        | Добавить          |
+| `Nullable type mismatch` | Kotlin nullable vs Java platform type | `!!` или `?.`     |
+| `No accessor`            | Поле private                          | `@JvmField`       |
 
 ---
 

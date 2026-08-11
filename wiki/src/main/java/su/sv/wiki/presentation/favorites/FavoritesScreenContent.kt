@@ -51,7 +51,6 @@ import com.github.terrakok.modo.stack.forward
 import su.sv.commonui.theme.DeviceFormFactor
 import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalDeviceFormFactor
-import su.sv.wiki.presentation.decodeHtmlEntities
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
@@ -60,6 +59,7 @@ import su.sv.commonui.util.ProvideAdaptiveDimensions
 import su.sv.wiki.R
 import su.sv.wiki.domain.model.WikiArticle
 import su.sv.wiki.presentation.article.ArticleScreen
+import su.sv.wiki.presentation.decodeHtmlEntities
 
 /**
  * Контент экрана избранного (для modo)
@@ -285,7 +285,8 @@ private fun extractPlainText(html: String): String {
 
     // 2. Удаляем ссылки на картинки (типичные MediaWiki форматы)
     // Удаляем URL картинки который может быть в тексте
-    text = text.replace(Regex("https?://[^\\s<>\"']+\\.(jpg|jpeg|png|gif|webp|bmp)[^\\s<>\"']*"), "")
+    text =
+        text.replace(Regex("https?://[^\\s<>\"']+\\.(jpg|jpeg|png|gif|webp|bmp)[^\\s<>\"']*"), "")
 
     // 3. Удаляем HTML теги
     text = text.replace(Regex("<[^>]*>"), "")

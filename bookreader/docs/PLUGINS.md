@@ -2,7 +2,8 @@
 
 ## Обзор
 
-Плагины обеспечивают рендеринг различных форматов файлов. Каждый плагин реализует интерфейс `Plugin` (`app/Plugin.kt`) и наследуется от FBReader-класса `BuiltinFormatPlugin`.
+Плагины обеспечивают рендеринг различных форматов файлов. Каждый плагин реализует интерфейс
+`Plugin` (`app/Plugin.kt`) и наследуется от FBReader-класса `BuiltinFormatPlugin`.
 
 ---
 
@@ -26,13 +27,13 @@ Plugin.View.Search     ← поиск текста
 
 ## Поддерживаемые форматы
 
-| Формат | Плагин | Рендерер | Выделение | Поиск |
-|---|---|---|---|---|
-| PDF | PDFPlugin | Pdfium (смартфон) или Android PdfRenderer (планшет) | Есть (pdfium) | Есть (pdfium) |
-| DjVu | DjvuPlugin | libdjvu (нативная) | Есть | Есть |
-| CBZ | ComicsPlugin | BitmapFactory | Нет | Нет |
-| CBR | ComicsPlugin | BitmapFactory + junrar | Нет | Нет |
-| EPUB/FB2/MOBI | FBReader (нет плагина) | FBReader engine | Есть | Есть |
+| Формат        | Плагин                 | Рендерер                                            | Выделение     | Поиск         |
+|---------------|------------------------|-----------------------------------------------------|---------------|---------------|
+| PDF           | PDFPlugin              | Pdfium (смартфон) или Android PdfRenderer (планшет) | Есть (pdfium) | Есть (pdfium) |
+| DjVu          | DjvuPlugin             | libdjvu (нативная)                                  | Есть          | Есть          |
+| CBZ           | ComicsPlugin           | BitmapFactory                                       | Нет           | Нет           |
+| CBR           | ComicsPlugin           | BitmapFactory + junrar                              | Нет           | Нет           |
+| EPUB/FB2/MOBI | FBReader (нет плагина) | FBReader engine                                     | Есть          | Есть          |
 
 ---
 
@@ -41,17 +42,24 @@ Plugin.View.Search     ← поиск текста
 Файл: `app/Plugin.kt`
 
 ### Plugin.Box
+
 Прямоугольник в координатах документа:
+
 ```
 x, y — нижний левый угол
 w, h — ширина и высота
 ```
-Метод `toRect(w, h)` конвертирует в Android `Rect`, учитывая инверсию оси Y (координаты PDF снизу вверх).
+
+Метод `toRect(w, h)` конвертирует в Android `Rect`, учитывая инверсию оси Y (координаты PDF снизу
+вверх).
 
 ### Plugin.Page
+
 Представляет одну страницу документа:
+
 - `pageNumber` — номер страницы (0-indexed)
-- `pageOffset` — вертикальное смещение внутри страницы (для документов которые не помещаются на экран)
+- `pageOffset` — вертикальное смещение внутри страницы (для документов которые не помещаются на
+  экран)
 - `pageBox` — размер страницы в единицах документа
 - `w`, `h` — размер экрана в пикселях
 - `ratio` — коэффициент масштабирования (pageBox.w / w)
@@ -61,13 +69,16 @@ w, h — ширина и высота
 - `dpi` — DPI страницы
 
 Методы:
+
 - `renderPage()` — вычисляет ratio, hh, pageStep, pageOverlap
 - `renderRect()` — возвращает `RenderRect` с src/dst прямоугольниками для `canvas.drawBitmap()`
 - `next()` / `prev()` — переходы между страницами
 - `scale(w, h)` — масштабирует pageBox для zoom
 
 ### Plugin.View
+
 Базовый класс для отображения книги:
+
 - `current: Page` — текущая страница
 - `wallpaper: Bitmap?` — фон (обои)
 - `wallpaperColor: Int` — цвет фона
@@ -76,6 +87,7 @@ w, h — ширина и высота
 - `reflower: Reflow?` — алгоритм reflow
 
 Ключевые методы:
+
 - `drawOnBitmap()` / `drawOnCanvas()` — рендеринг страницы на Bitmap/Canvas
 - `gotoPosition(p)` — переход к позиции
 - `getPosition()` — текущая позиция (paragraphIndex=страница, elementIndex=смещение)
@@ -94,17 +106,22 @@ w, h — ширина и высота
 ### Выбор рендерера (смартфон vs планшет)
 
 При первом вызове `PDFPlugin.create(info)` определяется тип устройства:
+
 ```kotlin
 // Если screenSize >= 7.0 дюймов → планшет → Android PdfRenderer
 // Иначе → смартфон → pdfium (нативная библиотека)
 private var usePdfRenderer: Boolean? = null
 ```
 
-**Причина**: pdfium краша на некоторых планшетах с большим экраном. Android PdfRenderer стабилен, но не поддерживает текстовые операции.
+**Причина**: pdfium краша на некоторых планшетах с большим экраном. Android PdfRenderer стабилен, но
+не поддерживает текстовые операции.
 
-**Важный хак**: На планшетах (NativeView) для выделения текста и поиска всё равно используется pdfium через **ленивую инициализацию** `initTextDoc()`. Т.е. PdfRenderer рендерит страницы, а pdfium читает текст.
+**Важный хак**: На планшетах (NativeView) для выделения текста и поиска всё равно используется
+pdfium через **ленивую инициализацию** `initTextDoc()`. Т.е. PdfRenderer рендерит страницы, а pdfium
+читает текст.
 
 ### NativeView (для планшетов)
+
 ```kotlin
 inner class NativeView(f: ZLFile) : Plugin.View() {
     var doc: PdfRenderer           // рендерит страницы
@@ -113,35 +130,48 @@ inner class NativeView(f: ZLFile) : Plugin.View() {
 }
 ```
 
-Хак с PdfRenderer: при вызове `draw()` нужно закрыть страницу перед `NativePage(curr, index, w, h)`, т.к. PdfRenderer бросает `IllegalStateException` при повторном открытии той же страницы. Поэтому `curr.page?.close(); curr.page = null` перед созданием нового `NativePage`.
+Хак с PdfRenderer: при вызове `draw()` нужно закрыть страницу перед `NativePage(curr, index, w, h)`,
+т.к. PdfRenderer бросает `IllegalStateException` при повторном открытии той же страницы. Поэтому
+`curr.page?.close(); curr.page = null` перед созданием нового `NativePage`.
 
 PdfRenderer требует `Bitmap.Config.ARGB_8888`, не поддерживает `RGB_565`.
 
 ### PdfiumView (для смартфонов)
+
 Использует нативную библиотеку pdfium. Ограничение на размер bitmap при reflow:
+
 ```kotlin
 val maxDimension = 2000
 val scaleMultiplier = if (w > maxDimension || h > maxDimension) 1 else 2
 ```
 
 ### PDFTextModel
-Реализует `ZLTextModel` + `PdfiumView`. Используется FBReader для хранения количества страниц как "параграфов". Каждая страница PDF = один параграф с типом `END_OF_TEXT_PARAGRAPH`.
+
+Реализует `ZLTextModel` + `PdfiumView`. Используется FBReader для хранения количества страниц как "
+параграфов". Каждая страница PDF = один параграф с типом `END_OF_TEXT_PARAGRAPH`.
 
 ### SimplePdfTextModel
-Используется в NativeView (планшеты). Содержит только количество страниц, без содержимого (PdfRenderer не предоставляет текст).
+
+Используется в NativeView (планшеты). Содержит только количество страниц, без содержимого (
+PdfRenderer не предоставляет текст).
 
 ### PdfSearch
+
 Поиск текста по всем страницам:
+
 - `setPage(page)` — задаёт начальную страницу, сразу поиск по всем страницам книги
 - `next()` / `prev()` — навигация по результатам
 - Использует `pdfium.openPage(i).open().getText()` для каждой страницы
 
 ### Selection (PDF)
+
 Выделение по символам pdfium:
+
 - `SelectionPage` — открытая страница с текстом (pdfium.Text)
 - `startPage.index` / `endPage.index` — индексы начального/конечного символа
 - Метод `selectWord()` — выделяет слово по нажатию (расширяет от индекса влево и вправо)
-- `getBounds(page)` — возвращает прямоугольники символов, конвертированные в device-координаты через `ppage.toDevice()`
+- `getBounds(page)` — возвращает прямоугольники символов, конвертированные в device-координаты через
+  `ppage.toDevice()`
 
 ---
 
@@ -152,11 +182,16 @@ val scaleMultiplier = if (w > maxDimension || h > maxDimension) 1 else 2
 Использует нативную библиотеку djvulibre (загружается через `Natives.loadLibraries`).
 
 ### Особенности
-- `DjvuLibre` — кастомный класс с кэшем `SparseArray<Page>` для информации о страницах (чтобы не перечитывать каждый раз)
-- Координатная система DjVu отличается: ось Y инвертирована. Методы `toPage()` и `toDevice()` конвертируют
-- Текстовые зоны иерархические: `ZONE_CHARACTER`, `ZONE_WORD`, `ZONE_LINE`, `ZONE_PARAGRAPH` и т.д. Поиск идёт по всем типам, берётся первый непустой
+
+- `DjvuLibre` — кастомный класс с кэшем `SparseArray<Page>` для информации о страницах (чтобы не
+  перечитывать каждый раз)
+- Координатная система DjVu отличается: ось Y инвертирована. Методы `toPage()` и `toDevice()`
+  конвертируют
+- Текстовые зоны иерархические: `ZONE_CHARACTER`, `ZONE_WORD`, `ZONE_LINE`, `ZONE_PARAGRAPH` и т.д.
+  Поиск идёт по всем типам, берётся первый непустой
 
 ### DjvuView
+
 Метод `render()` использует масштаб x2 (`r.scale(w * 2, h * 2)`) для качества при reflow.
 
 ---
@@ -166,21 +201,26 @@ val scaleMultiplier = if (w > maxDimension || h > maxDimension) 1 else 2
 Файл: `app/ComicsPlugin.kt`
 
 ### Поддерживаемые архивы
+
 - CBZ = ZIP-архив с изображениями → `ZipDecoder` (zip4j)
 - CBR = RAR-архив с изображениями → `RarDecoder` (junrar)
 
 ### Декодеры
+
 `Decoder` — базовый класс:
+
 - `pages: ArrayList<ArchiveFile>` — список файлов изображений
 - `toc: ArrayList<ArchiveToc>?` — структура папок как оглавление
 - `render(p, c)` — декодирует изображение через `BitmapFactory`
 
 `ArchiveFile` — интерфейс для файла в архиве:
+
 - `open(): InputStream` — открыть для чтения
 - `copy(os: OutputStream)` — скопировать
 - `rect: Plugin.Box?` — размер изображения (ленивая инициализация через `getImageSize()`)
 
 ### Особенности
+
 - Страницы сортируются по имени файла (`SortByName`)
 - TOC строится автоматически из структуры папок в архиве (если папок > 1)
 - ComicsView не поддерживает выделение текста и поиск
@@ -213,6 +253,7 @@ val scaleMultiplier = if (w > maxDimension || h > maxDimension) 1 else 2
 ## Система reflow
 
 `Reflow` (`app/Reflow.kt`) — алгоритм для переформатирования PDF под размер экрана:
+
 - Рендерит страницу PDF в bitmap
 - Использует k2pdfopt для разбиения на колонки
 - Результат — несколько "виртуальных" страниц из одной PDF-страницы

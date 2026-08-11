@@ -42,7 +42,12 @@ class ReaderDisplayDelegate(
             ViewMode.PAGING
         }
         onHideSelectionPanel()
-        sharedPreferences.edit { putString(ReaderPreferences.PREFERENCE_VIEW_MODE, newMode.toString()) }
+        sharedPreferences.edit {
+            putString(
+                ReaderPreferences.PREFERENCE_VIEW_MODE,
+                newMode.toString()
+            )
+        }
         getFBReaderView()?.setWidget(
             if (newMode == ViewMode.CONTINUOUS) FBReaderView.Widgets.CONTINUOUS
             else FBReaderView.Widgets.PAGING

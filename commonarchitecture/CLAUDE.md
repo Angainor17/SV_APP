@@ -4,11 +4,13 @@
 
 ## Обзор
 
-Модуль `commonarchitecture` содержит базовые классы и утилиты для архитектуры приложения, включая базовые ViewModel, Activity, DI модули и обработку ошибок.
+Модуль `commonarchitecture` содержит базовые классы и утилиты для архитектуры приложения, включая
+базовые ViewModel, Activity, DI модули и обработку ошибок.
 
 ## Основные классы
 
 ### BaseViewModel
+
 Базовый класс для всех ViewModel:
 
 ```kotlin
@@ -18,6 +20,7 @@ abstract class BaseViewModel : ViewModel()
 Все ViewModel в приложении наследуются от этого класса.
 
 ### BaseActivity
+
 Базовый класс для Activity:
 
 ```kotlin
@@ -25,6 +28,7 @@ abstract class BaseActivity : AppCompatActivity()
 ```
 
 ### NetworkError
+
 Класс ошибки сети:
 
 ```kotlin
@@ -32,6 +36,7 @@ class NetworkError(cause: Throwable) : Exception(cause)
 ```
 
 ### runCatchingHttpRequest
+
 Обёртка для API запросов с обработкой ошибок:
 
 ```kotlin
@@ -47,6 +52,7 @@ when {
 ```
 
 ### ResourcesRepository
+
 Доступ к ресурсам приложения (перемещён в commonarchitecture):
 
 ```kotlin
@@ -67,9 +73,11 @@ class ResourcesRepository @Inject constructor(context: Context) {
 ## DI Модули
 
 ### ApiServiceModule
+
 Модуль для предоставления API сервисов.
 
 ### CoroutineModule
+
 Модуль для предоставления корутин:
 
 ```kotlin
@@ -84,6 +92,7 @@ object CoroutineModule {
 ## Use Cases
 
 ### UseCases
+
 Базовые интерфейсы для use cases:
 
 ```kotlin

@@ -36,11 +36,13 @@ object PermissionHelper {
                 Manifest.permission.READ_MEDIA_AUDIO,
                 Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
             )
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
                 Manifest.permission.READ_MEDIA_IMAGES,
                 Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.READ_MEDIA_AUDIO
             )
+
             else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
 
@@ -56,6 +58,7 @@ object PermissionHelper {
                 Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.READ_MEDIA_AUDIO
             )
+
             else -> arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -72,7 +75,10 @@ object PermissionHelper {
     fun hasStoragePermissions(context: Context, isWrite: Boolean = false): Boolean {
         val permissions = if (isWrite) STORAGE_PERMISSIONS_RW else STORAGE_PERMISSIONS_RO
         return permissions.all { permission ->
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
         }
     }
 

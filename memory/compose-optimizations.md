@@ -18,6 +18,7 @@ metadata:
 **Файл:** `books/src/main/java/su/sv/books/catalog/presentation/root/ui/BookList.kt`
 
 **Было:**
+
 ```kotlin
 state.filteredBooks.forEach { book ->
     item(key = book.id) {
@@ -27,6 +28,7 @@ state.filteredBooks.forEach { book ->
 ```
 
 **Стало:**
+
 ```kotlin
 items(
     items = state.filteredBooks,
@@ -36,9 +38,11 @@ items(
 }
 ```
 
-**Причина:** Использование `items()` с `key` позволяет LazyGrid более эффективно управлять рекомпозицией и переиспользовать элементы.
+**Причина:** Использование `items()` с `key` позволяет LazyGrid более эффективно управлять
+рекомпозицией и переиспользовать элементы.
 
-**Потенциальный баг:** Если элементы списка не отображаются или дублируются — проверить уникальность `book.id`.
+**Потенциальный баг:** Если элементы списка не отображаются или дублируются — проверить уникальность
+`book.id`.
 
 ---
 
@@ -47,6 +51,7 @@ items(
 **Файл:** `info/src/main/java/su/sv/info/rootinfo/ui/InfoContent.kt`
 
 **Было:**
+
 ```kotlin
 items(state.items.size) {
     InfoItem(state.items[it])
@@ -54,6 +59,7 @@ items(state.items.size) {
 ```
 
 **Стало:**
+
 ```kotlin
 items(
     items = state.items,
@@ -63,9 +69,12 @@ items(
 }
 ```
 
-**Причина:** Индексный доступ без ключа вызывает полную рекомпозицию при любых изменениях списка. Ключи позволяют Compose отслеживать элементы. Используется `url` как уникальный ключ, так как `id` отсутствует в модели.
+**Причина:** Индексный доступ без ключа вызывает полную рекомпозицию при любых изменениях списка.
+Ключи позволяют Compose отслеживать элементы. Используется `url` как уникальный ключ, так как `id`
+отсутствует в модели.
 
-**Потенциальный баг:** Если элементы не отображаются — проверить уникальность `url` в `UiLinkItem`. Если URL не уникален, элементы могут пропадать.
+**Потенциальный баг:** Если элементы не отображаются — проверить уникальность `url` в `UiLinkItem`.
+Если URL не уникален, элементы могут пропадать.
 
 ---
 
@@ -74,6 +83,7 @@ items(
 **Файл:** `main/src/main/java/su/sv/main/bottomnav/BottomNavigationUi.kt`
 
 **Было:**
+
 ```kotlin
 val navigationSelectedItem = remember(currentRoute) {
     when (currentRoute) { ... }
@@ -81,6 +91,7 @@ val navigationSelectedItem = remember(currentRoute) {
 ```
 
 **Стало:**
+
 ```kotlin
 val navigationSelectedItem by remember {
     derivedStateOf {
@@ -89,9 +100,11 @@ val navigationSelectedItem by remember {
 }
 ```
 
-**Причина:** `derivedStateOf` оптимизирует пересчёт значения — recomposition происходит только когда результат действительно изменился.
+**Причина:** `derivedStateOf` оптимизирует пересчёт значения — recomposition происходит только когда
+результат действительно изменился.
 
-**Потенциальный баг:** Если не подсвечивается правильный таб — проверить логику маппинга route → index.
+**Потенциальный баг:** Если не подсвечивается правильный таб — проверить логику маппинга route →
+index.
 
 ---
 
@@ -100,6 +113,7 @@ val navigationSelectedItem by remember {
 **Файл:** `main/src/main/java/su/sv/main/bottomnav/BottomNavigationUi.kt`
 
 **Было:**
+
 ```kotlin
 @Composable
 fun bottomNavigationItems(): List<BottomNavigationItem> {
@@ -108,6 +122,7 @@ fun bottomNavigationItems(): List<BottomNavigationItem> {
 ```
 
 **Стало:**
+
 ```kotlin
 @Composable
 private fun rememberBottomNavigationItems(): List<BottomNavigationItem> {
@@ -117,7 +132,8 @@ private fun rememberBottomNavigationItems(): List<BottomNavigationItem> {
 
 **Причина:** Мемоизация списка避免了 пересоздания при каждой рекомпозиции.
 
-**Потенциальный баг:** Если изменились строки ресурсов (локализация) — они не обновятся динамически. В текущей реализации строки захардкожены. При необходимости вернуть `stringResource()`.
+**Потенциальный баг:** Если изменились строки ресурсов (локализация) — они не обновятся динамически.
+В текущей реализации строки захардкожены. При необходимости вернуть `stringResource()`.
 
 ---
 
@@ -126,6 +142,7 @@ private fun rememberBottomNavigationItems(): List<BottomNavigationItem> {
 **Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/NewsList.kt`
 
 **Было:**
+
 ```kotlin
 items(
     count = lazyPagingItems.itemCount,
@@ -137,6 +154,7 @@ items(
 ```
 
 **Стало:**
+
 ```kotlin
 items(
     count = lazyPagingItems.itemCount,
@@ -147,7 +165,8 @@ items(
 }
 ```
 
-**Причина:** `contentType` позволяет Compose оптимизировать переиспользование view-холдеров при скролле.
+**Причина:** `contentType` позволяет Compose оптимизировать переиспользование view-холдеров при
+скролле.
 
 **Потенциальный баг:** Если есть разные типы элементов в списке — нужно добавить разные contentType.
 
@@ -158,6 +177,7 @@ items(
 **Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/RootNews.kt`
 
 **Было:**
+
 ```kotlin
 when (loadState) {
     LoadState.Loading if !hasItems -> { ... }
@@ -169,6 +189,7 @@ when (loadState) {
 ```
 
 **Стало:**
+
 ```kotlin
 when {
     loadState is LoadState.Loading && !hasItems -> { ... }
@@ -180,7 +201,8 @@ when {
 
 **Причина:** Упрощение читаемости и избежание вложенных условий.
 
-**Потенциальный баг:** Если отображается неправильное состояние (загрузка вместо контента) — проверить порядок условий в `when`.
+**Потенциальный баг:** Если отображается неправильное состояние (загрузка вместо контента) —
+проверить порядок условий в `when`.
 
 ---
 
@@ -198,12 +220,14 @@ when {
 ## 7. contentWindowInsets для вложенных Scaffold
 
 **Файлы:**
+
 - `books/.../RootBooksCatalog.kt`
 - `news/.../RootNews.kt`
 - `info/.../RootInfo.kt`
 - `wiki/.../RootWiki.kt`
 
 **Изменение:**
+
 ```kotlin
 Scaffold(
     contentWindowInsets = WindowInsets(0.dp),
@@ -211,9 +235,12 @@ Scaffold(
 )
 ```
 
-**Причина:** Внешний Scaffold в BottomNavigation уже добавляет отступы для bottomBar и статус-бара. Вложенные Scaffold по умолчанию также добавляют `contentWindowInsets`, что приводит к двойным отступам (лишний отступ между контентом и bottom navigation bar).
+**Причина:** Внешний Scaffold в BottomNavigation уже добавляет отступы для bottomBar и статус-бара.
+Вложенные Scaffold по умолчанию также добавляют `contentWindowInsets`, что приводит к двойным
+отступам (лишний отступ между контентом и bottom navigation bar).
 
-**Потенциальный баг:** Если убрать внешний Scaffold или изменить структуру навигации — нужно будет вернуть `contentWindowInsets` по умолчанию.
+**Потенциальный баг:** Если убрать внешний Scaffold или изменить структуру навигации — нужно будет
+вернуть `contentWindowInsets` по умолчанию.
 
 ---
 

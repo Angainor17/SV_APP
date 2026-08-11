@@ -14,6 +14,7 @@ metadata:
 ## Architecture Analysis
 
 ### View Hierarchy
+
 ```
 FBReaderView (RelativeLayout)
 ├── ScrollWidget (RecyclerView) - pages container
@@ -30,6 +31,7 @@ FBReaderView (RelativeLayout)
 ### Key Finding: Bookmarks Architecture
 
 **BookmarksView.java (line 1857-1860):**
+
 ```java
 public void addView(View v) {
     bookmarks.add(v);
@@ -42,12 +44,14 @@ Bookmarks Views добавляются в FBReaderView как direct children, �
 ### Touch Handling
 
 **ScrollWidget.Gestures.openCursor() (line 1587-1588):**
+
 ```java
 x = (int) (e.getX() - v.getLeft());
 y = (int) (e.getY() - v.getTop());
 ```
 
 Coordinates вычисляются relative to PageView. При scale нужно адаптировать:
+
 ```java
 x = (int) ((e.getX() - v.getLeft()) / v.getScaleX());
 y = (int) ((e.getY() - v.getTop()) / v.getScaleY());
@@ -56,6 +60,7 @@ y = (int) ((e.getY() - v.getTop()) / v.getScaleY());
 ### PageView Content
 
 **PageView.onDraw() - draws:**
+
 - Page bitmap (from pluginview.render())
 - Selection overlay (if selection != null)
 - Bookmarks overlay is NOT drawn here!
@@ -63,37 +68,44 @@ y = (int) ((e.getY() - v.getTop()) / v.getScaleY());
 ## Scale Approaches
 
 ### Approach 1: Scale FBReaderView
+
 ```java
 fbReaderView.setScaleX(zoomFactor);
 fbReaderView.setScaleY(zoomFactor);
 ```
 
 **Pros:**
+
 - All children scale automatically (including bookmarks)
 - Simple implementation
 - ScrollWidget, PageViews, BookmarksView all scale
 
 **Cons:**
+
 - Need to adapt ALL touch coordinates
 - Scale affects entire FBReaderView including topBar area
 - Need to scale pivot point (where pinch started)
 
 ### Approach 2: Scale ScrollWidget only
+
 ```java
 scrollWidget.setScaleX(zoomFactor);
 scrollWidget.setScaleY(zoomFactor);
 ```
 
 **Pros:**
+
 - Only pages scale, topBar unaffected
 - Bookmarks in PageView would scale
 
 **Cons:**
+
 - Bookmarks Views are NOT in ScrollWidget! They're in FBReaderView!
 - Need separate handling for bookmarks
 - More complex touch coordinate adaptation
 
 ### Approach 3: Scale PageViews individually
+
 ```java
 for (PageView page : visiblePages) {
     page.setScaleX(zoomFactor);
@@ -102,15 +114,18 @@ for (PageView page : visiblePages) {
 ```
 
 **Pros:**
+
 - Fine-grained control
 - Can scale only visible pages
 
 **Cons:**
+
 - Bookmarks Views still in FBReaderView, not scaled
 - RecyclerView layout issues (PageViews overlap)
 - Complex touch handling
 
 ### Approach 4: Matrix transformation
+
 ```java
 canvas.save();
 canvas.scale(zoomFactor, zoomFactor);
@@ -119,11 +134,13 @@ canvas.restore();
 ```
 
 **Pros:**
+
 - No actual view scale
 - Touch coordinates unchanged (event.getX/Y unchanged)
 - Bookmarks positioning needs manual matrix
 
 **Cons:**
+
 - Applied in onDraw() of each PageView
 - Bookmarks Views use absolute coordinates - need manual update
 - More complex implementation
@@ -174,14 +191,14 @@ public class ZoomTouchAdapter {
 
 ## Estimated Complexity
 
-| Component | Difficulty | Time |
-|-----------|------------|------|
-| Scale gesture detection | Medium | 1h |
-| FBReaderView scale application | Low | 30min |
-| Touch coordinate adapter | High | 2h |
-| Zoom controls UI | Low | 1h |
-| Testing + fixes | Medium | 2h |
-| **Total** | | **6.5h** |
+| Component                      | Difficulty | Time     |
+|--------------------------------|------------|----------|
+| Scale gesture detection        | Medium     | 1h       |
+| FBReaderView scale application | Low        | 30min    |
+| Touch coordinate adapter       | High       | 2h       |
+| Zoom controls UI               | Low        | 1h       |
+| Testing + fixes                | Medium     | 2h       |
+| **Total**                      |            | **6.5h** |
 
 ## Risks
 

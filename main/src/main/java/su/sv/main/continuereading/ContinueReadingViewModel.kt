@@ -1,7 +1,6 @@
 package su.sv.main.continuereading
 
 import android.net.Uri
-import timber.log.Timber
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.axet.bookreader.domain.GetLastReadBookUseCase
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val TAG = "ContinueReading"
@@ -81,7 +81,10 @@ class ContinueReadingViewModel @Inject constructor(
                 return@launch
             }
 
-            Timber.d(TAG, "loadAndCheck: found book='${bookInfo.title}': uri=${bookInfo.bookFileUri}")
+            Timber.d(
+                TAG,
+                "loadAndCheck: found book='${bookInfo.title}': uri=${bookInfo.bookFileUri}"
+            )
             _state.value = ContinueReadingState.Visible(bookInfo)
         }
     }
@@ -93,7 +96,10 @@ class ContinueReadingViewModel @Inject constructor(
         val currentState = _state.value as? ContinueReadingState.Visible ?: return
         val bookInfo = currentState.bookInfo
 
-        Timber.d(TAG, "onContinueClick: opening book='${bookInfo.title}', uri=${bookInfo.bookFileUri}")
+        Timber.d(
+            TAG,
+            "onContinueClick: opening book='${bookInfo.title}', uri=${bookInfo.bookFileUri}"
+        )
 
         viewModelScope.launch {
             _effect.emit(

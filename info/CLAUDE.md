@@ -31,6 +31,7 @@ info/
 ## Основные компоненты
 
 ### RootInfoViewModel
+
 ViewModel информационного экрана:
 
 ```kotlin
@@ -41,6 +42,7 @@ class RootInfoViewModel : BaseViewModel() {
 ```
 
 ### GetInfoLinksUseCase
+
 Use case для получения списка ссылок:
 
 ```kotlin
@@ -50,6 +52,7 @@ class GetInfoLinksUseCase @Inject constructor() {
 ```
 
 ### UiLinkItem
+
 Модель элемента для UI:
 
 ```kotlin
@@ -62,6 +65,7 @@ data class UiLinkItem(
 ```
 
 ### UiInfoState
+
 Состояние экрана:
 
 ```kotlin

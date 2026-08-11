@@ -132,6 +132,7 @@ fun BookmarksCompactScreen(
                     title = stringResource(R.string.bookmarks_empty_title),
                     icon = Icons.AutoMirrored.Filled.MenuBook
                 )
+
                 is UiBookmarksState.NotesList -> NotesListContent(
                     notes = currentState.notes,
                     onNoteClick = { viewModel.onAction(BookmarksAction.OnNoteClick(it)) },
@@ -139,10 +140,12 @@ fun BookmarksCompactScreen(
                     onDeleteRequest = { viewModel.onAction(BookmarksAction.OnDeleteNoteRequest(it)) },
                     onShareClick = { viewModel.onAction(BookmarksAction.OnShareNote(it)) },
                 )
+
                 is UiBookmarksState.BooksList -> BooksListContent(
                     books = currentState.books,
                     onBookClick = { viewModel.onAction(BookmarksAction.OnBookClick(it)) },
                 )
+
                 is UiBookmarksState.BookNotes -> BookNotesContent(
                     book = currentState.book,
                     notes = currentState.notes,
@@ -151,6 +154,7 @@ fun BookmarksCompactScreen(
                     onDeleteRequest = { viewModel.onAction(BookmarksAction.OnDeleteNoteRequest(it)) },
                     onShareClick = { viewModel.onAction(BookmarksAction.OnShareNote(it)) },
                 )
+
                 is UiBookmarksState.Error -> FullScreenError {
                     viewModel.onAction(BookmarksAction.OnRetryClick)
                 }
@@ -309,6 +313,7 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
             BookmarksEffect.NavigateBack -> {
                 stackNavigation.back()
             }
+
             is BookmarksEffect.OpenReader -> {
                 val note = effect.note
                 val bookUri = note.bookFileUri
@@ -345,6 +350,7 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                     ).show()
                 }
             }
+
             is BookmarksEffect.ShareNote -> {
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
@@ -354,6 +360,7 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                 val shareIntent = Intent.createChooser(sendIntent, null)
                 context.startActivity(shareIntent)
             }
+
             is BookmarksEffect.OpenBookCard -> {
                 // Переход на карточку книги (когда файл книги удалён)
                 val note = effect.note
@@ -371,6 +378,7 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
                 )
                 stackNavigation.forward(BookDetailScreen(uiBook = uiBook))
             }
+
             is BookmarksEffect.ShowError -> {
                 Timber.e("Error: ${effect.message}")
             }
