@@ -140,7 +140,10 @@ bookreader/src/main/java/com/github/axet/bookreader/
 │   ├── DjvuPlugin.kt
 │   ├── PDFPlugin.kt
 │   ├── PermissionHelper.kt
-│   ├── Plugin.kt
+│   ├── Plugin.kt                # API-интерфейс (71 строка) с backward-compatible врапперами
+│   ├── PluginBox.kt             # PluginBox, PluginRenderRect — вынесены из Plugin.kt
+│   ├── PluginPage.kt            # PluginPage — abstract class страницы, вынесен из Plugin.kt
+│   ├── PluginView.kt            # PluginView + Selection/Link/Search — вынесены из Plugin.kt
 │   ├── ReaderPreferences.kt
 │   ├── Reflow.kt
 │   ├── Storage.java            # Legacy Java class с Bookmark

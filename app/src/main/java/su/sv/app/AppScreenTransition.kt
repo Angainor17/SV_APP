@@ -83,7 +83,7 @@ fun ComposeRendererScope<StackState>.AppScreenTransition(
                 }
             }
         },
-        content = { screen -> screen.SaveableContent(screenModifier, manualResumePause = true) }
+        content = { screen -> screen.SaveableContent(screenModifier) }
     )
 }
 
@@ -125,7 +125,7 @@ fun ComposeRendererScope<StackState>.AppScreenTransitionFull(
                 }
             }
         },
-        content = { screen -> screen.SaveableContent(screenModifier, manualResumePause = true) }
+        content = { screen -> screen.SaveableContent(screenModifier) }
     )
 }
 
@@ -147,6 +147,6 @@ fun ComposeRendererScope<StackState>.AppScreenTransitionFade(
             val fadeSpec = tween<Float>(durationMillis = 250, easing = FastOutSlowInEasing)
             fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
         },
-        content = { screen -> screen.SaveableContent(screenModifier, manualResumePause = true) }
+        content = { screen -> screen.SaveableContent(screenModifier) }
     )
 }

@@ -712,7 +712,8 @@ fun SingleVideoPreview() {
                 link = "link"
             )
         ),
-        allMedia = listOf()
+        allMedia = listOf(),
+        vkPostUrl = "https://vk.com/post"
     )
     SVAPPThemeLightPreview {
         NewsItem(item = item, onItemClick = {})
@@ -737,7 +738,8 @@ fun SingleVideoPreviewDark() {
                 link = "link"
             )
         ),
-        allMedia = listOf()
+        allMedia = listOf(),
+        vkPostUrl = "https://vk.com/post"
     )
     SVAPPTheme(themeMode = ThemeMode.DARK) {
         NewsItem(item = item, onItemClick = {})
@@ -758,7 +760,8 @@ fun NewsItemPreview() {
             UiNewsMedia.ItemImage("https://picsum.photos/300/300")
         ),
         videos = listOf(),
-        allMedia = listOf()
+        allMedia = listOf(),
+        vkPostUrl = "https://vk.com/post"
     )
     SVAPPThemeLightPreview {
         NewsItem(item = item, onItemClick = {})
@@ -784,7 +787,8 @@ fun MediaGrid2ItemsPreview() {
         allMedia = listOf(
             UiNewsMedia.ItemImage("https://picsum.photos/300/300"),
             UiNewsMedia.ItemImage("https://picsum.photos/300/300")
-        )
+        ),
+        vkPostUrl = "https://vk.com/post"
     )
     SVAPPThemeLightPreview {
         NewsItem(item = item, onItemClick = {})
@@ -808,7 +812,8 @@ fun MediaGrid3ItemsPreview() {
             UiNewsMedia.ItemImage("https://picsum.photos/300/300"),
             UiNewsMedia.ItemImage("https://picsum.photos/300/300"),
             UiNewsMedia.ItemImage("https://picsum.photos/300/300")
-        )
+        ),
+        vkPostUrl = "https://vk.com/post"
     )
     SVAPPThemeLightPreview {
         NewsItem(item = item, onItemClick = {})
@@ -833,7 +838,8 @@ fun MediaGrid4ItemsPreview() {
             UiNewsMedia.ItemImage("https://picsum.photos/300/300"),
             UiNewsMedia.ItemImage("https://picsum.photos/300/300"),
             UiNewsMedia.ItemImage("https://picsum.photos/300/300")
-        )
+        ),
+        vkPostUrl = "https://vk.com/post"
     )
     SVAPPThemeLightPreview {
         NewsItem(item = item, onItemClick = {})

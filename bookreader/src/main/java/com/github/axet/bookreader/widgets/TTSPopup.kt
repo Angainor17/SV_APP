@@ -20,6 +20,7 @@ import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.androidlibrary.widgets.Toast
 import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.Plugin
+import com.github.axet.bookreader.app.PluginView
 import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Reflow
 import com.github.axet.bookreader.app.Storage
@@ -53,7 +54,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         @JvmStatic
-        fun getRect(pluginview: Plugin.View, v: ScrollWidget.ScrollAdapter.PageView, bm: Storage.Bookmark): Rect? {
+        fun getRect(pluginview: PluginView, v: ScrollWidget.ScrollAdapter.PageView, bm: Storage.Bookmark): Rect? {
             val page = pluginview.selectPage(bm.start, v.info, v.width, v.height)
             val s = pluginview.select(bm.start, bm.end)
             return if (s != null) {
@@ -84,7 +85,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         @JvmStatic
-        fun isEOL(s: Plugin.View.Selection): Boolean {
+        fun isEOL(s: PluginView.Selection): Boolean {
             val str = s.getText() ?: return false
             for (e in EOL) {
                 if (str == e) return true
@@ -634,7 +635,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
     }
 
-    fun selectionOpen(s: Plugin.View.Selection) {
+    fun selectionOpen(s: PluginView.Selection) {
         marks.clear()
         var bm = Storage.Bookmark(s.getText()!!, s.getStart()!!, s.getEnd()!!)
         bm = expandWord(bm)
@@ -849,7 +850,7 @@ class TTSPopup(val fb: FBReaderView) {
         var p: Int = k.paragraphIndex
         var e: Int = k.elementIndex
         var c: Int = k.charIndex
-        var all: Plugin.View.Selection? = null
+        var all: PluginView.Selection? = null
         var allText: String? = null
         var text: String? = null
 

@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.FrameLayout
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.bookreader.app.Plugin
+import com.github.axet.bookreader.app.PluginView
 import org.geometerplus.zlibrary.core.library.ZLibrary
 import org.geometerplus.zlibrary.core.view.SelectionCursor
 import timber.log.Timber
@@ -22,7 +23,7 @@ import timber.log.Timber
 open class SelectionView(
     context: Context,
     custom: FBReaderView.CustomView,
-    @JvmField val selection: Plugin.View.Selection,
+    @JvmField val selection: PluginView.Selection,
     private val callbacks: SelectionCallbacks = EmptySelectionCallbacks()
 ) : FrameLayout(context) {
 
@@ -895,12 +896,12 @@ open class SelectionView(
     class PageView(
         context: Context,
         custom: FBReaderView.CustomView,
-        val setter: Plugin.View.Selection.Setter?
+        val setter: PluginView.Selection.Setter?
     ) : View(context) {
 
         var viewBounds = Rect() // размер view
         var margin = Rect() // абсолютные координаты
-        var selection: Plugin.View.Selection.Bounds? = null
+        var selection: PluginView.Selection.Bounds? = null
 
         var lines: List<Rect>? = null
 

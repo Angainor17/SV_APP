@@ -96,6 +96,7 @@ public class DataServer extends NanoHTTPD {
                 }
                 final Response res =
                         new Response(Response.Status.OK, MimeType.IMAGE_PNG.toString(), stream);
+                res.setChunkedTransfer(true);
                 res.addHeader("X-Width", String.valueOf(options.outWidth));
                 res.addHeader("X-Height", String.valueOf(options.outHeight));
                 return res;
