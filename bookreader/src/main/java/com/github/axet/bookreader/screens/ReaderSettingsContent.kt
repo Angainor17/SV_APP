@@ -33,6 +33,7 @@ import com.github.axet.bookreader.R
 import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
+import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.ui.components.AppToolbarWithBack
 
 /**
@@ -46,6 +47,7 @@ fun ReaderSettingsContent(
 ) {
     val context = LocalContext.current
     val stackNavigation = LocalStackNavigation.current
+    val formFactor = LocalDeviceFormFactor.current
 
     // Получаем SharedPreferences для настроек
     val shared = remember {
@@ -63,9 +65,6 @@ fun ReaderSettingsContent(
     }
     var screenLock by remember {
         mutableStateOf(shared.getString(ReaderPreferences.PREFERENCE_SCREENLOCK, "0") ?: "0")
-    }
-    var rotate by remember {
-        mutableStateOf(shared.getBoolean(ReaderPreferences.PREFERENCE_ROTATE, false))
     }
     // Two column view: null = auto, true = enable, false = disable
     var twoColumnView by remember {
@@ -88,8 +87,6 @@ fun ReaderSettingsContent(
                     volumeKeys = sharedPreferences.getBoolean(key, false)
                 ReaderPreferences.PREFERENCE_SCREENLOCK ->
                     screenLock = sharedPreferences.getString(key, "0") ?: "0"
-                ReaderPreferences.PREFERENCE_ROTATE ->
-                    rotate = sharedPreferences.getBoolean(key, false)
                 ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW ->
                     twoColumnView = when (sharedPreferences.getString(key, "auto")) {
                         "true" -> "true"
@@ -147,34 +144,26 @@ fun ReaderSettingsContent(
                 },
             )
 
-            // Поворот экрана
-            SettingsSwitch(
-                title = stringResource(R.string.sv_pref_rotate_title),
-                subtitle = stringResource(R.string.sv_pref_rotate_summary),
-                checked = rotate,
-                onCheckedChange = { checked ->
-                    shared.edit { putBoolean(ReaderPreferences.PREFERENCE_ROTATE, checked) }
-                },
-            )
-
-            // Двухстраничный режим
-            SettingsItem(
-                title = stringResource(R.string.sv_pref_two_column_title),
-                subtitle = when (twoColumnView) {
-                    "true" -> stringResource(R.string.sv_view_mode_paging) // Включено
-                    "false" -> stringResource(R.string.sv_view_mode_continuous) // Выключено (одна колонка)
-                    else -> stringResource(R.string.sv_pref_two_column_auto)
-                },
-                onClick = {
-                    // Циклический переключатель: auto -> true -> false -> auto
-                    val newValue = when (twoColumnView) {
-                        "auto" -> "true"
-                        "true" -> "false"
-                        else -> "auto"
-                    }
-                    shared.edit { putString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, newValue) }
-                },
-            )
+            // Двухстраничный режим — только для планшетов
+            if (!formFactor.isCompact()) {
+                SettingsItem(
+                    title = stringResource(R.string.sv_pref_two_column_title),
+                    subtitle = when (twoColumnView) {
+                        "true" -> stringResource(R.string.sv_view_mode_paging) // Включено
+                        "false" -> stringResource(R.string.sv_view_mode_continuous) // Выключено (одна колонка)
+                        else -> stringResource(R.string.sv_pref_two_column_auto)
+                    },
+                    onClick = {
+                        // Циклический переключатель: auto -> true -> false -> auto
+                        val newValue = when (twoColumnView) {
+                            "auto" -> "true"
+                            "true" -> "false"
+                            else -> "auto"
+                        }
+                        shared.edit { putString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, newValue) }
+                    },
+                )
+            }
 
             // Планируемые настройки (требуют дополнительные компоненты):
             // - Папка синхронизации — требует интеграции Storage Access Framework (SAF)
