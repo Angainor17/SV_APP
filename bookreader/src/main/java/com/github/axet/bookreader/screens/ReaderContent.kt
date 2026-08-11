@@ -10,7 +10,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.preference.PreferenceManager
 import android.view.KeyEvent
-import android.view.View
+import android.view.Window
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -59,7 +59,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -108,7 +107,6 @@ fun ReaderContent(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val view = LocalView.current
 
     // Состояние для FBReaderView
     var fbReaderView by remember { mutableStateOf<FBReaderView?>(null) }
@@ -891,51 +889,55 @@ private fun BatteryReceiver(fbReaderView: FBReaderView?) {
 }
 
 /**
- * Обработчик клавиш громкости для навигации по страницам
+ * Обработчик клавиш громкости для навигации по страницам.
+ *
+ * Использует [Window.Callback.dispatchKeyEvent] вместо [View.OnKeyListener],
+ * чтобы перехватывать события громкости ДО того, как они попадут в иерархию View.
+ * Это надёжнее, потому что:
+ * - View.OnKeyListener требует, чтобы view имела фокус
+ * - PagerWidget (дочерняя view FBReaderView) имеет isFocusable=true и забирает фокус
+ * - Window.Callback перехватывает события независимо от фокуса
  */
 @Composable
 private fun VolumeKeysHandler(
     fbReaderView: FBReaderView?,
     viewModel: ReaderViewModel
 ) {
-    val view = LocalView.current
     val context = LocalContext.current
+    val activity = remember(context) { context as? Activity } ?: return
 
     val volumeKeysEnabled = remember {
         val shared = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
         shared.getBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, false)
     }
 
-    DisposableEffect(fbReaderView, volumeKeysEnabled) {
+    DisposableEffect(fbReaderView, volumeKeysEnabled, activity) {
         if (fbReaderView == null || !volumeKeysEnabled) {
             return@DisposableEffect onDispose {}
         }
 
-        val keyListener = View.OnKeyListener { _, keyCode, event ->
-            if (!viewModel.volumeKeysEnabled) return@OnKeyListener false
-
-            when {
-                keyCode == KeyEvent.KEYCODE_VOLUME_DOWN &&
-                        event.action == KeyEvent.ACTION_DOWN -> {
-                    fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
-                    true
+        val originalCallback = activity.window.callback
+        val wrapper = object : Window.Callback by originalCallback {
+            override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+                if (viewModel.volumeKeysEnabled) {
+                    when (event.keyCode) {
+                        KeyEvent.KEYCODE_VOLUME_DOWN if event.action == KeyEvent.ACTION_DOWN -> {
+                            fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
+                            return true
+                        }
+                        KeyEvent.KEYCODE_VOLUME_UP if event.action == KeyEvent.ACTION_DOWN -> {
+                            fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
+                            return true
+                        }
+                    }
                 }
-
-                keyCode == KeyEvent.KEYCODE_VOLUME_UP &&
-                        event.action == KeyEvent.ACTION_DOWN -> {
-                    fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
-                    true
-                }
-
-                else -> false
+                return originalCallback.dispatchKeyEvent(event)
             }
         }
-
-        view.isFocusableInTouchMode = true
-        view.setOnKeyListener(keyListener)
+        activity.window.callback = wrapper
 
         onDispose {
-            view.setOnKeyListener(null)
+            activity.window.callback = originalCallback
         }
     }
 }

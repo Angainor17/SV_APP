@@ -12,7 +12,6 @@ import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.Modo.rememberRootScreen
 import com.github.terrakok.modo.RootScreen
 import com.github.terrakok.modo.stack.StackNavModel
-import com.github.terrakok.modo.stack.StackScreen
 import dagger.hilt.android.AndroidEntryPoint
 import su.sv.commonarchitecture.presentation.base.BaseActivity
 import su.sv.commonui.theme.SVAPPTheme
@@ -28,7 +27,7 @@ class MainActivity : BaseActivity() {
     @Inject
     lateinit var customColorsRepository: CustomColorsRepository
 
-    private var rootScreen: RootScreen<StackScreen>? = null
+    private var rootScreen: RootScreen<*>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +59,7 @@ class MainActivity : BaseActivity() {
                         )
                     )
                 }
+                this@MainActivity.rootScreen = rootScreen
                 rootScreen.Content(modifier = Modifier.fillMaxSize())
             }
         }
