@@ -1,6 +1,7 @@
 # ТЗ: Zoom/Pinch режим для bookreader
 
 ## Дата: 2026-07-03
+
 ## Статус: Draft
 
 ---
@@ -8,12 +9,15 @@
 ## 1. Обзор
 
 ### 1.1 Цель
+
 Реализовать zoom (увеличение) режима для bookreader с сохранением всей функциональности:
+
 - Bookmarks/заметки видимы при zoom
 - Long press работает при zoom (создание заметок/выделение)
 - Zoom применяется ко всем видимым страницам
 
 ### 1.2 Подход
+
 Scale transformation к FBReaderView вместо PinchView overlay.
 
 ---
@@ -22,25 +26,26 @@ Scale transformation к FBReaderView вместо PinchView overlay.
 
 ### 2.1 Zoom gestures
 
-| Gesture | Действие |
-|---------|----------|
-| Pinch in (сведение пальцев) | Увеличение (zoom in) |
+| Gesture                        | Действие                                     |
+|--------------------------------|----------------------------------------------|
+| Pinch in (сведение пальцев)    | Увеличение (zoom in)                         |
 | Pinch out (разведение пальцев) | Уменьшение (zoom out) до 1.0 = выход из zoom |
-| Double tap | Zoom to "fit width" - убрать боковые отступы |
-| Double tap при zoom | Reset to 1.0 (toggle) |
-| System back button | Выход из zoom (reset scale = 1.0) |
+| Double tap                     | Zoom to "fit width" - убрать боковые отступы |
+| Double tap при zoom            | Reset to 1.0 (toggle)                        |
+| System back button             | Выход из zoom (reset scale = 1.0)            |
 
 ### 2.2 Zoom limits
 
-| Parameter | Value |
-|-----------|-------|
-| Минимальный zoom | 1.0 (normal view) |
+| Parameter         | Value                  |
+|-------------------|------------------------|
+| Минимальный zoom  | 1.0 (normal view)      |
 | Максимальный zoom | 3.0 (или configurable) |
-| Default zoom | 1.0 |
+| Default zoom      | 1.0                    |
 
 ### 2.3 Double tap zoom
 
 **Fit width calculation:**
+
 ```java
 // Вычислить zoom factor чтобы текст занимал всю ширину
 float fitWidthZoom = screenWidth / pageContentWidth;
@@ -49,6 +54,7 @@ fitWidthZoom = Math.max(1.0f, Math.min(3.0f, fitWidthZoom));
 ```
 
 **Behavior:**
+
 - Double tap → zoom to fit width (обычно ~1.2-1.5x)
 - Если уже zoomed → reset to 1.0 (toggle behavior)
 - Pivot point: center of tapped page
@@ -56,18 +62,19 @@ fitWidthZoom = Math.max(1.0f, Math.min(3.0f, fitWidthZoom));
 ### 2.4 Удалённый функционал
 
 **Убрать из текущего PinchView:**
+
 - ❌ Rotation (повороты влево/вправо) - не нужен
 - ❌ Close button - не нужен (закрытие через pinch out или back)
 
 ### 2.5 Сохраняемый функционал
 
-| Функция | Требование |
-|---------|------------|
-| Bookmarks visibility | ✅ Bookmarks/заметки видны при любом zoom |
-| Long press | ✅ Работает при zoom для создания заметок |
-| Selection | ✅ Выделение текста работает при zoom |
-| Navigation | ✅ Scroll работает при zoom |
-| All pages zoom | ✅ Zoom применяется ко всем видимым страницам |
+| Функция              | Требование                                   |
+|----------------------|----------------------------------------------|
+| Bookmarks visibility | ✅ Bookmarks/заметки видны при любом zoom     |
+| Long press           | ✅ Работает при zoom для создания заметок     |
+| Selection            | ✅ Выделение текста работает при zoom         |
+| Navigation           | ✅ Scroll работает при zoom                   |
+| All pages zoom       | ✅ Zoom применяется ко всем видимым страницам |
 
 ---
 
@@ -77,17 +84,17 @@ fitWidthZoom = Math.max(1.0f, Math.min(3.0f, fitWidthZoom));
 
 Если gesture недостаточно, добавить простые controls:
 
-| Control | Placement | Action |
-|---------|-----------|--------|
+| Control        | Placement        | Action                    |
+|----------------|------------------|---------------------------|
 | Zoom indicator | Top-right corner | Показывает текущий zoom % |
-| Reset button | В zoom indicator | Reset zoom = 1.0 |
+| Reset button   | В zoom indicator | Reset zoom = 1.0          |
 
 ### 3.2 Visual feedback
 
-| Event | Feedback |
-|-------|----------|
-| Zoom change | Smooth animation (200ms) |
-| Exit zoom | Smooth animation back to 1.0 |
+| Event       | Feedback                     |
+|-------------|------------------------------|
+| Zoom change | Smooth animation (200ms)     |
+| Exit zoom   | Smooth animation back to 1.0 |
 
 ---
 
@@ -191,52 +198,57 @@ BackHandler(enabled = currentZoom > 1.0f) {
 
 ### 6.1 Test scenarios
 
-| Scenario | Expected result |
-|----------|-----------------|
-| Pinch in | Zoom increases, bookmarks visible |
-| Pinch out to 1.0 | Exit zoom mode smoothly |
-| Double tap | Zoom to fit width (no side margins) |
-| Double tap при zoom | Reset to 1.0 |
-| Long press при zoom | Selection/bookmark creation works |
-| Tap на bookmark при zoom | Bookmark edit dialog opens |
-| Back button при zoom | Exit zoom mode |
-| Scroll при zoom | Smooth scroll at zoomed scale |
+| Scenario                 | Expected result                     |
+|--------------------------|-------------------------------------|
+| Pinch in                 | Zoom increases, bookmarks visible   |
+| Pinch out to 1.0         | Exit zoom mode smoothly             |
+| Double tap               | Zoom to fit width (no side margins) |
+| Double tap при zoom      | Reset to 1.0                        |
+| Long press при zoom      | Selection/bookmark creation works   |
+| Tap на bookmark при zoom | Bookmark edit dialog opens          |
+| Back button при zoom     | Exit zoom mode                      |
+| Scroll при zoom          | Smooth scroll at zoomed scale       |
 
 ### 6.2 Edge cases
 
-| Case | Handling |
-|------|----------|
-| Zoom > 3.0 | Clamp to max 3.0 |
-| Zoom < 1.0 | Clamp to min 1.0, exit zoom |
-| Rapid pinch | Smooth animation, no flicker |
-| Scroll при zoom | Adjust scroll velocity |
+| Case            | Handling                     |
+|-----------------|------------------------------|
+| Zoom > 3.0      | Clamp to max 3.0             |
+| Zoom < 1.0      | Clamp to min 1.0, exit zoom  |
+| Rapid pinch     | Smooth animation, no flicker |
+| Scroll при zoom | Adjust scroll velocity       |
 
 ---
 
 ## 7. Implementation plan
 
 ### Phase 1: Remove PinchView overlay (1h)
+
 - Remove PinchGesture class
 - Remove pinchOpen/pinchClose calls
 - Clean up touch handling order
 
 ### Phase 2: Add gesture detectors (1h)
+
 - Create ZoomGestureHandler class
 - Detect pinch gestures (ScaleGestureDetector)
 - Detect double tap (GestureDetector)
 - Apply scale to FBReaderView
 
 ### Phase 3: Touch coordinate adapter (2h)
+
 - Create TouchCoordinateAdapter class
 - Modify all touch handlers in ScrollWidget
 - Modify touch handlers in SelectionView
 
 ### Phase 4: Zoom controls UI (1h) - optional
+
 - Add zoom indicator
 - Add reset button
 - Add animation for smooth transitions
 
 ### Phase 5: Testing (2h)
+
 - Test all scenarios
 - Fix edge cases
 - Performance optimization
@@ -247,29 +259,29 @@ BackHandler(enabled = currentZoom > 1.0f) {
 
 ## 8. Risks and mitigation
 
-| Risk | Mitigation |
-|------|------------|
-| Touch coordinates wrong | Unit tests for adapter, visual testing |
+| Risk                         | Mitigation                               |
+|------------------------------|------------------------------------------|
+| Touch coordinates wrong      | Unit tests for adapter, visual testing   |
 | Bookmarks positioning broken | Verify BookmarksView.update() with scale |
-| Scroll velocity wrong | Adjust scroll factor by zoom |
-| Performance at high zoom | Limit max zoom, optimize rendering |
+| Scroll velocity wrong        | Adjust scroll factor by zoom             |
+| Performance at high zoom     | Limit max zoom, optimize rendering       |
 
 ---
 
 ## 9. Acceptance criteria
 
-| Criteria | Status |
-|----------|--------|
-| Zoom in работает | ⬜ |
-| Zoom out работает | ⬜ |
-| Zoom out до 1.0 = exit | ⬜ |
-| Back button = exit | ⬜ |
-| Double tap = fit width zoom | ⬜ |
-| Double tap при zoom = reset | ⬜ |
-| Bookmarks visible при zoom | ⬜ |
-| Long press works при zoom | ⬜ |
-| Selection works при zoom | ⬜ |
-| Scroll works при zoom | ⬜ |
-| No rotation UI | ⬜ |
-| No close button | ⬜ |
-| Smooth animations | ⬜ |
+| Criteria                    | Status |
+|-----------------------------|--------|
+| Zoom in работает            | ⬜      |
+| Zoom out работает           | ⬜      |
+| Zoom out до 1.0 = exit      | ⬜      |
+| Back button = exit          | ⬜      |
+| Double tap = fit width zoom | ⬜      |
+| Double tap при zoom = reset | ⬜      |
+| Bookmarks visible при zoom  | ⬜      |
+| Long press works при zoom   | ⬜      |
+| Selection works при zoom    | ⬜      |
+| Scroll works при zoom       | ⬜      |
+| No rotation UI              | ⬜      |
+| No close button             | ⬜      |
+| Smooth animations           | ⬜      |

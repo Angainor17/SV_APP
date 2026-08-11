@@ -58,7 +58,11 @@ fun InfoItem(item: UiLinkItem) {
                 onClick = { openLink(context, item.url) },
                 onLongClick = {
                     clipboardManager.setText(AnnotatedString(item.url))
-                    Toast.makeText(context, context.getString(R.string.link_copied), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.link_copied),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             )
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)

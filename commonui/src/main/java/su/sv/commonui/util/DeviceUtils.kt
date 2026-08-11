@@ -45,7 +45,7 @@ object DeviceUtils {
      */
     fun isHuawei(): Boolean {
         return Build.MANUFACTURER.equals("huawei", ignoreCase = true) ||
-               Build.MANUFACTURER.equals("honor", ignoreCase = true)
+                Build.MANUFACTURER.equals("honor", ignoreCase = true)
     }
 
     /**

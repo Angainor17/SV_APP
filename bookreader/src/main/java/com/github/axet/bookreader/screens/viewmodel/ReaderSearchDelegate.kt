@@ -18,25 +18,29 @@ class ReaderSearchDelegate(
     fun search(query: String) {
         val currentState = getState() ?: return
         val shouldSearch = query.length >= 2
-        updateState(currentState.copy(
-            searchState = currentState.searchState.copy(
-                isActive = true,
-                query = query,
-                resultsCount = 0,
-                currentResultIndex = 0,
-                isLoading = shouldSearch
+        updateState(
+            currentState.copy(
+                searchState = currentState.searchState.copy(
+                    isActive = true,
+                    query = query,
+                    resultsCount = 0,
+                    currentResultIndex = 0,
+                    isLoading = shouldSearch
+                )
             )
-        ))
+        )
         if (shouldSearch) {
             getFBReaderView()?.performSearch(query) { count, index ->
                 val state = getState() ?: return@performSearch
-                updateState(state.copy(
-                    searchState = state.searchState.copy(
-                        resultsCount = count,
-                        currentResultIndex = index,
-                        isLoading = false
+                updateState(
+                    state.copy(
+                        searchState = state.searchState.copy(
+                            resultsCount = count,
+                            currentResultIndex = index,
+                            isLoading = false
+                        )
                     )
-                ))
+                )
             }
         }
     }
@@ -44,26 +48,30 @@ class ReaderSearchDelegate(
     fun next() {
         getFBReaderView()?.performSearchNext { count, newIndex ->
             val state = getState() ?: return@performSearchNext
-            updateState(state.copy(
-                searchState = state.searchState.copy(
-                    resultsCount = count,
-                    currentResultIndex = newIndex,
-                    isLoading = false
+            updateState(
+                state.copy(
+                    searchState = state.searchState.copy(
+                        resultsCount = count,
+                        currentResultIndex = newIndex,
+                        isLoading = false
+                    )
                 )
-            ))
+            )
         }
     }
 
     fun previous() {
         getFBReaderView()?.performSearchPrevious { count, newIndex ->
             val state = getState() ?: return@performSearchPrevious
-            updateState(state.copy(
-                searchState = state.searchState.copy(
-                    resultsCount = count,
-                    currentResultIndex = newIndex,
-                    isLoading = false
+            updateState(
+                state.copy(
+                    searchState = state.searchState.copy(
+                        resultsCount = count,
+                        currentResultIndex = newIndex,
+                        isLoading = false
+                    )
                 )
-            ))
+            )
         }
     }
 
@@ -75,11 +83,13 @@ class ReaderSearchDelegate(
 
     fun updateResults(count: Int, currentIndex: Int) {
         val currentState = getState() ?: return
-        updateState(currentState.copy(
-            searchState = currentState.searchState.copy(
-                resultsCount = count,
-                currentResultIndex = currentIndex
+        updateState(
+            currentState.copy(
+                searchState = currentState.searchState.copy(
+                    resultsCount = count,
+                    currentResultIndex = currentIndex
+                )
             )
-        ))
+        )
     }
 }

@@ -121,7 +121,7 @@ fun AdaptiveNavigationScaffold(
                             .then(
                                 adaptiveDims.contentMaxWidth?.let { maxWidth ->
                                     Modifier.fillMaxWidth()
-                                        // Ограничение ширины будет обработано в content
+                                    // Ограничение ширины будет обработано в content
                                 } ?: Modifier.fillMaxSize(),
                             ),
                     ) {

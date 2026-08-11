@@ -156,7 +156,10 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
                 setTextColor(Color.WHITE)
                 setTypeface(typeface, Typeface.BOLD)
             }
-            addView(text, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
+            addView(
+                text,
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER)
+            )
             g = GradientDrawable().apply {
                 cornerRadius = ThemeUtils.dp2px(context, 20f).toFloat() // радиус скругления углов
                 gradientType = GradientDrawable.LINEAR_GRADIENT

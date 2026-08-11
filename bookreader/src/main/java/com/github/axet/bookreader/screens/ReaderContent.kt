@@ -123,7 +123,15 @@ fun ReaderContent(
                     ZLTextFixedPosition(pos.endParagraph, pos.endElement, pos.endChar)
                 )
             }
-            viewModel.onAction(ReaderActions.LoadBook(bookUri, position, bookCoverUrl, bookTitle, bookAuthor))
+            viewModel.onAction(
+                ReaderActions.LoadBook(
+                    uri = bookUri,
+                    position = position,
+                    bookCoverUrl = bookCoverUrl,
+                    bookTitle = bookTitle,
+                    bookAuthor = bookAuthor
+                )
+            )
         }
     }
 
@@ -196,7 +204,7 @@ fun ReaderContent(
 
             // Навигация по страницам
             if (currentState.showNavigation && fbReaderView != null) {
-                val pagePosition = fbReaderView?.app?.getTextView()?.pagePosition()
+                val pagePosition = fbReaderView?.app?.textView?.pagePosition()
                 val currentPage = pagePosition?.Current ?: 1
                 val totalPages = pagePosition?.Total ?: 1
                 val chapterTitle = fbReaderView?.app?.getCurrentTOCElement()?.text
@@ -257,13 +265,15 @@ fun ReaderContent(
                                     ReaderActions.NavigateBack -> {
                                         // Если fullscreen - сначала exit fullscreen
                                         if (currentState.isFullscreen) {
-                                            Timber.tag("voronin").d("NavigateBack in fullscreen - exiting fullscreen first")
+                                            Timber.tag("voronin")
+                                                .d("NavigateBack in fullscreen - exiting fullscreen first")
                                             viewModel.onAction(ReaderActions.SetFullscreen(false))
                                             fbReaderView?.exitFullscreen()
                                         } else {
                                             onNavigateBack()
                                         }
                                     }
+
                                     ReaderActions.NavigateToSettings -> onNavigateToSettings()
                                     else -> viewModel.onAction(action)
                                 }
@@ -302,9 +312,12 @@ fun ReaderContent(
                                     }
 
                                     override fun onFullscreenToggle(isFullscreen: Boolean) {
-                                        Timber.tag("voronin").d("=== ReaderContent: onFullscreenToggle($isFullscreen) ===")
-                                        Timber.tag("voronin").d("Current viewMode: ${currentState.viewMode}")
-                                        Timber.tag("voronin").d("Scaffold topBar visible: ${!currentState.isFullscreen}")
+                                        Timber.tag("voronin")
+                                            .d("=== ReaderContent: onFullscreenToggle($isFullscreen) ===")
+                                        Timber.tag("voronin")
+                                            .d("Current viewMode: ${currentState.viewMode}")
+                                        Timber.tag("voronin")
+                                            .d("Scaffold topBar visible: ${!currentState.isFullscreen}")
                                         viewModel.onAction(ReaderActions.SetFullscreen(isFullscreen))
                                     }
 
@@ -313,7 +326,12 @@ fun ReaderContent(
                                     }
 
                                     override fun onSelectionShow(startY: Int, endY: Int) {
-                                        viewModel.onAction(ReaderActions.ShowSelection(startY, endY))
+                                        viewModel.onAction(
+                                            ReaderActions.ShowSelection(
+                                                startY,
+                                                endY
+                                            )
+                                        )
                                     }
 
                                     override fun onSelectionHide() {
@@ -321,10 +339,15 @@ fun ReaderContent(
                                         viewModel.hideSelection()
                                     }
 
-                                    override fun onZoomChange(scale: Float, pivotX: Float, pivotY: Float) {
+                                    override fun onZoomChange(
+                                        scale: Float,
+                                        pivotX: Float,
+                                        pivotY: Float
+                                    ) {
                                         // Zoom is applied directly to FBReaderView via scaleX/Y
                                         // Optionally notify ViewModel for UI state (zoom indicator)
-                                        Timber.tag("voronin").d("ReaderContent: onZoomChange scale=$scale pivot=$pivotX,$pivotY")
+                                        Timber.tag("voronin")
+                                            .d("ReaderContent: onZoomChange scale=$scale pivot=$pivotX,$pivotY")
                                     }
 
                                     override fun onZoomEnd() {
@@ -350,7 +373,8 @@ fun ReaderContent(
                                         val savedPos = viewModel.getSavedPosition()
                                         if (savedPos != null) {
                                             viewModel.clearSavedPosition()
-                                            if (fbook.info == null) fbook.info = Storage.RecentInfo()
+                                            if (fbook.info == null) fbook.info =
+                                                Storage.RecentInfo()
                                             fbook.info.position = savedPos
                                         }
 
@@ -381,8 +405,9 @@ fun ReaderContent(
                             // Обновление view при изменении состояния (без пересоздания)
                             if (isLoaded) {
                                 val viewMode = currentState.viewMode
-                                val desiredWidget = if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
-                                else FBReaderView.Widgets.PAGING
+                                val desiredWidget =
+                                    if (viewMode.name == "CONTINUOUS") FBReaderView.Widgets.CONTINUOUS
+                                    else FBReaderView.Widgets.PAGING
 
                                 // Только переключаем widget если он отличается от текущего
                                 // Это предотвращает удаление SelectionView во время touch
@@ -907,7 +932,7 @@ private fun VolumeKeysHandler(
     val activity = remember(context) { context as? Activity } ?: return
 
     val volumeKeysEnabled = remember {
-        val shared = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        val shared = PreferenceManager.getDefaultSharedPreferences(context)
         shared.getBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, false)
     }
 
@@ -925,6 +950,7 @@ private fun VolumeKeysHandler(
                             fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
                             return true
                         }
+
                         KeyEvent.KEYCODE_VOLUME_UP if event.action == KeyEvent.ACTION_DOWN -> {
                             fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
                             return true

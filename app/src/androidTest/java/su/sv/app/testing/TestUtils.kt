@@ -107,7 +107,8 @@ object TestUtils {
     ): List<SemanticsNodeInteraction> {
         return List(
             onAllNodesWithTag(tag, useUnmergedTree)
-                .fetchSemanticsNodes().size) { index ->
+                .fetchSemanticsNodes().size
+        ) { index ->
             onAllNodesWithTag(tag, useUnmergedTree)[index]
         }
     }

@@ -121,7 +121,8 @@ data class SelectionState(
      * Проверяет, нужно ли скрыть панель действий.
      * Панель скрывается при начале drag.
      */
-    fun shouldHidePanel(): Boolean = dragState.isDragging() && startHandleBounds != null && endHandleBounds != null
+    fun shouldHidePanel(): Boolean =
+        dragState.isDragging() && startHandleBounds != null && endHandleBounds != null
 
     /**
      * Проверяет, нужно ли показать панель действий.

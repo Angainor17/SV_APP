@@ -18,7 +18,8 @@ metadata:
 При поиске статьи "Стоимость" в конце текста появляется блок:
 > "Смотрите также видео: В. И. Галко. Что такое стоимость?"
 
-На исходном сайте (svremya.su) этот текст содержит ссылку на внешнее видео. В приложении ссылка не работает.
+На исходном сайте (svremya.su) этот текст содержит ссылку на внешнее видео. В приложении ссылка не
+работает.
 
 ## Цель
 
@@ -27,6 +28,7 @@ metadata:
 ## Анализ
 
 ### Текущая реализация
+
 - HTML-контент приходит с API (`action=parse`)
 - В `ArticleView.kt` HTML очищается от тегов, остаются только внутренние wiki-ссылки
 - Внешние ссылки теряются при обработке
@@ -36,10 +38,13 @@ metadata:
 **Запрос**: `api.php?action=parse&page=Стоимость&prop=text|links|extlinks&format=json`
 
 **Результат**:
-- API не поддерживает `extlinks` property (warning: "Unrecognized value for parameter \"prop\": extlinks")
+
+- API не поддерживает `extlinks` property (warning: "Unrecognized value for parameter \"prop\":
+  extlinks")
 - Внешние ссылки присутствуют только в HTML-контенте
 
 **Структура внешней ссылки в HTML**:
+
 ```html
 <a rel="nofollow" class="external text" href="https://vk.com/video-206226873_456239852">
     В. И. Галко. Что такое стоимость?
@@ -47,11 +52,13 @@ metadata:
 ```
 
 **Признаки внешней ссылки**:
+
 - `class="external text"` или `class="external"`
 - `rel="nofollow"`
 - `href` начинается с `http://` или `https://` (не с `/`)
 
 **Контекст** (статья "Стоимость"):
+
 ```html
 <table class="wikitable">
 <tbody><tr>
@@ -65,11 +72,13 @@ metadata:
 ### Этап 1: Обновление моделей данных
 
 **Файлы для изменения**:
+
 - `domain/model/WikiArticle.kt`
 - `presentation/root/model/UiWikiArticle.kt`
 - `presentation/root/mapper/UiWikiMapper.kt`
 
 **Новые модели**:
+
 ```kotlin
 // domain/model/WikiArticle.kt
 data class WikiExternalLink(
@@ -104,14 +113,17 @@ data class UiWikiArticle(
 ### Этап 2: Парсинг внешних ссылок из HTML
 
 **Файлы для изменения**:
+
 - `data/repository/WikiRepositoryImpl.kt`
 
 **Алгоритм парсинга**:
+
 1. Использовать Regex для поиска `<a>` тегов с `class="external"`
 2. Извлечь `href` и текст ссылки
 3. Добавить в модель `WikiArticle`
 
 **Пример реализации**:
+
 ```kotlin
 private fun parseExternalLinks(html: String): List<WikiExternalLink> {
     val regex = """<a[^>]*class="external[^"]*"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>""".toRegex()
@@ -127,15 +139,18 @@ private fun parseExternalLinks(html: String): List<WikiExternalLink> {
 ### Этап 3: Отображение в UI
 
 **Файлы для изменения**:
+
 - `presentation/root/ui/ArticleView.kt`
 - `root/RootWiki.kt`
 
 **Изменения в `buildAnnotatedContent`**:
+
 1. При очистке HTML сохранять текст внешних ссылок
 2. Использовать `LinkAnnotation.Url` для внешних ссылок
 3. При клике открывать `Intent.ACTION_VIEW`
 
 **Пример**:
+
 ```kotlin
 withLink(LinkAnnotation.Url(link.url)) {
     withStyle(style = SpanStyle(
@@ -148,6 +163,7 @@ withLink(LinkAnnotation.Url(link.url)) {
 ```
 
 **Открытие внешней ссылки**:
+
 ```kotlin
 // В ArticleView добавить параметр
 onExternalLinkClick: (String) -> Unit
@@ -166,6 +182,7 @@ ArticleView(
 ### Этап 4: Визуальное отличие внешних ссылок
 
 **Идеи**:
+
 - Другой цвет (tertiary вместо primary)
 - Иконка внешней ссылки после текста (опционально)
 
@@ -179,24 +196,28 @@ ArticleView(
 ## Технические детали
 
 ### Зависимости
+
 - Стандартные библиотеки Kotlin (Regex)
 - Android Intent API
 - Jetpack Compose Text API
 
 ### Риски
+
 - Позиция ссылки в тексте может смещаться при очистке HTML
 - Необходимо обрабатывать HTML-сущности (`&amp;`, `&quot;` и т.д.)
 
 ## Оценка трудозатрат
 
-| Этап | Время |
-|------|-------|
-| Модели данных | 15 мин |
-| Парсинг HTML | 30 мин |
-| UI изменения | 30 мин |
-| Тестирование | 15 мин |
-| **Итого** | ~1.5 часа |
+| Этап          | Время     |
+|---------------|-----------|
+| Модели данных | 15 мин    |
+| Парсинг HTML  | 30 мин    |
+| UI изменения  | 30 мин    |
+| Тестирование  | 15 мин    |
+| **Итого**     | ~1.5 часа |
 
-**Why:** Пользователи не могут переходить по внешним ссылкам (видео, источники), что ограничивает функциональность Wiki-модуля.
+**Why:** Пользователи не могут переходить по внешним ссылкам (видео, источники), что ограничивает
+функциональность Wiki-модуля.
 
-**How to apply:** Выполнить этапы последовательно. После каждого этапа проверять компиляцию и базовую функциональность.
+**How to apply:** Выполнить этапы последовательно. После каждого этапа проверять компиляцию и
+базовую функциональность.

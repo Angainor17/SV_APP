@@ -34,7 +34,8 @@ open class PluginView {
 
         const val RENDER_MIN = 512 // минимальная ширина экрана
 
-        @JvmField val NEGATIVE = floatArrayOf(
+        @JvmField
+        val NEGATIVE = floatArrayOf(
             -1.0f, 0f, 0f, 0f, 255f, // красный
             0f, -1.0f, 0f, 0f, 255f, // зелёный
             0f, 0f, -1.0f, 0f, 255f, // синий
@@ -63,13 +64,20 @@ open class PluginView {
         }
     }
 
-    @JvmField var wallpaper: Bitmap? = null
-    @JvmField var wallpaperColor: Int = 0
-    @JvmField var paint: Paint = Paint() // цвет переднего плана / содержимого
-    @JvmField var current: PluginPage? = null
-    @JvmField var reflow: Boolean = false
-    @JvmField var reflowDebug: Boolean = false
-    @JvmField var reflower: Reflow? = null
+    @JvmField
+    var wallpaper: Bitmap? = null
+    @JvmField
+    var wallpaperColor: Int = 0
+    @JvmField
+    var paint: Paint = Paint() // цвет переднего плана / содержимого
+    @JvmField
+    var current: PluginPage? = null
+    @JvmField
+    var reflow: Boolean = false
+    @JvmField
+    var reflowDebug: Boolean = false
+    @JvmField
+    var reflower: Reflow? = null
 
     init {
         updateTheme()
@@ -153,11 +161,13 @@ open class PluginView {
                     current!!.pageOffset = 0
                     current!!.load()
                 }
+
                 ZLViewEnums.PageIndex.next -> {
                     current!!.pageNumber++
                     current!!.pageOffset = 0
                     current!!.load()
                 }
+
                 else -> {}
             }
             return false
@@ -193,14 +203,18 @@ open class PluginView {
         }
         current!!.load(index)
         val r: PluginPage = when (index) {
-            ZLViewEnums.PageIndex.previous -> object : PluginPage(current!!, ZLViewEnums.PageIndex.next) {
+            ZLViewEnums.PageIndex.previous -> object :
+                PluginPage(current!!, ZLViewEnums.PageIndex.next) {
                 override fun load() {}
                 override fun getPagesCount(): Int = current!!.getPagesCount()
             }
-            ZLViewEnums.PageIndex.next -> object : PluginPage(current!!, ZLViewEnums.PageIndex.previous) {
+
+            ZLViewEnums.PageIndex.next -> object :
+                PluginPage(current!!, ZLViewEnums.PageIndex.previous) {
                 override fun load() {}
                 override fun getPagesCount(): Int = current!!.getPagesCount()
             }
+
             else -> return false
         }
         return !old.equals(r.pageNumber, r.pageOffset) // нужен сброс кэша?
@@ -244,7 +258,11 @@ open class PluginView {
                         return true
                     if (current!!.pageNumber != reflower!!.page) { // происходит только на 0-й странице документа
                         val render = reflower!!.index
-                        val bm = render(reflower!!.rw, reflower!!.h, current!!.pageNumber)!! // 0-я страница
+                        val bm = render(
+                            reflower!!.rw,
+                            reflower!!.h,
+                            current!!.pageNumber
+                        )!! // 0-я страница
                         reflower!!.load(bm, current!!.pageNumber, 0)
                         bm.recycle()
                         var count = reflower!!.count()
@@ -254,12 +272,17 @@ open class PluginView {
                     }
                     return false
                 }
+
                 ZLViewEnums.PageIndex.next -> {
                     if (current!!.pageNumber + 1 < current!!.getPagesCount())
                         return true
                     if (current!!.pageNumber != reflower!!.page) { // происходит только на последней странице документа
                         val render = reflower!!.index - reflower!!.count()
-                        val bm = render(reflower!!.rw, reflower!!.h, current!!.pageNumber)!! // последняя страница
+                        val bm = render(
+                            reflower!!.rw,
+                            reflower!!.h,
+                            current!!.pageNumber
+                        )!! // последняя страница
                         reflower!!.load(bm, current!!.pageNumber, 0)
                         bm.recycle()
                         reflower!!.index = render
@@ -267,6 +290,7 @@ open class PluginView {
                     }
                     return false
                 }
+
                 else -> return true // current???
             }
         }
@@ -308,7 +332,15 @@ open class PluginView {
     /**
      * Рисует на bitmap.
      */
-    open fun drawOnBitmap(context: Context, bitmap: Bitmap, w: Int, h: Int, index: ZLViewEnums.PageIndex, custom: FBReaderView.CustomView, info: Storage.RecentInfo) {
+    open fun drawOnBitmap(
+        context: Context,
+        bitmap: Bitmap,
+        w: Int,
+        h: Int,
+        index: ZLViewEnums.PageIndex,
+        custom: FBReaderView.CustomView,
+        info: Storage.RecentInfo
+    ) {
         val canvas = Canvas(bitmap)
         drawOnCanvas(context, canvas, w, h, index, custom, info)
     }
@@ -331,7 +363,15 @@ open class PluginView {
     /**
      * Рисует на canvas.
      */
-    open fun drawOnCanvas(context: Context, canvas: Canvas, w: Int, h: Int, index: ZLViewEnums.PageIndex, custom: FBReaderView.CustomView, info: Storage.RecentInfo) {
+    open fun drawOnCanvas(
+        context: Context,
+        canvas: Canvas,
+        w: Int,
+        h: Int,
+        index: ZLViewEnums.PageIndex,
+        custom: FBReaderView.CustomView,
+        info: Storage.RecentInfo
+    ) {
         var index = index
         if (reflow) {
             if (reflower == null)
@@ -379,6 +419,7 @@ open class PluginView {
                     }
                     reflower!!.pending = -1
                 }
+
                 ZLViewEnums.PageIndex.current -> {
                     if (reflower!!.count() > 0) {
                         bm = reflower!!.render(render)
@@ -405,6 +446,7 @@ open class PluginView {
                         }
                     }
                 }
+
                 ZLViewEnums.PageIndex.next -> { // следующая может указывать на несколько страниц вперёд
                     if (reflower!!.count() == -1) { // прогулка по сброшенному reflower, перезагрузка
                         bm = render(reflower!!.rw, reflower!!.h, page)
@@ -432,6 +474,7 @@ open class PluginView {
                     }
                     reflower!!.pending = 1
                 }
+
                 else -> {}
             }
             if (bm != null) {
@@ -494,6 +537,7 @@ open class PluginView {
      */
     open fun getCurrentTOCElement(tocTree: TOCTree): TOCTree? {
         var treeToSelect: TOCTree? = null
+
         @Suppress("UNCHECKED_CAST")
         val iterator = (tocTree as Iterable<TOCTree>).iterator()
         while (iterator.hasNext()) {
@@ -580,7 +624,14 @@ open class PluginView {
     /**
      * Создаёт выделение.
      */
-    open fun select(start: ZLTextPosition, info: Reflow.Info?, w: Int, h: Int, x: Int, y: Int): Selection? {
+    open fun select(
+        start: ZLTextPosition,
+        info: Reflow.Info?,
+        w: Int,
+        h: Int,
+        x: Int,
+        y: Int
+    ): Selection? {
         val p = selectPoint(info, x, y)
         if (p != null)
             return select(selectPage(start, info, w, h), p)
@@ -746,10 +797,14 @@ open class PluginView {
          * Границы выделения.
          */
         class Bounds {
-            @JvmField var rr: Array<Rect>? = null
-            @JvmField var reverse: Boolean = false
-            @JvmField var start: Boolean = false
-            @JvmField var end: Boolean = false
+            @JvmField
+            var rr: Array<Rect>? = null
+            @JvmField
+            var reverse: Boolean = false
+            @JvmField
+            var start: Boolean = false
+            @JvmField
+            var end: Boolean = false
         }
 
         /**
@@ -776,9 +831,12 @@ open class PluginView {
      * Ссылка в документе.
      */
     class Link {
-        @JvmField var url: String? = null
-        @JvmField var index: Int = 0
-        @JvmField var rect: Rect? = null
+        @JvmField
+        var url: String? = null
+        @JvmField
+        var index: Int = 0
+        @JvmField
+        var rect: Rect? = null
 
         constructor()
 
@@ -833,8 +891,10 @@ open class PluginView {
          * Границы найденного текста.
          */
         class Bounds {
-            @JvmField var rr: Array<Rect>? = null
-            @JvmField var highlight: Array<Rect>? = null
+            @JvmField
+            var rr: Array<Rect>? = null
+            @JvmField
+            var highlight: Array<Rect>? = null
         }
     }
 }

@@ -12,6 +12,7 @@ metadata:
 ## Правило
 
 **ВСЕ логи в приложении должны использовать строго:**
+
 ```kotlin
 Timber.tag("voronin").d/w/e/i/v(...)
 ```
@@ -39,11 +40,13 @@ Timber.tag("voronin_selection").d() // Модифицированный тег
 ## Формат сообщений
 
 Для удобства поиска используйте формат:
+
 ```
 [ClassName] [method]: [description]
 ```
 
 Примеры:
+
 ```kotlin
 Timber.tag("voronin").d("PagerWidget onLongClick: selection created at %s", position)
 Timber.tag("voronin").d("SelectionView hideHandles: hiding handles for page change")

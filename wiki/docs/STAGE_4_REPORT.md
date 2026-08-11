@@ -4,17 +4,17 @@
 
 ### Созданы все Use Cases
 
-| Use Case | Описание |
-|----------|----------|
-| `SearchArticleUseCase` | Поиск статьи по запросу |
-| `GetArticleUseCase` | Получение статьи по заголовку |
-| `GetFavoritesUseCase` | Получение списка избранных статей (Flow) |
-| `AddFavoriteUseCase` | Добавление статьи в избранное |
-| `RemoveFavoriteUseCase` | Удаление статьи из избранного |
-| `IsFavoriteUseCase` | Проверка наличия статьи в избранном |
-| `GetHistoryUseCase` | Получение истории поиска (Flow) |
-| `AddHistoryUseCase` | Добавление статьи в историю |
-| `ClearHistoryUseCase` | Очистка истории |
+| Use Case                | Описание                                 |
+|-------------------------|------------------------------------------|
+| `SearchArticleUseCase`  | Поиск статьи по запросу                  |
+| `GetArticleUseCase`     | Получение статьи по заголовку            |
+| `GetFavoritesUseCase`   | Получение списка избранных статей (Flow) |
+| `AddFavoriteUseCase`    | Добавление статьи в избранное            |
+| `RemoveFavoriteUseCase` | Удаление статьи из избранного            |
+| `IsFavoriteUseCase`     | Проверка наличия статьи в избранном      |
+| `GetHistoryUseCase`     | Получение истории поиска (Flow)          |
+| `AddHistoryUseCase`     | Добавление статьи в историю              |
+| `ClearHistoryUseCase`   | Очистка истории                          |
 
 ### Расположение файлов
 

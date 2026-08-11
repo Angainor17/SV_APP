@@ -115,14 +115,24 @@ class ReaderViewModel @Inject constructor(
     fun onAction(action: ReaderActions) {
         when (action) {
             // Загрузка книги
-            is ReaderActions.LoadBook -> loadBook(action.uri, action.position, action.bookCoverUrl, action.bookTitle, action.bookAuthor)
+            is ReaderActions.LoadBook -> loadBook(
+                action.uri,
+                action.position,
+                action.bookCoverUrl,
+                action.bookTitle,
+                action.bookAuthor
+            )
 
             // Сохранение позиции
             ReaderActions.SavePosition -> savePosition()
 
             // Навигация
-            ReaderActions.NavigateBack -> { /* Обрабатывается на уровне Screen */ }
-            ReaderActions.NavigateToSettings -> { /* Обрабатывается на уровне Screen */ }
+            ReaderActions.NavigateBack -> { /* Обрабатывается на уровне Screen */
+            }
+
+            ReaderActions.NavigateToSettings -> { /* Обрабатывается на уровне Screen */
+            }
+
             is ReaderActions.GoToPosition -> goToPosition(action.position)
             is ReaderActions.GoToBookmark -> goToBookmark(action.bookmark)
 
@@ -146,6 +156,7 @@ class ReaderViewModel @Inject constructor(
             ReaderActions.HideSelection -> {
                 fbReaderView?.app?.runAction(ActionCode.SELECTION_CLEAR)
             }
+
             ReaderActions.SelectionCopy -> selectionDelegate.copy()
             ReaderActions.SelectionShare -> selectionDelegate.share()
             ReaderActions.SelectionBookmark -> selectionDelegate.bookmark()
@@ -154,7 +165,12 @@ class ReaderViewModel @Inject constructor(
 
             // Закладки — делегировано
             is ReaderActions.EditBookmark -> bookmarksDelegate.edit(action.bookmark)
-            is ReaderActions.SaveBookmarkEdit -> bookmarksDelegate.saveEdit(action.bookmark, action.name, action.color)
+            is ReaderActions.SaveBookmarkEdit -> bookmarksDelegate.saveEdit(
+                action.bookmark,
+                action.name,
+                action.color
+            )
+
             is ReaderActions.AddBookmark -> bookmarksDelegate.add(action.bookmark)
             is ReaderActions.DeleteBookmark -> bookmarksDelegate.delete(action.bookmark)
 
@@ -178,7 +194,13 @@ class ReaderViewModel @Inject constructor(
 
     // ==================== Загрузка книги ====================
 
-    private fun loadBook(uri: Uri, position: FBReaderView.ZLTextIndexPosition?, bookCoverUrl: String?, bookTitle: String?, bookAuthor: String?) {
+    private fun loadBook(
+        uri: Uri,
+        position: FBReaderView.ZLTextIndexPosition?,
+        bookCoverUrl: String?,
+        bookTitle: String?,
+        bookAuthor: String?
+    ) {
         Timber.tag("voronin").d("=== loadBook START ===")
         Timber.tag("voronin").d("uri=$uri, position=$position")
 
@@ -191,7 +213,8 @@ class ReaderViewModel @Inject constructor(
                     context.contentResolver.openInputStream(uri)
                 } catch (e: SecurityException) {
                     Timber.tag("voronin").e(e, "Security exception accessing file: $uri")
-                    _state.value = ReaderState.Error(context.getString(R.string.sv_error_file_access))
+                    _state.value =
+                        ReaderState.Error(context.getString(R.string.sv_error_file_access))
                     return@launch
                 } catch (e: Exception) {
                     Timber.tag("voronin").e(e, "Error accessing file: $uri")
@@ -199,7 +222,8 @@ class ReaderViewModel @Inject constructor(
                 }
 
                 if (inputStream == null) {
-                    _state.value = ReaderState.Error(context.getString(R.string.sv_error_file_not_found))
+                    _state.value =
+                        ReaderState.Error(context.getString(R.string.sv_error_file_not_found))
                     return@launch
                 }
                 inputStream.close()
@@ -224,6 +248,7 @@ class ReaderViewModel @Inject constructor(
                     e.message?.contains("EACCES") == true -> context.getString(R.string.sv_error_file_access)
                     e.message?.contains("ENOENT") == true || e.message?.contains("No such file") == true ->
                         context.getString(R.string.sv_error_file_not_found)
+
                     else -> e.message ?: context.getString(R.string.sv_error_open_book)
                 }
                 _state.value = ReaderState.Error(errorMessage)
@@ -272,7 +297,8 @@ class ReaderViewModel @Inject constructor(
                 try {
                     val info = Storage.RecentInfo(context, uri)
                     if (info.position != null && save.position != null &&
-                        save.position!!.samePositionAs(info.position)) {
+                        save.position!!.samePositionAs(info.position)
+                    ) {
                         if (save.fontsize == null || info.fontsize != null && save.fontsize == info.fontsize) {
                             if (save.equals(info.fontsizes)) {
                                 if (save.bookmarks == null || info.bookmarks != null && save.bookmarks == info.bookmarks) {
@@ -317,17 +343,32 @@ class ReaderViewModel @Inject constructor(
 
     private fun toggleBookmarks() {
         val s = _state.value as? ReaderState.Content ?: return
-        _state.value = s.copy(showToc = false, showBookmarks = !s.showBookmarks, showFontSettings = false, showNavigation = false)
+        _state.value = s.copy(
+            showToc = false,
+            showBookmarks = !s.showBookmarks,
+            showFontSettings = false,
+            showNavigation = false
+        )
     }
 
     private fun toggleNavigation() {
         val s = _state.value as? ReaderState.Content ?: return
-        _state.value = s.copy(showToc = false, showBookmarks = false, showFontSettings = false, showNavigation = !s.showNavigation)
+        _state.value = s.copy(
+            showToc = false,
+            showBookmarks = false,
+            showFontSettings = false,
+            showNavigation = !s.showNavigation
+        )
     }
 
     private fun toggleFontSettings() {
         val s = _state.value as? ReaderState.Content ?: return
-        _state.value = s.copy(showToc = false, showBookmarks = false, showFontSettings = !s.showFontSettings, showNavigation = false)
+        _state.value = s.copy(
+            showToc = false,
+            showBookmarks = false,
+            showFontSettings = !s.showFontSettings,
+            showNavigation = false
+        )
     }
 
     fun hideDialogs() {
@@ -387,7 +428,12 @@ class ReaderViewModel @Inject constructor(
 
     private fun zoomUpdate(scale: Float, pivotX: Float, pivotY: Float) {
         val s = _state.value as? ReaderState.Content ?: return
-        _state.value = s.copy(zoomScale = scale, zoomPivotX = pivotX, zoomPivotY = pivotY, isInZoom = scale > 1.0f)
+        _state.value = s.copy(
+            zoomScale = scale,
+            zoomPivotX = pivotX,
+            zoomPivotY = pivotY,
+            isInZoom = scale > 1.0f
+        )
     }
 
     private fun zoomReset() {

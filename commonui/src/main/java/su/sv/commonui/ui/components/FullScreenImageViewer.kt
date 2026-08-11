@@ -69,7 +69,8 @@ fun FullScreenImageViewer(
 ) {
     if (images.isEmpty()) return
 
-    val pagerState = rememberPagerState(initialPage = initialIndex.coerceIn(0, images.size - 1)) { images.size }
+    val pagerState =
+        rememberPagerState(initialPage = initialIndex.coerceIn(0, images.size - 1)) { images.size }
     var isControlsVisible by remember { mutableStateOf(showNavigationControls) }
 
     Dialog(

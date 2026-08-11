@@ -48,7 +48,7 @@ fun BookList(
     val isFiltersVisible by remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex == 0 &&
-                lazyGridState.firstVisibleItemScrollOffset < 100
+                    lazyGridState.firstVisibleItemScrollOffset < 100
         }
     }
 

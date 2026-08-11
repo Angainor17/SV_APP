@@ -4,13 +4,15 @@
 
 ## Обзор
 
-Модуль `bookreader` отвечает за чтение книг в различных форматах (PDF, EPUB, FB2 и др.). Основан на библиотеке FBReader.
+Модуль `bookreader` отвечает за чтение книг в различных форматах (PDF, EPUB, FB2 и др.). Основан на
+библиотеке FBReader.
 
 ## Основные компоненты
 
 ### Activities
 
 #### BookReaderMainActivity
+
 Главная Activity приложения чтения:
 
 ```kotlin
@@ -18,14 +20,17 @@ class BookReaderMainActivity : AppCompatActivity()
 ```
 
 #### FullscreenActivity
+
 Полноэкранный режим чтения.
 
 #### SettingsActivity
+
 Настройки приложения чтения.
 
 ### Fragments
 
 #### ReaderFragment
+
 Фрагмент для отображения книги:
 
 ```kotlin
@@ -33,11 +38,13 @@ class ReaderFragment : Fragment()
 ```
 
 Отвечает за:
+
 - Отображение текста книги
 - Навигацию по страницам
 - Управление закладками
 
 #### LibraryFragment
+
 Фрагмент библиотеки книг:
 
 ```kotlin
@@ -54,6 +61,7 @@ class LibraryFragment : Fragment()
 - И другие
 
 ### PermissionHelper
+
 Помощник для работы с разрешениями:
 
 ```kotlin
@@ -64,6 +72,7 @@ object PermissionHelper {
 ```
 
 ### BookApplication
+
 Application класс для инициализации:
 
 ```kotlin
@@ -92,6 +101,7 @@ public static class Bookmark {
 ### Функция очистки текста
 
 FBReader вставляет специальные символы в текст закладок:
+
 - `U+FFFE` (65534) — маркер переноса слов
 - Управляющие символы
 - Маркеры `[image]`, `[1]`, `[2]`
@@ -115,6 +125,7 @@ fun cleanBookmarkText(text: String): String {
 ```
 
 Используется при отображении:
+
 - `screens/ui/BookmarksComposeDialog.kt` — список закладок
 - `screens/ui/BookmarkBottomSheet.kt` — редактирование закладки
 
@@ -196,6 +207,7 @@ bookreader/src/main/java/com/github/axet/bookreader/
 ## Зависимости
 
 Модуль использует:
+
 - FBReader библиотеку (модуль `fbreader`)
 - DragSortListView для списка книг
 
@@ -204,6 +216,7 @@ bookreader/src/main/java/com/github/axet/bookreader/
 ### Статус миграции (обновлено 2026-07-26)
 
 **Мигрированные файлы:**
+
 - app/ (все Kotlin файлы кроме Storage.java)
 - domain/ (все файлы)
 - screens/ (все Compose экраны)
@@ -212,11 +225,13 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - widgets/ (большинство файлов, кроме FBReaderView.java и ScrollWidget.java)
 
 **Оставшиеся Java файлы (3 файла):**
+
 - `app/Storage.java` - наследуется от внешней Java библиотеки
 - `widgets/ScrollWidget.java` - много внутренних классов
 - `widgets/FBReaderView.java` - декомпозируется
 
 ### Новые компоненты (2026-07-26)
+
 - `screens/ReaderScreen.kt` — главный Compose экран чтения
 - `screens/ReaderSettingsScreen.kt` — экран настроек
 - `screens/viewmodel/` — ViewModel с MVI паттерном
@@ -228,14 +243,18 @@ bookreader/src/main/java/com/github/axet/bookreader/
 ### Особенности миграции Storage.java
 
 **Сложности:**
+
 - Наследуется от внешней Java библиотеки `com.github.axet.androidlibrary.app.Storage`
 - Много статических методов, вызываемых из Kotlin кода
-- Внутренние классы: `Info`, `Progress`, `ProgresInputstream`, `FileCbz`, `FileCbr`, `FBook`, `Book`, `RecentInfo`, `Bookmark`, `Bookmarks`
+- Внутренние классы: `Info`, `Progress`, `ProgresInputstream`, `FileCbz`, `FileCbr`, `FBook`,
+  `Book`, `RecentInfo`, `Bookmark`, `Bookmarks`
 
 **Требуется:**
+
 - Добавить `@JvmStatic` для статических методов в `companion object`
 - Добавить `@JvmField` для статических полей
-- Создать обёртки для статических методов родительского класса (например, `getFile`, `exists`, `getNameNoExt` и т.д.)
+- Создать обёртки для статических методов родительского класса (например, `getFile`, `exists`,
+  `getNameNoExt` и т.д.)
 - Использовать `open class` для классов которые наследуются (например, `Bookmark`)
 - Использовать `lateinit` для `Book.info` и `FBook.book`
 
@@ -250,4 +269,5 @@ bookreader/src/main/java/com/github/axet/bookreader/
 
 ## Примечания
 
-Модуль интегрирован с основным приложением через навигацию. При нажатии на скачанную книгу открывается этот модуль.
+Модуль интегрирован с основным приложением через навигацию. При нажатии на скачанную книгу
+открывается этот модуль.

@@ -44,7 +44,8 @@ class WikiRepositoryImpl @Inject constructor(
 
             when {
                 !response.isSuccessful -> {
-                    Timber.tag("voronin").d("searchArticle: query='$query', error: code=${response.code()}")
+                    Timber.tag("voronin")
+                        .d("searchArticle: query='$query', error: code=${response.code()}")
                     WikiResult.Error(
                         message = "Ошибка сети: ${response.code()}",
                         code = response.code().toString(),
@@ -57,11 +58,15 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 else -> {
-                    val body = checkNotNull(response.body()) { "Body was null despite passing null checks" }
-                    val query = checkNotNull(body.query) { "Query was null despite passing null checks" }
-                    val searchResults = checkNotNull(query.search) { "Search results were null despite passing null checks" }
+                    val body =
+                        checkNotNull(response.body()) { "Body was null despite passing null checks" }
+                    val query =
+                        checkNotNull(body.query) { "Query was null despite passing null checks" }
+                    val searchResults =
+                        checkNotNull(query.search) { "Search results were null despite passing null checks" }
                     val searchItem = searchResults.first()
-                    Timber.tag("voronin").d("searchArticle: query='$query', results=${searchResults.size}, first='${searchItem.title}'")
+                    Timber.tag("voronin")
+                        .d("searchArticle: query='$query', results=${searchResults.size}, first='${searchItem.title}'")
                     WikiResult.Success(
                         WikiSearchResult(
                             title = searchItem.title.orEmpty(),
@@ -101,7 +106,8 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 response.body()?.error != null -> {
-                    val error = checkNotNull(response.body()?.error) { "Error body was null despite null check" }
+                    val error =
+                        checkNotNull(response.body()?.error) { "Error body was null despite null check" }
                     if (error.code == "missingtitle") {
                         WikiResult.NotFound
                     } else {
@@ -120,7 +126,8 @@ class WikiRepositoryImpl @Inject constructor(
                 }
 
                 else -> {
-                    val parseData = checkNotNull(response.body()?.parse) { "Parse data was null despite null check" }
+                    val parseData =
+                        checkNotNull(response.body()?.parse) { "Parse data was null despite null check" }
                     val rawHtmlContent = parseData.text?.content.orEmpty()
                     val articleTitle = parseData.title.orEmpty()
                     val imageUrl = extractImageUrl(rawHtmlContent)
@@ -152,7 +159,10 @@ class WikiRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSearchSuggestions(query: String, limit: Int): List<WikiSearchSuggestion> {
+    override suspend fun getSearchSuggestions(
+        query: String,
+        limit: Int
+    ): List<WikiSearchSuggestion> {
         return try {
             if (query.length < 2) {
                 Timber.tag("voronin").d("getSearchSuggestions: query='$query' (too short, skipped)")
@@ -163,15 +173,18 @@ class WikiRepositoryImpl @Inject constructor(
             val response = api.search(query = query, what = "title", limit = limit)
 
             if (!response.isSuccessful || response.body()?.query?.search == null) {
-                Timber.tag("voronin").d("getSearchSuggestions: query='$query', error: not successful or null")
+                Timber.tag("voronin")
+                    .d("getSearchSuggestions: query='$query', error: not successful or null")
                 return emptyList()
             }
 
-            val searchData = checkNotNull(response.body()?.query?.search) { "Search data was null despite null check" }
+            val searchData =
+                checkNotNull(response.body()?.query?.search) { "Search data was null despite null check" }
             val results = searchData.map { item ->
                 WikiSearchSuggestion(title = item.title.orEmpty())
             }
-            Timber.tag("voronin").d("getSearchSuggestions: query='$query', results=${results.size}, titles=${results.map { it.title }}")
+            Timber.tag("voronin")
+                .d("getSearchSuggestions: query='$query', results=${results.size}, titles=${results.map { it.title }}")
             results
         } catch (e: Exception) {
             Timber.tag("voronin").e(e, "getSearchSuggestions: query='$query', exception")
@@ -354,7 +367,10 @@ class WikiRepositoryImpl @Inject constructor(
      */
     private fun extractImageUrl(html: String): String? {
         // Сперва ищем ссылку на картинку в контейнере extimg (специфика сайта svremya.su)
-        val extImgRegex = """<div[^>]*class="extimg[^"]*"[^>]*>.*?<a[^>]*href="([^"]+\.(?:jpg|jpeg|png|gif|webp))"[^>]*>""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val extImgRegex =
+            """<div[^>]*class="extimg[^"]*"[^>]*>.*?<a[^>]*href="([^"]+\.(?:jpg|jpeg|png|gif|webp))"[^>]*>""".toRegex(
+                RegexOption.DOT_MATCHES_ALL
+            )
         val extImgMatch = extImgRegex.find(html)
         if (extImgMatch != null) {
             return extImgMatch.groupValues[1]
@@ -387,7 +403,8 @@ class WikiRepositoryImpl @Inject constructor(
         if (imageUrl == null) return html
 
         // Удаляем весь div с классом extimg, содержащий ссылку на эту картинку
-        val extImgBlockRegex = """<div[^>]*class="extimg[^"]*"[^>]*>.*?</div>""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val extImgBlockRegex =
+            """<div[^>]*class="extimg[^"]*"[^>]*>.*?</div>""".toRegex(RegexOption.DOT_MATCHES_ALL)
         return extImgBlockRegex.replace(html, "")
     }
 }

@@ -84,10 +84,12 @@ class BookmarksRepository @Inject constructor(
                 for (jsonFile in jsonFiles) {
                     try {
                         val bookNotes = loadNotesFromJsonUri(jsonFile.uri, jsonFile.bookId)
-                        Timber.tag("voronin2").d("getAllNotes: Book ${jsonFile.bookId}: ${bookNotes.size} notes")
+                        Timber.tag("voronin2")
+                            .d("getAllNotes: Book ${jsonFile.bookId}: ${bookNotes.size} notes")
                         notes.addAll(bookNotes)
                     } catch (e: Exception) {
-                        Timber.tag("voronin2").e(e, "getAllNotes: Error loading from ${jsonFile.uri}")
+                        Timber.tag("voronin2")
+                            .e(e, "getAllNotes: Error loading from ${jsonFile.uri}")
                     }
                 }
 
@@ -232,8 +234,10 @@ class BookmarksRepository @Inject constructor(
                     )
                     val cursor = contentResolver.query(childrenUri, null, null, null, null)
                     cursor?.use {
-                        val idIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
-                        val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                        val idIndex =
+                            it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                        val nameIndex =
+                            it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
                         while (it.moveToNext()) {
                             if (idIndex < 0 || nameIndex < 0) continue
                             val id = it.getString(idIndex)
@@ -243,7 +247,8 @@ class BookmarksRepository @Inject constructor(
                             if (name.endsWith(".json")) {
                                 val bookId = name.substringBeforeLast(".")
                                 if (bookId.length == Storage.MD5_SIZE) {
-                                    val uri = DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
+                                    val uri =
+                                        DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
                                     files.add(JsonFileInfo(uri, bookId))
                                     Timber.d("Found JSON file: $name, bookId=$bookId")
                                 }
@@ -251,6 +256,7 @@ class BookmarksRepository @Inject constructor(
                         }
                     }
                 }
+
                 ContentResolver.SCHEME_FILE -> {
                     Timber.d("Listing JSON files using File scheme")
                     val dir = File(storageUri.path!!)
@@ -265,6 +271,7 @@ class BookmarksRepository @Inject constructor(
                         }
                     }
                 }
+
                 else -> {
                     Timber.w("Unknown storage scheme: $scheme")
                 }
@@ -296,8 +303,10 @@ class BookmarksRepository @Inject constructor(
                     )
                     val cursor = contentResolver.query(childrenUri, null, null, null, null)
                     cursor?.use {
-                        val idIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
-                        val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                        val idIndex =
+                            it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                        val nameIndex =
+                            it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
                         while (it.moveToNext()) {
                             if (idIndex < 0 || nameIndex < 0) continue
                             val id = it.getString(idIndex)
@@ -309,10 +318,12 @@ class BookmarksRepository @Inject constructor(
                     }
                     null
                 }
+
                 ContentResolver.SCHEME_FILE -> {
                     val file = File(storageUri.path!!, "$bookId.json")
                     if (file.exists()) Uri.fromFile(file) else null
                 }
+
                 else -> null
             }
         } catch (e: Exception) {
@@ -370,13 +381,20 @@ class BookmarksRepository @Inject constructor(
                     val noteCoverPath = bookmarkJson.optString("coverUrl", null) ?: coverPath
 
                     // URI файла книги из закладки (сохранённый при создании), или fallback на URI книги
-                    val noteBookFileUri = bookmarkJson.optString("bookFileUri", null) ?: bookFileUriFromBook
+                    val noteBookFileUri =
+                        bookmarkJson.optString("bookFileUri", null) ?: bookFileUriFromBook
 
                     val sentenceBefore = bookmarkJson.optString("sentenceBefore", null)
                     val sentenceAfter = bookmarkJson.optString("sentenceAfter", null)
                     val startParagraphIndex = startArray?.optInt(0) ?: 0
 
-                    Timber.d("Loading note: text=${text.take(30)}..., startParagraph=$startParagraphIndex, page=${calculatePageNumber(startParagraphIndex)}")
+                    Timber.d(
+                        "Loading note: text=${text.take(30)}..., startParagraph=$startParagraphIndex, page=${
+                            calculatePageNumber(
+                                startParagraphIndex
+                            )
+                        }"
+                    )
                     Timber.d("  sentenceBefore=$sentenceBefore, sentenceAfter=$sentenceAfter")
 
                     notes.add(
@@ -445,7 +463,8 @@ class BookmarksRepository @Inject constructor(
                 cacheDir.listFiles()?.forEach { file ->
                     // Имя файла обложки содержит MD5 книги
                     if (file.name.contains(bookId) &&
-                        (file.extension == "png" || file.extension == "jpg" || file.extension == "jpeg")) {
+                        (file.extension == "png" || file.extension == "jpg" || file.extension == "jpeg")
+                    ) {
                         Timber.d("Found cover for book $bookId: ${file.absolutePath}")
                         return file.absolutePath
                     }
@@ -457,7 +476,8 @@ class BookmarksRepository @Inject constructor(
             if (filesDir.exists()) {
                 filesDir.listFiles()?.forEach { file ->
                     if (file.name.contains(bookId) &&
-                        (file.extension == "png" || file.extension == "jpg" || file.extension == "jpeg")) {
+                        (file.extension == "png" || file.extension == "jpg" || file.extension == "jpeg")
+                    ) {
                         Timber.d("Found cover for book $bookId in filesDir: ${file.absolutePath}")
                         return file.absolutePath
                     }
@@ -504,6 +524,7 @@ class BookmarksRepository @Inject constructor(
                         os.write(json.toString(2).toByteArray())
                     }
                 }
+
                 ContentResolver.SCHEME_FILE -> {
                     File(uri.path!!).writeText(json.toString(2))
                 }
@@ -532,15 +553,18 @@ class BookmarksRepository @Inject constructor(
                     )
                     val cursor = contentResolver.query(childrenUri, null, null, null, null)
                     cursor?.use {
-                        val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
-                        val idIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                        val nameIndex =
+                            it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                        val idIndex =
+                            it.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
                         while (it.moveToNext()) {
                             if (nameIndex < 0 || idIndex < 0) continue
                             val name = it.getString(nameIndex)
                             // Ищем файл который начинается с bookId (MD5) и не является JSON
                             if (name.startsWith(bookId) && !name.endsWith(".json")) {
                                 val id = it.getString(idIndex)
-                                val uri = DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
+                                val uri =
+                                    DocumentsContract.buildDocumentUriUsingTree(storageUri, id)
                                 Timber.d("Found book file: $name for bookId: $bookId")
                                 return uri.toString()
                             }
@@ -548,6 +572,7 @@ class BookmarksRepository @Inject constructor(
                     }
                     null
                 }
+
                 ContentResolver.SCHEME_FILE -> {
                     val dir = File(storageUri.path!!)
                     dir.listFiles()?.forEach { file ->
@@ -558,6 +583,7 @@ class BookmarksRepository @Inject constructor(
                     }
                     null
                 }
+
                 else -> null
             }
         } catch (e: Exception) {

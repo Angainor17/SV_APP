@@ -174,7 +174,8 @@ class RootBooksCatalogViewModel @Inject constructor(
                 is BookFilter.All -> setOf(BookFilter.All)
                 else -> {
                     // При выборе другого фильтра убираем "Все" из выбранных
-                    val currentFilters = state.selectedFilters.filter { it !is BookFilter.All }.toSet()
+                    val currentFilters =
+                        state.selectedFilters.filter { it !is BookFilter.All }.toSet()
                     if (state.selectedFilters.contains(filter)) {
                         currentFilters - filter
                     } else {
@@ -190,7 +191,8 @@ class RootBooksCatalogViewModel @Inject constructor(
                 newSelectedFilters
             }
 
-            val updatedUiFilters = updateFiltersAvailability(state.filters, finalSelectedFilters, state.books)
+            val updatedUiFilters =
+                updateFiltersAvailability(state.filters, finalSelectedFilters, state.books)
 
             // Отправляем эффект для скролла к началу
             _oneTimeEffect.trySend(BooksListOneTimeEffect.ScrollToTop)
@@ -210,13 +212,15 @@ class RootBooksCatalogViewModel @Inject constructor(
             val newSelectedFilters = state.selectedFilters - filter
 
             // Если сбросили все фильтры, возвращаем "Все"
-            val finalSelectedFilters = if (newSelectedFilters.isEmpty() || newSelectedFilters.all { it is BookFilter.All }) {
-                setOf(BookFilter.All)
-            } else {
-                newSelectedFilters.filter { it !is BookFilter.All }.toSet()
-            }
+            val finalSelectedFilters =
+                if (newSelectedFilters.isEmpty() || newSelectedFilters.all { it is BookFilter.All }) {
+                    setOf(BookFilter.All)
+                } else {
+                    newSelectedFilters.filter { it !is BookFilter.All }.toSet()
+                }
 
-            val updatedUiFilters = updateFiltersAvailability(state.filters, finalSelectedFilters, state.books)
+            val updatedUiFilters =
+                updateFiltersAvailability(state.filters, finalSelectedFilters, state.books)
 
             // Отправляем эффект для скролла к началу
             _oneTimeEffect.trySend(BooksListOneTimeEffect.ScrollToTop)
@@ -238,7 +242,12 @@ class RootBooksCatalogViewModel @Inject constructor(
     ): List<UiBookFilter> {
         // Если нет выбранных фильтров или выбрано "Все" - все фильтры доступны
         if (selectedFilters.isEmpty() || selectedFilters.contains(BookFilter.All)) {
-            return filters.map { it.copy(isAvailable = true, isSelected = selectedFilters.contains(it.filter)) }
+            return filters.map {
+                it.copy(
+                    isAvailable = true,
+                    isSelected = selectedFilters.contains(it.filter)
+                )
+            }
         }
 
         // Фильтруем книги по выбранным фильтрам

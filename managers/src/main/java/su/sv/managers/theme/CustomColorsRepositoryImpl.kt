@@ -65,7 +65,7 @@ class CustomColorsRepositoryImpl @Inject constructor(
             "LIGHT" -> PreferencesKeys.CUSTOM_COLORS_LIGHT
             "DARK" -> PreferencesKeys.CUSTOM_COLORS_DARK
             else -> {
-                    Timber.w(TAG, "Unknown theme mode: ${colors.themeMode}")
+                Timber.w(TAG, "Unknown theme mode: ${colors.themeMode}")
                 return
             }
         }

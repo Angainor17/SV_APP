@@ -2,7 +2,8 @@
 
 ## Обзор
 
-Дизайн-система SV APP построена на базе **Material Design 3** (Material You) для Jetpack Compose. Система обеспечивает единообразный внешний вид приложения с поддержкой светлой и тёмной темы.
+Дизайн-система SV APP построена на базе **Material Design 3** (Material You) для Jetpack Compose.
+Система обеспечивает единообразный внешний вид приложения с поддержкой светлой и тёмной темы.
 
 ### Принципы
 
@@ -32,67 +33,67 @@ commonui/src/main/java/su/sv/commonui/theme/
 
 ### Основные цвета (Primary)
 
-| Назначение | Light Theme | Dark Theme | Описание |
-|------------|-------------|------------|----------|
-| `primary` | `#3F51B5` (Indigo 500) | `#D0BCFF` (Purple 80) | Основной цвет бренда |
-| `onPrimary` | `#FFFFFF` | `#381E72` | Текст/иконки на primary |
-| `primaryContainer` | `#E8E8F0` | `#4F378B` | Контейнер primary |
-| `onPrimaryContainer` | `#1A1A2E` | `#EADDFF` | Текст на primaryContainer |
+| Назначение           | Light Theme            | Dark Theme            | Описание                  |
+|----------------------|------------------------|-----------------------|---------------------------|
+| `primary`            | `#3F51B5` (Indigo 500) | `#D0BCFF` (Purple 80) | Основной цвет бренда      |
+| `onPrimary`          | `#FFFFFF`              | `#381E72`             | Текст/иконки на primary   |
+| `primaryContainer`   | `#E8E8F0`              | `#4F378B`             | Контейнер primary         |
+| `onPrimaryContainer` | `#1A1A2E`              | `#EADDFF`             | Текст на primaryContainer |
 
 ### Вторичные цвета (Secondary)
 
-| Назначение | Light Theme | Dark Theme | Описание |
-|------------|-------------|------------|----------|
-| `secondary` | `#5C6BC0` (Indigo 400) | `#B2ACB2` (Grey 80) | Акцентный цвет |
-| `onSecondary` | `#FFFFFF` | `#1E1E1E` | Текст/иконки на secondary |
-| `secondaryContainer` | `#E8EAF6` | `#4A4458` | Контейнер secondary |
-| `onSecondaryContainer` | `#1A237E` | `#E8DEF8` | Текст на secondaryContainer |
+| Назначение             | Light Theme            | Dark Theme          | Описание                    |
+|------------------------|------------------------|---------------------|-----------------------------|
+| `secondary`            | `#5C6BC0` (Indigo 400) | `#B2ACB2` (Grey 80) | Акцентный цвет              |
+| `onSecondary`          | `#FFFFFF`              | `#1E1E1E`           | Текст/иконки на secondary   |
+| `secondaryContainer`   | `#E8EAF6`              | `#4A4458`           | Контейнер secondary         |
+| `onSecondaryContainer` | `#1A237E`              | `#E8DEF8`           | Текст на secondaryContainer |
 
 ### Tertiary цвета (для карточек книг)
 
-| Назначение | Light Theme | Dark Theme | Описание |
-|------------|-------------|------------|----------|
-| `tertiary` | `#5C6BC0` | `#B2ACB2` | Акцент для карточек |
-| `onTertiary` | `#1A1A2E` (тёмный) | `#E6E1E5` (светлый) | **Текст на карточке книги** |
-| `tertiaryContainer` | `#E8EAF6` (светлый) | `#2D2D3A` (тёмный) | **Фон карточки книги** |
-| `onTertiaryContainer` | `#1A237E` | `#E6E1E5` | Текст на tertiaryContainer |
+| Назначение            | Light Theme         | Dark Theme          | Описание                    |
+|-----------------------|---------------------|---------------------|-----------------------------|
+| `tertiary`            | `#5C6BC0`           | `#B2ACB2`           | Акцент для карточек         |
+| `onTertiary`          | `#1A1A2E` (тёмный)  | `#E6E1E5` (светлый) | **Текст на карточке книги** |
+| `tertiaryContainer`   | `#E8EAF6` (светлый) | `#2D2D3A` (тёмный)  | **Фон карточки книги**      |
+| `onTertiaryContainer` | `#1A237E`           | `#E6E1E5`           | Текст на tertiaryContainer  |
 
 ### Фоновые цвета (Surface)
 
-| Назначение | Light Theme | Dark Theme | Описание |
-|------------|-------------|------------|----------|
-| `background` | `#FFFBFE` | `#1C1B1F` | Фон экрана |
-| `onBackground` | `#1C1B1F` | `#E6E1E5` | Основной текст |
-| `surface` | `#FFFBFE` | `#1C1B1F` | Поверхность (карточки) |
-| `onSurface` | `#1C1B1F` | `#E6E1E5` | Текст на surface |
-| `surfaceVariant` | `#E7E0EC` | `#49454F` | Вариант поверхности |
-| `onSurfaceVariant` | `#49454F` | `#CAC4D0` | Вторичный текст |
+| Назначение         | Light Theme | Dark Theme | Описание               |
+|--------------------|-------------|------------|------------------------|
+| `background`       | `#FFFBFE`   | `#1C1B1F`  | Фон экрана             |
+| `onBackground`     | `#1C1B1F`   | `#E6E1E5`  | Основной текст         |
+| `surface`          | `#FFFBFE`   | `#1C1B1F`  | Поверхность (карточки) |
+| `onSurface`        | `#1C1B1F`   | `#E6E1E5`  | Текст на surface       |
+| `surfaceVariant`   | `#E7E0EC`   | `#49454F`  | Вариант поверхности    |
+| `onSurfaceVariant` | `#49454F`   | `#CAC4D0`  | Вторичный текст        |
 
 ### Функциональные цвета
 
-| Назначение | Цвет | Описание |
-|------------|------|----------|
-| `error` | `#B3261E` | Ошибки, удаление (одинаково для обеих тем) |
-| `onError` | `#FFFFFF` | Текст на error |
-| `errorContainer` | `#F9DEDC` | Контейнер ошибки |
-| `onErrorContainer` | `#410E0B` | Текст на errorContainer |
-| `success` | `#2E7D32` | Успешные действия (зелёный) |
-| `warning` | `#F57C00` | Предупреждения (оранжевый) |
-| `info` | `#1976D2` | Информация (синий) |
+| Назначение         | Цвет      | Описание                                   |
+|--------------------|-----------|--------------------------------------------|
+| `error`            | `#B3261E` | Ошибки, удаление (одинаково для обеих тем) |
+| `onError`          | `#FFFFFF` | Текст на error                             |
+| `errorContainer`   | `#F9DEDC` | Контейнер ошибки                           |
+| `onErrorContainer` | `#410E0B` | Текст на errorContainer                    |
+| `success`          | `#2E7D32` | Успешные действия (зелёный)                |
+| `warning`          | `#F57C00` | Предупреждения (оранжевый)                 |
+| `info`             | `#1976D2` | Информация (синий)                         |
 
 ### Цвета ссылок и интерактивных элементов
 
-| Назначение | Light Theme | Dark Theme | Описание |
-|------------|-------------|------------|----------|
-| `linkColor` | `#1976D2` | `#64B5F6` | Цвет ссылок в тексте |
-| `rippleColor` | `#1F1C1B1F` | `#1FE6E1E5` | Ripple-эффект |
+| Назначение    | Light Theme | Dark Theme  | Описание             |
+|---------------|-------------|-------------|----------------------|
+| `linkColor`   | `#1976D2`   | `#64B5F6`   | Цвет ссылок в тексте |
+| `rippleColor` | `#1F1C1B1F` | `#1FE6E1E5` | Ripple-эффект        |
 
 ### Цвета карточек с действиями
 
-| Назначение | Light Theme | Dark Theme | Описание |
-|------------|-------------|------------|----------|
-| `cardStroke` | `#40000000` (тёмная) | `#40FFFFFF` (светлая) | Обводка карточки |
-| `swipeDeleteBackground` | `#B3261E` | `#B3261E` | Фон при свайпе удаления |
+| Назначение              | Light Theme          | Dark Theme            | Описание                |
+|-------------------------|----------------------|-----------------------|-------------------------|
+| `cardStroke`            | `#40000000` (тёмная) | `#40FFFFFF` (светлая) | Обводка карточки        |
+| `swipeDeleteBackground` | `#B3261E`            | `#B3261E`             | Фон при свайпе удаления |
 
 ---
 
@@ -102,27 +103,28 @@ commonui/src/main/java/su/sv/commonui/theme/
 
 ### Текстовые стили
 
-| Стиль | Размер | Weight | Line Height | Использование |
-|-------|--------|--------|-------------|---------------|
-| `displayLarge` | 57sp | Regular | 64sp | Заголовки больших экранов |
-| `displayMedium` | 45sp | Regular | 52sp | — |
-| `displaySmall` | 36sp | Regular | 44sp | — |
-| `headlineLarge` | 32sp | Regular | 40sp | Главные заголовки экранов |
-| `headlineMedium` | 28sp | Regular | 36sp | Заголовки секций |
-| `headlineSmall` | 24sp | Regular | 32sp | Подзаголовки |
-| `titleLarge` | 22sp | Regular | 28sp | Заголовки карточек |
-| `titleMedium` | 16sp | Medium | 24sp | Заголовки списков |
-| `titleSmall` | 14sp | Medium | 20sp | Малые заголовки |
-| `bodyLarge` | 16sp | Regular | 24sp | Основной текст |
-| `bodyMedium` | 14sp | Regular | 20sp | Вторичный текст |
-| `bodySmall` | 12sp | Regular | 16sp | Вспомогательный текст |
-| `labelLarge` | 14sp | Medium | 20sp | Кнопки |
-| `labelMedium` | 12sp | Medium | 16sp | Малые кнопки, chips |
-| `labelSmall` | 11sp | Medium | 16sp | Метки |
+| Стиль            | Размер | Weight  | Line Height | Использование             |
+|------------------|--------|---------|-------------|---------------------------|
+| `displayLarge`   | 57sp   | Regular | 64sp        | Заголовки больших экранов |
+| `displayMedium`  | 45sp   | Regular | 52sp        | —                         |
+| `displaySmall`   | 36sp   | Regular | 44sp        | —                         |
+| `headlineLarge`  | 32sp   | Regular | 40sp        | Главные заголовки экранов |
+| `headlineMedium` | 28sp   | Regular | 36sp        | Заголовки секций          |
+| `headlineSmall`  | 24sp   | Regular | 32sp        | Подзаголовки              |
+| `titleLarge`     | 22sp   | Regular | 28sp        | Заголовки карточек        |
+| `titleMedium`    | 16sp   | Medium  | 24sp        | Заголовки списков         |
+| `titleSmall`     | 14sp   | Medium  | 20sp        | Малые заголовки           |
+| `bodyLarge`      | 16sp   | Regular | 24sp        | Основной текст            |
+| `bodyMedium`     | 14sp   | Regular | 20sp        | Вторичный текст           |
+| `bodySmall`      | 12sp   | Regular | 16sp        | Вспомогательный текст     |
+| `labelLarge`     | 14sp   | Medium  | 20sp        | Кнопки                    |
+| `labelMedium`    | 12sp   | Medium  | 16sp        | Малые кнопки, chips       |
+| `labelSmall`     | 11sp   | Medium  | 16sp        | Метки                     |
 
 ### Исключения
 
-Читалка книг (`bookreader`, `fbreader`) может использовать собственную типографику, определяемую настройками книги.
+Читалка книг (`bookreader`, `fbreader`) может использовать собственную типографику, определяемую
+настройками книги.
 
 ---
 
@@ -370,6 +372,7 @@ LazyColumn(
 ### Состояния экрана
 
 Все экраны должны обрабатывать три состояния:
+
 1. **Loading** — `AppLoadingIndicator()` или `FullScreenLoading()`
 2. **Error** — `AppErrorView()` или `FullScreenError()`
 3. **Content** — основной контент
@@ -565,7 +568,9 @@ fun RootFeature(viewModel: RootFeatureViewModel = hiltViewModel()) {
 
 ### Примечание о дочерних экранах
 
-Если корневой экран применяет тему, то дочерние экраны (открываемые через `stackNavigation.forward()`) **не должны** применять тему повторно. Это позволяет избежать двойного обёртывания.
+Если корневой экран применяет тему, то дочерние экраны (открываемые через
+`stackNavigation.forward()`) **не должны** применять тему повторно. Это позволяет избежать двойного
+обёртывания.
 
 ---
 
@@ -573,28 +578,28 @@ fun RootFeature(viewModel: RootFeatureViewModel = hiltViewModel()) {
 
 ### Новые файлы
 
-| Файл | Описание |
-|------|----------|
-| `theme/Dimensions.kt` | Отступы и размеры |
-| `theme/Shape.kt` | Формы (радиусы) |
-| `theme/ThemeConfig.kt` | Конфигурация темы |
-| `ui/components/AppCard.kt` | Карточка |
-| `ui/components/AppButton.kt` | Кнопки |
-| `ui/components/AppLoading.kt` | Индикаторы загрузки |
-| `ui/components/AppError.kt` | Экраны ошибок |
-| `ui/components/AppEmptyState.kt` | Пустые состояния |
-| `ui/components/AppToolbar.kt` | Тулбар |
-| `ui/components/ThemeToggleIcon.kt` | Иконка смены темы |
-| `managers/ThemeRepository.kt` | Хранение настроек темы |
+| Файл                               | Описание               |
+|------------------------------------|------------------------|
+| `theme/Dimensions.kt`              | Отступы и размеры      |
+| `theme/Shape.kt`                   | Формы (радиусы)        |
+| `theme/ThemeConfig.kt`             | Конфигурация темы      |
+| `ui/components/AppCard.kt`         | Карточка               |
+| `ui/components/AppButton.kt`       | Кнопки                 |
+| `ui/components/AppLoading.kt`      | Индикаторы загрузки    |
+| `ui/components/AppError.kt`        | Экраны ошибок          |
+| `ui/components/AppEmptyState.kt`   | Пустые состояния       |
+| `ui/components/AppToolbar.kt`      | Тулбар                 |
+| `ui/components/ThemeToggleIcon.kt` | Иконка смены темы      |
+| `managers/ThemeRepository.kt`      | Хранение настроек темы |
 
 ### Изменяемые файлы
 
-| Файл | Изменения |
-|------|-----------|
-| `theme/Color.kt` | Расширить палитру |
+| Файл             | Изменения                              |
+|------------------|----------------------------------------|
+| `theme/Color.kt` | Расширить палитру                      |
 | `theme/Theme.kt` | Добавить ThemeConfig, CompositionLocal |
-| `theme/Type.kt` | Полная типографика |
-| `RootNews.kt` | Добавить тулбар с иконкой темы |
+| `theme/Type.kt`  | Полная типографика                     |
+| `RootNews.kt`    | Добавить тулбар с иконкой темы         |
 
 ---
 

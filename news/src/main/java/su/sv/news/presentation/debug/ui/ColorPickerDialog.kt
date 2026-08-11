@@ -317,7 +317,9 @@ private fun colorToHex(color: Color): String {
     val r = (argb shr 16) and 0xFF
     val g = (argb shr 8) and 0xFF
     val b = argb and 0xFF
-    return "#${r.toString(16).uppercase().padStart(2, '0')}${g.toString(16).uppercase().padStart(2, '0')}${b.toString(16).uppercase().padStart(2, '0')}"
+    return "#${r.toString(16).uppercase().padStart(2, '0')}${
+        g.toString(16).uppercase().padStart(2, '0')
+    }${b.toString(16).uppercase().padStart(2, '0')}"
 }
 
 /**
@@ -333,6 +335,7 @@ private fun parseHexColor(hex: String): Color? {
                 val b = cleanHex.substring(4, 6).toInt(16)
                 Color(r, g, b)
             }
+
             8 -> {
                 val a = cleanHex.substring(0, 2).toInt(16)
                 val r = cleanHex.substring(2, 4).toInt(16)
@@ -340,6 +343,7 @@ private fun parseHexColor(hex: String): Color? {
                 val b = cleanHex.substring(6, 8).toInt(16)
                 Color(r, g, b, a)
             }
+
             else -> null
         }
     } catch (e: Exception) {

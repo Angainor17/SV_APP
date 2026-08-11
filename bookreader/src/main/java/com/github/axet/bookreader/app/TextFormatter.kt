@@ -34,7 +34,12 @@ object TextFormatter {
      * Добавляет замены для найденных совпадений.
      */
     @JvmStatic
-    fun replace(reps: ArrayList<Replacement>, json: String, pattern: String, matcher: MatcherReplacement) {
+    fun replace(
+        reps: ArrayList<Replacement>,
+        json: String,
+        pattern: String,
+        matcher: MatcherReplacement
+    ) {
         val p = Pattern.compile(pattern, Pattern.MULTILINE or Pattern.DOTALL)
         val m = p.matcher(json)
         while (m.find()) {

@@ -154,7 +154,8 @@ sealed class ReaderActions {
     /**
      * Сохранить изменения закладки
      */
-    data class SaveBookmarkEdit(val bookmark: Storage.Bookmark, val name: String, val color: Int) : ReaderActions()
+    data class SaveBookmarkEdit(val bookmark: Storage.Bookmark, val name: String, val color: Int) :
+        ReaderActions()
 
     /**
      * Добавить закладку

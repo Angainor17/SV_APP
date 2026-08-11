@@ -99,6 +99,7 @@ private fun handleMediaClick(
         is UiNewsMedia.ItemVideo -> {
             actions.onAction(RootNewsActions.OnNewsMediaClick(media))
         }
+
         is UiNewsMedia.ItemImage -> {
             // Находим индекс изображения в списке изображений новости
             val imageIndex = newsItem.images.indexOfFirst { it.image == media.image }

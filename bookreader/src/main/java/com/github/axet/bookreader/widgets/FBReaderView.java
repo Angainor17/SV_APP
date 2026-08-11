@@ -131,10 +131,10 @@ public class FBReaderView extends RelativeLayout {
     SelectionView selection;
     ZLTextPosition scrollDelayed;
     boolean scrollCentered; // центрировать позицию при прокрутке
-    private boolean isFullscreenMode = false; // track fullscreen state
     DrawerLayout drawer;
     PluginView.Search search;
     int searchPagePending;
+    private boolean isFullscreenMode = false; // track fullscreen state
     private int searchCurrentIndex = 0; // Track current search result index
     private int searchTotalCount = 0; // Track total search result count (fb2/epub path)
 
@@ -601,15 +601,15 @@ public class FBReaderView extends RelativeLayout {
                     // Use modern WindowInsetsController API (Android 11+)
                     // This avoids flickering during fullscreen transition
                     WindowInsetsControllerCompat controller =
-                        new WindowInsetsControllerCompat(w, w.getDecorView());
+                            new WindowInsetsControllerCompat(w, w.getDecorView());
 
                     // Set window background to match book background to avoid flickering
                     // Book bgColor may have alpha=0, use wallpaper/paper color instead
                     int bgColor = app.BookTextView.getBackgroundColor().intValue();
                     // If alpha is 0, use paper color (light cream)
                     int bgColorWithAlpha = (bgColor & 0xFF000000) == 0
-                        ? (0xFF << 24) | bgColor  // Force opaque if transparent
-                        : bgColor;  // Keep original if already has alpha
+                            ? (0xFF << 24) | bgColor  // Force opaque if transparent
+                            : bgColor;  // Keep original if already has alpha
                     w.getDecorView().setBackgroundColor(bgColorWithAlpha);
 
                     // Notify listener BEFORE native toggle to sync with Compose
@@ -653,7 +653,7 @@ public class FBReaderView extends RelativeLayout {
                         post(() -> {
                             controller.hide(WindowInsetsCompat.Type.systemBars());
                             controller.setSystemBarsBehavior(
-                                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                             );
                             // Update selection coordinates after fullscreen change
                             updateSelectionAfterFullscreenChange();
@@ -964,16 +964,6 @@ public class FBReaderView extends RelativeLayout {
                 title != null ? title : "",
                 authors != null ? authors : "",
                 pageIndex
-        );
-    }
-
-    private interface CustomAction {
-        void action(
-                Context context,
-                String selectionText,
-                String title,
-                String author,
-                int page
         );
     }
 
@@ -1404,7 +1394,8 @@ public class FBReaderView extends RelativeLayout {
 
     /**
      * Perform search without ProgressDialog, results returned via callback.
-     * @param pattern search query
+     *
+     * @param pattern  search query
      * @param callback callback with (count, currentIndex)
      */
     public void performSearch(String pattern, SearchCallback callback) {
@@ -1499,16 +1490,9 @@ public class FBReaderView extends RelativeLayout {
         if (getContext() instanceof Activity) {
             Activity activity = (Activity) getContext();
             android.view.inputmethod.InputMethodManager imm =
-                (android.view.inputmethod.InputMethodManager) activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    (android.view.inputmethod.InputMethodManager) activity.getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getWindowToken(), 0);
         }
-    }
-
-    /**
-     * Callback interface for search results.
-     */
-    public interface SearchCallback {
-        void onResult(int count, int currentIndex);
     }
 
     public void overlaysClose() {
@@ -1573,7 +1557,7 @@ public class FBReaderView extends RelativeLayout {
     public void exitFullscreen() {
         if (w != null && isFullscreenMode) {
             WindowInsetsControllerCompat controller =
-                new WindowInsetsControllerCompat(w, w.getDecorView());
+                    new WindowInsetsControllerCompat(w, w.getDecorView());
             controller.show(WindowInsetsCompat.Type.systemBars());
             isFullscreenMode = false;
         }
@@ -1678,7 +1662,303 @@ public class FBReaderView extends RelativeLayout {
             tts.onScrollingFinished(pageIndex);
     }
 
+    /**
+     * Извлечь контекст предложения для закладки
+     *
+     * @param bookmark Закладка с позициями выделения
+     * @return Pair<sentenceBefore, sentenceAfter> или null
+     */
+    public kotlin.Pair<String, String> extractSentenceContext(Storage.Bookmark bookmark) {
+        android.util.Log.d("voronin2", "=== extractSentenceContext START ===");
+        android.util.Log.d("voronin2", "bookmark.text=" + bookmark.text);
+        android.util.Log.d("voronin2", "bookmark.start paragraph=" + bookmark.start.getParagraphIndex());
+        android.util.Log.d("voronin2", "bookmark.end paragraph=" + bookmark.end.getParagraphIndex());
+
+        if (app == null || app.BookTextView == null) {
+            android.util.Log.w("voronin2", "extractSentenceContext: app or BookTextView is null");
+            return null;
+        }
+
+        // Для PDF используем pluginview
+        if (pluginview != null) {
+            android.util.Log.d("voronin2", "Using pluginview (PDF mode)");
+            return extractSentenceContextPDF(bookmark);
+        }
+
+        try {
+            org.geometerplus.zlibrary.text.view.ZLTextView view = app.BookTextView;
+            org.geometerplus.zlibrary.text.model.ZLTextModel model = view.getModel();
+
+            if (model == null) {
+                android.util.Log.w("voronin2", "extractSentenceContext: model is null");
+                return null;
+            }
+
+            android.util.Log.d("voronin2", "model.getParagraphsNumber()=" + model.getParagraphsNumber());
+
+            // Получаем позиции закладки
+            org.geometerplus.zlibrary.text.view.ZLTextPosition start = bookmark.start;
+            org.geometerplus.zlibrary.text.view.ZLTextPosition end = bookmark.end;
+
+            // Извлекаем больший контекст вокруг выделения
+            int contextParagraphs = 3;
+            int startParagraph = Math.max(0, start.getParagraphIndex() - contextParagraphs);
+            int endParagraph = Math.min(model.getParagraphsNumber() - 1, end.getParagraphIndex() + contextParagraphs);
+
+            android.util.Log.d("voronin2", "Extracting paragraphs from " + startParagraph + " to " + endParagraph);
+
+            StringBuilder fullText = new StringBuilder();
+            for (int i = startParagraph; i <= endParagraph; i++) {
+                try {
+                    org.geometerplus.zlibrary.text.model.ZLTextParagraph paragraph = model.getParagraph(i);
+                    if (paragraph == null) {
+                        android.util.Log.d("voronin", "Paragraph " + i + " is null");
+                        continue;
+                    }
+
+                    org.geometerplus.zlibrary.text.model.ZLTextParagraph.EntryIterator iterator = paragraph.iterator();
+                    if (iterator == null) {
+                        android.util.Log.d("voronin", "Paragraph " + i + " iterator is null (PDF page?)");
+                        continue;
+                    }
+
+                    while (iterator.next()) {
+                        if (iterator.getType() == org.geometerplus.zlibrary.text.model.ZLTextParagraph.Entry.TEXT) {
+                            char[] data = iterator.getTextData();
+                            int offset = iterator.getTextOffset();
+                            int length = iterator.getTextLength();
+                            fullText.append(data, offset, length);
+                        }
+                    }
+                    fullText.append(" ");
+                } catch (Exception e) {
+                    android.util.Log.e("voronin", "Error extracting paragraph " + i, e);
+                }
+            }
+
+            String text = normalizeExtractedText(fullText.toString().trim());
+            android.util.Log.d("voronin", "extracted text length=" + text.length());
+            android.util.Log.d("voronin", "extracted text preview=" + (text.length() > 100 ? text.substring(0, 100) + "..." : text));
+
+            if (text.isEmpty()) {
+                android.util.Log.w("voronin", "extractSentenceContext: text is empty");
+                return null;
+            }
+
+            // Находим заметку в тексте (noteText нормализуем тем же способом, что и text,
+            // иначе выделение, пересекающее перенос слова/несколько предложений, не найдётся)
+            String noteText = normalizeExtractedText(bookmark.text);
+            int noteIndex = text.indexOf(noteText);
+
+            android.util.Log.d("voronin", "noteText=" + noteText);
+            android.util.Log.d("voronin", "noteIndex=" + noteIndex);
+
+            if (noteIndex == -1) {
+                // Пробуем без учёта регистра
+                noteIndex = text.toLowerCase().indexOf(noteText.toLowerCase());
+                android.util.Log.d("voronin", "noteIndex (case insensitive)=" + noteIndex);
+                if (noteIndex == -1) {
+                    android.util.Log.w("voronin", "extractSentenceContext: note text not found in extracted text");
+                    return null;
+                }
+                // Используем реальный текст из найденной позиции
+                noteText = text.substring(noteIndex, Math.min(noteIndex + noteText.length(), text.length()));
+            }
+
+            bookmark.text = noteText;
+
+            // Находим границы предложения
+            int sentenceStart = findSentenceStart(text, noteIndex);
+            int sentenceEnd = findSentenceEnd(text, noteIndex + noteText.length());
+
+            android.util.Log.d("voronin", "sentenceStart=" + sentenceStart + ", sentenceEnd=" + sentenceEnd);
+
+            // Извлекаем части
+            String before = text.substring(sentenceStart, noteIndex).trim();
+            String after = text.substring(noteIndex + noteText.length(), sentenceEnd).trim();
+
+            android.util.Log.d("voronin", "sentenceBefore=" + before);
+            android.util.Log.d("voronin", "sentenceAfter=" + after);
+            android.util.Log.d("voronin", "=== extractSentenceContext END ===");
+
+            return new kotlin.Pair<>(
+                    before.isEmpty() ? null : before,
+                    after.isEmpty() ? null : after
+            );
+
+        } catch (Exception e) {
+            android.util.Log.e("FBReaderView", "Error extracting sentence context", e);
+            return null;
+        }
+    }
+
+    /**
+     * Извлечь контекст предложения для PDF (через pluginview)
+     */
+    private kotlin.Pair<String, String> extractSentenceContextPDF(Storage.Bookmark bookmark) {
+        android.util.Log.d("voronin2", "=== extractSentenceContextPDF ===");
+
+        try {
+            // Для PDF paragraph = номер страницы
+            int pageNum = bookmark.start.getParagraphIndex();
+            android.util.Log.d("voronin2", "PDF page number: " + pageNum);
+
+            if (pluginview == null) {
+                android.util.Log.w("voronin2", "pluginview is null");
+                return null;
+            }
+
+            android.util.Log.d("voronin2", "pluginview class: " + pluginview.getClass().getSimpleName());
+
+            // Получаем текст текущей страницы
+            android.util.Log.d("voronin2", "Calling pluginview.getPageText(" + pageNum + ")...");
+            String pageText = pluginview.getPageText(pageNum);
+            android.util.Log.d("voronin2", "getPageText returned: " + (pageText == null ? "null" : pageText.length() + " chars"));
+
+            if (pageText == null || pageText.isEmpty()) {
+                android.util.Log.w("voronin2", "Failed to get page text or page is empty");
+                return null;
+            }
+
+            pageText = normalizeExtractedText(pageText);
+
+            android.util.Log.d("voronin2", "Page text length: " + pageText.length());
+            android.util.Log.d("voronin2", "Page text preview: " + (pageText.length() > 100 ? pageText.substring(0, 100) + "..." : pageText));
+
+            // Находим заметку в тексте страницы
+            String noteText = bookmark.text;
+            if (noteText == null || noteText.isEmpty()) {
+                android.util.Log.w("voronin2", "Bookmark text is null or empty");
+                return null;
+            }
+
+            // Само выделение (bookmark.text) — это СЫРОЙ текст из pdfium, с теми же
+            // артефактами переноса строк, что и в pageText. Если выделение пересекает
+            // перенос слова по слогам (или просто идёт через несколько строк/предложений),
+            // несовпадение нормализации между noteText и уже нормализованным pageText
+            // ломает indexOf() — и контекст не добавляется вообще, а не только с "-".
+            // Нормализуем обе стороны одинаково, чтобы поиск был устойчив всегда.
+            noteText = normalizeExtractedText(noteText);
+
+            android.util.Log.d("voronin2", "Looking for note text: " + noteText);
+
+            int noteIndex = pageText.indexOf(noteText);
+
+            if (noteIndex == -1) {
+                // Пробуем без учёта регистра
+                noteIndex = pageText.toLowerCase().indexOf(noteText.toLowerCase());
+                android.util.Log.d("voronin2", "noteIndex (case insensitive): " + noteIndex);
+                if (noteIndex == -1) {
+                    android.util.Log.w("voronin2", "Note text not found in page text");
+                    return null;
+                }
+                // Используем реальный текст из найденной позиции
+                noteText = pageText.substring(noteIndex, Math.min(noteIndex + noteText.length(), pageText.length()));
+            }
+
+            android.util.Log.d("voronin2", "Found note at index: " + noteIndex);
+
+            // Обновляем сам текст заметки (жирная часть) той же нормализованной версией —
+            // иначе перенос слов остаётся только "починенным" в контексте до/после,
+            // а в самом выделенном тексте (если оно пересекает перенос) — нет.
+            bookmark.text = noteText;
+
+            // Находим границы предложения
+            int sentenceStart = findSentenceStart(pageText, noteIndex);
+            int sentenceEnd = findSentenceEnd(pageText, noteIndex + noteText.length());
+
+            android.util.Log.d("voronin2", "sentenceStart: " + sentenceStart + ", sentenceEnd: " + sentenceEnd);
+
+            // Извлекаем части
+            String before = pageText.substring(sentenceStart, noteIndex).trim();
+            String after = pageText.substring(noteIndex + noteText.length(), sentenceEnd).trim();
+
+            android.util.Log.d("voronin2", "sentenceBefore: " + before);
+            android.util.Log.d("voronin2", "sentenceAfter: " + after);
+
+            // Очищаем текст от спецсимволов FBReader
+            String beforeClean = before.isEmpty() ? null : cleanBookmarkText(before);
+            String afterClean = after.isEmpty() ? null : cleanBookmarkText(after);
+
+            return new kotlin.Pair<>(beforeClean, afterClean);
+
+        } catch (Exception e) {
+            android.util.Log.e("voronin2", "Error extracting PDF sentence context", e);
+            return null;
+        }
+    }
+
+    /**
+     * Найти начало предложения (назад до точки/!/?)
+     */
+    private int findSentenceStart(String text, int fromIndex) {
+        int index = fromIndex - 1;
+        while (index >= 0) {
+            char c = text.charAt(index);
+            if (c == '.' || c == '!' || c == '?') {
+                return index + 1;
+            }
+            index--;
+        }
+        return 0;
+    }
+
+    /**
+     * Найти конец предложения (вперёд до точки/!/?)
+     */
+    private int findSentenceEnd(String text, int fromIndex) {
+        int index = fromIndex;
+        while (index < text.length()) {
+            char c = text.charAt(index);
+            if (c == '.' || c == '!' || c == '?') {
+                return index + 1;
+            }
+            index++;
+        }
+        return text.length();
+    }
+
+    /**
+     * Нормализует сырой текст страницы перед поиском границ предложения.
+     * <p>
+     * 1. Перенос слова по слогам на разрыве строки. Проверено через logcat на
+     * реальном pageText: pdfium (io.legere) кладёт между "образова" и "ние"
+     * НЕ '-\n', а обычный дефис + ОДИН ПРОБЕЛ ("образова" + '-' + ' ' + "ние") —
+     * переноса строки там нет вовсе. Поэтому признак переноса — это дефис,
+     * после которого идёт пробел(ы), а затем СТРОЧНАЯ буква: строчная, потому
+     * что продолжение слога всегда строчное, даже если перенесённое слово само
+     * начиналось с заглавной (например "Ленинград-\nская" из "Ленинградская").
+     * Настоящий дефис в слове (например "по-моему", "какой-то") пробела после
+     * себя не имеет — такие места \\s+ не матчит и не трогает. Настоящее тире
+     * как знак препинания в этой книге набрано типографским "—" (em dash), а
+     * не ASCII-дефисом, поэтому с дефис+пробел+строчная буква не пересекается.
+     * 2. Оставшиеся переносы строк (перенос по ширине страницы, не абзац) схлопываются
+     * в пробел, чтобы поиск границы предложения шёл по пунктуации, а не по вёрстке.
+     */
+    private String normalizeExtractedText(String text) {
+        String dehyphenated = text.replaceAll("(\\p{L})-\\s+(\\p{Ll})", "$1$2");
+        String flattened = dehyphenated.replaceAll("\\s*\\n\\s*", " ");
+        return flattened.replaceAll(" {2,}", " ");
+    }
+
     public enum Widgets {PAGING, CONTINUOUS}
+
+    private interface CustomAction {
+        void action(
+                Context context,
+                String selectionText,
+                String title,
+                String author,
+                int page
+        );
+    }
+
+    /**
+     * Callback interface for search results.
+     */
+    public interface SearchCallback {
+        void onResult(int count, int currentIndex);
+    }
 
     public interface Listener {
         void onScrollingFinished(ZLViewEnums.PageIndex index);
@@ -1703,7 +1983,8 @@ public class FBReaderView extends RelativeLayout {
 
         /**
          * Called when zoom scale changes.
-         * @param scale The new zoom scale (1.0 = normal, >1.0 = zoomed in)
+         *
+         * @param scale  The new zoom scale (1.0 = normal, >1.0 = zoomed in)
          * @param pivotX The X pivot point for zoom
          * @param pivotY The Y pivot point for zoom
          */
@@ -2380,284 +2661,5 @@ public class FBReaderView extends RelativeLayout {
             else
                 return super.getCurrentTOCElement();
         }
-    }
-
-    /**
-     * Извлечь контекст предложения для закладки
-     *
-     * @param bookmark Закладка с позициями выделения
-     * @return Pair<sentenceBefore, sentenceAfter> или null
-     */
-    public kotlin.Pair<String, String> extractSentenceContext(Storage.Bookmark bookmark) {
-        android.util.Log.d("voronin2", "=== extractSentenceContext START ===");
-        android.util.Log.d("voronin2", "bookmark.text=" + bookmark.text);
-        android.util.Log.d("voronin2", "bookmark.start paragraph=" + bookmark.start.getParagraphIndex());
-        android.util.Log.d("voronin2", "bookmark.end paragraph=" + bookmark.end.getParagraphIndex());
-
-        if (app == null || app.BookTextView == null) {
-            android.util.Log.w("voronin2", "extractSentenceContext: app or BookTextView is null");
-            return null;
-        }
-
-        // Для PDF используем pluginview
-        if (pluginview != null) {
-            android.util.Log.d("voronin2", "Using pluginview (PDF mode)");
-            return extractSentenceContextPDF(bookmark);
-        }
-
-        try {
-            org.geometerplus.zlibrary.text.view.ZLTextView view = app.BookTextView;
-            org.geometerplus.zlibrary.text.model.ZLTextModel model = view.getModel();
-
-            if (model == null) {
-                android.util.Log.w("voronin2", "extractSentenceContext: model is null");
-                return null;
-            }
-
-            android.util.Log.d("voronin2", "model.getParagraphsNumber()=" + model.getParagraphsNumber());
-
-            // Получаем позиции закладки
-            org.geometerplus.zlibrary.text.view.ZLTextPosition start = bookmark.start;
-            org.geometerplus.zlibrary.text.view.ZLTextPosition end = bookmark.end;
-
-            // Извлекаем больший контекст вокруг выделения
-            int contextParagraphs = 3;
-            int startParagraph = Math.max(0, start.getParagraphIndex() - contextParagraphs);
-            int endParagraph = Math.min(model.getParagraphsNumber() - 1, end.getParagraphIndex() + contextParagraphs);
-
-            android.util.Log.d("voronin2", "Extracting paragraphs from " + startParagraph + " to " + endParagraph);
-
-            StringBuilder fullText = new StringBuilder();
-            for (int i = startParagraph; i <= endParagraph; i++) {
-                try {
-                    org.geometerplus.zlibrary.text.model.ZLTextParagraph paragraph = model.getParagraph(i);
-                    if (paragraph == null) {
-                        android.util.Log.d("voronin", "Paragraph " + i + " is null");
-                        continue;
-                    }
-
-                    org.geometerplus.zlibrary.text.model.ZLTextParagraph.EntryIterator iterator = paragraph.iterator();
-                    if (iterator == null) {
-                        android.util.Log.d("voronin", "Paragraph " + i + " iterator is null (PDF page?)");
-                        continue;
-                    }
-
-                    while (iterator.next()) {
-                        if (iterator.getType() == org.geometerplus.zlibrary.text.model.ZLTextParagraph.Entry.TEXT) {
-                            char[] data = iterator.getTextData();
-                            int offset = iterator.getTextOffset();
-                            int length = iterator.getTextLength();
-                            fullText.append(data, offset, length);
-                        }
-                    }
-                    fullText.append(" ");
-                } catch (Exception e) {
-                    android.util.Log.e("voronin", "Error extracting paragraph " + i, e);
-                }
-            }
-
-            String text = normalizeExtractedText(fullText.toString().trim());
-            android.util.Log.d("voronin", "extracted text length=" + text.length());
-            android.util.Log.d("voronin", "extracted text preview=" + (text.length() > 100 ? text.substring(0, 100) + "..." : text));
-
-            if (text.isEmpty()) {
-                android.util.Log.w("voronin", "extractSentenceContext: text is empty");
-                return null;
-            }
-
-            // Находим заметку в тексте (noteText нормализуем тем же способом, что и text,
-            // иначе выделение, пересекающее перенос слова/несколько предложений, не найдётся)
-            String noteText = normalizeExtractedText(bookmark.text);
-            int noteIndex = text.indexOf(noteText);
-
-            android.util.Log.d("voronin", "noteText=" + noteText);
-            android.util.Log.d("voronin", "noteIndex=" + noteIndex);
-
-            if (noteIndex == -1) {
-                // Пробуем без учёта регистра
-                noteIndex = text.toLowerCase().indexOf(noteText.toLowerCase());
-                android.util.Log.d("voronin", "noteIndex (case insensitive)=" + noteIndex);
-                if (noteIndex == -1) {
-                    android.util.Log.w("voronin", "extractSentenceContext: note text not found in extracted text");
-                    return null;
-                }
-                // Используем реальный текст из найденной позиции
-                noteText = text.substring(noteIndex, Math.min(noteIndex + noteText.length(), text.length()));
-            }
-
-            bookmark.text = noteText;
-
-            // Находим границы предложения
-            int sentenceStart = findSentenceStart(text, noteIndex);
-            int sentenceEnd = findSentenceEnd(text, noteIndex + noteText.length());
-
-            android.util.Log.d("voronin", "sentenceStart=" + sentenceStart + ", sentenceEnd=" + sentenceEnd);
-
-            // Извлекаем части
-            String before = text.substring(sentenceStart, noteIndex).trim();
-            String after = text.substring(noteIndex + noteText.length(), sentenceEnd).trim();
-
-            android.util.Log.d("voronin", "sentenceBefore=" + before);
-            android.util.Log.d("voronin", "sentenceAfter=" + after);
-            android.util.Log.d("voronin", "=== extractSentenceContext END ===");
-
-            return new kotlin.Pair<>(
-                before.isEmpty() ? null : before,
-                after.isEmpty() ? null : after
-            );
-
-        } catch (Exception e) {
-            android.util.Log.e("FBReaderView", "Error extracting sentence context", e);
-            return null;
-        }
-    }
-
-    /**
-     * Извлечь контекст предложения для PDF (через pluginview)
-     */
-    private kotlin.Pair<String, String> extractSentenceContextPDF(Storage.Bookmark bookmark) {
-        android.util.Log.d("voronin2", "=== extractSentenceContextPDF ===");
-
-        try {
-            // Для PDF paragraph = номер страницы
-            int pageNum = bookmark.start.getParagraphIndex();
-            android.util.Log.d("voronin2", "PDF page number: " + pageNum);
-
-            if (pluginview == null) {
-                android.util.Log.w("voronin2", "pluginview is null");
-                return null;
-            }
-
-            android.util.Log.d("voronin2", "pluginview class: " + pluginview.getClass().getSimpleName());
-
-            // Получаем текст текущей страницы
-            android.util.Log.d("voronin2", "Calling pluginview.getPageText(" + pageNum + ")...");
-            String pageText = pluginview.getPageText(pageNum);
-            android.util.Log.d("voronin2", "getPageText returned: " + (pageText == null ? "null" : pageText.length() + " chars"));
-
-            if (pageText == null || pageText.isEmpty()) {
-                android.util.Log.w("voronin2", "Failed to get page text or page is empty");
-                return null;
-            }
-
-            pageText = normalizeExtractedText(pageText);
-
-            android.util.Log.d("voronin2", "Page text length: " + pageText.length());
-            android.util.Log.d("voronin2", "Page text preview: " + (pageText.length() > 100 ? pageText.substring(0, 100) + "..." : pageText));
-
-            // Находим заметку в тексте страницы
-            String noteText = bookmark.text;
-            if (noteText == null || noteText.isEmpty()) {
-                android.util.Log.w("voronin2", "Bookmark text is null or empty");
-                return null;
-            }
-
-            // Само выделение (bookmark.text) — это СЫРОЙ текст из pdfium, с теми же
-            // артефактами переноса строк, что и в pageText. Если выделение пересекает
-            // перенос слова по слогам (или просто идёт через несколько строк/предложений),
-            // несовпадение нормализации между noteText и уже нормализованным pageText
-            // ломает indexOf() — и контекст не добавляется вообще, а не только с "-".
-            // Нормализуем обе стороны одинаково, чтобы поиск был устойчив всегда.
-            noteText = normalizeExtractedText(noteText);
-
-            android.util.Log.d("voronin2", "Looking for note text: " + noteText);
-
-            int noteIndex = pageText.indexOf(noteText);
-
-            if (noteIndex == -1) {
-                // Пробуем без учёта регистра
-                noteIndex = pageText.toLowerCase().indexOf(noteText.toLowerCase());
-                android.util.Log.d("voronin2", "noteIndex (case insensitive): " + noteIndex);
-                if (noteIndex == -1) {
-                    android.util.Log.w("voronin2", "Note text not found in page text");
-                    return null;
-                }
-                // Используем реальный текст из найденной позиции
-                noteText = pageText.substring(noteIndex, Math.min(noteIndex + noteText.length(), pageText.length()));
-            }
-
-            android.util.Log.d("voronin2", "Found note at index: " + noteIndex);
-
-            // Обновляем сам текст заметки (жирная часть) той же нормализованной версией —
-            // иначе перенос слов остаётся только "починенным" в контексте до/после,
-            // а в самом выделенном тексте (если оно пересекает перенос) — нет.
-            bookmark.text = noteText;
-
-            // Находим границы предложения
-            int sentenceStart = findSentenceStart(pageText, noteIndex);
-            int sentenceEnd = findSentenceEnd(pageText, noteIndex + noteText.length());
-
-            android.util.Log.d("voronin2", "sentenceStart: " + sentenceStart + ", sentenceEnd: " + sentenceEnd);
-
-            // Извлекаем части
-            String before = pageText.substring(sentenceStart, noteIndex).trim();
-            String after = pageText.substring(noteIndex + noteText.length(), sentenceEnd).trim();
-
-            android.util.Log.d("voronin2", "sentenceBefore: " + before);
-            android.util.Log.d("voronin2", "sentenceAfter: " + after);
-
-            // Очищаем текст от спецсимволов FBReader
-            String beforeClean = before.isEmpty() ? null : cleanBookmarkText(before);
-            String afterClean = after.isEmpty() ? null : cleanBookmarkText(after);
-
-            return new kotlin.Pair<>(beforeClean, afterClean);
-
-        } catch (Exception e) {
-            android.util.Log.e("voronin2", "Error extracting PDF sentence context", e);
-            return null;
-        }
-    }
-
-    /**
-     * Найти начало предложения (назад до точки/!/?)
-     */
-    private int findSentenceStart(String text, int fromIndex) {
-        int index = fromIndex - 1;
-        while (index >= 0) {
-            char c = text.charAt(index);
-            if (c == '.' || c == '!' || c == '?') {
-                return index + 1;
-            }
-            index--;
-        }
-        return 0;
-    }
-
-    /**
-     * Найти конец предложения (вперёд до точки/!/?)
-     */
-    private int findSentenceEnd(String text, int fromIndex) {
-        int index = fromIndex;
-        while (index < text.length()) {
-            char c = text.charAt(index);
-            if (c == '.' || c == '!' || c == '?') {
-                return index + 1;
-            }
-            index++;
-        }
-        return text.length();
-    }
-
-    /**
-     * Нормализует сырой текст страницы перед поиском границ предложения.
-     *
-     * 1. Перенос слова по слогам на разрыве строки. Проверено через logcat на
-     *    реальном pageText: pdfium (io.legere) кладёт между "образова" и "ние"
-     *    НЕ '-\n', а обычный дефис + ОДИН ПРОБЕЛ ("образова" + '-' + ' ' + "ние") —
-     *    переноса строки там нет вовсе. Поэтому признак переноса — это дефис,
-     *    после которого идёт пробел(ы), а затем СТРОЧНАЯ буква: строчная, потому
-     *    что продолжение слога всегда строчное, даже если перенесённое слово само
-     *    начиналось с заглавной (например "Ленинград-\nская" из "Ленинградская").
-     *    Настоящий дефис в слове (например "по-моему", "какой-то") пробела после
-     *    себя не имеет — такие места \\s+ не матчит и не трогает. Настоящее тире
-     *    как знак препинания в этой книге набрано типографским "—" (em dash), а
-     *    не ASCII-дефисом, поэтому с дефис+пробел+строчная буква не пересекается.
-     * 2. Оставшиеся переносы строк (перенос по ширине страницы, не абзац) схлопываются
-     *    в пробел, чтобы поиск границы предложения шёл по пунктуации, а не по вёрстке.
-     */
-    private String normalizeExtractedText(String text) {
-        String dehyphenated = text.replaceAll("(\\p{L})-\\s+(\\p{Ll})", "$1$2");
-        String flattened = dehyphenated.replaceAll("\\s*\\n\\s*", " ");
-        return flattened.replaceAll(" {2,}", " ");
     }
 }

@@ -20,18 +20,20 @@ metadata:
 **Задача:** Создать explicit state class для управления состоянием выделения.
 
 **Изменения:**
+
 1. Создать `SelectionState` data class с:
-   - `isDragging: Boolean`
-   - `activeHandle: HandleType?` (Left/Right/None)
-   - `dragOffset: Offset`
-   - `startBounds: Rect`
-   - `endBounds: Rect`
+    - `isDragging: Boolean`
+    - `activeHandle: HandleType?` (Left/Right/None)
+    - `dragOffset: Offset`
+    - `startBounds: Rect`
+    - `endBounds: Rect`
 
 2. Refactor `HandleRect` и `HotRect` чтобы использовать state вместо mutable fields
 
 3. Добавить `SelectionStateFlow` для reactive updates
 
 **Файлы:**
+
 - `SelectionView.kt` - добавить SelectionState
 - `SelectionView.kt` - refactor HandleRect.onTouchEvent
 
@@ -40,10 +42,11 @@ metadata:
 **Задача:** Упростить onTouchEvent logic.
 
 **Изменения:**
+
 1. Разделить onTouchEvent на отдельные handlers:
-   - `handleDragStart()`
-   - `handleDragMove()`
-   - `handleDragEnd()`
+    - `handleDragStart()`
+    - `handleDragMove()`
+    - `handleDragEnd()`
 
 2. Использовать sealed class для drag state:
    ```kotlin
@@ -56,6 +59,7 @@ metadata:
 3. Добавить better logging для debugging
 
 **Файлы:**
+
 - `SelectionView.kt:336-363` - refactor onTouchEvent
 
 ### Phase 3: Error Handling & Null Safety (приоритет: средний)
@@ -63,11 +67,13 @@ metadata:
 **Задача:** Улучшить null safety и error handling.
 
 **Изменения:**
+
 1. Проверить все `!!` usages в SelectionView.kt
 2. Добавить safe calls или early returns
 3. Добавить state validation перед operations
 
 **Файлы:**
+
 - `SelectionView.kt` - null safety improvements
 - `PDFPlugin.kt` - уже начато (SelectionBounds)
 
@@ -76,6 +82,7 @@ metadata:
 **Задача:** Упростить onTouchLock/onTouchUnlock callbacks.
 
 **Изменения:**
+
 1. Использовать lambda вместо open functions
 2. Добавить explicit callback interface:
    ```kotlin
@@ -89,6 +96,7 @@ metadata:
 3. Убрать drawer lockMode из SelectionView (responsibility leakage)
 
 **Файлы:**
+
 - `SelectionView.kt:377-382` - refactor callbacks
 - `FBReaderView.java:1147-1166` - simplify callback creation
 
@@ -97,14 +105,16 @@ metadata:
 **Задача:** Упростить coordinate transformations.
 
 **Изменения:**
+
 1. Создать `SelectionCoordinates` helper class
 2. Документировать все coordinate systems:
-   - Device coordinates (absolute)
-   - Page coordinates (relative to page)
-   - View coordinates (relative to SelectionView)
+    - Device coordinates (absolute)
+    - Page coordinates (relative to page)
+    - View coordinates (relative to SelectionView)
 3. Добавить conversion functions
 
 **Файлы:**
+
 - Новый файл `SelectionCoordinates.kt`
 - `SelectionView.kt` - использовать helper
 
@@ -113,6 +123,7 @@ metadata:
 **Задача:** Добавить unit tests и улучшить документацию.
 
 **Изменения:**
+
 1. Создать tests для SelectionState
 2. Создать tests для coordinate conversions
 3. Обновить KDoc comments

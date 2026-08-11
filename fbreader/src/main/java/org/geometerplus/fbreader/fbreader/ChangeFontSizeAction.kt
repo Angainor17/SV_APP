@@ -21,9 +21,11 @@ package org.geometerplus.fbreader.fbreader
 
 import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption
 
-internal class ChangeFontSizeAction(fbreader: FBReaderApp, private val myDelta: Int) : FBAction(fbreader) {
+internal class ChangeFontSizeAction(fbreader: FBReaderApp, private val myDelta: Int) :
+    FBAction(fbreader) {
     override fun run(vararg params: Any?) {
-        val option: ZLIntegerRangeOption = Reader.ViewOptions.getTextStyleCollection().baseStyle.FontSizeOption
+        val option: ZLIntegerRangeOption =
+            Reader.ViewOptions.getTextStyleCollection().baseStyle.FontSizeOption
         option.value = option.value + myDelta
         Reader.clearTextCaches()
         Reader.getViewWidget().repaint()

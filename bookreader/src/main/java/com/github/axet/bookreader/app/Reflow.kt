@@ -28,14 +28,22 @@ class Reflow(
     private val custom: FBReaderView.CustomView,
     private val info: Storage.RecentInfo
 ) {
-    @JvmField var k2: K2PdfOpt? = null
-    @JvmField var page: Int = 0 // страница документа
-    @JvmField var index: Int = 0 // текущая позиция просмотра
-    @JvmField var pending: Int = 0 // ожидаемое действие, можно отменить
-    @JvmField var w: Int = 0
-    @JvmField var h: Int = 0
-    @JvmField var rw: Int = 0
-    @JvmField var bm: Bitmap? = null // исходный bitmap, утилизируется при ошибках
+    @JvmField
+    var k2: K2PdfOpt? = null
+    @JvmField
+    var page: Int = 0 // страница документа
+    @JvmField
+    var index: Int = 0 // текущая позиция просмотра
+    @JvmField
+    var pending: Int = 0 // ожидаемое действие, можно отменить
+    @JvmField
+    var w: Int = 0
+    @JvmField
+    var h: Int = 0
+    @JvmField
+    var rw: Int = 0
+    @JvmField
+    var bm: Bitmap? = null // исходный bitmap, утилизируется при ошибках
     private val context: Context
 
     init {
@@ -62,10 +70,34 @@ class Reflow(
          */
         @JvmStatic
         fun drawRect(canvas: Canvas, rect: Rect, paint: Paint) {
-            canvas.drawLine(rect.left.toFloat(), rect.top.toFloat(), rect.right.toFloat(), rect.top.toFloat(), paint)
-            canvas.drawLine(rect.left.toFloat(), rect.bottom.toFloat(), rect.right.toFloat(), rect.bottom.toFloat(), paint)
-            canvas.drawLine(rect.left.toFloat(), rect.top.toFloat(), rect.left.toFloat(), rect.bottom.toFloat(), paint)
-            canvas.drawLine(rect.right.toFloat(), rect.top.toFloat(), rect.right.toFloat(), rect.bottom.toFloat(), paint)
+            canvas.drawLine(
+                rect.left.toFloat(),
+                rect.top.toFloat(),
+                rect.right.toFloat(),
+                rect.top.toFloat(),
+                paint
+            )
+            canvas.drawLine(
+                rect.left.toFloat(),
+                rect.bottom.toFloat(),
+                rect.right.toFloat(),
+                rect.bottom.toFloat(),
+                paint
+            )
+            canvas.drawLine(
+                rect.left.toFloat(),
+                rect.top.toFloat(),
+                rect.left.toFloat(),
+                rect.bottom.toFloat(),
+                paint
+            )
+            canvas.drawLine(
+                rect.right.toFloat(),
+                rect.top.toFloat(),
+                rect.right.toFloat(),
+                rect.bottom.toFloat(),
+                paint
+            )
         }
     }
 
@@ -100,7 +132,8 @@ class Reflow(
             this.w = w
             this.h = h
             this.rw = rw
-            this.index = 0 // размер изменился, reflow страница может переполнить общее количество страниц
+            this.index =
+                0 // размер изменился, reflow страница может переполнить общее количество страниц
             create()
         }
         if (k2 == null)
@@ -109,7 +142,10 @@ class Reflow(
 
     private fun create() {
         val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        var old: Float = shared.getFloat(ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW, ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW_DEFAULT)
+        var old: Float = shared.getFloat(
+            ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW,
+            ReaderPreferences.PREFERENCE_FONTSIZE_REFLOW_DEFAULT
+        )
         if (info.fontsize != null)
             old = info.fontsize!! / 100f
         k2?.let {
@@ -186,6 +222,7 @@ class Reflow(
                 index++
                 pending = 0
             }
+
             ZLViewEnums.PageIndex.current -> { // cancel
                 pending = 0
                 if (count() == -1) return
@@ -201,6 +238,7 @@ class Reflow(
                     return
                 }
             }
+
             ZLViewEnums.PageIndex.previous -> {
                 index--
                 pending = 0
@@ -358,10 +396,14 @@ class Reflow(
      * Информация о регионах reflow.
      */
     class Info(reflower: Reflow, page: Int) {
-        @JvmField val bm: Rect // размер исходного bitmap
-        @JvmField val margin: Rect // отступы страницы
-        @JvmField val src: Map<Rect, Rect>
-        @JvmField val dst: Map<Rect, Rect>
+        @JvmField
+        val bm: Rect // размер исходного bitmap
+        @JvmField
+        val margin: Rect // отступы страницы
+        @JvmField
+        val src: Map<Rect, Rect>
+        @JvmField
+        val dst: Map<Rect, Rect>
 
         init {
             bm = Rect(0, 0, reflower.bm!!.width, reflower.bm!!.height)

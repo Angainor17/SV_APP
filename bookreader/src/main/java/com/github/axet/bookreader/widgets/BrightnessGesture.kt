@@ -22,18 +22,21 @@ open class BrightnessGesture(private val fb: FBReaderView) {
                     return true
                 }
             }
+
             MotionEvent.ACTION_MOVE -> {
                 if (myIsBrightnessAdjustmentInProgress) {
                     if (x >= areaWidth * 2) {
                         myIsBrightnessAdjustmentInProgress = false
                         return false
                     } else {
-                        val delta = ((myStartBrightness + 30) * (myStartY - y) / fb.height).toFloat()
+                        val delta =
+                            ((myStartBrightness + 30) * (myStartY - y) / fb.height).toFloat()
                         fb.widget!!.setScreenBrightness((myStartBrightness + delta).toInt())
                         return true
                     }
                 }
             }
+
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (myIsBrightnessAdjustmentInProgress) {
                     myIsBrightnessAdjustmentInProgress = false

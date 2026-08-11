@@ -87,10 +87,12 @@ class BookDetailViewModel @Inject constructor(
     }
 
     private fun handleAllNotesClick(book: UiBook) {
-        _oneTimeEffect.trySend(BookDetailOneTimeEffect.OpenBookmarksForBook(
-            bookFileUri = book.fileUri?.toString(),
-            bookTitle = book.title,
-        ))
+        _oneTimeEffect.trySend(
+            BookDetailOneTimeEffect.OpenBookmarksForBook(
+                bookFileUri = book.fileUri?.toString(),
+                bookTitle = book.title,
+            )
+        )
     }
 
     private fun loadNotesIfBookDownloaded(book: UiBook) {

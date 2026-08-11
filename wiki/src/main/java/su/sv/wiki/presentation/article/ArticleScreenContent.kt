@@ -83,6 +83,7 @@ fun ArticleScreenContent(
                         },
                     )
                 }
+
                 else -> {
                     AppToolbarWithBack(
                         title = stringResource(R.string.wiki_loading),
@@ -96,6 +97,7 @@ fun ArticleScreenContent(
             is ArticleState.Loading -> {
                 FullScreenLoading()
             }
+
             is ArticleState.Content -> {
                 val adaptiveDims = LocalAdaptiveDimensions.current
                 val formFactor = LocalDeviceFormFactor.current
@@ -132,6 +134,7 @@ fun ArticleScreenContent(
                     )
                 }
             }
+
             is ArticleState.NotFound -> {
                 NotFoundContent(
                     modifier = Modifier
@@ -139,6 +142,7 @@ fun ArticleScreenContent(
                         .padding(paddingValues),
                 )
             }
+
             is ArticleState.Error -> {
                 FullScreenError {
                     viewModel.loadArticle(articleTitle)

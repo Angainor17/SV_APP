@@ -25,14 +25,17 @@ app/src/androidTest/java/su/sv/app/
 ## Категории тестов
 
 ### @SmokeTest
+
 Критические сценарии, которые должны проходить всегда.
 Проверяют базовую функциональность приложения.
 
 ### @ReleaseTest
+
 Тесты, которые должны запускаться перед релизом.
 Проверяют все основные сценарии использования.
 
 ### @NavigationTest
+
 Тесты навигации между экранами.
 
 ## Запуск тестов
@@ -82,6 +85,7 @@ app/src/androidTest/java/su/sv/app/
 ```
 
 Скрипт выполняет:
+
 1. Проверку кода (ktlint)
 2. Сборку release APK
 3. Запуск UI тестов (опционально)
@@ -149,6 +153,7 @@ class MyScreenTest {
 ## Отчёты тестов
 
 После выполнения тестов отчёты доступны в:
+
 - HTML: `app/build/reports/androidTests/connected/`
 - XML: `app/build/test-results/`
 
@@ -165,12 +170,14 @@ class MyScreenTest {
 ### Тесты падают с "No devices connected"
 
 Убедитесь, что:
+
 - Эмулятор запущен или устройство подключено
 - `adb devices` показывает устройство
 
 ### Тесты не находят элементы
 
 Проверьте:
+
 - `testTag` добавлен в Compose компонент
 - Тег соответствует `TestTags.kt`
 - Используйте `useUnmergedTree = true` для LazyColumn
@@ -178,6 +185,7 @@ class MyScreenTest {
 ### Hilt injection fails
 
 Убедитесь, что:
+
 - Класс аннотирован `@HiltAndroidTest`
 - `hiltRule` добавлен как первое правило
 - Вызов `hiltRule.inject()` в `@Before`

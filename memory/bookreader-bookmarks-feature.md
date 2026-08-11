@@ -13,7 +13,8 @@ metadata:
 
 ## Обзор
 
-Полнофункциональная система закладок для читалки книг с поддержкой создания, редактирования, удаления и навигации.
+Полнофункциональная система закладок для читалки книг с поддержкой создания, редактирования,
+удаления и навигации.
 
 ## Компоненты
 
@@ -35,9 +36,11 @@ public static class Bookmark {
 ### 2. UI компоненты
 
 #### BookmarksComposeDialog
+
 **Файл:** `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/BookmarksComposeDialog.kt`
 
 Диалог со списком закладок:
+
 - Отображение номера страницы (С. N)
 - Текст закладки (до 100 символов)
 - Название закладки (если задано)
@@ -45,9 +48,11 @@ public static class Bookmark {
 - Клик по закладке → переход к позиции
 
 #### BookmarkBottomSheet
+
 **Файл:** `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/BookmarkBottomSheet.kt`
 
 BottomSheet для редактирования закладки:
+
 - Заголовок "Закладка"
 - Текст закладки (read-only)
 - Поле редактирования названия
@@ -96,6 +101,7 @@ val BOOKMARK_COLORS = listOf(
 ### Навигация к закладке
 
 **Постраничный режим (PagerWidget):**
+
 ```kotlin
 // Игнорируем offset, открываем страницу как в TOC
 val position = ZLTextFixedPosition(
@@ -109,6 +115,7 @@ widget?.repaint()
 ```
 
 **Непрерывный режим (ScrollWidget):**
+
 ```kotlin
 // Игнорируем offset, открываем страницу по центру
 val position = ZLTextFixedPosition(
@@ -126,6 +133,7 @@ gotoPositionCentered(position)
 Проблема: `FBook.info` — копия `Storage.Book.info`, изменения не синхронизируются автоматически.
 
 Решение:
+
 - `syncBookmarksFromFBook()` — копирует закладки из FBook в Storage.Book
 - `onBookmarksUpdate()` — callback при изменении закладок
 - При создании/редактировании/удалении — обновляются оба объекта
@@ -184,10 +192,12 @@ sealed class ReaderActions {
 ## Файлы
 
 ### Созданные
+
 - `BookmarkBottomSheet.kt` — BottomSheet редактирования
 - `BookmarksComposeDialog.kt` — Диалог списка закладок
 
 ### Изменённые
+
 - `ReaderState.kt` — добавлены `showBookmarkEdit`, `editingBookmark`
 - `ReaderActions.kt` — добавлены действия для закладок
 - `ReaderViewModel.kt` — добавлены методы для работы с закладками
@@ -199,5 +209,6 @@ sealed class ReaderActions {
 ---
 
 **Связанные задачи:**
+
 - [[fbreader-refactoring-plan]]
 - [[fbreader-activity-cleanup]]

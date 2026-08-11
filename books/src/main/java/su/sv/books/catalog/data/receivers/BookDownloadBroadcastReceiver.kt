@@ -20,6 +20,7 @@ class BookDownloadBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var downloadedActionHandler: BookDownloadedActionHandler
+
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 

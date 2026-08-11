@@ -115,7 +115,8 @@ class DownloadedBooksViewModel @Inject constructor(
                     _state.value = if (uiBooks.isEmpty()) {
                         UiDownloadedBooksState.Empty
                     } else {
-                        val showSwipeHint = !sharedPreferences.getBoolean(KEY_SWIPE_HINT_SHOWN, false)
+                        val showSwipeHint =
+                            !sharedPreferences.getBoolean(KEY_SWIPE_HINT_SHOWN, false)
                         UiDownloadedBooksState.Content(
                             books = uiBooks,
                             showSwipeHint = showSwipeHint,
@@ -123,9 +124,11 @@ class DownloadedBooksViewModel @Inject constructor(
                     }
                 },
                 onFailure = {
-                    _effect.trySend(DownloadedBookEffect.ShowError(
-                        resourcesRepository.getString(R.string.books_download_snack_error)
-                    ))
+                    _effect.trySend(
+                        DownloadedBookEffect.ShowError(
+                            resourcesRepository.getString(R.string.books_download_snack_error)
+                        )
+                    )
                     _state.value = UiDownloadedBooksState.Empty
                 }
             )
@@ -194,7 +197,8 @@ class DownloadedBooksViewModel @Inject constructor(
                 },
                 onFailure = { error ->
                     // Показываем конкретное сообщение об ошибке
-                    val errorMessage = error.message ?: resourcesRepository.getString(R.string.books_download_snack_error)
+                    val errorMessage = error.message
+                        ?: resourcesRepository.getString(R.string.books_download_snack_error)
                     _effect.trySend(DownloadedBookEffect.ShowError(errorMessage))
                 }
             )

@@ -39,12 +39,16 @@ import su.sv.commonui.theme.SVAPPTheme
 enum class LoadingStyle {
     /** Три точки с пульсацией */
     PULSE_DOTS,
+
     /** Двойной вращающийся круг */
     DOUBLE_CIRCLE,
+
     /** Пульсирующий круг */
     PULSE_CIRCLE,
+
     /** Волновые точки */
     WAVE_DOTS,
+
     /** Градиентная вращающаяся дуга */
     GRADIENT_ARC
 }
@@ -70,21 +74,25 @@ fun AnimatedLoadingIndicator(
             color = color,
             modifier = modifier
         )
+
         LoadingStyle.DOUBLE_CIRCLE -> DoubleCircleIndicator(
             color = color,
             backgroundColor = backgroundColor,
             size = size,
             modifier = modifier
         )
+
         LoadingStyle.PULSE_CIRCLE -> PulseCircleIndicator(
             color = color,
             size = size,
             modifier = modifier
         )
+
         LoadingStyle.WAVE_DOTS -> WaveDotsIndicator(
             color = color,
             modifier = modifier
         )
+
         LoadingStyle.GRADIENT_ARC -> GradientArcIndicator(
             color = color,
             secondaryColor = MaterialTheme.colorScheme.secondary,
@@ -497,7 +505,11 @@ private fun PulseDotsLightPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Pulse Dots - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    name = "Pulse Dots - Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun PulseDotsDarkPreview() {
     SVAPPTheme {
@@ -513,7 +525,11 @@ private fun DoubleCircleLightPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Double Circle - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    name = "Double Circle - Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun DoubleCircleDarkPreview() {
     SVAPPTheme {
@@ -529,7 +545,11 @@ private fun PulseCircleLightPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Pulse Circle - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    name = "Pulse Circle - Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun PulseCircleDarkPreview() {
     SVAPPTheme {
@@ -561,7 +581,11 @@ private fun GradientArcLightPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Gradient Arc - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    name = "Gradient Arc - Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun GradientArcDarkPreview() {
     SVAPPTheme {
@@ -579,7 +603,11 @@ private fun FullScreenLoadingLightPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Full Screen Loading - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    name = "Full Screen Loading - Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun FullScreenLoadingDarkPreview() {
     SVAPPTheme {

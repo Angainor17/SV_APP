@@ -10,6 +10,7 @@ metadata:
 # Zoom/Pinch на Jetpack Compose Research
 
 ## Дата: 2026-07-03
+
 ## Статус: ✅ IMPLEMENTED (2026-07-04)
 
 ---
@@ -17,10 +18,12 @@ metadata:
 ## Implementation Summary
 
 ### New Files:
+
 - `ZoomGestureHandler.kt` - ScaleGestureDetector + double tap + pan gesture
 - `ZoomTouchAdapter.kt` - Touch coordinate adaptation for zoomed state
 
 ### Modified Files:
+
 - `FBReaderView.java` - Removed PinchGesture, added Listener methods, zoom API
 - `ScrollWidget.java` - ZoomGestureHandler integration, coordinate adaptation
 - `PagerWidget.kt` - ZoomGestureHandler integration
@@ -30,6 +33,7 @@ metadata:
 - `ReaderContent.kt` - BackHandler for zoom, listener callbacks
 
 ### Features Implemented:
+
 - ✅ **Pinch gesture** - ScaleGestureDetector, no touch interception
 - ✅ **Double tap** - Fit-width zoom (calculates based on page width)
 - ✅ **Pan gesture** - Horizontal movement when zoomed
@@ -40,21 +44,24 @@ metadata:
 - ✅ **Long press works** - Gesture handler doesn't block
 
 ### Zoom Behavior:
-| Action | Result |
-|--------|--------|
-| Pinch in | Zoom increase (max 3.0x) |
-| Pinch out | Zoom decrease, exit at 1.0 |
-| Double tap | Fit-width zoom (~1.1-1.25x) |
-| Double tap again | Reset to 1.0 (toggle) |
-| Horizontal pan | Move page left/right when zoomed |
-| Back button | Exit zoom mode |
+
+| Action           | Result                           |
+|------------------|----------------------------------|
+| Pinch in         | Zoom increase (max 3.0x)         |
+| Pinch out        | Zoom decrease, exit at 1.0       |
+| Double tap       | Fit-width zoom (~1.1-1.25x)      |
+| Double tap again | Reset to 1.0 (toggle)            |
+| Horizontal pan   | Move page left/right when zoomed |
+| Back button      | Exit zoom mode                   |
 
 ### Zoom Limits:
+
 - MIN_ZOOM = 1.0
 - MAX_ZOOM = 3.0 (pinch)
 - MAX_FIT_WIDTH_ZOOM = 1.25 (double tap)
 
 ### Fit-Width Calculation:
+
 ```
 if pageWidth < screenWidth:
     zoom = screenWidth / pageWidth (clamped to 1.25)
@@ -67,11 +74,13 @@ else:
 ## 1. Проблема и ТЗ (Original)
 
 ### Current Issues (из [[zoom-mode-issues]]):
+
 1. **Bookmarks исчезают при zoom** - PinchView overlay не содержит bookmarks
 2. **Long press не работает при zoom** - PinchView intercepts touch events
 3. **Zoom только 1 страницы** - в continuous mode zoom применяется только к touched page
 
 ### ТЗ Requirements (из [[zoom-feature-tz]]):
+
 - Scale transformation к FBReaderView вместо PinchView overlay
 - Zoom applied to all visible pages
 - Bookmarks/notes visible при zoom
@@ -84,6 +93,7 @@ else:
 ## 2. Architecture Analysis
 
 ### View Hierarchy:
+
 ```
 FBReaderView (RelativeLayout) ← AndroidView in Compose
 ├── ScrollWidget (RecyclerView) - pages container
@@ -95,6 +105,7 @@ FBReaderView (RelativeLayout) ← AndroidView in Compose
 ```
 
 ### Touch Flow:
+
 ```
 MotionEvent
     ↓
@@ -106,6 +117,7 @@ Other handlers (long press, scroll) не вызываются
 ```
 
 ### Compose Integration (ReaderContent.kt):
+
 ```kotlin
 Box(modifier = Modifier.fillMaxSize()) {
     AndroidView(
@@ -121,7 +133,8 @@ Box(modifier = Modifier.fillMaxSize()) {
 }
 ```
 
-**Key insight:** SelectionComposePanel НЕ intercepts touch - он только UI overlay. Touch events идут в AndroidView.
+**Key insight:** SelectionComposePanel НЕ intercepts touch - он только UI overlay. Touch events идут
+в AndroidView.
 
 ---
 
@@ -137,7 +150,8 @@ Box(modifier = Modifier
 }
 ```
 
-**Problem:** AndroidView получает touch events FIRST. Compose `pointerInput` не может intercept events от child AndroidView.
+**Problem:** AndroidView получает touch events FIRST. Compose `pointerInput` не может intercept
+events от child AndroidView.
 
 ### ❌ Option B: Scale FBReaderView via Compose state
 
@@ -151,11 +165,13 @@ AndroidView(
 )
 ```
 
-**Problem:** Touch coordinates не адаптированы. Long press, selection, bookmarks positioning будут wrong.
+**Problem:** Touch coordinates не адаптированы. Long press, selection, bookmarks positioning будут
+wrong.
 
 ### ✅ Option C: Hybrid - Gesture detection в Java, State/UI в Compose
 
 **Architecture:**
+
 ```
 ScaleGestureDetector (Java, in FBReaderView)
     ↓
@@ -179,11 +195,13 @@ FBReaderView touch handlers adapt coordinates using zoom state
 ### Phase 1: Remove PinchView overlay (1h)
 
 **Remove from FBReaderView.java:**
+
 - `PinchGesture.pinchOpen()` - delete
 - `PinchGesture.pinchClose()` - delete
 - `PinchView` creation - delete
 
 **Modify touch handling:**
+
 ```java
 // ScrollWidget.Gestures.onTouchEvent()
 public boolean onTouchEvent(MotionEvent e) {
@@ -199,6 +217,7 @@ public boolean onTouchEvent(MotionEvent e) {
 ### Phase 2: Add ScaleGestureDetector for zoom (1.5h)
 
 **Create ZoomGestureHandler.java:**
+
 ```java
 public class ZoomGestureHandler {
     private final ScaleGestureDetector scaleDetector;
@@ -235,6 +254,7 @@ public class ZoomGestureHandler {
 ```
 
 **Integrate into ScrollWidget.Gestures:**
+
 ```java
 // Before other handlers, but doesn't block them!
 public boolean onTouchEvent(MotionEvent e) {
@@ -250,6 +270,7 @@ public boolean onTouchEvent(MotionEvent e) {
 ### Phase 3: Touch Coordinate Adapter (2h)
 
 **Create ZoomTouchAdapter.kt:**
+
 ```kotlin
 class ZoomTouchAdapter(
     private val fbReaderView: FBReaderView
@@ -271,6 +292,7 @@ class ZoomTouchAdapter(
 ```
 
 **Modify ScrollWidget.Gestures.openCursor():**
+
 ```java
 // Original:
 x = (int) (e.getX() - v.getLeft());
@@ -283,6 +305,7 @@ y = adapter.adaptY(e.getY() - v.getTop());
 ```
 
 **Modify BookmarksView positioning:**
+
 ```java
 // When adding bookmark view:
 View v = new WordView(fb.getContext());
@@ -295,6 +318,7 @@ v.setScaleY(fb.getScaleY());
 ### Phase 4: Compose State & UI (1h)
 
 **Extend FBReaderView.Listener:**
+
 ```java
 interface Listener {
     // Existing methods...
@@ -304,6 +328,7 @@ interface Listener {
 ```
 
 **Add to ReaderViewModel:**
+
 ```kotlin
 sealed class ReaderActions {
     // Existing...
@@ -321,6 +346,7 @@ data class ReaderState.Content(
 ```
 
 **Modify ReaderContent.kt:**
+
 ```kotlin
 AndroidView(
     factory = { ctx -> FBReaderView(ctx).apply {
@@ -355,6 +381,7 @@ if (state.isInZoom) {
 ```
 
 **Create ZoomIndicatorCompose.kt:**
+
 ```kotlin
 @Composable
 fun ZoomIndicatorCompose(
@@ -390,6 +417,7 @@ fun ZoomIndicatorCompose(
 ### Phase 5: Double tap zoom (0.5h)
 
 **Add GestureDetector for double tap:**
+
 ```java
 GestureDetector doubleTapDetector = new GestureDetector(ctx,
     new GestureDetector.SimpleOnGestureListener() {
@@ -415,6 +443,7 @@ GestureDetector doubleTapDetector = new GestureDetector(ctx,
 ### Phase 6: BackHandler for zoom exit (0.5h)
 
 **Add to ReaderContent.kt:**
+
 ```kotlin
 // Additional BackHandler for zoom
 BackHandler(enabled = state.isInZoom) {
@@ -427,28 +456,28 @@ BackHandler(enabled = state.isInZoom) {
 
 ## 5. Estimated Time
 
-| Phase | Time | Complexity |
-|-------|------|------------|
-| Remove PinchView | 1h | Low |
-| Add ScaleGestureDetector | 1.5h | Medium |
-| Touch coordinate adapter | 2h | High |
-| Compose state & UI | 1h | Medium |
-| Double tap zoom | 0.5h | Low |
-| BackHandler | 0.5h | Low |
-| Testing | 2h | Medium |
-| **Total** | **8h** | |
+| Phase                    | Time   | Complexity |
+|--------------------------|--------|------------|
+| Remove PinchView         | 1h     | Low        |
+| Add ScaleGestureDetector | 1.5h   | Medium     |
+| Touch coordinate adapter | 2h     | High       |
+| Compose state & UI       | 1h     | Medium     |
+| Double tap zoom          | 0.5h   | Low        |
+| BackHandler              | 0.5h   | Low        |
+| Testing                  | 2h     | Medium     |
+| **Total**                | **8h** |            |
 
 ---
 
 ## 6. Risks & Mitigation
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Touch coordinates wrong in selection | High | Unit tests for adapter, visual testing |
-| Bookmarks positioning broken | High | Verify bookmarks scale with FBReaderView |
-| Scroll velocity at zoom | Medium | Adjust scroll factor by zoom |
-| Performance at high zoom | Low | Limit max zoom to 3.0, optimize rendering |
-| Conflicting gestures (zoom vs scroll) | Medium | Priority handling, threshold detection |
+| Risk                                  | Impact | Mitigation                                |
+|---------------------------------------|--------|-------------------------------------------|
+| Touch coordinates wrong in selection  | High   | Unit tests for adapter, visual testing    |
+| Bookmarks positioning broken          | High   | Verify bookmarks scale with FBReaderView  |
+| Scroll velocity at zoom               | Medium | Adjust scroll factor by zoom              |
+| Performance at high zoom              | Low    | Limit max zoom to 3.0, optimize rendering |
+| Conflicting gestures (zoom vs scroll) | Medium | Priority handling, threshold detection    |
 
 ---
 
@@ -457,6 +486,7 @@ BackHandler(enabled = state.isInZoom) {
 **If decide to fully migrate FBReaderView to Compose:**
 
 ### Architecture:
+
 ```kotlin
 @Composable
 fun ZoomablePdfContainer(
@@ -510,6 +540,7 @@ fun ZoomablePdfContainer(
 ```
 
 **Requirements:**
+
 - Rewrite entire FBReaderView overlay system
 - Create Compose PDF rendering wrapper
 - Implement Compose touch handling for all gestures
@@ -521,16 +552,16 @@ fun ZoomablePdfContainer(
 
 ## 8. Key Files to Modify
 
-| File | Changes |
-|------|---------|
-| `FBReaderView.java` | Remove PinchGesture, add Listener.onZoomChange |
-| `ScrollWidget.java` | Remove pinch touch interception, add ZoomGestureHandler |
-| `ReaderContent.kt` | Add zoom state, AndroidView.update for scale, BackHandler |
-| `ReaderViewModel.kt` | Add ZoomUpdate/ZoomReset actions |
-| `ReaderState.kt` | Add zoomScale, zoomPivot fields |
-| `ZoomTouchAdapter.kt` | New file - coordinate adaptation |
-| `ZoomGestureHandler.java` | New file - ScaleGestureDetector wrapper |
-| `ZoomIndicatorCompose.kt` | New file - optional zoom indicator UI |
+| File                      | Changes                                                   |
+|---------------------------|-----------------------------------------------------------|
+| `FBReaderView.java`       | Remove PinchGesture, add Listener.onZoomChange            |
+| `ScrollWidget.java`       | Remove pinch touch interception, add ZoomGestureHandler   |
+| `ReaderContent.kt`        | Add zoom state, AndroidView.update for scale, BackHandler |
+| `ReaderViewModel.kt`      | Add ZoomUpdate/ZoomReset actions                          |
+| `ReaderState.kt`          | Add zoomScale, zoomPivot fields                           |
+| `ZoomTouchAdapter.kt`     | New file - coordinate adaptation                          |
+| `ZoomGestureHandler.java` | New file - ScaleGestureDetector wrapper                   |
+| `ZoomIndicatorCompose.kt` | New file - optional zoom indicator UI                     |
 
 ---
 
@@ -545,6 +576,7 @@ fun ZoomablePdfContainer(
 - **Scale application:** scaleX/Y on FBReaderView via AndroidView.update
 
 **Why:**
+
 - Minimal changes to existing Java code
 - Compose for state management and optional UI
 - Preserves all existing functionality (bookmarks, selection, scroll)

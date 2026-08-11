@@ -40,11 +40,13 @@ class ReaderSelectionDelegate(
             return
         }
         lastShowTime = System.currentTimeMillis()
-        updateState(currentState.copy(
-            showSelection = true,
-            selectionStartY = startY,
-            selectionEndY = endY
-        ))
+        updateState(
+            currentState.copy(
+                showSelection = true,
+                selectionStartY = startY,
+                selectionEndY = endY
+            )
+        )
     }
 
     fun hide() {

@@ -2,7 +2,8 @@
 
 ## Обзор
 
-Модуль `bookreader` отвечает за чтение книг в форматах PDF, EPUB, FB2, DjVu, CBZ/CBR. Основан на библиотеке **FBReader** (модуль `fbreader`). UI построен на **Jetpack Compose** с паттерном **MVI**.
+Модуль `bookreader` отвечает за чтение книг в форматах PDF, EPUB, FB2, DjVu, CBZ/CBR. Основан на
+библиотеке **FBReader** (модуль `fbreader`). UI построен на **Jetpack Compose** с паттерном **MVI**.
 
 ---
 
@@ -92,23 +93,24 @@ GetLastReadBookUseCase
 
 ## Внешние зависимости
 
-| Зависимость | Модуль/Артефакт | Для чего |
-|---|---|---|
-| FBReader | `fbreader` (внутренний модуль) | Ядро отображения EPUB/FB2, парсинг текста |
-| Pdfium | `com.github.axet.pdfium` | Рендеринг PDF (смартфоны), выделение текста |
-| Android PdfRenderer | Android API | Рендеринг PDF (планшеты, стабильный) |
-| DjvuLibre | `com.github.axet.djvulibre` | Рендеринг DjVu |
-| zip4j | `net.lingala.zip4j` | Чтение CBZ-архивов |
-| junrar | `de.innosystec.unrar` | Чтение CBR-архивов |
-| Hilt | `dagger.hilt.android` | DI для ViewModel и репозиториев |
-| Modo | `com.github.terrakok.modo` | Навигация между экранами |
-| Timber | `timber.log.Timber` | Логирование (всегда тег `"voronin"`) |
+| Зависимость         | Модуль/Артефакт                | Для чего                                    |
+|---------------------|--------------------------------|---------------------------------------------|
+| FBReader            | `fbreader` (внутренний модуль) | Ядро отображения EPUB/FB2, парсинг текста   |
+| Pdfium              | `com.github.axet.pdfium`       | Рендеринг PDF (смартфоны), выделение текста |
+| Android PdfRenderer | Android API                    | Рендеринг PDF (планшеты, стабильный)        |
+| DjvuLibre           | `com.github.axet.djvulibre`    | Рендеринг DjVu                              |
+| zip4j               | `net.lingala.zip4j`            | Чтение CBZ-архивов                          |
+| junrar              | `de.innosystec.unrar`          | Чтение CBR-архивов                          |
+| Hilt                | `dagger.hilt.android`          | DI для ViewModel и репозиториев             |
+| Modo                | `com.github.terrakok.modo`     | Навигация между экранами                    |
+| Timber              | `timber.log.Timber`            | Логирование (всегда тег `"voronin"`)        |
 
 ---
 
 ## Точки входа в модуль
 
 ### Открытие книги (основной путь)
+
 Внешние модули (books) открывают читалку через **Modo навигацию**:
 
 ```kotlin
@@ -147,12 +149,15 @@ BookReaderInitializer.init(context)
 ```
 
 Инициализирует:
+
 - `ZLAndroidApplication` — ядро FBReader
 - `TTFManager` — менеджер шрифтов
 - Загружает папку шрифтов из настроек
 
 ### GetLastReadBookUseCase (snackbar "Продолжить чтение")
-Используется в главном экране приложения для определения последней прочитанной книги. Сканирует хранилище через `Storage.list()`.
+
+Используется в главном экране приложения для определения последней прочитанной книги. Сканирует
+хранилище через `Storage.list()`.
 
 ---
 

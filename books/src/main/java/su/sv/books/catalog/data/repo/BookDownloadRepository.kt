@@ -119,7 +119,13 @@ class BookDownloadRepository @Inject constructor(
                     }
                 }
                 // Совпадение с суффиксом (файл-1.pdf, файл-2.pdf)
-                else if (localUri != null && localUri.contains(normalizedSearch.replace(" ", ".")) && localUri.endsWith(".$extension")) {
+                else if (localUri != null && localUri.contains(
+                        normalizedSearch.replace(
+                            " ",
+                            "."
+                        )
+                    ) && localUri.endsWith(".$extension")
+                ) {
                     score = 50
                 }
 
@@ -326,7 +332,10 @@ class BookDownloadRepository @Inject constructor(
                         return Result.success(true)
                     }
                 } catch (e: SecurityException) {
-                    Timber.w(e, "SecurityException - cannot delete via ContentResolver (Scoped Storage)")
+                    Timber.w(
+                        e,
+                        "SecurityException - cannot delete via ContentResolver (Scoped Storage)"
+                    )
                 }
             }
 
@@ -360,7 +369,9 @@ class BookDownloadRepository @Inject constructor(
                     val title = if (titleColumn >= 0) it.getString(titleColumn) else null
 
                     // Проверяем совпадение по URI или по имени файла в URI
-                    if (uri.toString() == localUri || uri.toString().contains(localUri ?: "") || localUri?.contains(uri.toString()) == true) {
+                    if (uri.toString() == localUri || uri.toString()
+                            .contains(localUri ?: "") || localUri?.contains(uri.toString()) == true
+                    ) {
                         Timber.d("Found downloadId=$id for uri=$uri (localUri=$localUri)")
                         return id
                     }
@@ -398,6 +409,7 @@ class BookDownloadRepository @Inject constructor(
                         } else null
                     }
                 }
+
                 else -> null
             }
         } catch (e: Exception) {

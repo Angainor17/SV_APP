@@ -40,7 +40,8 @@ class BugReportWorker @AssistedInject constructor(
             val deviceManufacturer = inputData.getString(KEY_DEVICE_MANUFACTURER) ?: "unknown"
             val androidVersion = inputData.getString(KEY_ANDROID_VERSION) ?: "unknown"
             val timestamp = inputData.getLong(KEY_TIMESTAMP, System.currentTimeMillis())
-            val screenshotUris = inputData.getStringArray(KEY_SCREENSHOTS)?.map { Uri.parse(it) } ?: emptyList()
+            val screenshotUris =
+                inputData.getStringArray(KEY_SCREENSHOTS)?.map { Uri.parse(it) } ?: emptyList()
 
             Timber.tag("voronin").d("BugReportWorker: starting work for $timestamp")
 

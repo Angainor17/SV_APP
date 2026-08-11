@@ -16,7 +16,13 @@ class LineBreaker(private val myLanguage: String) {
         private external fun init()
 
         @JvmStatic
-        private external fun setLineBreaksForCharArray(data: CharArray, offset: Int, length: Int, lang: String, breaks: ByteArray)
+        private external fun setLineBreaksForCharArray(
+            data: CharArray,
+            offset: Int,
+            length: Int,
+            lang: String,
+            breaks: ByteArray
+        )
 
         @JvmStatic
         private external fun setLineBreaksForString(data: String, lang: String, breaks: ByteArray)

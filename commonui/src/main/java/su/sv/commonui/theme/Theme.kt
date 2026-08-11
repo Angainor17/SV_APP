@@ -269,6 +269,7 @@ fun SVAPPTheme(
                     dynamicLightColorScheme(context)
                 }
             }
+
             darkTheme -> DarkColorScheme
             else -> LightColorScheme
         }
@@ -367,17 +368,22 @@ private fun applyCustomColors(
         primary = customColors.getColor("primary") ?: baseScheme.primary,
         onPrimary = customColors.getColor("onPrimary") ?: baseScheme.onPrimary,
         primaryContainer = customColors.getColor("primaryContainer") ?: baseScheme.primaryContainer,
-        onPrimaryContainer = customColors.getColor("onPrimaryContainer") ?: baseScheme.onPrimaryContainer,
+        onPrimaryContainer = customColors.getColor("onPrimaryContainer")
+            ?: baseScheme.onPrimaryContainer,
 
         secondary = customColors.getColor("secondary") ?: baseScheme.secondary,
         onSecondary = customColors.getColor("onSecondary") ?: baseScheme.onSecondary,
-        secondaryContainer = customColors.getColor("secondaryContainer") ?: baseScheme.secondaryContainer,
-        onSecondaryContainer = customColors.getColor("onSecondaryContainer") ?: baseScheme.onSecondaryContainer,
+        secondaryContainer = customColors.getColor("secondaryContainer")
+            ?: baseScheme.secondaryContainer,
+        onSecondaryContainer = customColors.getColor("onSecondaryContainer")
+            ?: baseScheme.onSecondaryContainer,
 
         tertiary = customColors.getColor("tertiary") ?: baseScheme.tertiary,
         onTertiary = customColors.getColor("onTertiary") ?: baseScheme.onTertiary,
-        tertiaryContainer = customColors.getColor("tertiaryContainer") ?: baseScheme.tertiaryContainer,
-        onTertiaryContainer = customColors.getColor("onTertiaryContainer") ?: baseScheme.onTertiaryContainer,
+        tertiaryContainer = customColors.getColor("tertiaryContainer")
+            ?: baseScheme.tertiaryContainer,
+        onTertiaryContainer = customColors.getColor("onTertiaryContainer")
+            ?: baseScheme.onTertiaryContainer,
 
         background = customColors.getColor("background") ?: baseScheme.background,
         onBackground = customColors.getColor("onBackground") ?: baseScheme.onBackground,
@@ -388,11 +394,15 @@ private fun applyCustomColors(
         onSurfaceVariant = customColors.getColor("onSurfaceVariant") ?: baseScheme.onSurfaceVariant,
         surfaceDim = customColors.getColor("surfaceDim") ?: baseScheme.surfaceDim,
         surfaceBright = customColors.getColor("surfaceBright") ?: baseScheme.surfaceBright,
-        surfaceContainerLowest = customColors.getColor("surfaceContainerLowest") ?: baseScheme.surfaceContainerLowest,
-        surfaceContainerLow = customColors.getColor("surfaceContainerLow") ?: baseScheme.surfaceContainerLow,
+        surfaceContainerLowest = customColors.getColor("surfaceContainerLowest")
+            ?: baseScheme.surfaceContainerLowest,
+        surfaceContainerLow = customColors.getColor("surfaceContainerLow")
+            ?: baseScheme.surfaceContainerLow,
         surfaceContainer = customColors.getColor("surfaceContainer") ?: baseScheme.surfaceContainer,
-        surfaceContainerHigh = customColors.getColor("surfaceContainerHigh") ?: baseScheme.surfaceContainerHigh,
-        surfaceContainerHighest = customColors.getColor("surfaceContainerHighest") ?: baseScheme.surfaceContainerHighest,
+        surfaceContainerHigh = customColors.getColor("surfaceContainerHigh")
+            ?: baseScheme.surfaceContainerHigh,
+        surfaceContainerHighest = customColors.getColor("surfaceContainerHighest")
+            ?: baseScheme.surfaceContainerHighest,
 
         outline = customColors.getColor("outline") ?: baseScheme.outline,
         outlineVariant = customColors.getColor("outlineVariant") ?: baseScheme.outlineVariant,

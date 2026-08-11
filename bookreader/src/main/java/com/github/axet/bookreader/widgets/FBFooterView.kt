@@ -71,7 +71,10 @@ class FBFooterView @JvmOverloads constructor(
         update()
         orientation = HORIZONTAL
         val cProfile: ColorProfile = fb.app.ViewOptions.getColorProfile()
-        setBackgroundColor(0xffffff and cProfile.FooterNGBackgroundOption.getValue().intValue() or 0xff000000.toInt())
+        setBackgroundColor(
+            0xffffff and cProfile.FooterNGBackgroundOption.getValue()
+                .intValue() or 0xff000000.toInt()
+        )
         var lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
         lp.gravity = Gravity.CENTER
         addView(TOCMarks(context), lp)
@@ -92,7 +95,10 @@ class FBFooterView @JvmOverloads constructor(
         if (footerOptions.ShowBattery.value) {
             val image = AppCompatImageView(context)
             image.setImageResource(R.drawable.ic_battery_std_24)
-            image.setColorFilter(0xffffff and cProfile.FooterNGForegroundOption.getValue().intValue() or 0xff000000.toInt())
+            image.setColorFilter(
+                0xffffff and cProfile.FooterNGForegroundOption.getValue()
+                    .intValue() or 0xff000000.toInt()
+            )
             val lpImage = LayoutParams(footer!!.height, footer!!.height)
             lpImage.gravity = Gravity.CENTER
             addView(image, lpImage)
@@ -109,7 +115,12 @@ class FBFooterView @JvmOverloads constructor(
         footer = customview!!.footer
         pagePosition = customview!!.pagePosition()
         family = fb!!.app.ViewOptions.getFooterOptions().Font.value
-        tf = AndroidFontUtil.typeface(fb!!.app.SystemInfo, FontEntry.systemEntry(family!!), footer!!.height > 10, false)
+        tf = AndroidFontUtil.typeface(
+            fb!!.app.SystemInfo,
+            FontEntry.systemEntry(family!!),
+            footer!!.height > 10,
+            false
+        )
         for (i in 0 until childCount) {
             val v = getChildAt(i)
             if (v is FontTextView)
@@ -174,7 +185,8 @@ class FBFooterView @JvmOverloads constructor(
             paint.typeface = tf
             paint.textSize = footer!!.height + 2f
             val cProfile: ColorProfile = fb!!.app.ViewOptions.getColorProfile()
-            paint.color = 0xffffff and cProfile.FooterNGForegroundOption.getValue().intValue() or 0xff000000.toInt()
+            paint.color = 0xffffff and cProfile.FooterNGForegroundOption.getValue()
+                .intValue() or 0xff000000.toInt()
         }
 
         fun updateText(str: String) {
@@ -190,7 +202,12 @@ class FBFooterView @JvmOverloads constructor(
         }
 
         override fun onDraw(c: Canvas) {
-            c.drawText(text, paddingLeft.toFloat(), height / 2 - ((paint.descent() + paint.ascent()) / 2), paint)
+            c.drawText(
+                text,
+                paddingLeft.toFloat(),
+                height / 2 - ((paint.descent() + paint.ascent()) / 2),
+                paint
+            )
         }
     }
 

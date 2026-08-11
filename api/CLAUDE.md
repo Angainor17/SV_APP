@@ -4,11 +4,13 @@
 
 ## Обзор
 
-Модуль `api` предоставляет клиент для работы с VK API, в частности для получения новостей (стен сообщества) и видео.
+Модуль `api` предоставляет клиент для работы с VK API, в частности для получения новостей (стен
+сообщества) и видео.
 
 ## Основные классы
 
 ### VkApi
+
 Retrofit интерфейс для VK API.
 
 ```kotlin
@@ -19,7 +21,9 @@ interface VkApi {
 ```
 
 ### VkNewsResponse
+
 Модель ответа VK API с вложенной структурой:
+
 ```
 VkResponse {
     response: VkNewsResponse {
@@ -29,12 +33,15 @@ VkResponse {
 ```
 
 ### VkResponseNewsAttachment
+
 Модель элемента новости с вложениями:
+
 - Текст поста
 - Фотографии (`VkAttachmentPhoto`)
 - Видео (`VkAttachmentVideo`)
 
 ### NewsRepo
+
 Репозиторий для получения новостей:
 
 ```kotlin
@@ -45,7 +52,9 @@ class NewsRepo @Inject constructor(private val vkApi: VkApi) {
 ```
 
 ### ApiNewsItem
+
 Модель элемента новости для UI:
+
 ```kotlin
 data class ApiNewsItem(
     val id: Int,

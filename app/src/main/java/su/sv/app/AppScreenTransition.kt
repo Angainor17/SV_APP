@@ -59,24 +59,35 @@ fun ComposeRendererScope<StackState>.AppScreenTransition(
                 val fadeSpec = tween<Float>(durationMillis = TRANSITION_DURATION_MS)
                 fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
             } else {
-                val slideSpec: FiniteAnimationSpec<IntOffset> = tween(durationMillis = TRANSITION_DURATION_MS, easing = FastOutSlowInEasing)
+                val slideSpec: FiniteAnimationSpec<IntOffset> =
+                    tween(durationMillis = TRANSITION_DURATION_MS, easing = FastOutSlowInEasing)
                 val fadeSpec = tween<Float>(durationMillis = TRANSITION_DURATION_MS / 2)
 
                 when (transitionType) {
                     // Push - новый экран въезжает справа, старый уезжает влево
                     StackTransitionType.Push -> {
                         slideInHorizontally(initialOffsetX = { it }, animationSpec = slideSpec) +
-                            fadeIn(fadeSpec) togetherWith
-                            slideOutHorizontally(targetOffsetX = { -it / 3 }, animationSpec = slideSpec) +
-                            fadeOut(fadeSpec)
+                                fadeIn(fadeSpec) togetherWith
+                                slideOutHorizontally(
+                                    targetOffsetX = { -it / 3 },
+                                    animationSpec = slideSpec
+                                ) +
+                                fadeOut(fadeSpec)
                     }
                     // Pop - предыдущий экран въезжает слева, текущий уезжает вправо
                     StackTransitionType.Pop -> {
-                        slideInHorizontally(initialOffsetX = { -it / 3 }, animationSpec = slideSpec) +
-                            fadeIn(fadeSpec) togetherWith
-                            slideOutHorizontally(targetOffsetX = { it }, animationSpec = slideSpec) +
-                            fadeOut(fadeSpec)
+                        slideInHorizontally(
+                            initialOffsetX = { -it / 3 },
+                            animationSpec = slideSpec
+                        ) +
+                                fadeIn(fadeSpec) togetherWith
+                                slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = slideSpec
+                                ) +
+                                fadeOut(fadeSpec)
                     }
+
                     else -> {
                         fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
                     }
@@ -103,23 +114,27 @@ fun ComposeRendererScope<StackState>.AppScreenTransitionFull(
         screenModifier = screenModifier.background(backgroundColor),
         transitionSpec = {
             val transitionType = calculateStackTransitionType(oldState, newState)
-            val slideSpec: FiniteAnimationSpec<IntOffset> = tween(durationMillis = TRANSITION_DURATION_MS, easing = FastOutSlowInEasing)
+            val slideSpec: FiniteAnimationSpec<IntOffset> =
+                tween(durationMillis = TRANSITION_DURATION_MS, easing = FastOutSlowInEasing)
             val fadeSpec = tween<Float>(durationMillis = TRANSITION_DURATION_MS / 2)
 
             when {
                 transitionType == StackTransitionType.Replace ||
-                    oldState?.stack?.lastOrNull() is DialogScreen ||
-                    newState?.stack?.lastOrNull() is DialogScreen -> {
+                        oldState?.stack?.lastOrNull() is DialogScreen ||
+                        newState?.stack?.lastOrNull() is DialogScreen -> {
                     fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
                 }
+
                 transitionType == StackTransitionType.Push -> {
                     slideIntoContainer(Left, animationSpec = slideSpec) togetherWith
-                        slideOutOfContainer(Left, animationSpec = slideSpec)
+                            slideOutOfContainer(Left, animationSpec = slideSpec)
                 }
+
                 transitionType == StackTransitionType.Pop -> {
                     slideIntoContainer(Right, animationSpec = slideSpec) togetherWith
-                        slideOutOfContainer(Right, animationSpec = slideSpec)
+                            slideOutOfContainer(Right, animationSpec = slideSpec)
                 }
+
                 else -> {
                     fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
                 }

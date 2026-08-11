@@ -68,9 +68,11 @@ class ArticleViewModel @Inject constructor(
                         isFavorite = isFavorite,
                     )
                 }
+
                 is WikiResult.NotFound -> {
                     _state.value = ArticleState.NotFound
                 }
+
                 is WikiResult.Error -> {
                     _state.value = ArticleState.Error(result.message)
                 }
@@ -133,6 +135,7 @@ sealed class ArticleState {
         val article: UiWikiArticle,
         val isFavorite: Boolean,
     ) : ArticleState()
+
     object NotFound : ArticleState()
     data class Error(val message: String) : ArticleState()
 }

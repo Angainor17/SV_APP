@@ -62,7 +62,9 @@ fun ThemeToggleIcon(
     val contentDescription = when (currentMode) {
         ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)   // Переключить на тёмную
         ThemeMode.DARK -> stringResource(R.string.theme_mode_light)   // Переключить на светлую
-        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(R.string.theme_mode_dark)
+        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(
+            R.string.theme_mode_dark
+        )
     }
 
     // Отслеживание долгого нажатия
@@ -87,9 +89,11 @@ fun ThemeToggleIcon(
                     isPressed = true
                     hasTriggeredLongPress = false
                 }
+
                 is PressInteraction.Release -> {
                     isPressed = false
                 }
+
                 is PressInteraction.Cancel -> {
                     isPressed = false
                     hasTriggeredLongPress = false
@@ -149,7 +153,9 @@ fun ThemeModeIcon(
     val contentDescription = when (mode) {
         ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)
         ThemeMode.DARK -> stringResource(R.string.theme_mode_light)
-        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(R.string.theme_mode_dark)
+        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(
+            R.string.theme_mode_dark
+        )
     }
 
     Icon(

@@ -40,6 +40,7 @@ class MockReaderViewModel {
                 wasSearchClosed = true
                 _searchState.value = SearchState()
             }
+
             is ReaderActions.Search -> {
                 _searchState.value = _searchState.value.copy(
                     isActive = true,
@@ -47,6 +48,7 @@ class MockReaderViewModel {
                     isLoading = action.query.length >= 2
                 )
             }
+
             ReaderActions.SearchNext -> {
                 val current = _searchState.value.currentResultIndex
                 val total = _searchState.value.resultsCount
@@ -56,6 +58,7 @@ class MockReaderViewModel {
                     )
                 }
             }
+
             ReaderActions.SearchPrevious -> {
                 val current = _searchState.value.currentResultIndex
                 if (current > 0) {
@@ -64,10 +67,13 @@ class MockReaderViewModel {
                     )
                 }
             }
+
             is ReaderActions.SetFullscreen -> {
                 updateContentState { it.copy(isFullscreen = action.isFullscreen) }
             }
-            else -> { /* log */ }
+
+            else -> { /* log */
+            }
         }
     }
 

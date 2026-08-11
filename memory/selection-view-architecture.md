@@ -26,13 +26,13 @@ SelectionView (FrameLayout) - bookreader/widgets/SelectionView.kt
 
 ## Ключевые компоненты
 
-| Класс | Файл | Функция |
-|-------|------|---------|
-| **SelectionView** | SelectionView.kt | Container, рисует маркеры через drawHandle(), обрабатывает touch events |
-| **PageView** | SelectionView.kt:605 | Рисует выделенные прямоугольники текста на странице |
-| **HandleRect** | SelectionView.kt:567 | Маркер для тяги, содержит which (Left/Right) и setter |
-| **HotRect** | SelectionView.kt:444 | Rect с hot point - точкой касания внутри маркера |
-| **HotPoint** | SelectionView.kt:528 | Point с offset для drag operations |
+| Класс             | Файл                 | Функция                                                                 |
+|-------------------|----------------------|-------------------------------------------------------------------------|
+| **SelectionView** | SelectionView.kt     | Container, рисует маркеры через drawHandle(), обрабатывает touch events |
+| **PageView**      | SelectionView.kt:605 | Рисует выделенные прямоугольники текста на странице                     |
+| **HandleRect**    | SelectionView.kt:567 | Маркер для тяги, содержит which (Left/Right) и setter                   |
+| **HotRect**       | SelectionView.kt:444 | Rect с hot point - точкой касания внутри маркера                        |
+| **HotPoint**      | SelectionView.kt:528 | Point с offset для drag operations                                      |
 
 ## Touch Handling Flow
 
@@ -81,6 +81,7 @@ class Selection : Plugin.View.Selection {
 **Файл:** PDFPlugin.kt:408-474
 
 Вычисляет границы выделения для конкретной страницы:
+
 - ss - start index на странице
 - ee - end index на странице
 - cc - count символов
@@ -155,10 +156,10 @@ fun rectHandle(which, x, y): HotRect {
 ## Known Issues
 
 1. **Race condition** - setWidget может вызвать selectionClose во время drag
-   - Решение: null safety в SelectionBounds constructor
+    - Решение: null safety в SelectionBounds constructor
 
 2. **Debounce** - hide/show panel могут приходить быстро
-   - Решение: debounce в ReaderViewModel.hideSelection()
+    - Решение: debounce в ReaderViewModel.hideSelection()
 
 ## Связанные файлы
 

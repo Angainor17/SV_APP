@@ -106,7 +106,7 @@ public class Storage extends com.github.axet.androidlibrary.app.Storage {
      * Check if storage permissions are granted.
      * Updated for Android 13+ (API 33+) granular media permissions.
      *
-     * @param context Context for permission check
+     * @param context     Context for permission check
      * @param permissions Permission array to check (use PERMISSIONS_RO or PERMISSIONS_RW)
      * @return true if all permissions are granted
      */

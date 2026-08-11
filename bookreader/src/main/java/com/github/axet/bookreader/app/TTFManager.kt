@@ -194,8 +194,10 @@ class TTFManager(val context: Context) {
         if (Build.VERSION.SDK_INT >= 26 && file is TTCFile) {
             when (file.uri.scheme) {
                 ContentResolver.SCHEME_FILE -> {
-                    return Typeface.Builder(Storage.getFile(file.uri)).setTtcIndex(file.index).build()
+                    return Typeface.Builder(Storage.getFile(file.uri)).setTtcIndex(file.index)
+                        .build()
                 }
+
                 ContentResolver.SCHEME_CONTENT -> {
                     val resolver = context.contentResolver
                     try {
@@ -210,6 +212,7 @@ class TTFManager(val context: Context) {
                         throw IllegalStateException(e)
                     }
                 }
+
                 else -> throw IllegalArgumentException("Unknown URI scheme")
             }
         } else {
@@ -278,7 +281,8 @@ class TTFManager(val context: Context) {
      * http://www.ulduzsoft.com/2012/01/enumerating-the-fonts-on-android-platform/
      */
     class TTFAnalyzer {
-        private var ttfFile: CacheImagesAdapter.SeekInputStream? = null // Файл шрифта; должен поддерживать seek
+        private var ttfFile: CacheImagesAdapter.SeekInputStream? =
+            null // Файл шрифта; должен поддерживать seek
 
         /**
          * Парсит TTF-файл и возвращает имя шрифта.
@@ -385,7 +389,9 @@ class TTFManager(val context: Context) {
                 val tag = readDword()
                 when (tag) {
                     0x74746366 -> return getTTCFontNames() // 'ttcf'
-                    0x74727565, 0x00010000, 0x4F54544F -> return arrayOf(getTtfFontName() ?: return null)
+                    0x74727565, 0x00010000, 0x4F54544F -> return arrayOf(
+                        getTtfFontName() ?: return null
+                    )
                 }
             } catch (_: Exception) {
                 return null

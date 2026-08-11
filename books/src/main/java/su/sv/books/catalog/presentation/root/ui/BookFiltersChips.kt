@@ -252,9 +252,27 @@ private fun SelectedFilterChipPreview() {
 private fun BookFiltersChipsPreview() {
     SVAPPThemeLightPreview {
         val filters = listOf(
-            UiBookFilter(filter = BookFilter.All, displayName = "Все", count = 34, isSelected = true, isAvailable = true),
-            UiBookFilter(filter = BookFilter.Category("Свободное Время"), displayName = "Свободное Время", count = 29, isSelected = false, isAvailable = true),
-            UiBookFilter(filter = BookFilter.Author("Ленин В. И."), displayName = "Ленин В. И.", count = 16, isSelected = false, isAvailable = true),
+            UiBookFilter(
+                filter = BookFilter.All,
+                displayName = "Все",
+                count = 34,
+                isSelected = true,
+                isAvailable = true
+            ),
+            UiBookFilter(
+                filter = BookFilter.Category("Свободное Время"),
+                displayName = "Свободное Время",
+                count = 29,
+                isSelected = false,
+                isAvailable = true
+            ),
+            UiBookFilter(
+                filter = BookFilter.Author("Ленин В. И."),
+                displayName = "Ленин В. И.",
+                count = 16,
+                isSelected = false,
+                isAvailable = true
+            ),
         )
         BookFiltersChips(
             filters = filters,

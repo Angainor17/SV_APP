@@ -9,6 +9,7 @@
 ## Основные компоненты
 
 ### SvApp
+
 Application класс приложения:
 
 ```kotlin
@@ -21,6 +22,7 @@ class SvApp : Application() {
 ```
 
 ### MainActivity
+
 Главная Activity приложения:
 
 ```kotlin
@@ -50,6 +52,7 @@ app/src/main/java/su/sv/app/
 ## Зависимости
 
 Модуль зависит от всех feature-модулей:
+
 - `main` — навигация
 - `news` — лента новостей
 - `books` — каталог книг
@@ -60,6 +63,7 @@ app/src/main/java/su/sv/app/
 ## AndroidManifest
 
 В манифесте определены:
+
 - `SvApp` как Application класс
 - `MainActivity` как главная Activity с `LAUNCHER` intent-filter
 - Необходимые разрешения (permissions)

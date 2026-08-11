@@ -23,11 +23,11 @@ interface DispatcherProvider {
 
 ## Правила использования
 
-| Операция | Диспетчер | Пример |
-|----------|-----------|--------|
-| **IO** (файлы, сеть, DB, DataStore) | `dispatcherProvider.io` | API запросы, Room DAO, JSON parsing |
-| **CPU-intensive** | `dispatcherProvider.default` | Маппинг, сортировка, фильтрация |
-| **UI** | `Dispatchers.Main` (viewModelScope) | `_state.value = ...`, `_effect.trySend()` |
+| Операция                            | Диспетчер                           | Пример                                    |
+|-------------------------------------|-------------------------------------|-------------------------------------------|
+| **IO** (файлы, сеть, DB, DataStore) | `dispatcherProvider.io`             | API запросы, Room DAO, JSON parsing       |
+| **CPU-intensive**                   | `dispatcherProvider.default`        | Маппинг, сортировка, фильтрация           |
+| **UI**                              | `Dispatchers.Main` (viewModelScope) | `_state.value = ...`, `_effect.trySend()` |
 
 ## UseCase Best Practice
 

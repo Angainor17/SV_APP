@@ -29,12 +29,13 @@ data class AdaptiveDimensions(
          * - Стандартные отступы
          * - Без ограничения ширины
          */
-        fun compact(baseDimensions: AppDimensions = AppDimensions.Default): AdaptiveDimensions = AdaptiveDimensions(
-            gridColumns = 2,
-            screenPadding = baseDimensions.screenPaddingHorizontal,
-            contentMaxWidth = null, // Без ограничения
-            gridSpacing = baseDimensions.itemSpacingMedium,
-        )
+        fun compact(baseDimensions: AppDimensions = AppDimensions.Default): AdaptiveDimensions =
+            AdaptiveDimensions(
+                gridColumns = 2,
+                screenPadding = baseDimensions.screenPaddingHorizontal,
+                contentMaxWidth = null, // Без ограничения
+                gridSpacing = baseDimensions.itemSpacingMedium,
+            )
 
         /**
          * Размеры для Medium (планшеты портрет, foldables сложенные)
@@ -42,12 +43,13 @@ data class AdaptiveDimensions(
          * - Увеличенные отступы
          * - Ограничение ширины 600dp
          */
-        fun medium(baseDimensions: AppDimensions = AppDimensions.Default): AdaptiveDimensions = AdaptiveDimensions(
-            gridColumns = 3,
-            screenPadding = baseDimensions.screenPaddingHorizontalLarge,
-            contentMaxWidth = 600.dp,
-            gridSpacing = baseDimensions.itemSpacingLarge,
-        )
+        fun medium(baseDimensions: AppDimensions = AppDimensions.Default): AdaptiveDimensions =
+            AdaptiveDimensions(
+                gridColumns = 3,
+                screenPadding = baseDimensions.screenPaddingHorizontalLarge,
+                contentMaxWidth = 600.dp,
+                gridSpacing = baseDimensions.itemSpacingLarge,
+            )
 
         /**
          * Размеры для Expanded (планшеты ландшафт, foldables разложенные)
@@ -55,12 +57,13 @@ data class AdaptiveDimensions(
          * - Большие отступы
          * - Ограничение ширины 840dp
          */
-        fun expanded(baseDimensions: AppDimensions = AppDimensions.Default): AdaptiveDimensions = AdaptiveDimensions(
-            gridColumns = 4,
-            screenPadding = baseDimensions.screenPaddingHorizontalLarge,
-            contentMaxWidth = 840.dp,
-            gridSpacing = baseDimensions.itemSpacingLarge,
-        )
+        fun expanded(baseDimensions: AppDimensions = AppDimensions.Default): AdaptiveDimensions =
+            AdaptiveDimensions(
+                gridColumns = 4,
+                screenPadding = baseDimensions.screenPaddingHorizontalLarge,
+                contentMaxWidth = 840.dp,
+                gridSpacing = baseDimensions.itemSpacingLarge,
+            )
 
         /**
          * Получить размеры по форм-фактору

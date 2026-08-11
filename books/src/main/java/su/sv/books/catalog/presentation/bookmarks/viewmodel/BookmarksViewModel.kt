@@ -344,6 +344,7 @@ class BookmarksViewModel @Inject constructor(
                                     state.copy(notes = updatedNotes)
                                 }
                             }
+
                             is UiBookmarksState.BookNotes -> {
                                 val updatedNotes = state.notes.filter { it.id != noteToDelete.id }
                                 if (updatedNotes.isEmpty()) {
@@ -353,15 +354,18 @@ class BookmarksViewModel @Inject constructor(
                                     state.copy(notes = updatedNotes)
                                 }
                             }
+
                             else -> state
                         }
                     }
                 },
                 onFailure = { error ->
                     Timber.e(error, "Failed to delete note")
-                    _effect.trySend(BookmarksEffect.ShowError(
-                        resourcesRepository.getString(R.string.books_error_loading)
-                    ))
+                    _effect.trySend(
+                        BookmarksEffect.ShowError(
+                            resourcesRepository.getString(R.string.books_error_loading)
+                        )
+                    )
                 }
             )
         }

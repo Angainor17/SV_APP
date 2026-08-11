@@ -237,6 +237,7 @@ fun AppIconButton(
                 icon()
             }
         }
+
         ButtonStyle.OUTLINED -> {
             OutlinedButton(
                 onClick = onClick,
@@ -246,6 +247,7 @@ fun AppIconButton(
                 icon()
             }
         }
+
         ButtonStyle.TEXT -> {
             TextButton(
                 onClick = onClick,
@@ -255,6 +257,7 @@ fun AppIconButton(
                 icon()
             }
         }
+
         ButtonStyle.TONAL -> {
             FilledTonalButton(
                 onClick = onClick,

@@ -75,7 +75,7 @@ class Pair<T1, T2>(
         if (this === other) return true
         if (other !is Pair<*, *>) return false
         return ComparisonUtil.equal(First, other.First) &&
-               ComparisonUtil.equal(Second, other.Second)
+                ComparisonUtil.equal(Second, other.Second)
     }
 
     /**
