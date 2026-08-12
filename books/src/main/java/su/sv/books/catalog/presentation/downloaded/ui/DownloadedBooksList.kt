@@ -57,11 +57,11 @@ fun DownloadedBooksList(
     onReadClick: (UiDownloadedBook) -> Unit,
     onBookClick: (UiDownloadedBook) -> Unit,
     onDeleteRequest: (UiDownloadedBook) -> Unit,
+    modifier: Modifier = Modifier,
     showSwipeHint: Boolean = false,
     onSwipeHintShown: () -> Unit = {},
     resetKey: Any? = null,
     deletingBookId: String? = null,
-    modifier: Modifier = Modifier,
 ) {
     val formFactor = LocalDeviceFormFactor.current
 

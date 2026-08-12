@@ -42,8 +42,8 @@ import su.sv.commonui.ui.linkify.LinkifyText
 fun ExpandingText(
     text: String,
     minimizedMaxLines: Int,
-    fontSize: TextUnit = TextUnit.Unspecified,
     modifier: Modifier = Modifier,
+    fontSize: TextUnit = TextUnit.Unspecified,
 ) {
     val context = LocalContext.current
 

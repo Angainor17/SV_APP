@@ -63,11 +63,11 @@ enum class LoadingStyle {
  */
 @Composable
 fun AnimatedLoadingIndicator(
+    modifier: Modifier = Modifier,
     style: LoadingStyle = LoadingStyle.GRADIENT_ARC,
     color: Color = MaterialTheme.colorScheme.primary,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     size: Dp = 48.dp,
-    modifier: Modifier = Modifier
 ) {
     when (style) {
         LoadingStyle.PULSE_DOTS -> PulseDotsIndicator(
@@ -109,9 +109,9 @@ fun AnimatedLoadingIndicator(
 @Composable
 private fun PulseDotsIndicator(
     color: Color,
+    modifier: Modifier = Modifier,
     dotSize: Dp = 12.dp,
     spacing: Dp = 12.dp,
-    modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 
@@ -292,9 +292,9 @@ private fun PulseCircleIndicator(
 @Composable
 private fun WaveDotsIndicator(
     color: Color,
+    modifier: Modifier = Modifier,
     dotSize: Dp = 10.dp,
     spacing: Dp = 8.dp,
-    modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 
@@ -384,8 +384,8 @@ private fun GradientArcIndicator(
     color: Color,
     secondaryColor: Color,
     size: Dp,
+    modifier: Modifier = Modifier,
     strokeWidth: Dp = 4.dp,
-    modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 

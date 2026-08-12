@@ -49,8 +49,8 @@ fun FullScreenLoading(
 @Composable
 fun FullScreenError(
     onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
     message: String? = null,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -93,10 +93,10 @@ fun FullScreenError(
 @Composable
 fun FullScreenEmpty(
     title: String,
+    modifier: Modifier = Modifier,
     description: String? = null,
     icon: ImageVector? = null,
     action: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -142,8 +142,8 @@ fun FullScreenEmpty(
  */
 @Composable
 fun FullScreenNoSearchResults(
+    modifier: Modifier = Modifier,
     query: String? = null,
-    modifier: Modifier = Modifier
 ) {
     val description = query?.let {
         "По запросу \"$it\" ничего не найдено"
@@ -162,8 +162,8 @@ fun FullScreenNoSearchResults(
  */
 @Composable
 fun FullScreenNoData(
+    modifier: Modifier = Modifier,
     message: String = "Нет данных для отображения",
-    modifier: Modifier = Modifier
 ) {
     FullScreenEmpty(
         title = message,

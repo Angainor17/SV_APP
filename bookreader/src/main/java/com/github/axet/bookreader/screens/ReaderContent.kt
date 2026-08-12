@@ -8,7 +8,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.view.KeyEvent
 import android.view.Window
 import androidx.activity.compose.BackHandler
@@ -85,7 +85,6 @@ import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.core.view.ZLViewEnums
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
-import su.sv.managers.theme.ThemeViewModel
 import timber.log.Timber
 
 /**
@@ -98,14 +97,12 @@ fun ReaderContent(
     bookTitle: String?,
     bookAuthor: String?,
     bookmarkPosition: BookmarkPosition?,
+    modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    modifier: Modifier = Modifier,
     viewModel: ReaderViewModel = hiltViewModel(),
-    themeViewModel: ThemeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     // Состояние для FBReaderView
@@ -188,7 +185,6 @@ fun ReaderContent(
 
             if (currentState.showFontSettings) {
                 FontsComposeBottomSheet(
-                    fbReaderView = fbReaderView,
                     onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
                     onFontSizeChange = { size ->
                         viewModel.onAction(ReaderActions.SetFontSize(size))
@@ -707,7 +703,6 @@ private fun collectTocItems(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FontsComposeBottomSheet(
-    fbReaderView: FBReaderView?,
     onDismiss: () -> Unit,
     onFontSizeChange: (Int) -> Unit,
     onFontFamilyChange: (String) -> Unit,
@@ -916,7 +911,7 @@ private fun BatteryReceiver(fbReaderView: FBReaderView?) {
 /**
  * Обработчик клавиш громкости для навигации по страницам.
  *
- * Использует [Window.Callback.dispatchKeyEvent] вместо [View.OnKeyListener],
+ * Использует Window.Callback.dispatchKeyEvent вместо View.OnKeyListener,
  * чтобы перехватывать события громкости ДО того, как они попадут в иерархию View.
  * Это надёжнее, потому что:
  * - View.OnKeyListener требует, чтобы view имела фокус

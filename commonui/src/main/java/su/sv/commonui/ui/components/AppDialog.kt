@@ -25,12 +25,12 @@ import su.sv.commonui.R
 fun AppAlertDialog(
     title: String,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
     text: String? = null,
     confirmText: String = stringResource(R.string.common_dialog_confirm),
     onConfirm: (() -> Unit)? = null,
     dismissText: String? = stringResource(R.string.common_dialog_cancel),
     icon: ImageVector? = null,
-    modifier: Modifier = Modifier
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,

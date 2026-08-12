@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.speech.tts.TextToSpeech
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -40,8 +40,6 @@ class TTSPopup(val fb: FBReaderView) {
     companion object {
         val TAG: String = TTSPopup::class.java.simpleName
 
-        @JvmField
-        val EOL = arrayOf("\n", "\r")
         @JvmField
         val STOPS = arrayOf(".", ";") // ",", "\"", "'", "!", "?", """, ":", "(", ")"
         @JvmField
@@ -94,15 +92,6 @@ class TTSPopup(val fb: FBReaderView) {
         }
 
         @JvmStatic
-        fun isEOL(s: PluginView.Selection): Boolean {
-            val str = s.getText() ?: return false
-            for (e in EOL) {
-                if (str == e) return true
-            }
-            return false
-        }
-
-        @JvmStatic
         fun stopOnLeft(e: ZLTextElement): Boolean {
             if (e is ZLTextWord) {
                 val str = e.string
@@ -149,14 +138,14 @@ class TTSPopup(val fb: FBReaderView) {
         override fun getUserLocale(): Locale {
             val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
             val lang = shared.getString(ReaderPreferences.PREFERENCE_LANGUAGE, "") ?: ""
-            return if (lang.isEmpty()) Locale.getDefault() else Locale(lang)
+            return if (lang.isEmpty()) Locale.getDefault() else Locale.forLanguageTag(lang)
         }
 
         override fun onRangeStart(utteranceId: String?, start: Int, end: Int, frame: Int) {
             if (fb.tts == null) return
             marks.clear()
             marks.add(fragment!!.fragment)
-            val bm = fragment!!.findWord(start, end)
+            val bm = fragment!!.findWord(start)
             if (bm != null) {
                 marks.add(bm)
                 fragment!!.word = bm
@@ -893,7 +882,7 @@ class TTSPopup(val fb: FBReaderView) {
             word = null
         }
 
-        fun findWord(start: Int, end: Int): Storage.Bookmark? {
+        fun findWord(start: Int): Storage.Bookmark? {
             for (bm in fragmentWords) {
                 if (bm.strStart == start) return bm
             }

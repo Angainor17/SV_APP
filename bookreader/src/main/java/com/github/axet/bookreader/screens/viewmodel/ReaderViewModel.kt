@@ -3,7 +3,7 @@ package com.github.axet.bookreader.screens.viewmodel
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -2,7 +2,7 @@ package com.github.axet.bookreader.app
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.core.net.toUri
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication
 import timber.log.Timber
@@ -25,12 +25,6 @@ object BookReaderInitializer {
 
     private var zlib: ZLAndroidApplication? = null
     private var ttf: TTFManager? = null
-
-    /**
-     * Проверка, была ли выполнена инициализация
-     */
-    val isInitialized: Boolean
-        get() = zlib != null
 
     /**
      * Получить менеджер TTF-шрифтов
@@ -80,12 +74,5 @@ object BookReaderInitializer {
         ttf?.preloadFonts()
 
         Timber.d("BookReaderInitializer.init() completed")
-    }
-
-    /**
-     * Получить SharedPreferences для настроек читалки
-     */
-    fun getSharedPreferences(context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }

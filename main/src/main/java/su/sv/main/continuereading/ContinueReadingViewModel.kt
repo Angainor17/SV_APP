@@ -64,25 +64,24 @@ class ContinueReadingViewModel @Inject constructor(
     fun loadAndCheck() {
         // Не показывать snackbar если пользователь уже взаимодействовал с ним
         if (wasInteracted) {
-            Timber.d(TAG, "loadAndCheck: already interacted, skipping")
+            Timber.tag(TAG).d("loadAndCheck: already interacted, skipping")
             return
         }
 
-        Timber.d(TAG, "loadAndCheck: loading last read book")
+        Timber.tag(TAG).d("loadAndCheck: loading last read book")
 
         viewModelScope.launch {
-            Timber.d(TAG, "loadAndCheck: fetching last read book, wasInteracted=$wasInteracted")
+            Timber.tag(TAG).d("loadAndCheck: fetching last read book, wasInteracted=$wasInteracted")
 
             val bookInfo = getLastReadBookUseCase()
 
             if (bookInfo == null) {
-                Timber.d(TAG, "loadAndCheck: no last read book found, setting Hidden")
+                Timber.tag(TAG).d("loadAndCheck: no last read book found, setting Hidden")
                 _state.value = ContinueReadingState.Hidden
                 return@launch
             }
 
-            Timber.d(
-                TAG,
+            Timber.tag(TAG).d(
                 "loadAndCheck: found book='${bookInfo.title}': uri=${bookInfo.bookFileUri}"
             )
             _state.value = ContinueReadingState.Visible(bookInfo)
@@ -96,8 +95,7 @@ class ContinueReadingViewModel @Inject constructor(
         val currentState = _state.value as? ContinueReadingState.Visible ?: return
         val bookInfo = currentState.bookInfo
 
-        Timber.d(
-            TAG,
+        Timber.tag(TAG).d(
             "onContinueClick: opening book='${bookInfo.title}', uri=${bookInfo.bookFileUri}"
         )
 
@@ -119,7 +117,7 @@ class ContinueReadingViewModel @Inject constructor(
      * Закрыть snackbar.
      */
     fun onDismissClick() {
-        Timber.d(TAG, "onDismissClick: hiding snackbar")
+        Timber.tag(TAG).d("onDismissClick: hiding snackbar")
         hideSnackbar()
     }
 

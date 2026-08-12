@@ -65,13 +65,13 @@ class CustomColorsRepositoryImpl @Inject constructor(
             "LIGHT" -> PreferencesKeys.CUSTOM_COLORS_LIGHT
             "DARK" -> PreferencesKeys.CUSTOM_COLORS_DARK
             else -> {
-                Timber.w(TAG, "Unknown theme mode: ${colors.themeMode}")
+                Timber.tag(TAG).w("Unknown theme mode: ${colors.themeMode}")
                 return
             }
         }
 
         val jsonString = gson.toJson(colors)
-        Timber.d(TAG, "Saving custom colors for ${colors.themeMode}: ${colors.colors.size} colors")
+        Timber.tag(TAG).d("Saving custom colors for ${colors.themeMode}: ${colors.colors.size} colors")
 
         context.customColorsDataStore.edit { preferences ->
             preferences[key] = jsonString
@@ -83,12 +83,12 @@ class CustomColorsRepositoryImpl @Inject constructor(
             "LIGHT" -> PreferencesKeys.CUSTOM_COLORS_LIGHT
             "DARK" -> PreferencesKeys.CUSTOM_COLORS_DARK
             else -> {
-                Timber.w(TAG, "Unknown theme mode: $themeMode")
+                Timber.tag(TAG).w("Unknown theme mode: $themeMode")
                 return
             }
         }
 
-        Timber.d(TAG, "Clearing custom colors for $themeMode")
+        Timber.tag(TAG).d("Clearing custom colors for $themeMode")
 
         context.customColorsDataStore.edit { preferences ->
             preferences.remove(key)
@@ -96,7 +96,7 @@ class CustomColorsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearAll() {
-        Timber.d(TAG, "Clearing all custom colors")
+        Timber.tag(TAG).d("Clearing all custom colors")
 
         context.customColorsDataStore.edit { preferences ->
             preferences.remove(PreferencesKeys.CUSTOM_COLORS_LIGHT)
