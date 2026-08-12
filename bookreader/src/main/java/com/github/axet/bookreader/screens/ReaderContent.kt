@@ -32,7 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -599,7 +599,7 @@ private fun TocItemRow(
     ) {
         // Иконка главы
         Icon(
-            imageVector = Icons.Default.List,
+            imageVector = Icons.AutoMirrored.Filled.List,
             contentDescription = null,
             modifier = Modifier.padding(end = 8.dp),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)

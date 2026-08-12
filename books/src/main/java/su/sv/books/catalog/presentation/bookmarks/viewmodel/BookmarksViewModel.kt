@@ -1,6 +1,7 @@
 package su.sv.books.catalog.presentation.bookmarks.viewmodel
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,7 +56,6 @@ class BookmarksViewModel @Inject constructor(
     val selectedNote: StateFlow<UiBookmarkNote?> get() = _selectedNote
 
     /** Фильтр по книге */
-    private var filterBookId: String? = null
     private var filterBookTitle: String? = null
 
     private var currentViewMode: NotesViewMode = NotesViewMode.LIST
@@ -157,7 +157,7 @@ class BookmarksViewModel @Inject constructor(
             _state.value = UiBookmarksState.Loading
 
             // Вычисляем MD5 из URI
-            val bookId = calculateMd5UseCase.execute(Uri.parse(bookFileUri)).getOrNull()
+            val bookId = calculateMd5UseCase.execute(bookFileUri.toUri()).getOrNull()
 
             if (bookId == null) {
                 Timber.w("Failed to calculate MD5 for bookFileUri: $bookFileUri")

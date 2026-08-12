@@ -346,7 +346,7 @@ private fun parseHexColor(hex: String): Color? {
 
             else -> null
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

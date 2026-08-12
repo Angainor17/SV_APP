@@ -9,7 +9,6 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.view.ViewCompat
 import com.github.axet.androidlibrary.widgets.PopupWindowCompat
 import com.github.axet.androidlibrary.widgets.ThemeUtils
 import com.github.axet.bookreader.R
@@ -55,7 +54,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
         for (k in maps.keys) {
             val r = maps[k]!!
             val v = views[k]!!
-            val dp2 = ThemeUtils.dp2px(context, 2f).toInt()
+            val dp2 = ThemeUtils.dp2px(context, 2f)
             val lp = v.layoutParams as MarginLayoutParams
             lp.setMargins(w * r.left / PERC + dp2, h * r.top / PERC + dp2, 0, 0)
             lp.width = w * r.width() / PERC - dp2 * 2
@@ -168,7 +167,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
             background = g
             val lp = MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
             layoutParams = lp
-            ViewCompat.setAlpha(text, 0.7f)
+            text.alpha = 0.7f
         }
     }
 }

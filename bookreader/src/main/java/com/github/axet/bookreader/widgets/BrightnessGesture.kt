@@ -7,7 +7,7 @@ open class BrightnessGesture(private val fb: FBReaderView) {
     private var myStartY: Int = 0
     private var myIsBrightnessAdjustmentInProgress: Boolean = false
     private var myStartBrightness: Int = 0
-    var areaWidth: Int = ThemeUtils.dp2px(fb.context, 36f).toInt()
+    var areaWidth: Int = ThemeUtils.dp2px(fb.context, 36f)
     private var myColorLevel: Int? = null
 
     fun onTouchEvent(e: MotionEvent): Boolean {
@@ -55,7 +55,6 @@ open class BrightnessGesture(private val fb: FBReaderView) {
             percent = 100
 
         val level: Float
-        val oldColorLevel = myColorLevel
         if (percent >= 25) {
             level = .01f + (percent - 25) * .99f / 75
             myColorLevel = null

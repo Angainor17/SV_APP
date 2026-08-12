@@ -1,7 +1,6 @@
 package com.github.axet.bookreader.app
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.core.net.toUri
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication
@@ -21,6 +20,7 @@ import timber.log.Timber
  * }
  * ```
  */
+@Suppress("StaticFieldLeak")
 object BookReaderInitializer {
 
     private var zlib: ZLAndroidApplication? = null

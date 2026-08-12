@@ -54,9 +54,6 @@ class ZoomGestureHandler(
     private var fitWidthZoom: Float = 1.5f  // Default, will be calculated
 
     // Pan tracking
-    private var lastTouchX: Float = 0f
-    private var lastTouchY: Float = 0f
-    private var isPanning: Boolean = false
 
     interface ZoomListener {
         /**
@@ -151,7 +148,7 @@ class ZoomGestureHandler(
                     resetZoom()
                 } else {
                     // Calculate fit-width zoom
-                    calculateAndApplyFitWidthZoom(e.x, e.y)
+                    calculateAndApplyFitWidthZoom()
                 }
                 return true
             }
@@ -184,7 +181,7 @@ class ZoomGestureHandler(
     /**
      * Calculate fit-width zoom factor to remove margins and fill screen with content.
      */
-    private fun calculateAndApplyFitWidthZoom(tapX: Float, tapY: Float) {
+    private fun calculateAndApplyFitWidthZoom() {
         val screenWidth = listener.getScreenWidth()
         val pageContentWidth = listener.getPageContentWidth()
 
@@ -208,7 +205,7 @@ class ZoomGestureHandler(
                 // Use content ratio to estimate actual text area
                 val contentRatio = 0.9f  // Assume 90% is content (small margins)
                 val contentWidth = actualPageWidth * contentRatio
-                fitWidthZoom = screenWidth.toFloat() / contentWidth.toFloat()
+                fitWidthZoom = screenWidth.toFloat() / contentWidth
                 Timber.tag("voronin")
                     .d("ZoomGestureHandler: page larger than screen, zoom=$fitWidthZoom contentRatio=$contentRatio")
             }
