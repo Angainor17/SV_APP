@@ -140,7 +140,7 @@ private fun DefaultEmptyDetail() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "Выберите элемент для просмотра",
+            text = stringResource(R.string.master_detail_select_hint),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

@@ -37,10 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
+import su.sv.books.R
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import kotlin.math.roundToInt
@@ -160,7 +162,7 @@ private fun DownloadedBookGridItem(
         ) {
             Icon(
                 imageVector = Icons.Outlined.Delete,
-                contentDescription = "Удалить книгу",
+                contentDescription = stringResource(R.string.books_downloaded_delete_content_description),
                 tint = androidx.compose.material3.MaterialTheme.colorScheme.error
             )
         }

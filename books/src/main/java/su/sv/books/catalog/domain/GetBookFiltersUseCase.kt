@@ -1,14 +1,18 @@
 package su.sv.books.catalog.domain
 
+import su.sv.books.R
 import su.sv.books.catalog.domain.model.Book
 import su.sv.books.catalog.domain.model.BookFilter
 import su.sv.books.catalog.domain.model.BookFilterWithCount
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import javax.inject.Inject
 
 /**
  * UseCase для формирования списка фильтров на основе списка книг
  */
-class GetBookFiltersUseCase @Inject constructor() {
+class GetBookFiltersUseCase @Inject constructor(
+    private val resourcesRepository: ResourcesRepository,
+) {
 
     /**
      * Максимальное количество фильтров (кроме "Все")
@@ -99,7 +103,7 @@ class GetBookFiltersUseCase @Inject constructor() {
         // Добавляем "Все" в начало
         val allFilter = BookFilterWithCount(
             filter = BookFilter.All,
-            displayName = "Все",
+            displayName = resourcesRepository.getString(R.string.books_filter_all),
             count = books.size,
         )
 

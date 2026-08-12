@@ -32,4 +32,7 @@
     <string name="image_viewer_content_description">Изображение %1$d из %2$d</string>
     <string name="image_viewer_close">Закрыть просмотр изображения</string>
 
+    <!-- Master-Detail -->
+    <string name="master_detail_select_hint">Выберите элемент для просмотра</string>
+
 </resources>

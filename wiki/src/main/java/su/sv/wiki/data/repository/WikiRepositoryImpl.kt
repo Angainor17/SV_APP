@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import su.sv.commonarchitecture.managers.ResourcesRepository
+import su.sv.wiki.R
 import su.sv.wiki.data.api.WikiApi
 import su.sv.wiki.data.api.model.ApiLink
 import su.sv.wiki.data.local.dao.ArticleCacheDao
@@ -28,6 +30,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class WikiRepositoryImpl @Inject constructor(
+    private val resourcesRepository: ResourcesRepository,
     private val api: WikiApi,
     private val favoriteDao: FavoriteDao,
     private val historyDao: HistoryDao,
@@ -47,7 +50,7 @@ class WikiRepositoryImpl @Inject constructor(
                     Timber.tag("voronin")
                         .d("searchArticle: query='$query', error: code=${response.code()}")
                     WikiResult.Error(
-                        message = "Ошибка сети: ${response.code()}",
+                        message = resourcesRepository.getString(R.string.wiki_error_network, response.code().toString()),
                         code = response.code().toString(),
                     )
                 }
@@ -79,7 +82,7 @@ class WikiRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("voronin").e(e, "searchArticle: query='$query', exception")
             WikiResult.Error(
-                message = e.message ?: "Неизвестная ошибка",
+                message = e.message ?: resourcesRepository.getString(R.string.wiki_error_unknown),
                 code = "NETWORK_ERROR",
             )
         }
@@ -100,7 +103,7 @@ class WikiRepositoryImpl @Inject constructor(
             when {
                 !response.isSuccessful -> {
                     WikiResult.Error(
-                        message = "Ошибка сети: ${response.code()}",
+                        message = resourcesRepository.getString(R.string.wiki_error_network, response.code().toString()),
                         code = response.code().toString(),
                     )
                 }
@@ -120,7 +123,7 @@ class WikiRepositoryImpl @Inject constructor(
 
                 response.body()?.parse == null -> {
                     WikiResult.Error(
-                        message = "Пустой ответ от сервера",
+                        message = resourcesRepository.getString(R.string.wiki_error_empty_response),
                         code = "EMPTY_RESPONSE",
                     )
                 }
@@ -153,7 +156,7 @@ class WikiRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e, "Error getting article: $title")
             WikiResult.Error(
-                message = e.message ?: "Неизвестная ошибка",
+                message = e.message ?: resourcesRepository.getString(R.string.wiki_error_unknown),
                 code = "NETWORK_ERROR",
             )
         }
