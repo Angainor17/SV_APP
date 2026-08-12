@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import android.provider.DocumentsContract
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.app.Storage
+import com.github.axet.bookreader.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -144,7 +145,7 @@ class BookmarksRepository @Inject constructor(
                             booksWithNotes.add(
                                 BookWithNotesData(
                                     bookId = jsonFile.bookId,
-                                    bookTitle = json?.optString("title") ?: "Неизвестная книга",
+                                    bookTitle = json?.optString("title") ?: context.getString(R.string.sv_unknown_book),
                                     bookAuthor = json?.optString("authors") ?: "",
                                     bookCoverPath = coverUrl,
                                     notesCount = notes.size,
@@ -349,7 +350,7 @@ class BookmarksRepository @Inject constructor(
                 return notes
             }
 
-            val bookTitle = json.optString("title", "Неизвестная книга")
+            val bookTitle = json.optString("title", context.getString(R.string.sv_unknown_book))
             val bookAuthor = json.optString("authors", "")
 
             // URI файла книги из JSON (на уровне книги) - fallback если в закладке не сохранён
