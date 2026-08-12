@@ -202,7 +202,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
         if (fb.pluginview != null) {
             val dst = getPageRect()
             var x = dst.left
-            var y = dst.top
+            val y = dst.top
             if (fb.pluginview!!.reflow) {
                 val info = getInfo()
                 if (info != null) // в onDrawInScrolling onScrollingFinished вызывается перед onDrawStatic, вызывая info == null
@@ -212,7 +212,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             val position = getPosition()
 
             for (l in links.values) {
-                l?.hide()
+                l.hide()
             }
             links[position]?.let {
                 it.show()
@@ -220,7 +220,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             }
 
             for (b in bookmarks.values) {
-                b?.hide()
+                b.hide()
             }
             bookmarks[position]?.let {
                 it.show()
@@ -228,7 +228,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             }
 
             for (t in tts.values) {
-                t?.hide()
+                t.hide()
             }
             tts[position]?.let {
                 it.show()
@@ -236,7 +236,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             }
 
             for (s in searchs.values) {
-                s?.hide()
+                s.hide()
             }
             searchs[position]?.let {
                 it.show()
@@ -442,7 +442,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
                     val page = fb.pluginview!!.selectPage(pos, getInfo(), dst.width(), dst.height())
                     val run = {
                         var x = dst.left
-                        var y = dst.top
+                        val y = dst.top
                         if (fb.pluginview!!.reflow)
                             x += getInfo()!!.margin.left
                         fb.selection.update(

@@ -1,7 +1,6 @@
 package com.github.axet.bookreader.widgets
 
 import android.graphics.Rect
-import org.geometerplus.zlibrary.core.view.SelectionCursor
 
 /**
  * Callback interface для событий SelectionView.
@@ -47,23 +46,7 @@ class EmptySelectionCallbacks : SelectionCallbacks {
  */
 enum class HandleType {
     LEFT,
-    RIGHT;
-
-    fun toSelectionCursorWhich(): SelectionCursor.Which {
-        return when (this) {
-            LEFT -> SelectionCursor.Which.Left
-            RIGHT -> SelectionCursor.Which.Right
-        }
-    }
-
-    companion object {
-        fun fromSelectionCursorWhich(which: SelectionCursor.Which): HandleType {
-            return when (which) {
-                SelectionCursor.Which.Left -> LEFT
-                SelectionCursor.Which.Right -> RIGHT
-            }
-        }
-    }
+    RIGHT
 }
 
 /**
@@ -96,49 +79,6 @@ sealed class DragState {
      * Проверяет, есть ли активный drag.
      */
     fun isDragging(): Boolean = this is Dragging
-
-    /**
-     * Возвращает активный handle если есть drag.
-     */
-    fun activeHandle(): HandleType? = (this as? Dragging)?.handle
-}
-
-/**
- * Состояние выделения текста.
- *
- * @param dragState состояние drag операции
- * @param startHandleBounds bounds начального маркера
- * @param endHandleBounds bounds конечного маркера
- * @param isValid true если выделение корректно (margin != null)
- */
-data class SelectionState(
-    val dragState: DragState = DragState.Idle,
-    val startHandleBounds: Rect? = null,
-    val endHandleBounds: Rect? = null,
-    val isValid: Boolean = false
-) {
-    /**
-     * Проверяет, нужно ли скрыть панель действий.
-     * Панель скрывается при начале drag.
-     */
-    fun shouldHidePanel(): Boolean =
-        dragState.isDragging() && startHandleBounds != null && endHandleBounds != null
-
-    /**
-     * Проверяет, нужно ли показать панель действий.
-     * Панель показывается при завершении drag если выделение корректно.
-     */
-    fun shouldShowPanel(): Boolean = dragState == DragState.Idle && isValid
-
-    /**
-     * Возвращает bounds для указанного handle.
-     */
-    fun getHandleBounds(handle: HandleType): Rect? {
-        return when (handle) {
-            HandleType.LEFT -> startHandleBounds
-            HandleType.RIGHT -> endHandleBounds
-        }
-    }
 }
 
 /**

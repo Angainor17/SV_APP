@@ -226,6 +226,7 @@ class TTSPopup(val fb: FBReaderView) {
     init {
         tts.ttsCreate()
         val inflater = LayoutInflater.from(context)
+        @Suppress("InflateParams")
         val view = inflater.inflate(R.layout.tts_popup, null)
         view.findViewById<View>(R.id.tts_left).setOnClickListener {
             stop()
@@ -245,7 +246,7 @@ class TTSPopup(val fb: FBReaderView) {
             }
         }
         view.findViewById<View>(R.id.tts_close).setOnClickListener { dismiss() }
-        val dp20 = ThemeUtils.dp2px(context, 20f).toInt()
+        val dp20 = ThemeUtils.dp2px(context, 20f)
         val f = FrameLayout(context)
         val round = FrameLayout(context)
         round.setBackgroundResource(org.geometerplus.R.drawable.panel)
@@ -712,6 +713,7 @@ class TTSPopup(val fb: FBReaderView) {
         fb.ttsUpdate()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onScrollingFinished(pageIndex: ZLViewEnums.PageIndex) {
         for (r in onScrollFinished) r.run()
         onScrollFinished.clear()
