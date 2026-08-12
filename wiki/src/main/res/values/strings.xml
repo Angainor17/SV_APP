@@ -43,4 +43,9 @@
     <!-- Master-Detail (планшеты) -->
     <string name="wiki_favorites_select_hint">Выберите статью из избранного</string>
     <string name="wiki_error_loading">Ошибка загрузки</string>
+
+    <!-- Ошибки -->
+    <string name="wiki_error_network">Ошибка сети: %s</string>
+    <string name="wiki_error_unknown">Неизвестная ошибка</string>
+    <string name="wiki_error_empty_response">Пустой ответ от сервера</string>
 </resources>

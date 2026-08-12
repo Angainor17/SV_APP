@@ -6,4 +6,26 @@
     <string name="info_bug_report_content_description">Сообщить о проблеме</string>
     <string name="link_copied">Ссылка скопирована</string>
 
+    <!-- Info links: тексты -->
+    <string name="info_link_buy_book">Купить бумажную книгу</string>
+    <string name="info_link_download_book">Скачать электронную книгу</string>
+    <string name="info_link_vk_group">Группа Свободное время</string>
+    <string name="info_link_win_science">Наука Побеждать</string>
+    <string name="info_link_red_university">Красный университет. II отделение</string>
+    <string name="info_link_vk_lobbyo">Академия Смыслов Lobbyo</string>
+    <string name="info_link_youtube_lobbyo">YouTube канал Академия Смыслов Lobbyo</string>
+    <string name="info_link_dzen_sv">Дзен канал группы Свободное время</string>
+    <string name="info_link_telegram_sv">Телеграм канал группы Свободное время</string>
+
+    <!-- Info links: URL -->
+    <string name="info_url_buy_book">https://svg-shop.ru/</string>
+    <string name="info_url_download_book">https://bibl.fra-mos.ru/category/svobodnoe-vremya/</string>
+    <string name="info_url_vk_group">https://vk.com/svobodnoev</string>
+    <string name="info_url_win_science">https://vk.com/kurs.kommunizma</string>
+    <string name="info_url_red_university">https://vk.com/communism.university</string>
+    <string name="info_url_vk_lobbyo">https://vk.com/lobbyo</string>
+    <string name="info_url_youtube_lobbyo">https://www.youtube.com/channel/UCCWUurfuoWhXkFpjNZkLc-A</string>
+    <string name="info_url_dzen_sv">https://dzen.ru/svremya</string>
+    <string name="info_url_telegram_sv">https://t.me/SVremya</string>
+
 </resources>

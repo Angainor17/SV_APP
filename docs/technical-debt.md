@@ -387,10 +387,20 @@ scroll/two-column режим на затронутых устройствах.
 
 ### ✅ Non-suspend Use Cases + Hardcoded строки + Timber (2026-08-12)
 
-- **GetLastReadBookUseCase**: добавлен `suspend`, I/O через `withContext(dispatcherProvider.io)`, хардкод-строка `"Книга"` → `DEFAULT_BOOK_TITLE`
-- **BookmarksRepository**: `"Неизвестная книга"` → `UNKNOWN_BOOK_TITLE`
+- **GetLastReadBookUseCase**: добавлен `suspend`, I/O через `withContext(dispatcherProvider.io)`, `"Книга"` → `R.string.default_book_title`
+- **BookmarksRepository**: `"Неизвестная книга"` → `R.string.sv_unknown_book`
 - **Timber**: подтверждено, что `CustomColorsRepositoryImpl`, `ContinueReadingViewModel`, `PDFPlugin` уже используют Timber
 - **Ложные срабатывания**: QA/Wiki use cases возвращают `Flow` — не требуют `suspend`
+
+### ✅ Вынос хардкод-строк в ресурсы (2026-08-12)
+
+- **GetInfoLinksUseCase** (`info`): 9 текстов ссылок + 9 URL → `info/strings.xml`
+- **WikiRepositoryImpl** (`wiki`): `"Ошибка сети"`, `"Неизвестная ошибка"`, `"Пустой ответ от сервера"` → `wiki/strings.xml`
+- **GetBookFiltersUseCase** (`books`): `"Все"` → `R.string.books_filter_all`
+- **MasterDetailLayout** (`commonui`): `"Выберите элемент для просмотра"` → `R.string.master_detail_select_hint`
+- **DownloadedBooksList** (`books`): `"Удалить книгу"` → `R.string.books_downloaded_delete_content_description`
+
+Строки читаются через `ResourcesRepository` (commonarchitecture), а не напрямую через `context.getString`.
 
 ### ✅ Lint исправления (2026-07-26)
 

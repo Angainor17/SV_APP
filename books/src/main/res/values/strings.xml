@@ -22,7 +22,7 @@
     <string name="books_downloaded_empty_title">Нет скачанных книг</string>
     <string name="books_downloaded_read_button">Читать</string>
     <string name="books_downloaded_page_progress">Страница: %1$d / %2$d</string>
-    <string name="books_downloaded_delete_content_description">Удалить</string>
+    <string name="books_downloaded_delete_content_description">Удалить книгу</string>
     <string name="books_downloaded_delete_dialog_title">Подтверждение</string>
     <string name="books_downloaded_delete_dialog_message">Вы точно хотите удалить \"%1$s\"?</string>
     <string name="books_downloaded_delete_dialog_yes">Да</string>
@@ -63,5 +63,8 @@
     <string name="notes_title_with_count">Заметки (%1$d)</string>
     <string name="notes_loading">Загрузка заметок…</string>
     <string name="notes_all_notes">Все заметки</string>
+
+    <!-- Filters -->
+    <string name="books_filter_all">Все</string>
 
 </resources>

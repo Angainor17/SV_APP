@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import su.sv.commonarchitecture.di.module.DispatcherProvider
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -66,6 +67,7 @@ data class BookWithNotesData(
 class BookmarksRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
+    private val resourcesRepository: ResourcesRepository,
 ) {
     private val storage by lazy { Storage(context) }
 
@@ -145,7 +147,7 @@ class BookmarksRepository @Inject constructor(
                             booksWithNotes.add(
                                 BookWithNotesData(
                                     bookId = jsonFile.bookId,
-                                    bookTitle = json?.optString("title") ?: context.getString(R.string.sv_unknown_book),
+                                    bookTitle = json?.optString("title") ?: resourcesRepository.getString(R.string.sv_unknown_book),
                                     bookAuthor = json?.optString("authors") ?: "",
                                     bookCoverPath = coverUrl,
                                     notesCount = notes.size,
@@ -350,7 +352,7 @@ class BookmarksRepository @Inject constructor(
                 return notes
             }
 
-            val bookTitle = json.optString("title", context.getString(R.string.sv_unknown_book))
+            val bookTitle = json.optString("title", resourcesRepository.getString(R.string.sv_unknown_book))
             val bookAuthor = json.optString("authors", "")
 
             // URI файла книги из JSON (на уровне книги) - fallback если в закладке не сохранён
