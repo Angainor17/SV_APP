@@ -138,14 +138,15 @@ fun ReaderContent(
     // Обработка клавиш громкости
     VolumeKeysHandler(fbReaderView, viewModel)
 
-    // Сохранение позиции при уходе с экрана (не закрываем книгу!)
+    // Сохранение позиции при уходе с экрана
     DisposableEffect(Unit) {
         onDispose {
             viewModel.savePosition()
             // Выходим из fullscreen режима при закрытии экрана
             fbReaderView?.exitFullscreen()
-            // НЕ вызываем closeBook() - книга должна оставаться открытой
-            // closeBook() вызовется в ViewModel.onCleared() при уничтожении ViewModel
+            // Закрываем View — освобождаем pluginview/tts. Сама книга (currentFBook)
+            // остаётся в ViewModel и перезагрузится при возврате на экран.
+            fbReaderView?.closeBook()
         }
     }
 
