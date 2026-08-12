@@ -40,7 +40,6 @@ import su.sv.commonui.ui.components.AppToolbarWithBack
  * Контент экрана настроек читалки
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("DEPRECATION")
 @Composable
 fun ReaderSettingsContent(
     modifier: Modifier = Modifier,

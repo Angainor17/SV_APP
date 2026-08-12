@@ -1,6 +1,5 @@
 package su.sv.books.catalog.presentation.root.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -57,7 +56,6 @@ import su.sv.commonui.ui.components.FullScreenLoading
  * Главный экран каталога книг
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RootBooksCatalog(
     viewModel: RootBooksCatalogViewModel = hiltViewModel(),
