@@ -14,7 +14,7 @@ import javax.inject.Inject
  * UseCase для отправки баг-репорта через Tracer API + Imgbb
  */
 class SendBugReportUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val imgbbUploader: ImgbbUploader,
     private val bugReportWorkManager: BugReportWorkManager,
 ) {

@@ -12,7 +12,7 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 class ResourcesRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     fun getLanguage(): String = Locale.getDefault().language
 

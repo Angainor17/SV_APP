@@ -34,7 +34,7 @@ object RecreateActivity
  */
 @HiltViewModel
 class ThemeViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val themeRepository: ThemeRepository
 ) : ViewModel() {

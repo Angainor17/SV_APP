@@ -46,7 +46,7 @@ data class NoteContextResult(
  */
 @Singleton
 class BookContextService @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
 ) {
 

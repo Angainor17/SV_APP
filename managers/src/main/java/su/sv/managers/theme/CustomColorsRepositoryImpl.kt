@@ -29,7 +29,7 @@ private const val TAG = "CustomColorsRepo"
  */
 @Singleton
 class CustomColorsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val gson: Gson = Gson()
 ) : CustomColorsRepository {
 

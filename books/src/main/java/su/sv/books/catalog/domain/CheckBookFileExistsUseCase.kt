@@ -11,7 +11,7 @@ import javax.inject.Inject
  * UseCase для проверки существования файла книги по URI
  */
 class CheckBookFileExistsUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     /**
      * Проверить существование файла по URI

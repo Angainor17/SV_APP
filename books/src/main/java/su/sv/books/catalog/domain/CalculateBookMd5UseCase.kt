@@ -15,7 +15,7 @@ import javax.inject.Inject
  * Используется для связи между UiBook (fileUri) и BookmarkNote (bookId = MD5)
  */
 class CalculateBookMd5UseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
 ) {
 

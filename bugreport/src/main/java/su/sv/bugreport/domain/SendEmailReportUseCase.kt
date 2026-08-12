@@ -13,7 +13,7 @@ import javax.inject.Inject
  * UseCase для создания Intent отправки баг-репорта на email
  */
 class SendEmailReportUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     /**
      * Создаёт Intent для отправки баг-репорта на email
