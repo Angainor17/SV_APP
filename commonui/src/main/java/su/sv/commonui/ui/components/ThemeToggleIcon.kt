@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 import su.sv.commonui.R
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.ThemeMode
@@ -75,7 +76,7 @@ fun ThemeToggleIcon(
     // Обработка долгого нажатия через корутину
     LaunchedEffect(isPressed) {
         if (isPressed && !hasTriggeredLongPress) {
-            delay(5000) // 5 секунд
+            delay(5.seconds) // 5 секунд
             onLongPress()
             hasTriggeredLongPress = true
         }
@@ -125,43 +126,4 @@ fun ThemeToggleIcon(
             modifier = Modifier.size(dimensions.iconSizeToolbar)
         )
     }
-}
-
-/**
- * Иконка режима темы (без клика)
- * Показывает иконку следующего режима при переключении
- *
- * @param mode режим темы
- * @param isSystemDark true если системная тема тёмная
- * @param modifier модификатор
- */
-@Composable
-fun ThemeModeIcon(
-    mode: ThemeMode,
-    modifier: Modifier = Modifier,
-    isSystemDark: Boolean = false,
-) {
-    val dimensions = LocalAppDimensions.current
-
-    // Показываем иконку противоположного режима
-    val iconRes = when (mode) {
-        ThemeMode.LIGHT -> R.drawable.ic_theme_dark   // При светлой теме показываем луну
-        ThemeMode.DARK -> R.drawable.ic_theme_light    // При тёмной теме показываем солнце
-        ThemeMode.SYSTEM -> if (isSystemDark) R.drawable.ic_theme_light else R.drawable.ic_theme_dark
-    }
-
-    val contentDescription = when (mode) {
-        ThemeMode.LIGHT -> stringResource(R.string.theme_mode_dark)
-        ThemeMode.DARK -> stringResource(R.string.theme_mode_light)
-        ThemeMode.SYSTEM -> if (isSystemDark) stringResource(R.string.theme_mode_light) else stringResource(
-            R.string.theme_mode_dark
-        )
-    }
-
-    Icon(
-        imageVector = ImageVector.vectorResource(iconRes),
-        contentDescription = contentDescription,
-        tint = MaterialTheme.colorScheme.onSurface,
-        modifier = modifier.size(dimensions.iconSizeToolbar)
-    )
 }

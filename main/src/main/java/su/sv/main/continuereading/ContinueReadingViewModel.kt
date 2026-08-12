@@ -1,6 +1,7 @@
 package su.sv.main.continuereading
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.axet.bookreader.domain.GetLastReadBookUseCase
@@ -102,7 +103,7 @@ class ContinueReadingViewModel @Inject constructor(
         viewModelScope.launch {
             _effect.emit(
                 ContinueReadingEffect.OpenBook(
-                    bookUri = Uri.parse(bookInfo.bookFileUri),
+                    bookUri = bookInfo.bookFileUri.toUri(),
                     bookTitle = bookInfo.title,
                     bookAuthor = bookInfo.authors,
                     coverUrl = bookInfo.coverUrl,

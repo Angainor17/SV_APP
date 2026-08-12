@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import su.sv.commonui.theme.LocalAppDimensions
 
 /**
@@ -80,68 +79,4 @@ fun AppLoadingIndicator(
             style = stroke
         )
     }
-}
-
-/**
- * Малый индикатор загрузки
- */
-@Composable
-fun AppLoadingIndicatorSmall(
-    modifier: Modifier = Modifier,
-    color: Color? = null
-) {
-    val dimensions = LocalAppDimensions.current
-    AppLoadingIndicator(
-        size = dimensions.loadingIndicatorSizeSmall,
-        strokeWidth = 2.dp,
-        color = color,
-        modifier = modifier
-    )
-}
-
-/**
- * Большой индикатор загрузки
- */
-@Composable
-fun AppLoadingIndicatorLarge(
-    modifier: Modifier = Modifier,
-    color: Color? = null
-) {
-    val dimensions = LocalAppDimensions.current
-    AppLoadingIndicator(
-        size = dimensions.loadingIndicatorSizeLarge,
-        strokeWidth = 4.dp,
-        color = color,
-        modifier = modifier
-    )
-}
-
-/**
- * Индикатор загрузки с цветом поверхности
- */
-@Composable
-fun AppLoadingIndicatorOnSurface(
-    modifier: Modifier = Modifier,
-    size: Dp? = null
-) {
-    AppLoadingIndicator(
-        size = size,
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = modifier
-    )
-}
-
-/**
- * Индикатор загрузки с цветом ошибки
- */
-@Composable
-fun AppLoadingIndicatorError(
-    modifier: Modifier = Modifier,
-    size: Dp? = null
-) {
-    AppLoadingIndicator(
-        size = size,
-        color = MaterialTheme.colorScheme.error,
-        modifier = modifier
-    )
 }

@@ -1,6 +1,5 @@
 package su.sv.commonarchitecture.mock
 
-import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Protocol
 import okhttp3.Request
@@ -21,9 +20,7 @@ import javax.inject.Singleton
  * @since 2026-06-24
  */
 @Singleton
-class MockDataProvider @Inject constructor(
-    private val gson: Gson
-) {
+class MockDataProvider @Inject constructor() {
 
     // =====================================
     // Wiki API Mocks (svremya.su)

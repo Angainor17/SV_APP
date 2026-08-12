@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter.State
 import coil3.request.ImageRequest
-import su.sv.commonui.theme.LocalAdaptiveDimensions
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
@@ -71,7 +70,6 @@ fun NewsItem(
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val dimensions = LocalAppDimensions.current
-    val adaptiveDims = LocalAdaptiveDimensions.current
     val formFactor = LocalDeviceFormFactor.current
 
     // На планшетах используем горизонтальный layout
@@ -80,7 +78,6 @@ fun NewsItem(
             modifier = modifier,
             item = item,
             dimensions = dimensions,
-            adaptiveDims = adaptiveDims,
             onItemClick = onItemClick,
         )
     } else {
@@ -88,7 +85,6 @@ fun NewsItem(
             modifier = modifier,
             item = item,
             dimensions = dimensions,
-            adaptiveDims = adaptiveDims,
             onItemClick = onItemClick,
         )
     }
@@ -103,7 +99,6 @@ private fun NewsItemPhone(
     modifier: Modifier,
     item: UiNewsItem,
     dimensions: su.sv.commonui.theme.AppDimensions,
-    adaptiveDims: su.sv.commonui.theme.AdaptiveDimensions,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     Card(
@@ -166,7 +161,6 @@ private fun NewsItemTablet(
     modifier: Modifier,
     item: UiNewsItem,
     dimensions: su.sv.commonui.theme.AppDimensions,
-    adaptiveDims: su.sv.commonui.theme.AdaptiveDimensions,
     onItemClick: (UiNewsMedia) -> Unit,
 ) {
     val hasMedia = item.images.isNotEmpty() || item.videos.isNotEmpty()
@@ -174,7 +168,7 @@ private fun NewsItemTablet(
 
     // Состояние для хранения высоты Row
     val rowHeightPxState = remember { mutableIntStateOf(0) }
-    val rowHeightPx = rowHeightPxState.value
+    val rowHeightPx = rowHeightPxState.intValue
     val density = LocalDensity.current
 
     Card(
@@ -190,7 +184,7 @@ private fun NewsItemTablet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .onSizeChanged { size -> rowHeightPxState.value = size.height }
+                .onSizeChanged { size -> rowHeightPxState.intValue = size.height }
         ) {
             // Картинка слева на всю высоту карточки
             if (hasMedia) {

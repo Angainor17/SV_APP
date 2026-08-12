@@ -1,7 +1,5 @@
 package su.sv.app
 
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Left
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Right
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
@@ -93,74 +91,6 @@ fun ComposeRendererScope<StackState>.AppScreenTransition(
                     }
                 }
             }
-        },
-        content = { screen -> screen.SaveableContent(screenModifier) }
-    )
-}
-
-/**
- * Альтернативная анимация с более выраженным эффектом slide (полный выезд экранов).
- * Используйте, если хотите более классический эффект смены экранов.
- */
-@Composable
-@OptIn(ExperimentalModoApi::class)
-fun ComposeRendererScope<StackState>.AppScreenTransitionFull(
-    modifier: Modifier = Modifier,
-    screenModifier: Modifier = Modifier
-) {
-    val backgroundColor = MaterialTheme.colorScheme.background
-    ScreenTransition(
-        modifier = modifier.background(backgroundColor),
-        screenModifier = screenModifier.background(backgroundColor),
-        transitionSpec = {
-            val transitionType = calculateStackTransitionType(oldState, newState)
-            val slideSpec: FiniteAnimationSpec<IntOffset> =
-                tween(durationMillis = TRANSITION_DURATION_MS, easing = FastOutSlowInEasing)
-            val fadeSpec = tween<Float>(durationMillis = TRANSITION_DURATION_MS / 2)
-
-            when {
-                transitionType == StackTransitionType.Replace ||
-                        oldState?.stack?.lastOrNull() is DialogScreen ||
-                        newState?.stack?.lastOrNull() is DialogScreen -> {
-                    fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
-                }
-
-                transitionType == StackTransitionType.Push -> {
-                    slideIntoContainer(Left, animationSpec = slideSpec) togetherWith
-                            slideOutOfContainer(Left, animationSpec = slideSpec)
-                }
-
-                transitionType == StackTransitionType.Pop -> {
-                    slideIntoContainer(Right, animationSpec = slideSpec) togetherWith
-                            slideOutOfContainer(Right, animationSpec = slideSpec)
-                }
-
-                else -> {
-                    fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
-                }
-            }
-        },
-        content = { screen -> screen.SaveableContent(screenModifier) }
-    )
-}
-
-/**
- * Альтернативная анимация только с fade (без slide).
- * Более мягкий и быстрый переход.
- */
-@Composable
-@OptIn(ExperimentalModoApi::class)
-fun ComposeRendererScope<StackState>.AppScreenTransitionFade(
-    modifier: Modifier = Modifier,
-    screenModifier: Modifier = Modifier
-) {
-    val backgroundColor = MaterialTheme.colorScheme.background
-    ScreenTransition(
-        modifier = modifier.background(backgroundColor),
-        screenModifier = screenModifier.background(backgroundColor),
-        transitionSpec = {
-            val fadeSpec = tween<Float>(durationMillis = 250, easing = FastOutSlowInEasing)
-            fadeIn(fadeSpec) togetherWith fadeOut(fadeSpec)
         },
         content = { screen -> screen.SaveableContent(screenModifier) }
     )

@@ -123,17 +123,6 @@ private val LightColorScheme = lightColorScheme(
 // EXTENSION PROPERTIES
 // ============================================================
 
-/**
- * Цвет ссылок в зависимости от темы
- */
-val ColorScheme.linkColor: Color
-    @Composable
-    @ReadOnlyComposable
-    get() = if (this == DarkColorScheme) DarkLinkColor else LightLinkColor
-
-/**
- * Цвет обводки карточки
- */
 val ColorScheme.cardStroke: Color
     @Composable
     @ReadOnlyComposable
@@ -154,17 +143,9 @@ val ColorScheme.success: Color
     @ReadOnlyComposable
     get() = FunctionalSuccess
 
-val ColorScheme.warning: Color
-    @ReadOnlyComposable
-    get() = FunctionalWarning
-
 val ColorScheme.info: Color
     @ReadOnlyComposable
     get() = FunctionalInfo
-
-val ColorScheme.danger: Color
-    @ReadOnlyComposable
-    get() = FunctionalDanger
 
 /**
  * Цвет избранного (красный для обеих тем)
@@ -430,14 +411,4 @@ fun SVAPPThemeLightPreview(
     content: @Composable () -> Unit
 ) {
     SVAPPTheme(themeMode = ThemeMode.LIGHT, content = content)
-}
-
-/**
- * Тёмная тема для Preview
- */
-@Composable
-fun SVAPPThemeDarkPreview(
-    content: @Composable () -> Unit
-) {
-    SVAPPTheme(themeMode = ThemeMode.DARK, content = content)
 }

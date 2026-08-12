@@ -114,13 +114,11 @@ class NaturalOrderComparator : Comparator<String> {
 
         var ia = 0
         var ib = 0
-        var nza = 0
-        var nzb = 0
 
         while (true) {
             // Считаем количество нулей перед последним сравниваемым числом
-            nza = 0
-            nzb = 0
+            var nza = 0
+            var nzb = 0
 
             var ca = charAt(a, ia)
             var cb = charAt(b, ib)

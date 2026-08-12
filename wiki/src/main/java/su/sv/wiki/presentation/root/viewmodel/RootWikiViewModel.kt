@@ -47,15 +47,15 @@ class RootWikiViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val searchArticleUseCase: SearchArticleUseCase,
     private val getArticleUseCase: GetArticleUseCase,
-    private val getHistoryUseCase: GetHistoryUseCase,
+    getHistoryUseCase: GetHistoryUseCase,
     private val addHistoryUseCase: AddHistoryUseCase,
     private val clearHistoryUseCase: ClearHistoryUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase,
     private val removeFavoriteUseCase: RemoveFavoriteUseCase,
     private val isFavoriteUseCase: IsFavoriteUseCase,
     private val getSearchSuggestionsUseCase: GetSearchSuggestionsUseCase,
-    private val hasFavoritesUseCase: HasFavoritesUseCase,
-    private val getFavoritesUseCase: GetFavoritesUseCase,
+    hasFavoritesUseCase: HasFavoritesUseCase,
+    getFavoritesUseCase: GetFavoritesUseCase,
     private val mapper: UiWikiMapper,
 ) : BaseViewModel(), WikiActionsHandler {
 

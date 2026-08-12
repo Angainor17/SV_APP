@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.os.Build
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -20,7 +19,6 @@ import org.geometerplus.zlibrary.core.library.ZLibrary
 import org.geometerplus.zlibrary.text.view.ZLTextView
 import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil
 import org.geometerplus.zlibrary.ui.android.view.ZLAndroidPaintContext
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * View для отображения нижней панели читалки с прогрессом, временем и батареей.
@@ -33,21 +31,11 @@ class FBFooterView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     companion object {
-        private val nextGeneratedId = AtomicInteger(1)
-
         /**
          * Генерирует уникальный ID для view.
          */
-        fun generateViewId(): Int { // ViewCompat API27
-            if (Build.VERSION.SDK_INT >= 17)
-                return View.generateViewId()
-            while (true) {
-                val result = nextGeneratedId.get()
-                var newValue = result + 1
-                if (newValue > 0x00FFFFFF) newValue = 1 // Сброс на 1, не 0
-                if (nextGeneratedId.compareAndSet(result, newValue))
-                    return result
-            }
+        fun generateViewId(): Int {
+            return View.generateViewId()
         }
     }
 
@@ -75,7 +63,7 @@ class FBFooterView @JvmOverloads constructor(
             0xffffff and cProfile.FooterNGBackgroundOption.getValue()
                 .intValue() or 0xff000000.toInt()
         )
-        var lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+        val lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
         lp.gravity = Gravity.CENTER
         addView(TOCMarks(context), lp)
         val footerOptions = fb.app.ViewOptions.getFooterOptions()
@@ -87,8 +75,8 @@ class FBFooterView @JvmOverloads constructor(
             addView(ProgressAsPercentage(context), lpText)
         if (footerOptions.ShowClock.value) {
             val clock = Clock(context)
-            val dp4 = ThemeUtils.dp2px(context, 4f).toInt()
-            val dp2 = ThemeUtils.dp2px(context, 2f).toInt()
+            val dp4 = ThemeUtils.dp2px(context, 4f)
+            val dp2 = ThemeUtils.dp2px(context, 2f)
             clock.setPadding(dp4, 0, dp2, 0)
             addView(clock, lpText)
         }
@@ -175,8 +163,7 @@ class FBFooterView @JvmOverloads constructor(
         protected val r = Rect()
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-            var w = getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
-            w = r.width() + paddingLeft + paddingRight
+            val w = r.width() + paddingLeft + paddingRight
             val h = footer!!.height
             setMeasuredDimension(w, h)
         }

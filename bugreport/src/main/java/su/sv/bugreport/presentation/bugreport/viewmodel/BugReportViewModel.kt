@@ -177,7 +177,7 @@ class BugReportViewModel @Inject constructor(
             context.packageManager
                 .getPackageInfo(context.packageName, 0)
                 .versionName ?: "unknown"
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "unknown"
         }
     }

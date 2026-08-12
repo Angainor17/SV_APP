@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ErrorOutline
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -137,84 +135,3 @@ fun FullScreenEmpty(
     }
 }
 
-/**
- * Стандартный экран "Нет результатов поиска"
- */
-@Composable
-fun FullScreenNoSearchResults(
-    modifier: Modifier = Modifier,
-    query: String? = null,
-) {
-    val description = query?.let {
-        "По запросу \"$it\" ничего не найдено"
-    }
-
-    FullScreenEmpty(
-        title = "Ничего не найдено",
-        description = description,
-        icon = Icons.Rounded.Search,
-        modifier = modifier
-    )
-}
-
-/**
- * Стандартный экран "Нет данных"
- */
-@Composable
-fun FullScreenNoData(
-    modifier: Modifier = Modifier,
-    message: String = "Нет данных для отображения",
-) {
-    FullScreenEmpty(
-        title = message,
-        icon = Icons.Rounded.Info,
-        modifier = modifier
-    )
-}
-
-/**
- * Inline-ошибка (для использования внутри контента)
- */
-@Composable
-fun InlineError(
-    message: String,
-    modifier: Modifier = Modifier,
-    onRetry: (() -> Unit)? = null
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center
-        )
-
-        onRetry?.let {
-            AppButton(
-                text = stringResource(R.string.common_retry),
-                onClick = it,
-                modifier = Modifier.padding(top = 8.dp),
-                style = ButtonStyle.TEXT
-            )
-        }
-    }
-}
-
-/**
- * Inline-индикатор загрузки (для использования внутри контента)
- */
-@Composable
-fun InlineLoading(
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        AppLoadingIndicator()
-    }
-}

@@ -475,7 +475,6 @@ open class PluginView {
                     reflower!!.pending = 1
                 }
 
-                else -> {}
             }
             if (bm != null) {
                 if (reflower == null || reflower!!.bm === bm)
@@ -593,24 +592,11 @@ open class PluginView {
     }
 
     /**
-     * Возвращает прямоугольник выделения.
-     */
-    open fun selectRect(info: Reflow.Info, x: Int, y: Int): Rect? {
-        var x = x - info.margin.left
-        val dst = info.dst
-        for (d in dst.keys) {
-            if (d.contains(x, y))
-                return dst[d]
-        }
-        return null
-    }
-
-    /**
      * Возвращает точку выделения.
      */
     open fun selectPoint(info: Reflow.Info?, x: Int, y: Int): Selection.Point? {
         return if (reflow) {
-            var x = x - info!!.margin.left
+            val x = x - info!!.margin.left
             for (d in info.dst.keys) {
                 if (d.contains(x, y))
                     return Selection.Point(info.fromDst(d, x, y))
@@ -837,8 +823,6 @@ open class PluginView {
         var index: Int = 0
         @JvmField
         var rect: Rect? = null
-
-        constructor()
 
         constructor(url: String?, index: Int, rect: Rect?) {
             this.url = url

@@ -1,7 +1,7 @@
 package com.github.axet.bookreader.domain
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import com.github.axet.bookreader.app.Storage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
@@ -93,10 +93,10 @@ class GetLastReadBookUseCase @Inject constructor(
      */
     private fun getFileName(uriString: String): String {
         return try {
-            val uri = Uri.parse(uriString)
+            val uri = uriString.toUri()
             Storage.getName(context, uri)
         } catch (e: Exception) {
-            Timber.tag(TAG).e("Error getting file name: $uriString", e)
+            Timber.tag(TAG).e(e, "Error getting file name: $uriString")
             "Книга"
         }
     }
