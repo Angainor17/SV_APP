@@ -36,11 +36,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import kotlin.math.roundToInt
@@ -229,18 +229,13 @@ private fun SwipeableBookItem(
     resetKey: Any?,
     isDeleting: Boolean,
 ) {
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
 
     // Максимальное смещение - 30% от ширины экрана
-    val maxSwipeDistance = with(density) {
-        (configuration.screenWidthDp.dp.toPx() * 0.3f)
-    }
+    val maxSwipeDistance = windowInfo.containerSize.width * 0.3f
 
     // Порог срабатывания - 25% от ширины (должен быть меньше максимального)
-    val triggerDistance = with(density) {
-        (configuration.screenWidthDp.dp.toPx() * 0.25f)
-    }
+    val triggerDistance = windowInfo.containerSize.width * 0.25f
 
     // Состояние свайпа - сбрасывается при изменении resetKey или book.id
     var offsetX by remember(book.id, resetKey) { mutableFloatStateOf(0f) }
@@ -249,13 +244,13 @@ private fun SwipeableBookItem(
     // Анимация подсказки для первого элемента
     if (showHint) {
         LaunchedEffect(Unit) {
-            delay(300)
+            delay(300.milliseconds)
             // Показываем небольшое смещение влево дважды
             repeat(2) {
                 offsetX = -triggerDistance * 0.8f
-                delay(400)
+                delay(400.milliseconds)
                 offsetX = 0f
-                delay(200)
+                delay(200.milliseconds)
             }
             onHintShown()
         }
@@ -279,7 +274,7 @@ private fun SwipeableBookItem(
     // Обработка dismissal - вызываем onDeleteRequest после анимации
     LaunchedEffect(isDismissed) {
         if (isDismissed) {
-            delay(200) // Небольшая задержка для анимации
+            delay(200.milliseconds) // Небольшая задержка для анимации
             onDeleteRequest()
             // Сбрасываем флаг dismissal - свайп останется открытым если isDeleting=true
             isDismissed = false

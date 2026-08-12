@@ -76,8 +76,8 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
     /**
      * Создаёт View для отображения комикса.
      */
-    override fun create(fbook: Storage.FBook): Plugin.View {
-        return ComicsView(BookUtil.fileByBook(fbook.book))
+    override fun create(book: Storage.FBook): Plugin.View {
+        return ComicsView(BookUtil.fileByBook(book.book))
     }
 
     override fun readMetainfo(book: AbstractBook) {}
@@ -130,7 +130,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
         while (i < bb.size) {
             val b = bb[i]
             val tt = b.name
-            if (tt == null || tt.isEmpty())
+            if (tt.isEmpty())
                 continue
             if (b.level > level) {
                 val c = loadTOC(i, b.level, bb, last!!)
@@ -396,10 +396,6 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
     class ComicsPage : Plugin.Page {
         var doc: Decoder? = null
 
-        constructor(r: ComicsPage) : super(r) {
-            doc = r.doc
-        }
-
         constructor(r: ComicsPage, index: ZLViewEnums.PageIndex, w: Int, h: Int) : super(r) {
             this.w = w
             this.h = h
@@ -471,7 +467,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
         }
 
         override fun draw(
-            canvas: Canvas,
+            bitmap: Canvas,
             w: Int,
             h: Int,
             index: ZLViewEnums.PageIndex,
@@ -483,7 +479,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
             val render = r.renderRect()
             val bm = doc!!.render(r.pageNumber, c)
             if (bm != null && render.dst != null) {
-                canvas.drawBitmap(bm, render.toRect(bm.width, bm.height), render.dst!!, paint)
+                bitmap.drawBitmap(bm, render.toRect(bm.width, bm.height), render.dst!!, paint)
                 bm.recycle()
             }
         }

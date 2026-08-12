@@ -136,6 +136,7 @@ class FBFooterView @JvmOverloads constructor(
             setMeasuredDimension(w, h)
         }
 
+        @Suppress("DrawAllocation")
         override fun onDraw(c: Canvas) {
             val paintContext = ZLAndroidPaintContext(
                 fb!!.app.SystemInfo,

@@ -89,8 +89,8 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
     }
 
-    override fun create(fbook: Storage.FBook): Plugin.View {
-        return DjvuView(BookUtil.fileByBook(fbook.book))
+    override fun create(book: Storage.FBook): Plugin.View {
+        return DjvuView(BookUtil.fileByBook(book.book))
     }
 
     @Throws(BookReadingException::class)
@@ -367,9 +367,9 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return rr as Array<Rect>
         }
 
-        override fun getBounds(p: Page): Bounds {
+        override fun getBounds(page: Page): Bounds {
             val bounds = Bounds()
-            val b = SelectionBounds(p)
+            val b = SelectionBounds(page)
             bounds.reverse = b.reverse
             bounds.start = b.first
             bounds.end = b.last
@@ -766,7 +766,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         override fun draw(
-            canvas: Canvas,
+            bitmap: Canvas,
             w: Int,
             h: Int,
             index: ZLViewEnums.PageIndex,
@@ -796,15 +796,15 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             )
             val src = checkNotNull(render.src) { "render.src is null in draw" }
             val dst = checkNotNull(render.dst) { "render.dst is null in draw" }
-            canvas.drawBitmap(bm, src, dst, paint)
+            bitmap.drawBitmap(bm, src, dst, paint)
             bm.recycle()
         }
 
         override fun select(
-            page: PluginView.Selection.Page,
+            p: PluginView.Selection.Page,
             point: PluginView.Selection.Point
         ): PluginView.Selection? {
-            val s = Selection(doc, page, point)
+            val s = Selection(doc, p, point)
             if (s.isEmpty()) return null
             return s
         }
