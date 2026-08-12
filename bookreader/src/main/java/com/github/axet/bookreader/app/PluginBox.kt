@@ -37,6 +37,7 @@ open class PluginBox {
     /**
      * Преобразует в Rect.
      */
+    @Suppress("UNUSED_PARAMETER")
     fun toRect(canvasWidth: Int, canvasHeight: Int): Rect {
         return Rect(x, canvasHeight - this.h - y, x + this.w, canvasHeight - y)
     }

@@ -41,27 +41,6 @@ open class PluginView {
             0f, 0f, -1.0f, 0f, 255f, // синий
             0f, 0f, 0f, 1.0f, 0f     // альфа
         )
-
-        /**
-         * Вычисляет нечётный индекс.
-         */
-        @JvmStatic
-        fun odd(i: Int): Int {
-            return ((i + 1) / 2) * ((i + 1) % 2 - i % 2)
-        }
-
-        /**
-         * Вычисляет нечётную страницу.
-         */
-        @JvmStatic
-        fun odd(page: Int, i: Int, max: Int): Int {
-            var p = page + odd(i)
-            if (page <= i / 2)
-                p = i
-            if (page + i / 2 >= max)
-                p = max - i - 1
-            return p
-        }
     }
 
     @JvmField

@@ -122,7 +122,6 @@ private fun DownloadedBooksGrid(
                 onReadClick = { onReadClick(book) },
                 onBookClick = { onBookClick(book) },
                 onDeleteRequest = { onDeleteRequest(book) },
-                isDeleting = deletingBookId == book.id,
             )
         }
     }
@@ -138,7 +137,6 @@ private fun DownloadedBookGridItem(
     onReadClick: () -> Unit,
     onBookClick: () -> Unit,
     onDeleteRequest: () -> Unit,
-    isDeleting: Boolean,
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()

@@ -3,6 +3,7 @@ package su.sv.books.catalog.presentation.bookmarks.ui
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -333,7 +334,7 @@ private fun HandleEffects(viewModel: BookmarksViewModel) {
 
                     stackNavigation.forward(
                         ReaderScreen(
-                            bookUri = Uri.parse(bookUri),
+                            bookUri = bookUri.toUri(),
                             bookCoverUrl = note.bookCoverUrl,
                             bookTitle = note.bookTitle,
                             bookAuthor = note.bookAuthor,

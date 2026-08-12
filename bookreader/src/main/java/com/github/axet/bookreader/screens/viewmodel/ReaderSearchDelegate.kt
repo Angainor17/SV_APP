@@ -80,16 +80,4 @@ class ReaderSearchDelegate(
         updateState(currentState.copy(searchState = SearchState()))
         getFBReaderView()?.searchClose()
     }
-
-    fun updateResults(count: Int, currentIndex: Int) {
-        val currentState = getState() ?: return
-        updateState(
-            currentState.copy(
-                searchState = currentState.searchState.copy(
-                    resultsCount = count,
-                    currentResultIndex = currentIndex
-                )
-            )
-        )
-    }
 }
