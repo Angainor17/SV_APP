@@ -1,11 +1,13 @@
 package su.sv.main.continuereading
 
+import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.axet.bookreader.domain.GetLastReadBookUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import su.sv.main.R
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,6 +47,7 @@ sealed class ContinueReadingEffect {
 @HiltViewModel
 class ContinueReadingViewModel @Inject constructor(
     private val getLastReadBookUseCase: GetLastReadBookUseCase,
+    @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ContinueReadingState>(ContinueReadingState.Hidden)
@@ -74,7 +78,9 @@ class ContinueReadingViewModel @Inject constructor(
         viewModelScope.launch {
             Timber.tag(TAG).d("loadAndCheck: fetching last read book, wasInteracted=$wasInteracted")
 
-            val bookInfo = getLastReadBookUseCase()
+            val bookInfo = getLastReadBookUseCase(
+                defaultTitle = context.getString(R.string.default_book_title)
+            )
 
             if (bookInfo == null) {
                 Timber.tag(TAG).d("loadAndCheck: no last read book found, setting Hidden")

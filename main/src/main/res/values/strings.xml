@@ -9,5 +9,6 @@
     <!-- Snackbar "Продолжить чтение" -->
     <string name="continue_reading_button">Продолжить</string>
     <string name="continue_reading_dismiss">Закрыть</string>
+    <string name="default_book_title">Книга</string>
 
 </resources>

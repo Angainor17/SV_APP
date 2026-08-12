@@ -1,7 +1,7 @@
 # Технический долг SV APP
 
 **Дата создания:** 2026-07-27
-**Последнее обновление:** 2026-08-11
+**Последнее обновление:** 2026-08-12
 
 ---
 
@@ -179,16 +179,12 @@ org.gradle.vfs.watch=true        # File system watching
 
 ## Код и качество
 
-### 🟡 P2: Удалить hardcoded строки в domain слое
+### ✅ Удалить hardcoded строки в domain слое (исправлено 2026-08-12)
 
-**Проблема:** Строки "Книга", "Неизвестная книга" в domain слое.
+- `GetLastReadBookUseCase` — `"Книга"` → параметр `defaultTitle`, передаётся из `R.string.default_book_title` (main)
+- `BookmarksRepository` — `"Неизвестная книга"` → `context.getString(R.string.sv_unknown_book)` (bookreader)
 
-**Файлы:**
-
-- `GetLastReadBookUseCase.kt:81` — "Книга"
-- `BookmarksRepository.kt:141` — "Неизвестная книга"
-
-**Решение:** Передавать строки из presentation слоя через параметры или StringProvider
+Обе строки вынесены в Android string resources, в domain-слое не осталось хардкод-строк.
 
 ---
 
@@ -389,6 +385,13 @@ scroll/two-column режим на затронутых устройствах.
 
 ## Выполненные задачи
 
+### ✅ Non-suspend Use Cases + Hardcoded строки + Timber (2026-08-12)
+
+- **GetLastReadBookUseCase**: добавлен `suspend`, I/O через `withContext(dispatcherProvider.io)`, хардкод-строка `"Книга"` → `DEFAULT_BOOK_TITLE`
+- **BookmarksRepository**: `"Неизвестная книга"` → `UNKNOWN_BOOK_TITLE`
+- **Timber**: подтверждено, что `CustomColorsRepositoryImpl`, `ContinueReadingViewModel`, `PDFPlugin` уже используют Timber
+- **Ложные срабатывания**: QA/Wiki use cases возвращают `Flow` — не требуют `suspend`
+
 ### ✅ Lint исправления (2026-07-26)
 
 - Исправлено 16 критических ошибок Range
@@ -555,17 +558,15 @@ scroll/two-column режим на затронутых устройствах.
 
 ## android.util.Log → Timber
 
-### 🟡 P2: Use android.util.Log вместо Timber
+### ✅ Use android.util.Log вместо Timber (исправлено ранее)
 
-**Файлы:**
+**Файлы (все уже используют Timber):**
 
-- `managers/src/main/java/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` (~6, 56, 68, 74, 86,
-  91, 99) — `Log.e`, `Log.d`, `Log.w`
-- `main/src/main/java/su/sv/main/continuereading/ContinueReadingViewModel.kt` (~8 debug-вызовов)
-- `bookreader/app/PDFPlugin.kt` (3 `Log.e`)
+- `managers/src/main/java/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` — `Timber.e()`, `Timber.tag(TAG).w/d()`
+- `main/src/main/java/su/sv/main/continuereading/ContinueReadingViewModel.kt` — `Timber.tag(TAG).d()`
+- `bookreader/app/PDFPlugin.kt` — `Timber.tag(TAG).e()`
 
-**Проблема:** Timber уже есть и используется в большинстве модулей, но в этих файлах — прямой
-`android.util.Log`.
+Все три файла уже мигрированы на Timber.
 
 ---
 
@@ -666,20 +667,22 @@ lock.
 
 ## Архитектурные потенциальные проблемы
 
-### 🟠 P1: Non-suspend Use Cases блокируют корутины
+### ✅ Non-suspend Use Cases — GetLastReadBookUseCase (исправлено 2026-08-12)
 
-**Файлы:**
+**Файл:** `bookreader/domain/GetLastReadBookUseCase.kt`
 
-- `bookreader/domain/GetLastReadBookUseCase.kt`
-- `qa/src/main/java/su/sv/qa/domain/usecase/ObserveAnsweredQuestionsUseCase.kt`
-- `qa/src/main/java/su/sv/qa/domain/usecase/ObserveAnsweredQuestionsForBookUseCase.kt`
-- `wiki/src/main/java/su/sv/wiki/domain/usecase/GetFavoritesUseCase.kt`
-- `wiki/src/main/java/su/sv/wiki/domain/usecase/GetHistoryUseCase.kt`
+**Что сделано:**
+- `operator fun invoke()` теперь `suspend` — не блокирует корутину
+- I/O операции (`Storage.list()`) выполняются через `withContext(dispatcherProvider.io)`
+- Хардкод-строка `"Книга"` вынесена в константу `DEFAULT_BOOK_TITLE`
 
-**Проблема:** Non-suspend `invoke()` возвращает результат напрямую. Если внутри — `withContext`,
-`room`, или блокирующий вызов — это блокирует диспетчер корутины.
+**Ложные срабатывания (не требуют исправления):**
+- `ObserveAnsweredQuestionsUseCase` — возвращает `Flow`, не выполняет блокирующих операций
+- `ObserveAnsweredQuestionsForBookUseCase` — возвращает `Flow`
+- `GetFavoritesUseCase` — возвращает `Flow`
+- `GetHistoryUseCase` — возвращает `Flow`
 
-**Решение:** Добавить `suspend` к `operator fun invoke()`.
+Возврат `Flow` сам по себе не блокирует корутину — Flow ленивый и исполняется только при сборе.
 
 ---
 
