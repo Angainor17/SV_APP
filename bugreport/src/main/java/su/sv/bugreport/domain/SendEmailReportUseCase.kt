@@ -1,19 +1,18 @@
 package su.sv.bugreport.domain
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
-import dagger.hilt.android.qualifiers.ApplicationContext
 import su.sv.bugreport.R
 import su.sv.bugreport.domain.model.BugReport
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import javax.inject.Inject
 
 /**
  * UseCase для создания Intent отправки баг-репорта на email
  */
 class SendEmailReportUseCase @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    private val resourcesRepository: ResourcesRepository,
 ) {
     /**
      * Создаёт Intent для отправки баг-репорта на email
@@ -56,7 +55,7 @@ class SendEmailReportUseCase @Inject constructor(
         body: String,
         screenshots: List<Uri>,
     ): Intent {
-        val chooserTitle = context.getString(R.string.bug_report_email_chooser_title)
+        val chooserTitle = resourcesRepository.getString(R.string.bug_report_email_chooser_title)
 
         val intent = if (screenshots.size > 1) {
             // Для множественных вложений используем ACTION_SEND_MULTIPLE
