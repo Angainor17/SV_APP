@@ -29,7 +29,7 @@ data class LastReadBookInfo(
  * book.info - это метаданные из JSON файла {md5}.json (создаётся при первом открытии книги)
  */
 class GetLastReadBookUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
 
     /**

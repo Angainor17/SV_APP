@@ -63,7 +63,7 @@ data class BookWithNotesData(
  */
 @Singleton
 class BookmarksRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
 ) {
     private val storage by lazy { Storage(context) }

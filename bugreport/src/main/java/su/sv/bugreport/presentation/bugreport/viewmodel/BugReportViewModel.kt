@@ -28,7 +28,7 @@ import javax.inject.Inject
 class BugReportViewModel @Inject constructor(
     private val sendBugReportUseCase: SendBugReportUseCase,
     private val sendEmailReportUseCase: SendEmailReportUseCase,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow<BugReportState>(BugReportState.Form())

@@ -18,7 +18,7 @@ import java.io.File
 import javax.inject.Inject
 
 class BookDownloadRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val resourcesRepository: ResourcesRepository,
 ) {
 
