@@ -144,24 +144,8 @@ val DarkInversePrimary = Color(0xFF6750A4)
 // FUNCTIONAL COLORS (одинаково для обеих тем)
 // ============================================================
 
-/** Успешные действия */
-val FunctionalSuccess = Color(0xFF2E7D32)
-
-/** Предупреждения */
-val FunctionalWarning = Color(0xFFF57C00)
-
-/** Информация */
-val FunctionalInfo = Color(0xFF1976D2)
-
-/** Удаление/опасные действия */
-val FunctionalDanger = Color(0xFFB3261E)
-
 /** Цвет избранного (красный для обеих тем) */
 val FavoriteColor = Color(0xFFE53935)
-
-/** Белый цвет для обеих тем */
-@Suppress("unused")
-val White = Color(0xFFFFFFFF)
 
 // ============================================================
 // LINK COLORS
@@ -186,10 +170,6 @@ val CardStrokeLight = Color(0x40000000)
 /** Обводка карточки - Dark */
 val CardStrokeDark = Color(0x40FFFFFF)
 
-/** Обводка карточки новостей (для совместимости) */
-@Suppress("unused")
-val NewItemBorderStroke = Color(0x40000000)
-
 // ============================================================
 // NAVIGATION BAR COLORS
 // ============================================================
@@ -205,18 +185,6 @@ val LightNavigationBarColor = LightBackground  // WarmGray 50
  * Совпадает с фоном приложения для единого внешнего вида.
  */
 val DarkNavigationBarColor = DarkBackground  // #1C1B1F
-
-// ============================================================
-// SWIPE ACTION COLORS
-// ============================================================
-
-/** Фон при свайпе удаления */
-@Suppress("unused")
-val SwipeDeleteBackground = Color(0xFFB3261E)
-
-/** Фон при свайпе "в избранное" */
-@Suppress("unused")
-val SwipeFavoriteBackground = Color(0xFFFFC107)
 
 // ============================================================
 // BOOK DOWNLOAD INDICATOR COLORS

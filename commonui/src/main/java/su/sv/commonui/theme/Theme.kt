@@ -137,22 +137,8 @@ val ColorScheme.navigationBarColor: Color
     get() = if (this == DarkColorScheme) DarkNavigationBarColor else LightNavigationBarColor
 
 /**
- * Функциональные цвета (одинаковы для обеих тем)
- */
-@Suppress("unused")
-val ColorScheme.success: Color
-    @ReadOnlyComposable
-    get() = FunctionalSuccess
-
-@Suppress("unused")
-val ColorScheme.info: Color
-    @ReadOnlyComposable
-    get() = FunctionalInfo
-
-/**
  * Цвет избранного (красный для обеих тем)
  */
-@Suppress("unused")
 val ColorScheme.favorite: Color
     @ReadOnlyComposable
     get() = FavoriteColor

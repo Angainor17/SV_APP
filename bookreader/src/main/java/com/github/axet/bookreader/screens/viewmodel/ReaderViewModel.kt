@@ -34,7 +34,7 @@ import javax.inject.Inject
  * - [ReaderDisplayDelegate] — режимы отображения
  */
 @HiltViewModel
-@Suppress("StaticFieldLeak", "DEPRECATION")
+@Suppress("StaticFieldLeak")
 class ReaderViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val resourcesRepository: ResourcesRepository,
