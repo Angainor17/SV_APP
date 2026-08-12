@@ -88,10 +88,10 @@ abstract class PluginPage {
      * Переходит к следующей странице.
      */
     fun next(): Boolean {
-        var pageOffset = this.pageOffset + pageStep
+        val pageOffset = this.pageOffset + pageStep
         val tail = pageBox!!.h - pageOffset
         if (pageOffset >= pageBox!!.h || tail <= pageOverlap) {
-            var pageNumber = this.pageNumber + 1
+            val pageNumber = this.pageNumber + 1
             if (pageNumber >= getPagesCount())
                 return false
             this.pageOffset = 0
@@ -114,7 +114,7 @@ abstract class PluginPage {
                 pageOffset // синхронизация с верхом = 0 или сохранение отрицательного смещения
             return true
         } else if (pageOffset < 0) {
-            var pageNumber = this.pageNumber - 1
+            val pageNumber = this.pageNumber - 1
             if (pageNumber < 0)
                 return false
             this.pageNumber = pageNumber

@@ -81,24 +81,4 @@ object PermissionHelper {
             ) == PackageManager.PERMISSION_GRANTED
         }
     }
-
-    /**
-     * Create a permission launcher using ActivityResultContracts.
-     * This is the modern approach to request permissions.
-     *
-     * @param activity The activity to register the launcher with
-     * @param onResult Callback with (allGranted, permissionResults)
-     * @return ActivityResultLauncher for requesting permissions
-     */
-    fun createPermissionLauncher(
-        activity: ComponentActivity,
-        onResult: (Boolean, Map<String, Boolean>) -> Unit
-    ): ActivityResultLauncher<Array<String>> {
-        return activity.registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            val allGranted = permissions.values.all { it }
-            onResult(allGranted, permissions)
-        }
-    }
 }

@@ -1,6 +1,5 @@
 package su.sv.books.catalog.presentation.bookmarks.viewmodel
 
-import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

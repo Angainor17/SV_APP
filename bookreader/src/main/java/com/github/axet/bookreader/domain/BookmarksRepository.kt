@@ -3,6 +3,7 @@ package com.github.axet.bookreader.domain
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toUri
 import android.provider.DocumentsContract
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
 import com.github.axet.bookreader.app.Storage
@@ -436,7 +437,7 @@ class BookmarksRepository @Inject constructor(
      */
     private fun findCoverByBookUri(bookUri: String): String? {
         return try {
-            val uri = Uri.parse(bookUri)
+            val uri = bookUri.toUri()
             // CacheImagesAdapter.cacheUri генерирует файл обложки на основе URI книги
             val coverFile = CacheImagesAdapter.cacheUri(context, uri)
             if (coverFile.exists()) {
