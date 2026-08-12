@@ -3,9 +3,6 @@ package com.github.axet.bookreader.app
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.util.DisplayMetrics
@@ -65,41 +62,7 @@ class Reflow(
             }
         }
 
-        /**
-         * Рисует прямоугольник на canvas.
-         */
-        @JvmStatic
-        fun drawRect(canvas: Canvas, rect: Rect, paint: Paint) {
-            canvas.drawLine(
-                rect.left.toFloat(),
-                rect.top.toFloat(),
-                rect.right.toFloat(),
-                rect.top.toFloat(),
-                paint
-            )
-            canvas.drawLine(
-                rect.left.toFloat(),
-                rect.bottom.toFloat(),
-                rect.right.toFloat(),
-                rect.bottom.toFloat(),
-                paint
-            )
-            canvas.drawLine(
-                rect.left.toFloat(),
-                rect.top.toFloat(),
-                rect.left.toFloat(),
-                rect.bottom.toFloat(),
-                paint
-            )
-            canvas.drawLine(
-                rect.right.toFloat(),
-                rect.top.toFloat(),
-                rect.right.toFloat(),
-                rect.bottom.toFloat(),
-                paint
-            )
         }
-    }
 
     /**
      * Возвращает левый отступ.
@@ -265,13 +228,6 @@ class Reflow(
      */
     fun close() {
         recycle()
-    }
-    private fun findPage(info: Info): Int {
-        for (i in 0 until count()) {
-            if (info.src == k2!!.getRectMaps(i))
-                return i
-        }
-        return -1
     }
 
     /**

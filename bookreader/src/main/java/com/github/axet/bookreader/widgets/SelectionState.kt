@@ -74,11 +74,6 @@ sealed class DragState {
         val startX: Int,
         val startY: Int
     ) : DragState()
-
-    /**
-     * Проверяет, есть ли активный drag.
-     */
-    fun isDragging(): Boolean = this is Dragging
 }
 
 /**

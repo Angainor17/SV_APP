@@ -71,7 +71,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
         fb.pivotY = 0f
     }
 
-    override fun getPageContentWidth(): Int? {
+    override fun getPageContentWidth(): Int {
         // Get page content width for fit-width zoom calculation
         if (fb.pluginview != null && fb.pluginview!!.current != null) {
             // Use current.w - the rendered page width on screen (in pixels)
@@ -269,28 +269,28 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
 
     fun linksClose() {
         for (l in links.values) {
-            l?.close()
+            l.close()
         }
         links.clear()
     }
 
     fun bookmarksClose() {
         for (l in bookmarks.values) {
-            l?.close()
+            l.close()
         }
         bookmarks.clear()
     }
 
     fun ttsClose() {
         for (l in tts.values) {
-            l?.close()
+            l.close()
         }
         tts.clear()
     }
 
     fun searchClose() {
         for (l in searchs.values) {
-            l?.close()
+            l.close()
         }
         searchs.clear()
     }

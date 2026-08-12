@@ -347,7 +347,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             return b.page.text.textPageGetText(b.ss, b.cc) ?: ""
         }
 
-        override fun getBoundsAll(page: Page): Array<Rect>? {
+        override fun getBoundsAll(page: Page): Array<Rect> {
             val p = openSelPage(page)
             val n = p.text.textPageCountRects(0, p.count)
             return Array(n) { i ->
