@@ -26,7 +26,7 @@ internal object WikiDatabaseModule {
             context,
             WikiDatabase::class.java,
             "wiki_database",
-        ).fallbackToDestructiveMigration().build()
+        ).fallbackToDestructiveMigration(dropAllTables = true).build()
     }
 
     @Provides

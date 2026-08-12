@@ -3,12 +3,13 @@ package com.github.axet.bookreader.widgets
 import android.animation.TimeAnimator
 import android.animation.ValueAnimator
 import android.os.Handler
+import android.os.Looper
 
 /**
  * Совместимый TimeAnimator для старых версий Android.
  */
 class TimeAnimatorCompat {
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
     private var listener: TimeListener? = null
     private val v: ValueAnimator = TimeAnimator()
 

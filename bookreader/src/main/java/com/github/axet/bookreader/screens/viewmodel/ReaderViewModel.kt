@@ -22,6 +22,7 @@ import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.managers.OnBookPagerManager
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -34,7 +35,6 @@ import javax.inject.Inject
  * - [ReaderDisplayDelegate] — режимы отображения
  */
 @HiltViewModel
-@Suppress("StaticFieldLeak")
 class ReaderViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val resourcesRepository: ResourcesRepository,
@@ -48,8 +48,15 @@ class ReaderViewModel @Inject constructor(
     private var currentBook: Storage.Book? = null
     private var currentFBook: Storage.FBook? = null
 
-    /** Ссылка на FBReaderView (управляется из Compose) */
-    var fbReaderView: FBReaderView? = null
+    /** Слабая ссылка на FBReaderView — ViewModel не должен удерживать View. */
+    private var fbReaderViewRef: WeakReference<FBReaderView>? = null
+
+    /** Ссылка на FBReaderView (управляется из Compose), хранится слабо. */
+    var fbReaderView: FBReaderView?
+        get() = fbReaderViewRef?.get()
+        set(value) {
+            fbReaderViewRef = value?.let(::WeakReference)
+        }
 
     /** Сохранённая позиция для восстановления при пересоздании FBReaderView */
     private var savedPosition: FBReaderView.ZLTextIndexPosition? = null

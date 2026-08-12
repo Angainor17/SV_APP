@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -145,43 +144,4 @@ private fun DefaultEmptyDetail() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-}
-
-/**
- * Режим отображения для Master-Detail
- */
-enum class MasterDetailMode {
-    /** Две панели рядом (Expanded) */
-    TWO_PANE,
-
-    /** Одна панель - master */
-    MASTER_ONLY,
-
-    /** Одна панель - detail */
-    DETAIL_ONLY,
-}
-
-/**
- * Определить режим Master-Detail на основе форм-фактора
- */
-@Composable
-fun rememberMasterDetailMode(): MasterDetailMode {
-    val formFactor = LocalDeviceFormFactor.current
-
-    return remember(formFactor) {
-        when (formFactor) {
-            is DeviceFormFactor.Expanded -> MasterDetailMode.TWO_PANE
-            is DeviceFormFactor.Compact,
-            is DeviceFormFactor.Medium -> MasterDetailMode.MASTER_ONLY
-        }
-    }
-}
-
-/**
- * Проверка, нужно ли использовать двухпанельный layout
- */
-@Composable
-fun isTwoPaneLayout(): Boolean {
-    val formFactor = LocalDeviceFormFactor.current
-    return formFactor.isExpanded()
 }
