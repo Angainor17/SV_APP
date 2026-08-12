@@ -336,9 +336,9 @@ open class SelectionView(
         }
 
         val left =
-            rectHandle(SelectionCursor.Which.Left, first!!.left, first.top + first.height() / 2)
+            rectHandle(SelectionCursor.Which.Left, first.left, first.top + first.height() / 2)
         val right =
-            rectHandle(SelectionCursor.Which.Right, last!!.right, last.top + last.height() / 2)
+            rectHandle(SelectionCursor.Which.Right, last.right, last.top + last.height() / 2)
 
         if (reverse) {
             startRect.rect = right
@@ -575,9 +575,7 @@ open class SelectionView(
      * Закрывает выделение.
      */
     fun close() {
-        if (selection != null) {
-            selection.close()
-        }
+        selection.close()
     }
 
     // === Page Change Handling ===
@@ -950,7 +948,7 @@ open class SelectionView(
             paint.style = Paint.Style.FILL
             paint.color = SELECTION_ALPHA shl 24 or custom.selectionBackgroundColor.intValue()
 
-            padding = ThemeUtils.dp2px(context, SELECTION_PADDING.toFloat()).toInt()
+            padding = ThemeUtils.dp2px(context, SELECTION_PADDING.toFloat())
 
             layoutParams = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         }

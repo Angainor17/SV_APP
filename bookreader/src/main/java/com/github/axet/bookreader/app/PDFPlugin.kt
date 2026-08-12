@@ -6,7 +6,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.ParcelFileDescriptor
-import android.util.Log
+import timber.log.Timber
 import android.util.SparseArray
 import androidx.core.graphics.createBitmap
 import com.github.axet.androidlibrary.widgets.CacheImagesAdapter
@@ -70,8 +70,8 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         fun create(info: Storage.Info): PDFPlugin = PDFPlugin(info)
     }
 
-    override fun create(fbook: Storage.FBook): Plugin.View {
-        val file = BookUtil.fileByBook(fbook.book)
+    override fun create(book: Storage.FBook): Plugin.View {
+        val file = BookUtil.fileByBook(book.book)
         return PdfiumView(file)
     }
 
@@ -90,7 +90,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             document.close()
             fd.close()
         } catch (e: IOException) {
-            Log.e(TAG, "readMetainfo() failed for ${f.path}", e)
+            Timber.tag(TAG).e(e, "readMetainfo() failed for ${f.path}")
             throw IllegalStateException(e)
         }
     }
@@ -356,9 +356,9 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             }
         }
 
-        override fun getBounds(p: Page): Bounds {
+        override fun getBounds(page: Page): Bounds {
             val bounds = Bounds()
-            val b = SelectionBounds(p)
+            val b = SelectionBounds(page)
             bounds.reverse = b.reverse
             bounds.start = b.first
             bounds.end = b.last
@@ -766,7 +766,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 document = PdfiumCore(config = PDFIUM_CONFIG).newDocument(fd)
                 current = PdfiumPage(document)
             } catch (e: IOException) {
-                Log.e(TAG, "PdfiumView.init() failed for ${f.path}", e)
+                Timber.tag(TAG).e(e, "PdfiumView.init() failed for ${f.path}")
                 throw IllegalStateException(e)
             }
         }
@@ -827,10 +827,10 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         }
 
         override fun select(
-            page: PluginView.Selection.Page,
+            p: PluginView.Selection.Page,
             point: PluginView.Selection.Point
         ): PluginView.Selection? {
-            val start = SelectionPage(document, page)
+            val start = SelectionPage(document, p)
             if (start.count > 0) {
                 val s = Selection(document, start, point)
                 if (s.isEmpty()) {
@@ -896,7 +896,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
                 page.close()
                 return result
             } catch (e: Throwable) {
-                Log.e(TAG, "PdfiumView.getPageText() error getting text for page $pageNum", e)
+                Timber.tag(TAG).e(e, "PdfiumView.getPageText() error getting text for page $pageNum")
             }
             return null
         }

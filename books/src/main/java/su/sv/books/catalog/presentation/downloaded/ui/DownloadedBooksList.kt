@@ -72,7 +72,6 @@ fun DownloadedBooksList(
             onReadClick = onReadClick,
             onBookClick = onBookClick,
             onDeleteRequest = onDeleteRequest,
-            deletingBookId = deletingBookId,
             modifier = modifier,
         )
     } else {
@@ -100,7 +99,6 @@ private fun DownloadedBooksGrid(
     onReadClick: (UiDownloadedBook) -> Unit,
     onBookClick: (UiDownloadedBook) -> Unit,
     onDeleteRequest: (UiDownloadedBook) -> Unit,
-    deletingBookId: String?,
     modifier: Modifier = Modifier,
 ) {
     val gridState = rememberLazyStaggeredGridState()

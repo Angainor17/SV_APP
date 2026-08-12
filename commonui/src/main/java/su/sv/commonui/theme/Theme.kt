@@ -139,10 +139,12 @@ val ColorScheme.navigationBarColor: Color
 /**
  * Функциональные цвета (одинаковы для обеих тем)
  */
+@Suppress("unused")
 val ColorScheme.success: Color
     @ReadOnlyComposable
     get() = FunctionalSuccess
 
+@Suppress("unused")
 val ColorScheme.info: Color
     @ReadOnlyComposable
     get() = FunctionalInfo
@@ -150,6 +152,7 @@ val ColorScheme.info: Color
 /**
  * Цвет избранного (красный для обеих тем)
  */
+@Suppress("unused")
 val ColorScheme.favorite: Color
     @ReadOnlyComposable
     get() = FavoriteColor
