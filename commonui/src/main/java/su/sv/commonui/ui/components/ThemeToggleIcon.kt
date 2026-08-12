@@ -44,10 +44,10 @@ import su.sv.commonui.theme.ThemeMode
 @Composable
 fun ThemeToggleIcon(
     currentMode: ThemeMode,
-    isSystemDark: Boolean = false,
     onToggle: (ThemeMode) -> Unit,
+    modifier: Modifier = Modifier,
+    isSystemDark: Boolean = false,
     onLongPress: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val dimensions = LocalAppDimensions.current
 
@@ -138,8 +138,8 @@ fun ThemeToggleIcon(
 @Composable
 fun ThemeModeIcon(
     mode: ThemeMode,
+    modifier: Modifier = Modifier,
     isSystemDark: Boolean = false,
-    modifier: Modifier = Modifier
 ) {
     val dimensions = LocalAppDimensions.current
 

@@ -58,6 +58,9 @@ dependencies {
         exclude("org.apache.httpcomponents", "httpmime")
     }
 
+    // AndroidX Preference (replaces deprecated android.preference)
+    implementation("androidx.preference:preference-ktx:1.2.1")
+
     implementation(libs.axet.djvulibre) {
         exclude("org.apache.httpcomponents", "httpmime")
     }

@@ -33,11 +33,11 @@ import su.sv.commonui.theme.LocalAppDimensions
  */
 @Composable
 fun AppLoadingIndicator(
+    modifier: Modifier = Modifier,
     size: Dp? = null,
     color: Color? = null,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
     sweepAngle: Float = 90f,
-    modifier: Modifier = Modifier
 ) {
     val dimensions = LocalAppDimensions.current
     val actualSize = size ?: dimensions.loadingIndicatorSize

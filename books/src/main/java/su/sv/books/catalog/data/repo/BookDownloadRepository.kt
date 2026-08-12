@@ -283,20 +283,13 @@ class BookDownloadRepository @Inject constructor(
                     cursor.count > 0
                 } ?: false
             } else {
-                // Для старых Android просто проверяем что URI не null
-                uri != null
+                // Для старых Android просто возвращаем true (URI уже проверен на входе)
+                true
             }
         } catch (e: Exception) {
             Timber.w(e, "URI not accessible: $uri")
             false
         }
-    }
-
-    /**
-     * Проверяет существует ли файл (для отображения статуса)
-     */
-    fun fileExists(fileNameWithExt: String): Boolean {
-        return getDownloadsUri(fileNameWithExt) != null
     }
 
     /**
@@ -361,12 +354,10 @@ class BookDownloadRepository @Inject constructor(
             cursor.use {
                 val idColumn = it.getColumnIndex(DownloadManager.COLUMN_ID)
                 val localUriColumn = it.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
-                val titleColumn = it.getColumnIndex(DownloadManager.COLUMN_TITLE)
 
                 while (it.moveToNext()) {
                     val id = if (idColumn >= 0) it.getLong(idColumn) else -1
                     val localUri = if (localUriColumn >= 0) it.getString(localUriColumn) else null
-                    val title = if (titleColumn >= 0) it.getString(titleColumn) else null
 
                     // Проверяем совпадение по URI или по имени файла в URI
                     if (uri.toString() == localUri || uri.toString()
@@ -389,31 +380,6 @@ class BookDownloadRepository @Inject constructor(
             null
         } catch (e: Exception) {
             Timber.e(e, "Error finding downloadId for uri=$uri")
-            null
-        }
-    }
-
-    /**
-     * Получить имя файла из URI
-     */
-    private fun getFileNameFromUri(uri: Uri): String? {
-        return try {
-            when (uri.scheme) {
-                "file" -> uri.path?.substringAfterLast("/")
-                "content" -> {
-                    val cursor = context.contentResolver.query(uri, null, null, null, null)
-                    cursor?.use {
-                        if (it.moveToFirst()) {
-                            val nameIndex = it.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)
-                            if (nameIndex >= 0) it.getString(nameIndex) else null
-                        } else null
-                    }
-                }
-
-                else -> null
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error getting file name from URI: $uri")
             null
         }
     }

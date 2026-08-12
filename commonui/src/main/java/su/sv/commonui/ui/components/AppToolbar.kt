@@ -125,10 +125,10 @@ fun AppToolbarWithBack(
 fun AppToolbarWithThemeToggle(
     title: String,
     currentThemeMode: ThemeMode,
-    isSystemDark: Boolean = false,
     onThemeToggle: (ThemeMode) -> Unit,
-    onThemeLongPress: () -> Unit = {},
     modifier: Modifier = Modifier,
+    isSystemDark: Boolean = false,
+    onThemeLongPress: () -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
