@@ -1,7 +1,5 @@
 package su.sv.bugreport.domain
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.ok.tracer.Tracer
 import ru.ok.tracer.crash.report.TracerCrashReport
 import su.sv.bugreport.data.BugReportWorkManager
@@ -14,7 +12,6 @@ import javax.inject.Inject
  * UseCase для отправки баг-репорта через Tracer API + Imgbb
  */
 class SendBugReportUseCase @Inject constructor(
-    @param:ApplicationContext private val context: Context,
     private val imgbbUploader: ImgbbUploader,
     private val bugReportWorkManager: BugReportWorkManager,
 ) {

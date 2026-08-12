@@ -1,6 +1,8 @@
 package su.sv.info.domain
 
 import kotlinx.coroutines.delay
+import su.sv.commonarchitecture.managers.ResourcesRepository
+import su.sv.info.R
 import su.sv.info.domain.model.LinkItem
 import su.sv.info.domain.model.LinkItem.BuyBook
 import su.sv.info.domain.model.LinkItem.DownloadBook
@@ -14,7 +16,9 @@ import su.sv.info.domain.model.LinkItem.YouTubeLobbyo
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
-class GetInfoLinksUseCase @Inject constructor() {
+class GetInfoLinksUseCase @Inject constructor(
+    private val resourcesRepository: ResourcesRepository,
+) {
 
     /**
      * Возвращает список ссылок на внешние ресурсы (магазин, соцсети, каналы).
@@ -28,40 +32,40 @@ class GetInfoLinksUseCase @Inject constructor() {
         return Result.success(
             listOf(
                 BuyBook(
-                    text = "Купить бумажную книгу",
-                    url = "https://svg-shop.ru/",
+                    text = resourcesRepository.getString(R.string.info_link_buy_book),
+                    url = resourcesRepository.getString(R.string.info_url_buy_book),
                 ),
                 DownloadBook(
-                    text = "Скачать электронную книгу",
-                    url = "https://bibl.fra-mos.ru/category/svobodnoe-vremya/",
+                    text = resourcesRepository.getString(R.string.info_link_download_book),
+                    url = resourcesRepository.getString(R.string.info_url_download_book),
                 ),
                 VkGroupSV(
-                    text = "Группа Свободное время",
-                    url = "https://vk.com/svobodnoev",
+                    text = resourcesRepository.getString(R.string.info_link_vk_group),
+                    url = resourcesRepository.getString(R.string.info_url_vk_group),
                 ),
                 WinScience(
-                    text = "Наука Побеждать",
-                    url = "https://vk.com/kurs.kommunizma",
+                    text = resourcesRepository.getString(R.string.info_link_win_science),
+                    url = resourcesRepository.getString(R.string.info_url_win_science),
                 ),
                 RedUniversity(
-                    text = "Красный университет. II отделение",
-                    url = "https://vk.com/communism.university",
+                    text = resourcesRepository.getString(R.string.info_link_red_university),
+                    url = resourcesRepository.getString(R.string.info_url_red_university),
                 ),
                 VkLobbyo(
-                    text = "Академия Смыслов Lobbyo",
-                    url = "https://vk.com/lobbyo",
+                    text = resourcesRepository.getString(R.string.info_link_vk_lobbyo),
+                    url = resourcesRepository.getString(R.string.info_url_vk_lobbyo),
                 ),
                 YouTubeLobbyo(
-                    text = "YouTube канал Академия Смыслов Lobbyo",
-                    url = "https://www.youtube.com/channel/UCCWUurfuoWhXkFpjNZkLc-A",
+                    text = resourcesRepository.getString(R.string.info_link_youtube_lobbyo),
+                    url = resourcesRepository.getString(R.string.info_url_youtube_lobbyo),
                 ),
                 DzenSv(
-                    text = "Дзен канал группы Свободное время",
-                    url = "https://dzen.ru/svremya",
+                    text = resourcesRepository.getString(R.string.info_link_dzen_sv),
+                    url = resourcesRepository.getString(R.string.info_url_dzen_sv),
                 ),
                 TelegramSv(
-                    text = "Телеграм канал группы Свободное время",
-                    url = "https://t.me/SVremya",
+                    text = resourcesRepository.getString(R.string.info_link_telegram_sv),
+                    url = resourcesRepository.getString(R.string.info_url_telegram_sv),
                 ),
             )
         )

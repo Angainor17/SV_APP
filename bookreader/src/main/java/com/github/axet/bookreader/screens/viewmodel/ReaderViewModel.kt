@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.text.view.ZLTextPosition
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.managers.OnBookPagerManager
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,6 +37,7 @@ import javax.inject.Inject
 @Suppress("StaticFieldLeak", "DEPRECATION")
 class ReaderViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
+    private val resourcesRepository: ResourcesRepository,
     private val onBookPagerManager: OnBookPagerManager,
 ) : ViewModel() {
 
@@ -214,7 +216,7 @@ class ReaderViewModel @Inject constructor(
                 } catch (e: SecurityException) {
                     Timber.tag("voronin").e(e, "Security exception accessing file: $uri")
                     _state.value =
-                        ReaderState.Error(context.getString(R.string.sv_error_file_access))
+                        ReaderState.Error(resourcesRepository.getString(R.string.sv_error_file_access))
                     return@launch
                 } catch (e: Exception) {
                     Timber.tag("voronin").e(e, "Error accessing file: $uri")
@@ -223,7 +225,7 @@ class ReaderViewModel @Inject constructor(
 
                 if (inputStream == null) {
                     _state.value =
-                        ReaderState.Error(context.getString(R.string.sv_error_file_not_found))
+                        ReaderState.Error(resourcesRepository.getString(R.string.sv_error_file_not_found))
                     return@launch
                 }
                 inputStream.close()
@@ -245,11 +247,11 @@ class ReaderViewModel @Inject constructor(
             } catch (e: Exception) {
                 Timber.tag("voronin").e(e, "=== loadBook FAILED ===")
                 val errorMessage = when {
-                    e.message?.contains("EACCES") == true -> context.getString(R.string.sv_error_file_access)
+                    e.message?.contains("EACCES") == true -> resourcesRepository.getString(R.string.sv_error_file_access)
                     e.message?.contains("ENOENT") == true || e.message?.contains("No such file") == true ->
-                        context.getString(R.string.sv_error_file_not_found)
+                        resourcesRepository.getString(R.string.sv_error_file_not_found)
 
-                    else -> e.message ?: context.getString(R.string.sv_error_open_book)
+                    else -> e.message ?: resourcesRepository.getString(R.string.sv_error_open_book)
                 }
                 _state.value = ReaderState.Error(errorMessage)
             }
