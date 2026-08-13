@@ -6,6 +6,9 @@ plugins {
 android {
     namespace = "org.geometerplus"
     compileSdk = 37
+    // Фиксируем NDK r28+ — именно с него нативные библиотеки по умолчанию
+    // собираются с выравниванием 16 KB (см. docs/technical-debt.md).
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         minSdk = 24
