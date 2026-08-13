@@ -1,7 +1,7 @@
 # Технический долг SV APP
 
 **Дата создания:** 2026-07-27
-**Последнее обновление:** 2026-08-12
+**Последнее обновление:** 2026-08-13
 
 ---
 
@@ -96,6 +96,152 @@ android.r8.optimizedResourceShrinking=false
 | ktlint      | 12.2.0     | 14.2.0               |
 | OkHttp      | 4.12.0     | 5.4.0                |
 | Navigation  | —          | 2.9.8 (2.10.0-alpha) |
+
+### 🟡 P2: Зависимости не обновлены (запись «✅ Обновление версий» не соответствует факту)
+
+**Проблема:** Запись выше «✅ Обновление версий зависимостей (2026-08-11)» ошибочно помечена
+выполненной. По факту обновлён только AGP (9.3.1 ✓); остальные версии в
+`gradle/libs.versions.toml` остались старыми. `./gradlew lint` (GradleDependency /
+NewerVersionAvailable) на 2026-08-13 показывает:
+
+| Зависимость | Сейчас | Доступно |
+|-------------|--------|----------|
+| Kotlin      | 2.2.20 | 2.4.10   |
+| Core KTX    | 1.17.0 | 1.19.0   |
+| Lifecycle   | 2.9.1  | 2.11.0   |
+| Compose BOM | 2025.06.01 | 2026.08.00 |
+| Navigation  | 2.9.1  | 2.9.8    |
+| ktlint      | 12.2.0 | 14.2.0   |
+| OkHttp      | 4.12.0 | 5.4.0    |
+| Activity Compose | 1.10.1 | 1.13.0 |
+| Material    | 1.12.0 | 1.14.0   |
+| Room        | 2.7.1  | 2.8.4    |
+| Hilt nav/work/compiler | 1.2.0 | 1.4.0 |
+| WorkManager | 2.9.0  | 2.11.2   |
+| Coil        | 3.3.0  | 3.5.0    |
+| MockK       | 1.13.13 | 1.14.11 |
+| Gradle      | 9.5.0  | 9.7.0    |
+
+**Модуль:** все / `gradle/libs.versions.toml`
+
+**Решение:** Провести реальное обновление версий — по одному, с прогоном тестов после каждого;
+либо скорректировать запись «✅ Обновление версий зависимостей», чтобы она не вводила в
+заблуждение.
+
+**Риски:** Резкий апгрейд Kotlin 2.2 → 2.4 / ktlint 12 → 14 / OkHttp 4 → 5 ломает сборку —
+обновлять постепенно.
+
+---
+
+### 🟡 P2: Лишние ABI в APK (armeabi, x86, x86_64)
+
+**Проблема:** Ни в `app/build.gradle.kts`, ни в `fbreader` нет `abiFilters`. В APK попадают:
+- `armeabi` — полностью мёртвая ABI (нет живых устройств), приезжает из AAR (axet djvu/k2pdfopt);
+- `x86`, `x86_64` — нужны только эмулятору, в релизе это мёртвый вес;
+- локальные `.so` из `fbreader` собираются под 4 ABI (`APP_ABI := armeabi-v7a arm64-v8a x86 x86_64`).
+
+**Модуль:** app / fbreader
+
+**Решение:** В `app/build.gradle.kts` задать
+`ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }` (при необходимости добавить `x86_64`
+для эмулятора), а в `fbreader/src/main/jni/Application.mk` сократить `APP_ABI`.
+
+**Риски:** Если эмулятор x86_64 используется для разработки — оставить `x86_64` в debug,
+отфильтровать в release.
+
+---
+
+### 🟢 P3: Устаревшие флаги в gradle.properties
+
+**Проблема:** Остались мёртвые флаги:
+- `android.experimental.enableNative16KbAlignment=true` — был нужен в переходный период AGP
+  (8.5.1); в AGP 9.x выравнивание нативных библиотек на 16 KB включено по умолчанию;
+- `android.uniquePackageNames=false` — свойство удалено ещё в AGP 8.0, эффекта не имеет.
+
+**Решение:** Удалить обе строки, пересобрать APK и убедиться, что выравнивание `.so` не
+изменилось (`llvm-readelf -l` / `zipalign -c -P 16`).
+
+**Риски:** Минимальные — оба флага не влияют на AGP 9.3.1.
+
+---
+
+### 🟢 P3: x86_64 внешние библиотеки с выравниванием 4 KB
+
+**Проблема:** `libdjvu.so`, `libk2pdfopt.so`, `libwillus.so` из AAR (`com.github.axet`) на `x86_64`
+выровнены на 4 KB (0x1000), а не 16 KB. Теоретический риск краша на x86_64-эмуляторе с 16 KB
+page size; на реальных arm64-устройствах не встречается.
+
+**Решение:** Не критично (x86_64 — только эмулятор). При необходимости — пересобрать AAR.
+
+---
+
+### 🟢 P3: TODO `// TODO check voronin` в fbreader
+
+**Файл:** `fbreader/build.gradle.kts` (блок `externalNativeBuild → ndkBuild → path`)
+
+**Проблема:** Незакрытый TODO-маркер без описания задачи.
+
+**Решение:** Проверить, что путь `src/main/jni/Android.mk` корректен и сборка нативных библиотек
+работает, после чего убрать комментарий.
+
+---
+
+## Безопасность и подпись релиза
+
+### 🟠 P1: Release keystore (SV.jks) закоммичен в git
+
+**Проблема:** `SV.jks` (2572 байта) лежит в корне репозитория и отслеживается git
+(`git ls-files` → `SV.jks`), при этом в `.gitignore` нет ни `*.jks`, ни `*.keystore`. Ключ
+подписи релиза находится в системе контроля версий — любой с доступом к репозиторию может
+подписывать/перевыпускать приложение.
+
+**Модуль:** корень репозитория
+**Файлы:** `SV.jks`, `.gitignore`
+
+**Решение:**
+1. Убрать из git: `git rm --cached SV.jks` и добавить `*.jks` / `*.keystore` в `.gitignore`.
+2. Хранить keystore в защищённом хранилище (CI secrets / менеджер паролей).
+3. Если ключ мог утечь — сгенерировать новый keystore.
+
+**Риски:** Ключ, попавший в историю git, останется в истории даже после `git rm` — при утечке
+репозитория нужен новый ключ.
+
+---
+
+### 🟠 P1: Хардкод API-токенов tracer в `app/build.gradle.kts`
+
+**Проблема:** `pluginToken` и `appToken` (2 токена × 3 блока `tracer { create(...) }`) зашиты
+открытым текстом в `app/build.gradle.kts` и попадают в git. Токены отчётов/крашей
+(`ru.ok.tracer`) раскрыты в истории репозитория.
+
+**Файл:** `app/build.gradle.kts` (строки 62–83)
+
+**Решение:** Вынести токены в `local.properties` / Gradle properties / env и не коммитить:
+```kotlin
+tracer {
+    create("defaultConfig") {
+        pluginToken = providers.gradleProperty("tracer.pluginToken").get()
+        appToken = providers.gradleProperty("tracer.appToken").get()
+    }
+}
+```
+
+**Риски:** Токены в истории git останутся — при утечке репозитория сгенерировать новые токены.
+
+---
+
+### 🟠 P1: Не настроена подпись release-сборки
+
+**Проблема:** `release` buildType не имеет `signingConfig`, ни одного `signingConfigs` в проекте
+нет. `SV.jks` лежит рядом, но нигде не подключён. Итог: `assembleRelease` даёт
+unsigned/непубликуемый APK — релиз в RuStore невозможен без ручной подписи.
+
+**Файл:** `app/build.gradle.kts`
+
+**Решение:** Настроить `signingConfigs { create("release") { ... } }` с `SV.jks` (или новым
+ключом), подключить его в `release`, а сам keystore хранить вне git (см. пункт про SV.jks).
+
+**Риски:** Подпись release и debug уже различаются; пароль/alias не коммитить.
 
 ---
 
@@ -875,6 +1021,28 @@ lock.
 4. **`Modeo.onRootScreenFinished`** в `MainActivity.onDestroy()` — если `recreate()` вызывается в
    процессе, ` onDestroy` не вызывает `onRootScreenFinished` (проверка `isFinishing`). Но после
    `recreate()` — ViewModel уничтожаются и пересоздаются, Modo stack должен быть clean.
+
+---
+
+## Неиспользуемые ресурсы
+
+### 🟡 P2: Мёртвые ресурсы fbreader и app
+
+**Проблема:** Android lint (`UnusedResources`) + ручная сверка нашли неиспользуемые ресурсы:
+- `fbreader`: ~67 мёртвых drawable — PNG-иконки `ic_arrow_back_*`, `ic_arrow_forward_*`,
+  `ic_close_*` (~60 шт.) и 7 xml `background_kitkat_*.xml`; неиспользуемый цвет `light_gray`.
+  Java-код fbreader ссылается только на `R.id.content` — ресурсы унаследованы от старого UI FBReader.
+- `app`: цвета `R.color.white` и `R.color.splash_icon_tint` не используются.
+
+**Модуль:** fbreader, app
+**Файлы:** `fbreader/src/main/res/drawable*/`, `fbreader/src/main/res/values/colors.xml`,
+`app/src/main/res/values/colors.xml`
+
+**Решение:** Прогнать `./gradlew lint`, удалить найденное, проверить сборку. Осторожно с
+ресурсами, на которые ссылаются по строковому имени в рантайме (`getIdentifier`).
+
+**Риски:** Удаление ресурса, имя которого формируется динамически, ломает рантайм — перед
+удалением грепать по коду.
 
 ---
 
