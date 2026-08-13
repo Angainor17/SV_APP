@@ -37,7 +37,11 @@ android {
             )
         }
         debug {
-            applicationIdSuffix = ".debug"
+            // Отдельная версия для разработки: другой package id, имя и иконка,
+            // чтобы на одном устройстве можно было держать и прод, и дев.
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Свободное время dev")
         }
     }
     compileOptions {
