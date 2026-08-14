@@ -2,7 +2,8 @@
 <resources>
     <!--    ID приложения 53428682 -->
     <!--    ID сообщества (через запятую, если их несколько) 230099627 -->
-    <string name="vk_service_key_mini_app_for_api_request">b9706c30b9706c30b9706c30e1ba5f2dfabb970b9706c30de8ad0e58734cfcfea510261</string>
+    <!--    VK service key вынесен из ресурсов и обфусцирован (XOR+Base64):
+            хранится в su.sv.api.data.NewsRepo -->
     <string name="vk_public_name">svremyanews</string>
     <!--    https://vkhost.github.io/ -->
 
