@@ -103,7 +103,8 @@
       "Bash(identify /Users/i.u.voronin/StudioProjects/SV_APP/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp)",
       "Bash(python3 -c \"import sys; print\\('python:', sys.version\\)\")",
       "Bash(adb shell *)",
-      "Bash(adb exec-out *)"
+      "Bash(adb exec-out *)",
+      "Bash(python3 *)"
     ]
   }
 }
