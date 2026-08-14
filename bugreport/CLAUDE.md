@@ -283,11 +283,13 @@ OneTimeEffect(viewModel.effect) { effect ->
 
 ## API Keys
 
-**Imgbb API Key:** хранится в `ImgbbUploader.kt`
+**Imgbb API Key:** хранится в `ImgbbUploader.kt` в обфусцированном виде (XOR+Base64),
+расшифровывается через `ApiKeyObfuscator.decode()`.
 
 ```kotlin
 companion object {
-    const val API_KEY = "b4d9b1eb07f78d1d5cad70253cd29b03"
+    private const val ENCODED_API_KEY = "…"
+    private const val API_KEY_XOR = "sv_imgbb"
 }
 ```
 

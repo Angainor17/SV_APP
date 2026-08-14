@@ -17,6 +17,7 @@ import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import su.sv.commonarchitecture.utils.ApiKeyObfuscator
 
 /**
  * Сервис загрузки изображений на Imgbb
@@ -97,7 +98,8 @@ class ImgbbUploader @Inject constructor(
                 )
                 .build()
 
-            val url = "https://api.imgbb.com/1/upload?key=$API_KEY"
+            val apiKey = ApiKeyObfuscator.decode(ENCODED_API_KEY, API_KEY_XOR)
+            val url = "https://api.imgbb.com/1/upload?key=$apiKey"
 
             val request = Request.Builder()
                 .url(url)
@@ -137,8 +139,9 @@ class ImgbbUploader @Inject constructor(
     }
 
     companion object {
-        // API ключ для загрузки изображений на Imgbb
-        // Получен на https://imgbb.com/
-        const val API_KEY = "b4d9b1eb07f78d1d5cad70253cd29b03"
+        // API-ключ Imgbb (https://imgbb.com/), обфусцирован XOR+Base64.
+        // Расшифровывается через ApiKeyObfuscator.decode().
+        private const val ENCODED_API_KEY = "EUI7UA9WBwBDQTleVQNTBkYVPg1aV1BXQBU7W1QFUlE="
+        private const val API_KEY_XOR = "sv_imgbb"
     }
 }
