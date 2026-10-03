@@ -17,46 +17,35 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.fbreader;
+package org.geometerplus.fbreader.fbreader
 
-import org.geometerplus.zlibrary.text.view.ZLTextControlElement;
-import org.geometerplus.zlibrary.text.view.ZLTextTraverser;
-import org.geometerplus.zlibrary.text.view.ZLTextView;
-import org.geometerplus.zlibrary.text.view.ZLTextWord;
+import org.geometerplus.zlibrary.text.view.ZLTextControlElement
+import org.geometerplus.zlibrary.text.view.ZLTextTraverser
+import org.geometerplus.zlibrary.text.view.ZLTextView
+import org.geometerplus.zlibrary.text.view.ZLTextWord
 
-class WordCountTraverser extends ZLTextTraverser {
-    protected int myCount;
+class WordCountTraverser(view: ZLTextView) : ZLTextTraverser(view) {
+    protected var myCount: Int = 0
 
-    WordCountTraverser(ZLTextView view) {
-        super(view);
+    override fun processWord(word: ZLTextWord) {
+        ++myCount
     }
 
-    @Override
-    protected void processWord(ZLTextWord word) {
-        ++myCount;
-    }
-
-    @Override
-    protected void processControlElement(ZLTextControlElement control) {
+    override fun processControlElement(control: ZLTextControlElement) {
         // does nothing
     }
 
-    @Override
-    protected void processSpace() {
+    override fun processSpace() {
         // does nothing
     }
 
-    @Override
-    protected void processNbSpace() {
+    override fun processNbSpace() {
         // does nothing
     }
 
-    @Override
-    protected void processEndOfParagraph() {
+    override fun processEndOfParagraph() {
         // does nothing
     }
 
-    public int getCount() {
-        return myCount;
-    }
+    fun getCount(): Int = myCount
 }
