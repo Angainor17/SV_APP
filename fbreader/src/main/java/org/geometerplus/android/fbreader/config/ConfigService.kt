@@ -17,35 +17,27 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.ui.android.image;
+package org.geometerplus.android.fbreader.config
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
 
-import org.geometerplus.zlibrary.core.image.ZLStreamImage;
+class ConfigService : Service() {
+    private var myConfig: ConfigInterface.Stub? = null
 
-import java.io.IOException;
-import java.io.InputStream;
+    override fun onBind(intent: Intent): IBinder? = myConfig
 
-final class InputStreamImageData extends ZLAndroidImageData {
-    private final ZLStreamImage myImage;
-
-    InputStreamImageData(ZLStreamImage image) {
-        myImage = image;
+    override fun onCreate() {
+        super.onCreate()
+        myConfig = SQLiteConfig(this)
     }
 
-    protected Bitmap decodeWithOptions(BitmapFactory.Options options) {
-        final InputStream stream = myImage.inputStream();
-        if (stream == null) {
-            return null;
+    override fun onDestroy() {
+        if (myConfig != null) {
+            // TODO: close db
+            myConfig = null
         }
-
-        final Bitmap bmp = BitmapFactory.decodeStream(stream, new Rect(), options);
-        try {
-            stream.close();
-        } catch (IOException e) {
-        }
-        return bmp;
+        super.onDestroy()
     }
 }
