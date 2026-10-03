@@ -1028,8 +1028,8 @@ class TTSPopup(val fb: FBReaderView) {
             return true
         }
 
-        override fun getParagraphIndex(): Int = p
-        override fun getElementIndex(): Int = e
-        override fun getCharIndex(): Int = c
+        override val paragraphIndex: Int get() = p
+        override val elementIndex: Int get() = e
+        override val charIndex: Int get() = c
     }
 }

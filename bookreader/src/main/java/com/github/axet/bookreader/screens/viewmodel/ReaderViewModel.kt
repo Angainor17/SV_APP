@@ -306,7 +306,7 @@ class ReaderViewModel @Inject constructor(
                 try {
                     val info = Storage.RecentInfo(context, uri)
                     if (info.position != null && save.position != null &&
-                        save.position!!.samePositionAs(info.position)
+                        save.position!!.samePositionAs(info.position!!)
                     ) {
                         if (save.fontsize == null || info.fontsize != null && save.fontsize == info.fontsize) {
                             if (save.equals(info.fontsizes)) {

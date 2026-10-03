@@ -51,7 +51,7 @@ class ReaderBookmarksDelegate(
         bookmark.last = System.currentTimeMillis()
 
         val fbBookmark = getFBReaderView()?.book?.info?.bookmarks?.find {
-            it.start!!.samePositionAs(bookmark.start)
+            it.start!!.samePositionAs(bookmark.start!!)
         }
         if (fbBookmark != null) {
             fbBookmark.name = bookmark.name
@@ -91,7 +91,7 @@ class ReaderBookmarksDelegate(
         val book = getCurrentBook() ?: return
 
         val index = book.info!!.bookmarks!!.indexOfFirst {
-            it.start!!.samePositionAs(bookmark.start) && it.end!!.samePositionAs(bookmark.end)
+            it.start!!.samePositionAs(bookmark.start!!) && it.end!!.samePositionAs(bookmark.end!!)
         }
         if (index >= 0) {
             book.info!!.bookmarks!!.removeAt(index)
@@ -103,7 +103,7 @@ class ReaderBookmarksDelegate(
         val fbBookmarks = getFBReaderView()?.book?.info?.bookmarks
         if (fbBookmarks != null) {
             val fbIndex = fbBookmarks.indexOfFirst {
-                it.start!!.samePositionAs(bookmark.start) && it.end!!.samePositionAs(bookmark.end)
+                it.start!!.samePositionAs(bookmark.start!!) && it.end!!.samePositionAs(bookmark.end!!)
             }
             if (fbIndex >= 0) {
                 fbBookmarks.removeAt(fbIndex)

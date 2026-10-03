@@ -254,7 +254,7 @@ class BookContextService @Inject constructor(
 
         for (i in startParagraph..endParagraph) {
             val paragraph = textModel.getParagraph(i) ?: continue
-            val iterator = paragraph.iterator()
+            val iterator = paragraph.iterator() ?: continue
 
             while (iterator.next()) {
                 val entryType = iterator.getType()
