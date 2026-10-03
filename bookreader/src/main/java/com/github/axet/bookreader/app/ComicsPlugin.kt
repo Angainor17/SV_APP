@@ -453,9 +453,9 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
             c: ScrollWidget.ScrollAdapter.PageCursor
         ): Plugin.Page {
             val page = if (c.start == null)
-                c.end.paragraphIndex - 1
+                c.end!!.paragraphIndex - 1
             else
-                c.start.paragraphIndex
+                c.start!!.paragraphIndex
             return ComicsPage(doc!!, page, w, h)
         }
 

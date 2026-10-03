@@ -145,7 +145,7 @@ fun ReaderTopBar(
             } else {
                 // Normal mode - show book title
                 Text(
-                    text = state.book.info.title,
+                    text = state.book.info!!.title!!,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium,

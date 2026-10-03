@@ -62,8 +62,8 @@ class TTSPopup(val fb: FBReaderView) {
             v: ScrollWidget.ScrollAdapter.PageView,
             bm: Storage.Bookmark
         ): Rect? {
-            val page = pluginview.selectPage(bm.start, v.info, v.width, v.height)
-            val s = pluginview.select(bm.start, bm.end)
+            val page = pluginview.selectPage(bm.start!!, v.info, v.width, v.height)
+            val s = pluginview.select(bm.start!!, bm.end!!)
             return if (s != null) {
                 val bb = s.getBounds(page)
                 s.close()
@@ -152,7 +152,7 @@ class TTSPopup(val fb: FBReaderView) {
             }
             if (fb.widget is ScrollWidget && (fb.widget as ScrollWidget).scrollState == RecyclerView.SCROLL_STATE_IDLE) {
                 val page = if (isEmpty(fragment!!.word)) fragment!!.fragment else fragment!!.word!!
-                val pos = (fb.widget as ScrollWidget).adapter.findPage(page.start)
+                val pos = (fb.widget as ScrollWidget).adapter.findPage(page.start!!)
                 if (pos != -1) {
                     val c = (fb.widget as ScrollWidget).adapter.pages[pos]
                     val first = (fb.widget as ScrollWidget).findFirstPage()
@@ -293,7 +293,7 @@ class TTSPopup(val fb: FBReaderView) {
             if (fb.widget is ScrollWidget) {
                 val first = (fb.widget as ScrollWidget).findFirstPage()
                 val c = (fb.widget as ScrollWidget).adapter.pages[first]
-                val bm = expandWord(Storage.Bookmark("", c.start, c.start))
+                val bm = expandWord(Storage.Bookmark("", c.start!!, c.start!!))
                 fragment = Fragment(bm)
             }
             if (fb.widget is PagerWidget) {
@@ -307,7 +307,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
         marks.add(fragment!!.fragment)
         if (fb.widget is ScrollWidget) {
-            val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start)
+            val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start!!)
             if (pos == -1) return
             val nc = (fb.widget as ScrollWidget).adapter.pages[pos]
             val first = (fb.widget as ScrollWidget).findFirstPage()
@@ -330,22 +330,22 @@ class TTSPopup(val fb: FBReaderView) {
                     updateGravity()
                 }
             } else {
-                val s = fb.pluginview.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
+                val s = fb.pluginview!!.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
                 val dst = (fb.widget as PagerWidget).getPageRect()
-                val px = fb.pluginview.getPosition()
+                val px = fb.pluginview!!.getPosition()
                 if (px.paragraphIndex > fragment!!.fragment.start!!.paragraphIndex) {
                     onScrollFinished.add { updateGravity() }
                     fb.scrollPrevPage()
                 } else {
-                    val page = fb.pluginview.selectPage(
+                    val page = fb.pluginview!!.selectPage(
                         px,
                         (fb.widget as PagerWidget).getInfo(),
                         dst.width(),
                         dst.height()
                     )
                     val bounds = s!!.getBounds(page)
-                    if (fb.pluginview.reflow) {
-                        bounds!!.rr = fb.pluginview.boundsUpdate(
+                    if (fb.pluginview!!.reflow) {
+                        bounds!!.rr = fb.pluginview!!.boundsUpdate(
                             bounds.rr!!,
                             (fb.widget as PagerWidget).getInfo()!!
                         )
@@ -355,7 +355,7 @@ class TTSPopup(val fb: FBReaderView) {
                     val ii = ArrayList(Arrays.asList(*bounds!!.rr!!))
                     Collections.sort(ii, SelectionView.LinesUL(ii))
                     s.close()
-                    if (ii[ii.size - 1].bottom < (fb.widget as PagerWidget).top + fb.pluginview.current!!.pageOffset / fb.pluginview.current!!.ratio) {
+                    if (ii[ii.size - 1].bottom < (fb.widget as PagerWidget).top + fb.pluginview!!.current!!.pageOffset / fb.pluginview!!.current!!.ratio) {
                         onScrollFinished.add { updateGravity() }
                         fb.scrollPrevPage()
                     } else {
@@ -374,7 +374,7 @@ class TTSPopup(val fb: FBReaderView) {
     fun updatePlay() {
         val p = tts.dones.contains(speakNext) || speakRetry != null
         play.setImageResource(if (p) R.drawable.ic_outline_pause_24 else R.drawable.ic_outline_play_arrow_24)
-        fb.listener.ttsStatus(p)
+        fb.listener!!.ttsStatus(p)
     }
 
     fun selectNext() {
@@ -383,7 +383,7 @@ class TTSPopup(val fb: FBReaderView) {
             if (fb.widget is ScrollWidget) {
                 val first = (fb.widget as ScrollWidget).findFirstPage()
                 val c = (fb.widget as ScrollWidget).adapter.pages[first]
-                val bm = expandWord(Storage.Bookmark("", c.start, c.start))
+                val bm = expandWord(Storage.Bookmark("", c.start!!, c.start!!))
                 fragment = Fragment(bm)
             }
             if (fb.widget is PagerWidget) {
@@ -397,7 +397,7 @@ class TTSPopup(val fb: FBReaderView) {
         }
         marks.add(fragment!!.fragment)
         if (fb.widget is ScrollWidget) {
-            val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start)
+            val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start!!)
             if (pos == -1) return
             val nc = (fb.widget as ScrollWidget).adapter.pages[pos]
             val first = (fb.widget as ScrollWidget).findFirstPage()
@@ -421,21 +421,21 @@ class TTSPopup(val fb: FBReaderView) {
                     updateGravity()
                 }
             } else {
-                val s = fb.pluginview.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
+                val s = fb.pluginview!!.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
                 val dst = (fb.widget as PagerWidget).getPageRect()
-                val px = fb.pluginview.getPosition()
+                val px = fb.pluginview!!.getPosition()
                 if (px.paragraphIndex < fragment!!.fragment.start!!.paragraphIndex) {
                     fb.scrollNextPage()
                 } else {
-                    val page = fb.pluginview.selectPage(
+                    val page = fb.pluginview!!.selectPage(
                         px,
                         (fb.widget as PagerWidget).getInfo(),
                         dst.width(),
                         dst.height()
                     )
                     val bounds = s!!.getBounds(page)
-                    if (fb.pluginview.reflow) {
-                        bounds!!.rr = fb.pluginview.boundsUpdate(
+                    if (fb.pluginview!!.reflow) {
+                        bounds!!.rr = fb.pluginview!!.boundsUpdate(
                             bounds.rr!!,
                             (fb.widget as PagerWidget).getInfo()!!
                         )
@@ -445,7 +445,7 @@ class TTSPopup(val fb: FBReaderView) {
                     val ii = ArrayList(Arrays.asList(*bounds!!.rr!!))
                     Collections.sort(ii, SelectionView.LinesUL(ii))
                     s.close()
-                    if (ii[0].bottom > (fb.widget as PagerWidget).bottom + fb.pluginview.current!!.pageOffset / fb.pluginview.current!!.ratio) {
+                    if (ii[0].bottom > (fb.widget as PagerWidget).bottom + fb.pluginview!!.current!!.pageOffset / fb.pluginview!!.current!!.ratio) {
                         onScrollFinished.add { updateGravity() }
                         fb.scrollNextPage()
                     } else {
@@ -480,7 +480,7 @@ class TTSPopup(val fb: FBReaderView) {
             val k = PluginWordCursor(start)
             if (k.nextWord()) {
                 val end = expandRight(k)
-                return Storage.Bookmark(k.text, start, end)
+                return Storage.Bookmark(k.text!!, start, end)
             }
             k.close()
             return bm
@@ -503,7 +503,7 @@ class TTSPopup(val fb: FBReaderView) {
             val k = PluginWordCursor(end)
             if (k.prevWord()) {
                 val start = expandLeft(k)
-                return Storage.Bookmark(k.text, start, end)
+                return Storage.Bookmark(k.text!!, start, end)
             }
             k.close()
             return bm
@@ -554,15 +554,15 @@ class TTSPopup(val fb: FBReaderView) {
     }
 
     fun ensureVisible(bm: Storage.Bookmark) {
-        val pos = (fb.widget as ScrollWidget).adapter.findPage(bm.start)
+        val pos = (fb.widget as ScrollWidget).adapter.findPage(bm.start!!)
         val c = (fb.widget as ScrollWidget).adapter.pages[pos]
-        val v = (fb.widget as ScrollWidget).findViewPage(c)
+        val v = (fb.widget as ScrollWidget).findViewPage(c)!!
         val bottom = fb.top + (fb.widget as ScrollWidget).getMainAreaHeight()
         val rect: Rect? = if (fb.pluginview != null) {
-            getRect(fb.pluginview, v, bm) ?: return
+            getRect(fb.pluginview!!, v, bm) ?: return
         } else {
             if (v.text == null) return
-            FBReaderView.findUnion(v.text.areas(), bm) ?: return
+            FBReaderView.findUnion(v.text!!.areas(), bm) ?: return
         }
         rect!!.top += v.top
         rect.bottom += v.top
@@ -595,7 +595,7 @@ class TTSPopup(val fb: FBReaderView) {
             var view: View? = null
             var text: org.geometerplus.zlibrary.text.view.ZLTextElementAreaVector? = null
             if (fb.widget is ScrollWidget) {
-                val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start)
+                val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start!!)
                 if (pos == -1) return
                 val c = (fb.widget as ScrollWidget).adapter.pages[pos]
                 val v = (fb.widget as ScrollWidget).findViewPage(c)
@@ -628,20 +628,20 @@ class TTSPopup(val fb: FBReaderView) {
             var view: View? = null
             var info: Reflow.Info? = null
             if (fb.widget is ScrollWidget) {
-                val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start)
+                val pos = (fb.widget as ScrollWidget).adapter.findPage(fragment!!.fragment.start!!)
                 if (pos == -1) return
                 val c = (fb.widget as ScrollWidget).adapter.pages[pos]
                 val v = (fb.widget as ScrollWidget).findViewPage(c)
                 view = v
-                info = v.info
+                info = v!!.info
             }
             if (fb.widget is PagerWidget) {
                 view = fb.widget as View
                 info = (fb.widget as PagerWidget).getInfo()
             }
-            val s = fb.pluginview.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
+            val s = fb.pluginview!!.select(fragment!!.fragment.start!!, fragment!!.fragment.end!!)
             if (s != null) {
-                val page = fb.pluginview.selectPage(
+                val page = fb.pluginview!!.selectPage(
                     fragment!!.fragment.start!!,
                     info,
                     view!!.width,
@@ -660,7 +660,7 @@ class TTSPopup(val fb: FBReaderView) {
 
     fun getText(start: ZLTextPosition, end: ZLTextPosition): String? {
         if (fb.pluginview != null) {
-            val s = fb.pluginview.select(start, end)
+            val s = fb.pluginview!!.select(start, end)
             return if (s != null) {
                 val str = s.getText()
                 s.close()
@@ -697,7 +697,7 @@ class TTSPopup(val fb: FBReaderView) {
 
     fun selectionOpen(c: ScrollWidget.ScrollAdapter.PageCursor, x: Int, y: Int) {
         val v = (fb.widget as ScrollWidget).findViewPage(c)
-        var bm = selectWord(v.text, x, y)
+        var bm = selectWord(v!!.text, x, y)
         bm = expandWord(bm)
         marks.clear()
         if (!isEmpty(bm)) {
@@ -939,7 +939,7 @@ class TTSPopup(val fb: FBReaderView) {
             if (e >= all!!.getEnd()!!.elementIndex) {
                 e = 0
                 p++
-                val last = fb.pluginview.pagePosition().Total - 1
+                val last = fb.pluginview!!.pagePosition().Total - 1
                 if (p > last) {
                     p = last
                     return false
@@ -952,7 +952,7 @@ class TTSPopup(val fb: FBReaderView) {
 
         fun all() {
             close()
-            all = fb.pluginview.select(p)
+            all = fb.pluginview!!.select(p)
             if (all != null) allText = all!!.getText()
         }
 
@@ -984,7 +984,7 @@ class TTSPopup(val fb: FBReaderView) {
             } while (isWord(s) && !stopOnLeft(s))
             e = last
             val m =
-                fb.pluginview.select(ZLTextFixedPosition(p, e, 0), ZLTextFixedPosition(sp, k, 0))
+                fb.pluginview!!.select(ZLTextFixedPosition(p, e, 0), ZLTextFixedPosition(sp, k, 0))
             if (m != null) {
                 text = m.getText()
                 m.close()
@@ -1020,7 +1020,7 @@ class TTSPopup(val fb: FBReaderView) {
             } while (isWord(s) && !stopOnRight(s))
             e = last
             val m =
-                fb.pluginview.select(ZLTextFixedPosition(sp, k, 0), ZLTextFixedPosition(p, e, 0))
+                fb.pluginview!!.select(ZLTextFixedPosition(sp, k, 0), ZLTextFixedPosition(p, e, 0))
             if (m != null) {
                 text = m.getText()
                 m.close()

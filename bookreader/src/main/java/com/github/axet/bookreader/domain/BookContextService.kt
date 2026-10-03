@@ -79,7 +79,7 @@ class BookContextService @Inject constructor(
         return runCatching {
             withContext(dispatcherProvider.io) {
                 val book = storage.load(bookUri)
-                book.md5
+                book.md5!!
             }
         }
     }

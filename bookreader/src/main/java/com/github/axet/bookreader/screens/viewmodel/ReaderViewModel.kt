@@ -242,7 +242,7 @@ class ReaderViewModel @Inject constructor(
                 if (bookTitle != null) currentBook?.info?.title = bookTitle
                 if (bookAuthor != null) currentBook?.info?.authors = bookAuthor
 
-                currentFBook = storage.read(currentBook)
+                currentFBook = storage.read(currentBook!!)
                 ensureCoverCreated(currentBook, currentFBook)
 
                 _state.value = ReaderState.Content(
@@ -298,7 +298,7 @@ class ReaderViewModel @Inject constructor(
 
         try {
             savedPosition = fb.position as? FBReaderView.ZLTextIndexPosition
-            val save = Storage.RecentInfo(fbBook.info)
+            val save = Storage.RecentInfo(fbBook.info!!)
             save.position = fb.position
 
             val uri = storage.recentUri(book)
@@ -316,7 +316,7 @@ class ReaderViewModel @Inject constructor(
                             }
                         }
                     }
-                    if (book.info.last != info.last) {
+                    if (book.info!!.last != info.last) {
                         storage.move(uri, storage.storagePath)
                     }
                     save.merge(info.fontsizes, info.last)

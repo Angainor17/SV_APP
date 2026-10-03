@@ -226,7 +226,7 @@ fun ReaderContent(
             // Редактирование закладки
             if (currentState.showBookmarkEdit && currentState.editingBookmark != null) {
                 BookmarkBottomSheet(
-                    bookmarkText = currentState.editingBookmark.text,
+                    bookmarkText = currentState.editingBookmark.text.orEmpty(),
                     initialName = currentState.editingBookmark.name,
                     initialColor = currentState.editingBookmark.color,
                     onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
@@ -372,7 +372,7 @@ fun ReaderContent(
                                             viewModel.clearSavedPosition()
                                             if (fbook.info == null) fbook.info =
                                                 Storage.RecentInfo()
-                                            fbook.info.position = savedPos
+                                            fbook.info!!.position = savedPos
                                         }
 
                                         loadBook(fbook)

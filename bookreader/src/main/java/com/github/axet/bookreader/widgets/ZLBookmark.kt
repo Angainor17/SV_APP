@@ -8,7 +8,7 @@ import org.geometerplus.zlibrary.text.view.ZLTextSimpleHighlighting
 open class ZLBookmark(
     val view: FBView,
     val b: Storage.Bookmark
-) : ZLTextSimpleHighlighting(view, b.start, b.end) {
+) : ZLTextSimpleHighlighting(view, b.start!!, b.end!!) {
 
     override fun getForegroundColor(): ZLColor? = null
 

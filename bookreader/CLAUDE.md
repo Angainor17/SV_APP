@@ -157,7 +157,7 @@ bookreader/src/main/java/com/github/axet/bookreader/
 │   ├── PluginView.kt            # PluginView + Selection/Link/Search — вынесены из Plugin.kt
 │   ├── ReaderPreferences.kt
 │   ├── Reflow.kt
-│   ├── Storage.java            # Legacy Java class с Bookmark
+│   ├── Storage.kt             # Класс Storage с Bookmark (мигрирован из Java)
 │   ├── TTFManager.kt
 │   └── TextFormatter.kt
 ├── domain/
@@ -187,9 +187,9 @@ bookreader/src/main/java/com/github/axet/bookreader/
 │   ├── ActiveAreasView.kt
 │   ├── BrightnessGesture.kt
 │   ├── FBFooterView.kt
-│   ├── FBReaderView.java        # Legacy Java
+│   ├── FBReaderView.kt           # Мигрирован из Java (главный виджет)
 │   ├── PagerWidget.kt
-│   ├── ScrollWidget.java        # Legacy Java
+│   ├── ScrollWidget.kt          # Мигрирован из Java (RecyclerView-виджет прокрутки)
 │   ├── SelectionCoordinates.kt
 │   ├── SelectionState.kt
 │   ├── SelectionView.kt
@@ -213,22 +213,18 @@ bookreader/src/main/java/com/github/axet/bookreader/
 
 ## Миграция на Kotlin
 
-### Статус миграции (обновлено 2026-07-26)
+### Статус миграции (обновлено 2026-08-29)
 
 **Мигрированные файлы:**
 
-- app/ (все Kotlin файлы кроме Storage.java)
+- app/ (все файлы, включая Storage.kt)
 - domain/ (все файлы)
 - screens/ (все Compose экраны)
 - viewmodel/ (все файлы)
 - services/ImagesProvider.kt
-- widgets/ (большинство файлов, кроме FBReaderView.java и ScrollWidget.java)
+- widgets/ (все файлы)
 
-**Оставшиеся Java файлы (3 файла):**
-
-- `app/Storage.java` - наследуется от внешней Java библиотеки
-- `widgets/ScrollWidget.java` - много внутренних классов
-- `widgets/FBReaderView.java` - декомпозируется
+**Все Java файлы мигрированы в Kotlin.**
 
 ### Новые компоненты (2026-07-26)
 
@@ -240,7 +236,7 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - `app/ReaderPreferences.kt` — настройки чтения на DataStore
 - `domain/GetLastReadBookUseCase.kt` — use case для последней книги
 
-### Особенности миграции Storage.java
+### Миграция Storage.java (завершена 2026-08-29)
 
 **Сложности:**
 
@@ -249,14 +245,60 @@ bookreader/src/main/java/com/github/axet/bookreader/
 - Внутренние классы: `Info`, `Progress`, `ProgresInputstream`, `FileCbz`, `FileCbr`, `FBook`,
   `Book`, `RecentInfo`, `Bookmark`, `Bookmarks`
 
-**Требуется:**
+**Ключевые решения:**
 
-- Добавить `@JvmStatic` для статических методов в `companion object`
-- Добавить `@JvmField` для статических полей
-- Создать обёртки для статических методов родительского класса (например, `getFile`, `exists`,
-  `getNameNoExt` и т.д.)
-- Использовать `open class` для классов которые наследуются (например, `Bookmark`)
-- Использовать `lateinit` для `Book.info` и `FBook.book`
+- `@JvmStatic` для собственных статических методов в `companion object`; `@JvmField` для полей.
+- Обёртки для статических методов родителя (`getFile`, `exists`, `getName`, `list`,
+  `takePersistableUriPermission`, `getTypeByExt`) сделаны **без** `@JvmStatic` — иначе возникает
+  "accidental override" с унаследованными статиками. Java и так резолвит унаследованные статики напрямую.
+- `open class` для наследуемых внутренних классов (`Bookmark` и др.); публичные поля — `@JvmField`
+  с nullable-типами (совместимость `@JvmField` и `lateinit` невозможна).
+- `FBView.ImageFitting` — это enum, вложенный в package-private `ZLTextViewBase`. Java резолвит его
+  как `FBView.ImageFitting` (наследование вложенного типа), но Kotlin так не умеет, а `ZLTextViewBase`
+  недоступен извне пакета. Поэтому поле `RecentInfo.scale` хранится как `Enum<*>` и восстанавливается
+  по имени через рефлексию (`imageFittingValueOf`).
+
+### Миграция ScrollWidget.java (завершена 2026-08-29)
+
+**Сложности:**
+
+- Внутренние классы: `ScrollAdapter`, `PageView`, `PageHolder`, `PageCursor`, `Gestures`
+- Прямой перевод поля `public ZLTextPosition start` → `@JvmField var start: ZLTextPosition? = null`
+  меняет тип для Kotlin-вызывающих с платформенного `ZLTextPosition!` на явный `ZLTextPosition?`,
+  поэтому в вызывающих файлах (`ComicsPlugin`, `DjvuPlugin`, `PDFPlugin`, `TTSPopup`) потребовались `!!`.
+- `RecyclerView.getChildAt(i)` в Kotlin возвращает `View?` (а не `View`).
+
+**Ключевые решения:**
+
+- `inner class` для всех внутренних классов (обращаются к внешнему `fb`/`adapter`).
+- `@JvmField` для полей, читаемых из Java (`adapter`, `gesturesListener`, `PageView.info/text`,
+  `PageCursor.start/end`, `Gestures.e`, `PageHolder.page`) — `@JvmField` несовместим с `lateinit`.
+- Конфликт имён Java-поле/метод при переводе: в `PageView` анонимный `ProgressBar` имел поле
+  `handler` (переименовано в `mHandler`, т.к. `View.getHandler()` уже существует); в `Gestures`
+  поле `zoomHandler` + метод `getZoomHandler()` давали clash — явный `getZoomHandler()` удалён,
+  остался геттер от `lateinit var zoomHandler`.
+- `onScroll`/`onFling` из `GestureDetector.OnGestureListener` имеют **nullable** параметр `e1`;
+  в `onScroll` используется поле `e`, поэтому перевод требует `open(e!!)` (не `e2`).
+
+### Миграция FBReaderView.java (завершена 2026-08-29)
+
+**Сложности:**
+
+- Класс наследуется от `RelativeLayout` (а не от `View`): внутренний `CustomView extends FBView` — это
+  настоящий текстовый виджет; для ширины/высоты/скроллбара используется `this@FBReaderView.*`.
+- Java-геттеры, к которым Kotlin-вызывающие обращались **как к свойствам** (`fb.position`,
+  `customview.footer`, `fbv.isReflow`), переведены в Kotlin-свойства (`val position`, `val footer`,
+  `val isReflow`) — синтетические свойства работают только для Java-методов, не для Kotlin-функций.
+- `FBView.ImageFitting` — package-private enum из `ZLTextViewBase`: восстановление по имени через
+  рефлексию (`imageFitting()`) и получение `ImageOptions.FitToScreen` через рефлексию (`fitToScreenOption()`).
+- `SearchCallback`/`CustomAction` объявлены как `fun interface` для SAM-конверсии из лямбд.
+- `ConfigShadow extends Config` — реализованы все абстрактные методы (`getValueInternal`, `listGroups`,
+  `isInitialized` и др.).
+- Поля `pluginview`/`book`/`selection`/`footer` стали nullable → в вызывающих (`ScrollWidget`,
+  `PagerWidget`, `TTSPopup`) потребовались `!!`; `widget`/`drawer` — `@JvmField var ... = null`
+  (конфликт с `setWidget`/`setDrawer`); `app`/`config` — `lateinit`.
+- Вложенные `LinksView`/`BookmarksView`/`TTSView`/`SearchView` принимают `info: Reflow.Info?` (nullable),
+  чтобы соответствовать платформенному типу `Reflow.Info!` из Java.
 
 ### Общие правила миграции
 

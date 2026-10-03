@@ -5,7 +5,7 @@ import org.geometerplus.zlibrary.core.util.InputStreamHolder;
 import java.io.IOException;
 import java.io.InputStream;
 
-final class MyBufferedInputStream extends InputStream {
+public final class MyBufferedInputStream extends InputStream {
     private final InputStreamHolder myStreamHolder;
     private final byte[] myBuffer;
     int myBytesReady;

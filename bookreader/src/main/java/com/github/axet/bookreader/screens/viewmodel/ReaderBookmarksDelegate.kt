@@ -25,7 +25,7 @@ class ReaderBookmarksDelegate(
         val book = getCurrentBook() ?: return
         val fbookBookmarks = getFBReaderView()?.book?.info?.bookmarks
         if (fbookBookmarks != null) {
-            book.info.bookmarks = fbookBookmarks
+            book.info!!.bookmarks = fbookBookmarks
         }
         val currentState = getState() ?: return
         updateState(currentState.copy(book = book))
@@ -51,7 +51,7 @@ class ReaderBookmarksDelegate(
         bookmark.last = System.currentTimeMillis()
 
         val fbBookmark = getFBReaderView()?.book?.info?.bookmarks?.find {
-            it.start.samePositionAs(bookmark.start)
+            it.start!!.samePositionAs(bookmark.start)
         }
         if (fbBookmark != null) {
             fbBookmark.name = bookmark.name
@@ -70,9 +70,9 @@ class ReaderBookmarksDelegate(
 
         Timber.tag("voronin2").d("========== СОЗДАНИЕ ЗАМЕТКИ ==========")
         Timber.tag("voronin2")
-            .d("start: paragraph=${bookmark.start.paragraphIndex}, element=${bookmark.start.elementIndex}")
+            .d("start: paragraph=${bookmark.start!!.paragraphIndex}, element=${bookmark.start!!.elementIndex}")
         Timber.tag("voronin2")
-            .d("end: paragraph=${bookmark.end.paragraphIndex}, element=${bookmark.end.elementIndex}")
+            .d("end: paragraph=${bookmark.end!!.paragraphIndex}, element=${bookmark.end!!.elementIndex}")
 
         bookmark.coverUrl = book.info?.coverUrl
         bookmark.bookFileUri = book.url?.toString()
@@ -81,7 +81,7 @@ class ReaderBookmarksDelegate(
         bookmark.sentenceBefore = context?.first
         bookmark.sentenceAfter = context?.second
 
-        book.info.bookmarks.add(bookmark)
+        book.info!!.bookmarks!!.add(bookmark)
         getStorage().save(book)
         getFBReaderView()?.bookmarksUpdate()
         onSavePosition()
@@ -90,20 +90,20 @@ class ReaderBookmarksDelegate(
     fun delete(bookmark: Storage.Bookmark) {
         val book = getCurrentBook() ?: return
 
-        val index = book.info.bookmarks.indexOfFirst {
-            it.start.samePositionAs(bookmark.start) && it.end.samePositionAs(bookmark.end)
+        val index = book.info!!.bookmarks!!.indexOfFirst {
+            it.start!!.samePositionAs(bookmark.start) && it.end!!.samePositionAs(bookmark.end)
         }
         if (index >= 0) {
-            book.info.bookmarks.removeAt(index)
+            book.info!!.bookmarks!!.removeAt(index)
         }
         val newBookmarks = Storage.Bookmarks()
-        newBookmarks.addAll(book.info.bookmarks)
-        book.info.bookmarks = newBookmarks
+        newBookmarks.addAll(book.info!!.bookmarks!!)
+        book.info!!.bookmarks = newBookmarks
 
         val fbBookmarks = getFBReaderView()?.book?.info?.bookmarks
         if (fbBookmarks != null) {
             val fbIndex = fbBookmarks.indexOfFirst {
-                it.start.samePositionAs(bookmark.start) && it.end.samePositionAs(bookmark.end)
+                it.start!!.samePositionAs(bookmark.start) && it.end!!.samePositionAs(bookmark.end)
             }
             if (fbIndex >= 0) {
                 fbBookmarks.removeAt(fbIndex)
@@ -145,14 +145,14 @@ class ReaderBookmarksDelegate(
         }
 
         if (needSave) {
-            book.info.bookmarks = Storage.Bookmarks().apply { addAll(fbookBookmarks) }
+            book.info!!.bookmarks = Storage.Bookmarks().apply { addAll(fbookBookmarks) }
             getStorage().save(book)
             getFBReaderView()?.bookmarksUpdate()
         }
         Timber.tag("voronin2").d("=== migrateBookmarksContext END ===")
     }
 
-    private fun extractSentenceContext(bookmark: Storage.Bookmark): Pair<String, String?>? {
+    private fun extractSentenceContext(bookmark: Storage.Bookmark): Pair<String?, String?>? {
         return try {
             getFBReaderView()?.extractSentenceContext(bookmark)
         } catch (e: Exception) {

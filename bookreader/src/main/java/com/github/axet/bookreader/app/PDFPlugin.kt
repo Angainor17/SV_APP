@@ -786,7 +786,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             c: ScrollWidget.ScrollAdapter.PageCursor
         ): Plugin.Page? {
             val page: Int =
-                if (c.start == null) c.end.paragraphIndex - 1 else c.start.paragraphIndex
+                if (c.start == null) c.end!!.paragraphIndex - 1 else c.start!!.paragraphIndex
             return PdfiumPage(document, page, w, h)
         }
 

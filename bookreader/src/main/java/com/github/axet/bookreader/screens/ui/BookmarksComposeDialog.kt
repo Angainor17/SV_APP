@@ -101,7 +101,7 @@ fun BookmarksComposeDialog(
                         ) {
                             // Номер страницы
                             Text(
-                                text = stringResource(R.string.sv_bookmark_page_prefix) + " ${bookmark.start.paragraphIndex + 1}",
+                                text = stringResource(R.string.sv_bookmark_page_prefix) + " ${bookmark.start!!.paragraphIndex + 1}",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(end = dimensions.itemSpacingMedium)
@@ -119,7 +119,7 @@ fun BookmarksComposeDialog(
                                         fbReaderView?.apply {
                                             // Игнорируем offset, открываем страницу с закладкой
                                             val position = ZLTextFixedPosition(
-                                                bookmark.start.paragraphIndex,
+                                                bookmark.start!!.paragraphIndex,
                                                 0,
                                                 0
                                             )
@@ -136,13 +136,13 @@ fun BookmarksComposeDialog(
                                     }
                             ) {
                                 Text(
-                                    text = cleanBookmarkText(bookmark.text).take(100) + if (bookmark.text.length > 100) "..." else "",
+                                    text = cleanBookmarkText(bookmark.text.orEmpty()).take(100) + if ((bookmark.text?.length ?: 0) > 100) "..." else "",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 if (!bookmark.name.isNullOrBlank()) {
                                     Text(
-                                        text = bookmark.name,
+                                        text = bookmark.name!!,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
