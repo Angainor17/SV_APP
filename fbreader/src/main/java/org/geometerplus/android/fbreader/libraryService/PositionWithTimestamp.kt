@@ -18,9 +18,9 @@ class PositionWithTimestamp private constructor(
 ) : Parcelable {
 
     constructor(pos: ZLTextPosition) : this(
-        pos.getParagraphIndex(),
-        pos.getElementIndex(),
-        pos.getCharIndex(),
+        pos.paragraphIndex,
+        pos.elementIndex,
+        pos.charIndex,
         if (pos is ZLTextFixedPosition.WithTimestamp) pos.Timestamp else -1L
     )
 

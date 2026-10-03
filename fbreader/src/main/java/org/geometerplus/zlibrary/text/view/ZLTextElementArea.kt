@@ -19,23 +19,29 @@
 
 package org.geometerplus.zlibrary.text.view
 
-class ZLTextHyperlinkRegionSoul(
-    position: ZLTextPosition,
-    @JvmField val Hyperlink: ZLTextHyperlink
-) : ZLTextRegion.Soul(
-    position.paragraphIndex,
-    startElementIndex(Hyperlink, position.elementIndex),
-    endElementIndex(Hyperlink, position.elementIndex)
-) {
-    companion object {
-        private fun startElementIndex(hyperlink: ZLTextHyperlink, fallback: Int): Int {
-            val indexes = hyperlink.elementIndexes()
-            return if (indexes.isEmpty()) fallback else indexes[0]
-        }
+class ZLTextElementArea(
+    paragraphIndex: Int,
+    elementIndex: Int,
+    charIndex: Int,
+    @JvmField val Length: Int,
+    lastInElement: Boolean,
+    @JvmField val AddHyphenationSign: Boolean,
+    @JvmField val ChangeStyle: Boolean,
+    @JvmField val Style: ZLTextStyle,
+    @JvmField val Element: ZLTextElement,
+    @JvmField val XStart: Int,
+    @JvmField val XEnd: Int,
+    @JvmField val YStart: Int,
+    @JvmField val YEnd: Int,
+    @JvmField val ColumnIndex: Int,
+) : ZLTextFixedPosition(paragraphIndex, elementIndex, charIndex) {
 
-        private fun endElementIndex(hyperlink: ZLTextHyperlink, fallback: Int): Int {
-            val indexes = hyperlink.elementIndexes()
-            return if (indexes.isEmpty()) fallback else indexes[indexes.size - 1]
-        }
-    }
+    private val myIsLastInElement: Boolean = lastInElement
+
+    fun contains(x: Int, y: Int): Boolean =
+        (y >= YStart) && (y <= YEnd) && (x >= XStart) && (x <= XEnd)
+
+    fun isFirstInElement(): Boolean = CharIndex == 0
+
+    fun isLastInElement(): Boolean = myIsLastInElement
 }

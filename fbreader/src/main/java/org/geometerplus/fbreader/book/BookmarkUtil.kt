@@ -75,7 +75,7 @@ object BookmarkUtil {
             cursor.nextWord()
         }
         if (word != null) {
-            bookmark.setEnd(cursor.getParagraphIndex(), cursor.getElementIndex(), word.Length)
+            bookmark.setEnd(cursor.paragraphIndex, cursor.elementIndex, word.Length)
         }
     }
 }

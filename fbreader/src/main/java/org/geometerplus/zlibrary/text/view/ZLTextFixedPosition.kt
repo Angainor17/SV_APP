@@ -19,23 +19,36 @@
 
 package org.geometerplus.zlibrary.text.view
 
-class ZLTextHyperlinkRegionSoul(
-    position: ZLTextPosition,
-    @JvmField val Hyperlink: ZLTextHyperlink
-) : ZLTextRegion.Soul(
-    position.paragraphIndex,
-    startElementIndex(Hyperlink, position.elementIndex),
-    endElementIndex(Hyperlink, position.elementIndex)
-) {
-    companion object {
-        private fun startElementIndex(hyperlink: ZLTextHyperlink, fallback: Int): Int {
-            val indexes = hyperlink.elementIndexes()
-            return if (indexes.isEmpty()) fallback else indexes[0]
-        }
+open class ZLTextFixedPosition(
+    @JvmField val ParagraphIndex: Int,
+    @JvmField val ElementIndex: Int,
+    @JvmField val CharIndex: Int,
+) : ZLTextPosition() {
 
-        private fun endElementIndex(hyperlink: ZLTextHyperlink, fallback: Int): Int {
-            val indexes = hyperlink.elementIndexes()
-            return if (indexes.isEmpty()) fallback else indexes[indexes.size - 1]
-        }
+    constructor(position: ZLTextPosition) : this(
+        position.paragraphIndex,
+        position.elementIndex,
+        position.charIndex,
+    )
+
+    override val paragraphIndex: Int
+        get() = ParagraphIndex
+
+    override val elementIndex: Int
+        get() = ElementIndex
+
+    override val charIndex: Int
+        get() = CharIndex
+
+    class WithTimestamp(
+        paragraphIndex: Int,
+        elementIndex: Int,
+        charIndex: Int,
+        stamp: Long?,
+    ) : ZLTextFixedPosition(paragraphIndex, elementIndex, charIndex) {
+        @JvmField
+        val Timestamp: Long = stamp ?: -1L
+
+        override fun toString(): String = "${super.toString()}; timestamp = $Timestamp"
     }
 }
