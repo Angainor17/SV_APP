@@ -43,7 +43,7 @@ abstract class ZLImageProxy : ZLImage {
 
     abstract fun sourceType(): SourceType
 
-    abstract val realImage: ZLImage
+    abstract val realImage: ZLImage?
 
     abstract val id: String
 
