@@ -17,31 +17,26 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.options;
+package org.geometerplus.zlibrary.core.options
 
-public final class ZLIntegerOption extends ZLOption {
-    private int myValue;
-    private String myStringValue;
+class ZLIntegerOption(group: String, optionName: String, defaultValue: Int) :
+    ZLOption(group, optionName, defaultValue.toString()) {
 
-    public ZLIntegerOption(String group, String optionName, int defaultValue) {
-        super(group, optionName, String.valueOf(defaultValue));
-    }
+    private var myValue: Int = 0
+    private var myStringValue: String? = null
 
-    public int getValue() {
-        final String stringValue = getConfigValue();
-        if (!stringValue.equals(myStringValue)) {
-            myStringValue = stringValue;
-            try {
-                myValue = Integer.parseInt(stringValue);
-            } catch (NumberFormatException e) {
-            }
+    fun getValue(): Int {
+        val stringValue = getConfigValue()
+        if (stringValue != myStringValue) {
+            myStringValue = stringValue
+            myValue = stringValue.toIntOrNull() ?: myValue
         }
-        return myValue;
+        return myValue
     }
 
-    public void setValue(int value) {
-        myValue = value;
-        myStringValue = String.valueOf(value);
-        setConfigValue(myStringValue);
+    fun setValue(value: Int) {
+        myValue = value
+        myStringValue = value.toString()
+        setConfigValue(value.toString())
     }
 }
