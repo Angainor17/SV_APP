@@ -41,9 +41,9 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
      */
     fun getZoneMap(app: FBReaderView.FBReaderApp): TapZoneMap {
         val prefs: PageTurningOptions = app.PageTurningOptions
-        var id = prefs.tapZoneMap.value
+        var id = prefs.tapZoneMap.getValue()
         if ("" == id)
-            id = if (prefs.horizontal.value) "right_to_left" else "up"
+            id = if (prefs.horizontal.getValue()) "right_to_left" else "up"
         return TapZoneMap.zoneMap(id)
     }
 
@@ -110,7 +110,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
             for (y in 0 until zz.height) {
                 val z = zz.getActionByZone(
                     x, y,
-                    if (app.MiscOptions.EnableDoubleTap.value) TapZoneMap.Tap.singleNotDoubleTap else TapZoneMap.Tap.singleTap
+                    if (app.MiscOptions.EnableDoubleTap.getValue()) TapZoneMap.Tap.singleNotDoubleTap else TapZoneMap.Tap.singleTap
                 )
                 if (!app.isActionEnabled(z))
                     continue
@@ -124,7 +124,7 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
                     r.union(c)
             }
         }
-        if (app.MiscOptions.AllowScreenBrightnessAdjustment.value) {
+        if (app.MiscOptions.AllowScreenBrightnessAdjustment.getValue()) {
             val bw = if (app.viewWidget is ScrollWidget)
                 (app.viewWidget as ScrollWidget).gesturesListener.brightness.areaWidth * PERC / ww
             else

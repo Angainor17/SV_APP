@@ -217,10 +217,10 @@ open class FBReaderView @JvmOverloads constructor(
         val shared = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
         configColorProfile()
 
-        val d = shared.getInt(ReaderPreferences.PREFERENCE_FONTSIZE_FBREADER, app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption.value)
+        val d = shared.getInt(ReaderPreferences.PREFERENCE_FONTSIZE_FBREADER, app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption.getValue())
         config.setValue(app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption, d)
 
-        val f = shared.getString(ReaderPreferences.PREFERENCE_FONTFAMILY_FBREADER, app.ViewOptions.textStyleCollection.baseStyle.FontFamilyOption.value)!!
+        val f = shared.getString(ReaderPreferences.PREFERENCE_FONTFAMILY_FBREADER, app.ViewOptions.textStyleCollection.baseStyle.FontFamilyOption.getValue())!!
         config.setValue(app.ViewOptions.textStyleCollection.baseStyle.FontFamilyOption, f)
 
         val ignoreCSSFonts = shared.getBoolean(ReaderPreferences.PREFERENCE_IGNORE_EMBEDDED_FONTS, false)
@@ -244,7 +244,7 @@ open class FBReaderView @JvmOverloads constructor(
             twoColumnEnabled = false
         } else {
             // auto - use default FBReader logic (based on screen size)
-            twoColumnEnabled = app.ViewOptions.TwoColumnView.value
+            twoColumnEnabled = app.ViewOptions.TwoColumnView.getValue()
         }
         config.setValue(app.ViewOptions.TwoColumnView, twoColumnEnabled)
     }
@@ -437,7 +437,7 @@ open class FBReaderView @JvmOverloads constructor(
                             val snippet = app.getFootnoteData(hyperlink.Id)
                             if (snippet != null) {
                                 app.Collection.markHyperlinkAsVisited(app.currentBook, hyperlink.Id)
-                                val showToast = when (app.MiscOptions.ShowFootnoteToast.value) {
+                                val showToast = when (app.MiscOptions.ShowFootnoteToast.getValue()) {
                                     MiscOptions.FootnoteToastEnum.never -> false
                                     MiscOptions.FootnoteToastEnum.footnotesOnly -> hyperlink.Type == FBHyperlinkType.FOOTNOTE
                                     MiscOptions.FootnoteToastEnum.footnotesAndSuperscripts ->
@@ -836,8 +836,8 @@ open class FBReaderView @JvmOverloads constructor(
         val preferences = app.PageTurningOptions
         widget!!.startAnimatedScrolling(
             ZLViewEnums.PageIndex.next,
-            if (preferences.horizontal.value) ZLViewEnums.Direction.rightToLeft else ZLViewEnums.Direction.up,
-            preferences.animationSpeed.value
+            if (preferences.horizontal.getValue()) ZLViewEnums.Direction.rightToLeft else ZLViewEnums.Direction.up,
+            preferences.animationSpeed.getValue()
         )
     }
 
@@ -845,8 +845,8 @@ open class FBReaderView @JvmOverloads constructor(
         val preferences = app.PageTurningOptions
         widget!!.startAnimatedScrolling(
             ZLViewEnums.PageIndex.previous,
-            if (preferences.horizontal.value) ZLViewEnums.Direction.rightToLeft else ZLViewEnums.Direction.up,
-            preferences.animationSpeed.value
+            if (preferences.horizontal.getValue()) ZLViewEnums.Direction.rightToLeft else ZLViewEnums.Direction.up,
+            preferences.animationSpeed.getValue()
         )
     }
 
@@ -1391,7 +1391,7 @@ open class FBReaderView @JvmOverloads constructor(
         if (book!!.info!!.fontsize != null)
             dpiValue = book!!.info!!.fontsize!!
         else
-            dpiValue = app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption.value
+            dpiValue = app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption.getValue()
         return dpiValue * 160 / ZLibrary.Instance().displayDPI
     }
 
@@ -1405,7 +1405,7 @@ open class FBReaderView @JvmOverloads constructor(
     }
 
     fun getIgnoreCssFonts(): Boolean {
-        return !app.ViewOptions.textStyleCollection.baseStyle.UseCSSFontFamilyOption.value
+        return !app.ViewOptions.textStyleCollection.baseStyle.UseCSSFontFamilyOption.getValue()
     }
 
     fun setIgnoreCssFonts(b: Boolean) {
@@ -1483,10 +1483,10 @@ open class FBReaderView @JvmOverloads constructor(
                     }
 
                     while (iterator.next()) {
-                        if (iterator.type == ZLTextParagraph.Entry.TEXT) {
-                            val data = iterator.textData
-                            val offset = iterator.textOffset
-                            val length = iterator.textLength
+                        if (iterator.getType() == ZLTextParagraph.Entry.TEXT) {
+                            val data = iterator.getTextData()
+                            val offset = iterator.getTextOffset()
+                            val length = iterator.getTextLength()
                             fullText.append(data, offset, length)
                         }
                     }

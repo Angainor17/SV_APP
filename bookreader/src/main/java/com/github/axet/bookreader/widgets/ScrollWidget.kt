@@ -458,7 +458,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                             if (off > 0)
                                 scrollBy(0, off)
                             fb.post { updateOverlays() }
-                            adapter.oldTurn = ZLTextFixedPosition(c.start)
+                            adapter.oldTurn = ZLTextFixedPosition(c.start!!)
                             fb.scrollDelayed = null
                             return
                         }
@@ -1592,7 +1592,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
         fun openText(e: MotionEvent): Boolean {
             if (v!!.text == null)
                 return false
-            if (!fb.app.BookTextView.startCursor.samePositionAs(c!!.start))
+            if (!fb.app.BookTextView.startCursor.samePositionAs(c!!.start!!))
                 fb.app.BookTextView.gotoPosition(c!!.start)
             fb.app.BookTextView.myCurrentPage.TextElementMap = v!!.text
             return true

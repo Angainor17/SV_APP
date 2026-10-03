@@ -60,7 +60,7 @@ class FBFooterView @JvmOverloads constructor(
         orientation = HORIZONTAL
         val cProfile: ColorProfile = fb.app.ViewOptions.getColorProfile()
         setBackgroundColor(
-            0xffffff and cProfile.FooterNGBackgroundOption.getValue()
+            0xffffff and cProfile.FooterNGBackgroundOption.getValue()!!
                 .intValue() or 0xff000000.toInt()
         )
         val lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
@@ -73,18 +73,18 @@ class FBFooterView @JvmOverloads constructor(
             addView(ProgressAsPages(context), lpText)
         if (footerOptions.showProgressAsPercentage() && pagePosition!!.Total != 0)
             addView(ProgressAsPercentage(context), lpText)
-        if (footerOptions.ShowClock.value) {
+        if (footerOptions.ShowClock.getValue()) {
             val clock = Clock(context)
             val dp4 = ThemeUtils.dp2px(context, 4f)
             val dp2 = ThemeUtils.dp2px(context, 2f)
             clock.setPadding(dp4, 0, dp2, 0)
             addView(clock, lpText)
         }
-        if (footerOptions.ShowBattery.value) {
+        if (footerOptions.ShowBattery.getValue()) {
             val image = AppCompatImageView(context)
             image.setImageResource(R.drawable.ic_battery_std_24)
             image.setColorFilter(
-                0xffffff and cProfile.FooterNGForegroundOption.getValue()
+                0xffffff and cProfile.FooterNGForegroundOption.getValue()!!
                     .intValue() or 0xff000000.toInt()
             )
             val lpImage = LayoutParams(footer!!.height, footer!!.height)
@@ -102,7 +102,7 @@ class FBFooterView @JvmOverloads constructor(
         customview = fb!!.app.BookTextView as FBReaderView.CustomView
         footer = customview!!.footer
         pagePosition = customview!!.pagePosition()
-        family = fb!!.app.ViewOptions.getFooterOptions().Font.value
+        family = fb!!.app.ViewOptions.getFooterOptions().Font.getValue()
         tf = AndroidFontUtil.typeface(
             fb!!.app.SystemInfo,
             FontEntry.systemEntry(family!!),
@@ -173,7 +173,7 @@ class FBFooterView @JvmOverloads constructor(
             paint.typeface = tf
             paint.textSize = footer!!.height + 2f
             val cProfile: ColorProfile = fb!!.app.ViewOptions.getColorProfile()
-            paint.color = 0xffffff and cProfile.FooterNGForegroundOption.getValue()
+            paint.color = 0xffffff and cProfile.FooterNGForegroundOption.getValue()!!
                 .intValue() or 0xff000000.toInt()
         }
 
