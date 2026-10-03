@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -448,8 +449,31 @@ class ReaderScreenTest {
 
         composeRule.waitForIdle()
 
-        // Переходим к скачанным книгам
-        // Примечание: зависит от навигации в приложении
+        // Ждём загрузки каталога
+        composeRule.waitUntil(10000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+
+        // Кнопка «Скачанные» видна только при наличии скачанных книг.
+        // Пропускаем тест, если скачанных книг нет.
+        val buttonExists = try {
+            composeRule
+                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                .fetchSemanticsNode() != null
+        } catch (e: Throwable) {
+            false
+        }
+        assumeTrue("Нет скачанных книг (тестовая книга не найдена)", buttonExists)
+
+        // Открываем экран скачанных книг
+        composeRule
+            .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+            .performClick()
+
+        composeRule.waitForIdle()
     }
 
     private fun openBook() {

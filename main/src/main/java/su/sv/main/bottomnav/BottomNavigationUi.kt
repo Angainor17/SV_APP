@@ -174,6 +174,7 @@ private fun BottomNavContent(
                 icon = item.icon,
                 route = item.route,
                 showBadge = item.route == Screens.Wiki.route && showWikiBadge,
+                testTag = item.testTag,
             )
         }
     }
@@ -364,21 +365,25 @@ fun bottomNavigationItems(): List<BottomNavigationItem> {
             label = stringResource(R.string.nav_bar_news),
             icon = Icons.Filled.Home,
             route = Screens.News.route,
+            testTag = MainTestTags.BottomNav.TAB_NEWS,
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_books),
             icon = Icons.Filled.BooksVector,
             route = Screens.Books.route,
+            testTag = MainTestTags.BottomNav.TAB_BOOKS,
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_wiki),
             icon = Icons.Filled.Search,
             route = Screens.Wiki.route,
+            testTag = MainTestTags.BottomNav.TAB_WIKI,
         ),
         BottomNavigationItem(
             label = stringResource(R.string.nav_bar_info),
             icon = Icons.Filled.Info,
             route = Screens.Info.route,
+            testTag = MainTestTags.BottomNav.TAB_INFO,
         ),
     )
 }

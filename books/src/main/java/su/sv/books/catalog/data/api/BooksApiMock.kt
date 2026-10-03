@@ -171,6 +171,17 @@ class BooksApiMock @Inject constructor() : BooksApi {
                 fileNameWithExt = "REVOLYUTSIYA-I-KONTRREVOLYUTSIYA-V-S-Aleksandr-Sergeevich-Kazennov-_2983.pdf",
                 category = "Свободное время",
             ),
+            ApiBook(
+                id = "5",
+                title = "Сказание о царе Салтане",
+                description = "Волшебная сказка Александра Сергеевича Пушкина о царе Салтане, " +
+                        "его сыне князе Гвидоне и прекрасной царевне Лебеди.",
+                author = "А. С. Пушкин",
+                image = "https://picsum.photos/300/300",
+                link = "https://example.com/skazanie-o-tsare-saltane.pdf",
+                fileNameWithExt = "skazanie-o-tsare-saltane.pdf",
+                category = "Свободное время",
+            ),
         )
     }
 }

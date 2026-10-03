@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +34,7 @@ import su.sv.info.rootinfo.RootInfoViewModel
 import su.sv.info.rootinfo.model.RootInfoEffect
 import su.sv.info.rootinfo.model.UiInfoState
 import su.sv.info.rootinfo.viewmodel.RootInfoActions
+import su.sv.info.testing.InfoTestTags
 
 /**
  * Информационный экран
@@ -55,7 +57,9 @@ fun RootInfo(viewModel: RootInfoViewModel = hiltViewModel()) {
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .testTag(InfoTestTags.ROOT),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {

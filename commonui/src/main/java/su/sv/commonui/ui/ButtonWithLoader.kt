@@ -38,6 +38,7 @@ fun LoadingButton(
     text: String,
     onClick: () -> Unit,
     loading: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val transition = updateTransition(
         targetState = loading,
@@ -56,7 +57,7 @@ fun LoadingButton(
         onClick = {
             if (!loading) onClick.invoke()
         },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
         ),

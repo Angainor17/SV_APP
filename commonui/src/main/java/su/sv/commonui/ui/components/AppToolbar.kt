@@ -15,6 +15,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import su.sv.commonui.R
@@ -59,7 +60,10 @@ fun AppToolbar(
             if (navigationIcon != null) {
                 navigationIcon()
             } else if (onNavigationClick != null) {
-                IconButton(onClick = onNavigationClick) {
+                IconButton(
+                    onClick = onNavigationClick,
+                    modifier = Modifier.testTag("back_button"),
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.common_navigate_back),

@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +34,7 @@ import su.sv.books.catalog.presentation.downloaded.effects.DownloadedBookEffect
 import su.sv.books.catalog.presentation.downloaded.model.DeleteDialogState
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBooksState
 import su.sv.books.catalog.presentation.downloaded.viewmodel.DownloadedBooksViewModel
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppAlertDialog
 import su.sv.commonui.ui.components.AppToolbarWithBack
@@ -73,7 +75,7 @@ private fun DownloadedBooksContent(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(BooksTestTags.DownloadedBooks.ROOT),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             AppToolbarWithBack(
@@ -138,7 +140,9 @@ private fun DownloadedBooksContent(
 @Composable
 private fun EmptyBooksState() {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(BooksTestTags.DownloadedBooks.EMPTY_STATE),
         contentAlignment = Alignment.Center,
     ) {
         Column {

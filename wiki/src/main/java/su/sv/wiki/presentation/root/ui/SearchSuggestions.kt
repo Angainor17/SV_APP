@@ -24,9 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import su.sv.commonui.theme.SVAPPTheme
+import su.sv.wiki.testing.WikiTestTags
 
 /**
  * Список подсказок поиска с анимацией
@@ -63,7 +65,8 @@ fun SearchSuggestions(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .testTag(WikiTestTags.SUGGESTIONS_LIST),
         ) {
             suggestions.forEachIndexed { index, suggestion ->
                 SuggestionItem(
@@ -91,7 +94,8 @@ private fun SuggestionItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .testTag(WikiTestTags.SUGGESTION_ITEM),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

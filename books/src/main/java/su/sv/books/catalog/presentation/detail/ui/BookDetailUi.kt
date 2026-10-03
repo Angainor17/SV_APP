@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.screens.BookmarkPosition
@@ -29,6 +30,7 @@ import su.sv.books.catalog.presentation.detail.actions.DetailBookActions
 import su.sv.books.catalog.presentation.detail.effects.BookDetailOneTimeEffect
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
 import su.sv.books.catalog.presentation.detail.viewmodel.BookDetailViewModel
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithBack
 import su.sv.commonui.util.ProvideAdaptiveDimensions
@@ -58,7 +60,7 @@ fun BookDetailUi(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
             contentWindowInsets = WindowInsets.statusBars,
-            modifier = modifier,
+            modifier = modifier.testTag(BooksTestTags.BookDetail.ROOT),
             topBar = {
                 AppToolbarWithBack(
                     title = uiBook.title,

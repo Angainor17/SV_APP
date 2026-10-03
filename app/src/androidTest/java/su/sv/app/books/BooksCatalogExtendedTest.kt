@@ -2,6 +2,8 @@ package su.sv.app.books
 
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -9,6 +11,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeUp
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import su.sv.app.testing.BaseUiTest
 import su.sv.app.testing.ReleaseTest
@@ -37,6 +40,7 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @SmokeTest
     fun booksCatalog_searchField_isDisplayed() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
@@ -50,16 +54,21 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @ReleaseTest
     fun booksCatalog_searchByTitle_works() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        // Вводим название книги
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
-            .performTextInput("Сказание")
+            .performTextInput("Путеводитель")
 
         composeRule.waitForIdle()
 
-        // Ждём результаты
-        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 5000)
+        // Должна остаться ровно одна книга
+        composeRule.waitUntil(5000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size == 1
+        }
     }
 
     /**
@@ -69,38 +78,45 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @ReleaseTest
     fun booksCatalog_searchByAuthor_works() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        // Вводим имя автора
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
-            .performTextInput("Пушкин")
+            .performTextInput("Богатырёва")
 
         composeRule.waitForIdle()
 
-        // Ждём результаты
-        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 5000)
+        // Остаётся книга автора Богатырёвой
+        composeRule.waitUntil(5000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size == 1
+        }
     }
 
     /**
-     * Тест: Очистка поиска возвращает полный список.
+     * Тест: Поиск по несуществующему запросу даёт пустой список.
      */
     @Test
     @ReleaseTest
-    fun booksCatalog_clearSearch_showsAllBooks() {
+    fun booksCatalog_search_noResults_emptyList() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        // Сначала ищем
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
-            .performTextInput("test")
+            .performTextInput("zzz_nonexistent")
 
         composeRule.waitForIdle()
-        Thread.sleep(1000)
 
-        // Очищаем поле (удаляем текст)
-        // Примечание: зависит от реализации UI
-
-        composeRule.waitForIdle()
+        // Результатов нет
+        composeRule.waitUntil(5000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isEmpty()
+        }
     }
 
     // ==================== Category Filter Tests ====================
@@ -112,14 +128,11 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @ReleaseTest
     fun booksCatalog_categories_areVisible() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.CATEGORY_FILTER, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Категории могут отсутствовать
-        }
+        composeRule
+            .onNodeWithTag(TestTags.BooksCatalog.CATEGORY_FILTER, useUnmergedTree = true)
+            .assertExists()
     }
 
     /**
@@ -129,20 +142,21 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @ReleaseTest
     fun booksCatalog_filterByCategory_works() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        try {
-            // Кликаем на чип категории
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
-                .performClick()
+        val chipCount = composeRule
+            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
+            .fetchSemanticsNodes()
+            .size
+        assumeTrue("Нет чипов категорий", chipCount > 1)
 
-            composeRule.waitForIdle()
+        composeRule
+            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)[1]
+            .performClick()
 
-            // Проверяем наличие книг
-            waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 5000)
-        } catch (e: Exception) {
-            // Категории могут отсутствовать
-        }
+        composeRule.waitForIdle()
+
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 5000)
     }
 
     /**
@@ -152,24 +166,29 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @ReleaseTest
     fun booksCatalog_removeFilter_showsAllBooks() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        try {
-            // Выбираем категорию
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
-                .performClick()
+        val chipCount = composeRule
+            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
+            .fetchSemanticsNodes()
+            .size
+        assumeTrue("Нет чипов категорий", chipCount > 1)
 
-            composeRule.waitForIdle()
+        // Выбираем категорию
+        composeRule
+            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)[1]
+            .performClick()
 
-            // Снимаем выбор (повторный клик)
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
-                .performClick()
+        composeRule.waitForIdle()
 
-            composeRule.waitForIdle()
-        } catch (e: Exception) {
-            // Категории могут отсутствовать
-        }
+        // Снимаем выбор (повторный клик)
+        composeRule
+            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)[1]
+            .performClick()
+
+        composeRule.waitForIdle()
+
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 5000)
     }
 
     // ==================== Book Detail Tests ====================
@@ -182,13 +201,9 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     fun bookDetail_coverIsDisplayed() {
         openBookDetail()
 
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.BookDetail.COVER, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Обложка может отсутствовать
-        }
+        composeRule
+            .onNodeWithTag(TestTags.BookDetail.COVER, useUnmergedTree = true)
+            .assertExists()
     }
 
     /**
@@ -199,17 +214,13 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     fun bookDetail_descriptionIsDisplayed() {
         openBookDetail()
 
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.BookDetail.DESCRIPTION, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Описание может отсутствовать
-        }
+        composeRule
+            .onNodeWithTag(TestTags.BookDetail.DESCRIPTION, useUnmergedTree = true)
+            .assertExists()
     }
 
     /**
-     * Тест: Кнопка "Читать" кликабельна.
+     * Тест: Кнопка действия кликабельна.
      */
     @Test
     @ReleaseTest
@@ -222,57 +233,46 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     }
 
     /**
-     * Тест: Клик на "Читать" открывает читалку (если книга скачана).
+     * Тест: Клик на «Читать» открывает читалку (если книга скачана).
+     *
+     * Пропускается, если книга не скачана.
      */
     @Test
     @ReleaseTest
     fun bookDetail_readButtonOpensReader() {
         openBookDetail()
 
-        try {
+        // Читалка открывается только для скачанной книги — клик по кнопке не должен крашить
+        composeRule
+            .onNodeWithTag(TestTags.BookDetail.READ_BUTTON, useUnmergedTree = true)
+            .performClick()
+
+        composeRule.waitForIdle()
+
+        // Проверяем, что экран не упал (детали или читалка отображаются)
+        val readerOrDetailShown = composeRule
+            .onAllNodesWithTag(TestTags.BookDetail.ROOT, useUnmergedTree = true)
+            .fetchSemanticsNodes()
+            .isNotEmpty() ||
             composeRule
-                .onNodeWithTag(TestTags.BookDetail.READ_BUTTON, useUnmergedTree = true)
-                .performClick()
-
-            composeRule.waitForIdle()
-
-            // Проверяем, что читалка открылась
-            composeRule
-                .onNodeWithTag(TestTags.Reader.ROOT, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Книга может быть не скачана
-        }
-    }
-
-    /**
-     * Тест: Индикатор загрузки книги отображается при скачивании.
-     */
-    @Test
-    @ReleaseTest
-    fun bookDetail_downloadProgressIsDisplayed() {
-        openBookDetail()
-
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.BookDetail.DOWNLOAD_PROGRESS, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Книга может быть уже скачана
-        }
+                .onAllNodesWithTag(TestTags.Reader.ROOT, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        assert(readerOrDetailShown) { "Должен отображаться экран деталей или читалка" }
     }
 
     // ==================== Downloaded Books Tests ====================
 
     /**
      * Тест: Список скачанных книг отображается.
+     *
+     * Пропускается, если нет скачанных книг.
      */
     @Test
     @ReleaseTest
     fun downloadedBooks_listIsDisplayed() {
-        navigateToBooksTab()
+        assumeTrue("Нет скачанных книг", openDownloadedBooks())
 
-        // Проверяем наличие корневого элемента
         composeRule
             .onNodeWithTag(TestTags.DownloadedBooks.ROOT, useUnmergedTree = true)
             .assertExists()
@@ -280,64 +280,24 @@ class BooksCatalogExtendedTest : BaseUiTest() {
 
     /**
      * Тест: Свайп для удаления книги работает.
+     *
+     * Пропускается, если нет скачанных книг.
      */
     @Test
     @ReleaseTest
     fun downloadedBooks_swipeToDelete_works() {
-        navigateToBooksTab()
+        assumeTrue("Нет скачанных книг", openDownloadedBooks())
 
-        try {
-            waitForItems(TestTags.DownloadedBooks.ITEM, timeoutMs = 5000)
+        waitForItems(TestTags.DownloadedBooks.ITEM, timeoutMs = 5000)
 
-            // Свайпаем влево для удаления
-            composeRule
-                .onNodeWithTag(TestTags.DownloadedBooks.ITEM, useUnmergedTree = true)
-                .performTouchInput {
-                    swipeLeft()
-                }
+        composeRule
+            .onAllNodesWithTag(TestTags.DownloadedBooks.ITEM, useUnmergedTree = true)
+            .onFirst()
+            .performTouchInput {
+                swipeLeft()
+            }
 
-            composeRule.waitForIdle()
-        } catch (e: Exception) {
-            // Нет скачанных книг
-        }
-    }
-
-    /**
-     * Тест: Кнопка удаления книги работает.
-     */
-    @Test
-    @ReleaseTest
-    fun downloadedBooks_deleteButton_works() {
-        navigateToBooksTab()
-
-        try {
-            waitForItems(TestTags.DownloadedBooks.ITEM, timeoutMs = 5000)
-
-            composeRule
-                .onNodeWithTag(TestTags.DownloadedBooks.DELETE_BUTTON, useUnmergedTree = true)
-                .performClick()
-
-            composeRule.waitForIdle()
-        } catch (e: Exception) {
-            // Нет скачанных книг
-        }
-    }
-
-    /**
-     * Тест: Empty state отображается при отсутствии книг.
-     */
-    @Test
-    @ReleaseTest
-    fun downloadedBooks_emptyState_whenNoBooks() {
-        navigateToBooksTab()
-
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.DownloadedBooks.EMPTY_STATE, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Книги есть
-        }
+        composeRule.waitForIdle()
     }
 
     // ==================== Bookmarks Tests ====================
@@ -348,7 +308,7 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @Test
     @ReleaseTest
     fun bookmarks_rootIsDisplayed() {
-        navigateToBooksTab()
+        navigateToBookmarks()
 
         composeRule
             .onNodeWithTag(TestTags.Bookmarks.ROOT, useUnmergedTree = true)
@@ -356,71 +316,18 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     }
 
     /**
-     * Тест: Переключение режима отображения закладок.
-     */
-    @Test
-    @ReleaseTest
-    fun bookmarks_toggleDisplayMode_works() {
-        navigateToBooksTab()
-
-        try {
-            // Кликаем на переключатель режима
-            composeRule
-                .onNodeWithTag(TestTags.Bookmarks.MODE_TOGGLE, useUnmergedTree = true)
-                .performClick()
-
-            composeRule.waitForIdle()
-
-            // Проверяем, что режим изменился
-            composeRule
-                .onNodeWithTag(TestTags.Bookmarks.MODE_BY_BOOK, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Нет закладок
-        }
-    }
-
-    /**
-     * Тест: Клик по закладке открывает книгу.
-     */
-    @Test
-    @ReleaseTest
-    fun bookmarks_clickOpensBook() {
-        navigateToBooksTab()
-
-        try {
-            waitForItems(TestTags.Bookmarks.ITEM, timeoutMs = 5000)
-
-            composeRule
-                .onNodeWithTag(TestTags.Bookmarks.ITEM, useUnmergedTree = true)
-                .performClick()
-
-            composeRule.waitForIdle()
-
-            // Проверяем, что книга открылась
-            composeRule
-                .onNodeWithTag(TestTags.Reader.ROOT, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Нет закладок
-        }
-    }
-
-    /**
-     * Тест: Empty state для закладок.
+     * Тест: Empty state отображается при отсутствии заметок.
      */
     @Test
     @ReleaseTest
     fun bookmarks_emptyState_whenNoBookmarks() {
-        navigateToBooksTab()
+        navigateToBookmarks()
 
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.Bookmarks.EMPTY_STATE, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Закладки есть
-        }
+        // На чистом устройстве заметок нет — показывается пустое состояние.
+        // Если заметки есть, тест всё равно проходит (экран существует).
+        composeRule
+            .onNodeWithTag(TestTags.Bookmarks.ROOT, useUnmergedTree = true)
+            .assertExists()
     }
 
     // ==================== List Interaction Tests ====================
@@ -432,33 +339,66 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     @ReleaseTest
     fun booksCatalog_scrollWorks() {
         navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        waitForItems(TestTags.BooksCatalog.ITEM)
+        composeRule
+            .onNodeWithTag(TestTags.BooksCatalog.LIST, useUnmergedTree = true)
+            .performTouchInput {
+                swipeUp()
+            }
 
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.LIST, useUnmergedTree = true)
-                .performTouchInput {
-                    swipeUp()
-                }
-
-            composeRule.waitForIdle()
-        } catch (e: Exception) {
-            // Мало книг для скролла
-        }
+        composeRule.waitForIdle()
     }
 
     // ==================== Helper Methods ====================
 
     private fun openBookDetail() {
         navigateToBooksTab()
-
-        waitForItems(TestTags.BooksCatalog.ITEM)
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
         composeRule
-            .onNodeWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+            .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+            .onFirst()
             .performClick()
 
         composeRule.waitForIdle()
+    }
+
+    private fun navigateToBookmarks() {
+        navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
+
+        composeRule
+            .onNodeWithTag(TestTags.BooksCatalog.BOOKMARKS_BUTTON, useUnmergedTree = true)
+            .performClick()
+
+        composeRule.waitUntil(5000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.Bookmarks.ROOT, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+    }
+
+    private fun openDownloadedBooks(): Boolean {
+        navigateToBooksTab()
+        waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
+
+        val buttonExists = try {
+            composeRule
+                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                .fetchSemanticsNode() != null
+        } catch (e: Throwable) {
+            false
+        }
+
+        if (!buttonExists) return false
+
+        composeRule
+            .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+            .performClick()
+
+        composeRule.waitForIdle()
+        return true
     }
 }

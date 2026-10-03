@@ -61,7 +61,7 @@ class WikiScreenTest : BaseUiTest() {
         navigateToWikiTab()
 
         // Вводим минимум 2 символа для триггера поиска
-        val searchQuery = "Солн"
+        val searchQuery = "Маркс"
 
         composeRule
             .onNodeWithTag(TestTags.WikiRoot.SEARCH_FIELD, useUnmergedTree = true)
@@ -92,7 +92,7 @@ class WikiScreenTest : BaseUiTest() {
         // Вводим запрос
         composeRule
             .onNodeWithTag(TestTags.WikiRoot.SEARCH_FIELD, useUnmergedTree = true)
-            .performTextInput("Солн")
+            .performTextInput("Маркс")
 
         // Ждём suggestions
         composeRule.waitUntil(5000) {
@@ -128,7 +128,7 @@ class WikiScreenTest : BaseUiTest() {
             composeRule
                 .onNodeWithTag(TestTags.WikiRoot.HISTORY_LIST, useUnmergedTree = true)
                 .assertExists()
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             // История может быть пустой при первом запуске
         }
     }
@@ -214,7 +214,7 @@ class WikiScreenTest : BaseUiTest() {
             composeRule
                 .onNodeWithTag(TestTags.WikiArticle.ROOT, useUnmergedTree = true)
                 .assertExists()
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             // Ссылки могут отсутствовать в тестовой статье
         }
     }
@@ -240,7 +240,7 @@ class WikiScreenTest : BaseUiTest() {
             composeRule
                 .onNodeWithTag(TestTags.WikiFavorites.ROOT, useUnmergedTree = true)
                 .assertExists()
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             // Кнопка может не отображаться если нет избранных
         }
     }
@@ -265,7 +265,7 @@ class WikiScreenTest : BaseUiTest() {
             composeRule
                 .onNodeWithTag(TestTags.WikiFavorites.LIST, useUnmergedTree = true)
                 .assertExists()
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             // Игнорируем если нет избранных
         }
     }
@@ -297,7 +297,7 @@ class WikiScreenTest : BaseUiTest() {
             composeRule
                 .onNodeWithTag(TestTags.WikiArticle.ROOT, useUnmergedTree = true)
                 .assertExists()
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             // Игнорируем если нет избранных
         }
     }
@@ -326,10 +326,10 @@ class WikiScreenTest : BaseUiTest() {
         // Вводим запрос для поиска статьи
         composeRule
             .onNodeWithTag(TestTags.WikiRoot.SEARCH_FIELD, useUnmergedTree = true)
-            .performTextInput("Солнце")
+            .performTextInput("Маркс")
 
         // Ждём suggestions
-        composeRule.waitUntil(5000) {
+        composeRule.waitUntil(10000) {
             composeRule
                 .onAllNodesWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
                 .fetchSemanticsNodes()
@@ -342,5 +342,13 @@ class WikiScreenTest : BaseUiTest() {
             .performClick()
 
         composeRule.waitForIdle()
+
+        // Ждём загрузки контента статьи (inline ArticleView)
+        composeRule.waitUntil(10000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.WikiArticle.CONTENT, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
     }
 }

@@ -810,15 +810,40 @@ class ReaderScreenExtendedTest : BaseUiTest() {
     // ==================== Helper Methods ====================
 
     private fun assumeBookAvailable() {
-        // Проверяем наличие скачанной книги
-        // В реальном тесте проверяется наличие тестовой книги
-        Assume.assumeTrue("Тестовая книга не найдена", true)
+        // Проверяем наличие скачанной книги. Кнопка «Скачанные» в каталоге книг
+        // видна только при наличии хотя бы одной скачанной книги.
+        navigateToBooksTab()
+
+        val catalogLoaded = try {
+            waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
+            true
+        } catch (e: Throwable) {
+            false
+        }
+        if (!catalogLoaded) {
+            Assume.assumeTrue("Каталог книг не загрузился", false)
+            return
+        }
+
+        val buttonExists = try {
+            composeRule
+                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                .fetchSemanticsNode() != null
+        } catch (e: Throwable) {
+            false
+        }
+        Assume.assumeTrue("Нет скачанных книг (тестовая книга не найдена)", buttonExists)
     }
 
     private fun openBookForReading() {
-        navigateToBooksTab()
-
         try {
+            // assumeBookAvailable() уже проверил наличие кнопки «Скачанные»
+            composeRule
+                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                .performClick()
+
+            composeRule.waitForIdle()
+
             waitForItems(TestTags.DownloadedBooks.ITEM, timeoutMs = 5000)
 
             composeRule
@@ -829,7 +854,7 @@ class ReaderScreenExtendedTest : BaseUiTest() {
 
             // Ждём загрузки книги
             waitForTag(TestTags.Reader.ROOT, timeoutMs = 10000)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             // Книга может отсутствовать
         }
     }

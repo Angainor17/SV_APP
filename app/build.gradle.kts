@@ -148,6 +148,9 @@ dependencies {
 
     // UI tests
     androidTestImplementation(libs.bundles.androidTest)
+    androidTestImplementation(libs.hilt.android)
+    androidTestImplementation(libs.hilt.core)
+    androidTestImplementation(libs.dagger)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.leakcanary.android)

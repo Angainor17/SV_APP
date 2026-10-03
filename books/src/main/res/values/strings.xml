@@ -66,5 +66,6 @@
 
     <!-- Filters -->
     <string name="books_filter_all">Все</string>
+    <string name="books_search_placeholder">Поиск по названию или автору</string>
 
 </resources>

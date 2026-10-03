@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -68,6 +69,7 @@ import su.sv.wiki.presentation.root.ui.WikiSearchBar
 import su.sv.wiki.presentation.root.viewmodel.RootWikiViewModel
 import su.sv.wiki.presentation.root.viewmodel.actions.WikiActions
 import su.sv.wiki.presentation.root.viewmodel.effects.WikiOneTimeEffect
+import su.sv.wiki.testing.WikiTestTags
 
 /**
  * Главный экран Wiki
@@ -125,7 +127,8 @@ fun WikiCompactScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets(0.dp)),
+                .windowInsetsPadding(WindowInsets(0.dp))
+                .testTag(WikiTestTags.ROOT),
             contentAlignment = Alignment.Center,
         ) {
             Column(
@@ -193,7 +196,9 @@ fun WikiCompactScreen(
                                 focusManager.clearFocus()
                                 stackNavigation.forward(FavoritesScreen())
                             },
-                            modifier = Modifier.padding(end = dimensions.screenPaddingHorizontal / 2),
+                            modifier = Modifier
+                                .padding(end = dimensions.screenPaddingHorizontal / 2)
+                                .testTag(WikiTestTags.FAVORITES_BUTTON),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Favorite,

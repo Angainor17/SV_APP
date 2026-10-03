@@ -18,6 +18,7 @@ sealed class UiRootBooksState {
         val filteredBooks: List<UiBook>,
         val filters: List<UiBookFilter>,
         val selectedFilters: Set<BookFilter>,
+        val searchQuery: String = "",
         val isRefreshing: Boolean = false,
         val hasDownloadedBooks: Boolean = false,
         val filterScrollResetKey: Int = 0, // Ключ для сброса скролла чипов
@@ -29,9 +30,10 @@ sealed class UiRootBooksState {
                 filters: List<UiBookFilter>,
                 selectedFilters: Set<BookFilter>,
                 hasDownloadedBooks: Boolean,
+                searchQuery: String = "",
                 filterScrollResetKey: Int = 0,
             ): Content {
-                val filteredBooks = if (selectedFilters.isEmpty() || selectedFilters.contains(
+                val categoryFilteredBooks = if (selectedFilters.isEmpty() || selectedFilters.contains(
                         BookFilter.All
                     )
                 ) {
@@ -48,11 +50,21 @@ sealed class UiRootBooksState {
                         }
                     }
                 }
+                // Дополнительная фильтрация по поисковому запросу (по названию или автору)
+                val filteredBooks = if (searchQuery.isBlank()) {
+                    categoryFilteredBooks
+                } else {
+                    categoryFilteredBooks.filter { book ->
+                        book.title.contains(searchQuery, ignoreCase = true) ||
+                                book.author.contains(searchQuery, ignoreCase = true)
+                    }
+                }
                 return Content(
                     books = books,
                     filteredBooks = filteredBooks,
                     filters = filters,
                     selectedFilters = selectedFilters,
+                    searchQuery = searchQuery,
                     hasDownloadedBooks = hasDownloadedBooks,
                     filterScrollResetKey = filterScrollResetKey,
                 )

@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -45,6 +46,7 @@ import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.theme.DarkSurfaceContainerHighest
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPThemeLightPreview
@@ -65,6 +67,7 @@ fun BookItem(item: UiBook, actions: RootBooksActions) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .testTag(BooksTestTags.BooksCatalog.ITEM)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple()
@@ -83,7 +86,8 @@ private fun Logo(item: UiBook, actions: RootBooksActions) {
         AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(0.7f), // Типичное соотношение для книжных обложек (ширина : высота = 0.7)
+                .aspectRatio(0.7f) // Типичное соотношение для книжных обложек (ширина : высота = 0.7)
+                .testTag(BooksTestTags.BooksCatalog.ITEM_COVER),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(item.image)
                 .build(),
@@ -182,6 +186,7 @@ private fun InfoFooter(item: UiBook) {
             minLines = 2,
             overflow = TextOverflow.Ellipsis,
             color = MaterialTheme.colorScheme.onTertiary,
+            modifier = Modifier.testTag(BooksTestTags.BooksCatalog.ITEM_TITLE),
         )
 
         Spacer(Modifier.width(dimensions.itemSpacingSmall))
@@ -192,6 +197,7 @@ private fun InfoFooter(item: UiBook) {
             color = MaterialTheme.colorScheme.onTertiary,
             minLines = 2,
             maxLines = 2,
+            modifier = Modifier.testTag(BooksTestTags.BooksCatalog.ITEM_AUTHOR),
         )
 
         Row(

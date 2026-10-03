@@ -2,10 +2,12 @@ package su.sv.app.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import su.sv.app.testing.BaseUiTest
 import su.sv.app.testing.NavigationTest
@@ -144,7 +146,8 @@ class NavigationTest : BaseUiTest() {
 
         // Открываем детали книги
         composeRule
-            .onNodeWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+            .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+            .onFirst()
             .performClick()
 
         composeRule.waitForIdle()
@@ -169,6 +172,10 @@ class NavigationTest : BaseUiTest() {
 
     /**
      * Тест: Кнопка "Назад" работает на экране статьи Wiki.
+     *
+     * Статья, открытая через поиск, показывается inline внутри корневого экрана Wiki,
+     * поэтому кнопки «Назад» на ней нет. Пропускается, если кнопки нет (кнопка есть
+     * только на отдельном ArticleScreen, открываемом из истории/по ссылке).
      */
     @Test
     @ReleaseTest
@@ -180,7 +187,7 @@ class NavigationTest : BaseUiTest() {
         // Ищем статью
         composeRule
             .onNodeWithTag(TestTags.WikiRoot.SEARCH_FIELD, useUnmergedTree = true)
-            .performTextInput("Солнце")
+            .performTextInput("Маркс")
 
         composeRule.waitUntil(5000) {
             composeRule
@@ -191,15 +198,30 @@ class NavigationTest : BaseUiTest() {
 
         // Открываем статью
         composeRule
-            .onNodeWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
+            .onAllNodesWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
+            .onFirst()
             .performClick()
 
         composeRule.waitForIdle()
+
+        // Ждём загрузки статьи (inline ArticleView)
+        composeRule.waitUntil(10000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.WikiArticle.ROOT, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
 
         // Проверяем, что статья открыта
         composeRule
             .onNodeWithTag(TestTags.WikiArticle.ROOT, useUnmergedTree = true)
             .assertExists()
+
+        val hasBackButton = composeRule
+            .onAllNodesWithTag(TestTags.Common.BACK_BUTTON, useUnmergedTree = true)
+            .fetchSemanticsNodes()
+            .isNotEmpty()
+        assumeTrue("Статья открыта inline (кнопки «Назад» нет)", hasBackButton)
 
         // Нажимаем "Назад"
         composeRule
@@ -227,18 +249,18 @@ class NavigationTest : BaseUiTest() {
 
         // News → Books
         navigateToBooksTab()
-        composeRule.onNodeWithTag(TestTags.BooksCatalog.ROOT).assertExists()
+        composeRule.onNodeWithTag(TestTags.BooksCatalog.ROOT, useUnmergedTree = true).assertExists()
 
         // Books → Wiki
         navigateToWikiTab()
-        composeRule.onNodeWithTag(TestTags.WikiRoot.ROOT).assertExists()
+        composeRule.onNodeWithTag(TestTags.WikiRoot.ROOT, useUnmergedTree = true).assertExists()
 
         // Wiki → Info
         navigateToInfoTab()
-        composeRule.onNodeWithTag(TestTags.Info.ROOT).assertExists()
+        composeRule.onNodeWithTag(TestTags.Info.ROOT, useUnmergedTree = true).assertExists()
 
         // Info → News
         navigateToNewsTab()
-        composeRule.onNodeWithTag(TestTags.News.ROOT).assertExists()
+        composeRule.onNodeWithTag(TestTags.News.ROOT, useUnmergedTree = true).assertExists()
     }
 }

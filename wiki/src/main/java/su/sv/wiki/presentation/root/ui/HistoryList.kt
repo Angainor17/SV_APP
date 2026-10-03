@@ -20,11 +20,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.wiki.R
+import su.sv.wiki.testing.WikiTestTags
 
 /**
  * Список истории поиска
@@ -36,7 +38,7 @@ fun HistoryList(
     onClearClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.testTag(WikiTestTags.HISTORY_LIST)) {
         // Заголовок с кнопкой очистки
         Row(
             modifier = Modifier
@@ -91,7 +93,8 @@ private fun HistoryItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag(WikiTestTags.HISTORY_ITEM),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),

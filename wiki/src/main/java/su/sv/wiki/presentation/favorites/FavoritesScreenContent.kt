@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -60,6 +61,7 @@ import su.sv.wiki.R
 import su.sv.wiki.domain.model.WikiArticle
 import su.sv.wiki.presentation.article.ArticleScreen
 import su.sv.wiki.presentation.decodeHtmlEntities
+import su.sv.wiki.testing.WikiTestTags
 
 /**
  * Контент экрана избранного (для modo)
@@ -119,6 +121,7 @@ fun FavoritesCompactScreen(
     }
 
     Scaffold(
+        modifier = Modifier.testTag(WikiTestTags.Favorites.ROOT),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
@@ -153,12 +156,15 @@ fun FavoritesCompactScreen(
                 FullScreenEmpty(
                     title = stringResource(R.string.wiki_favorites_empty),
                     icon = Icons.Default.Favorite,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(WikiTestTags.Favorites.EMPTY_STATE),
                 )
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .testTag(WikiTestTags.Favorites.LIST)
                         .then(
                             if (formFactor is DeviceFormFactor.Expanded && maxContentWidth != null) {
                                 Modifier.widthIn(max = maxContentWidth)
@@ -201,7 +207,8 @@ private fun FavoriteItem(
             .fillMaxWidth()
             .padding(bottom = 8.dp)
             .clip(shape)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag(WikiTestTags.Favorites.ITEM),
         shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -254,6 +261,7 @@ private fun FavoriteItem(
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.testTag(WikiTestTags.Favorites.ITEM_TITLE),
                 )
 
                 // Описание статьи (extract plain text from HTML)

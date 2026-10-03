@@ -1,6 +1,7 @@
 package su.sv.app.info
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -44,6 +45,7 @@ class InfoScreenTest : BaseUiTest() {
     @SmokeTest
     fun infoScreen_linksList_isDisplayed() {
         navigateToInfoTab()
+        waitForInfoContent()
 
         composeRule
             .onNodeWithTag(TestTags.Info.LINKS_LIST, useUnmergedTree = true)
@@ -57,10 +59,11 @@ class InfoScreenTest : BaseUiTest() {
     @ReleaseTest
     fun infoScreen_linkItems_areVisible() {
         navigateToInfoTab()
+        waitForInfoContent()
 
         // Проверяем наличие хотя бы одной ссылки
         composeRule
-            .onNodeWithTag(TestTags.Info.LINK_ITEM, useUnmergedTree = true)
+            .onAllNodesWithTag(TestTags.Info.LINK_ITEM, useUnmergedTree = true)[0]
             .assertExists()
     }
 
@@ -71,6 +74,7 @@ class InfoScreenTest : BaseUiTest() {
     @ReleaseTest
     fun infoScreen_version_isDisplayed() {
         navigateToInfoTab()
+        waitForInfoContent()
 
         composeRule
             .onNodeWithTag(TestTags.Info.VERSION, useUnmergedTree = true)
@@ -86,13 +90,21 @@ class InfoScreenTest : BaseUiTest() {
     @ReleaseTest
     fun infoScreen_linkClick_works() {
         navigateToInfoTab()
+        waitForInfoContent()
 
         // Кликаем на первую ссылку
         composeRule
-            .onNodeWithTag(TestTags.Info.LINK_ITEM, useUnmergedTree = true)
+            .onAllNodesWithTag(TestTags.Info.LINK_ITEM, useUnmergedTree = true)[0]
             .performClick()
 
         // После клика должно открыться внешнее приложение (браузер/Telegram)
         // Проверить это в UI тесте сложно, поэтому просто проверяем отсутствие краша
+    }
+
+    // ==================== Helper Methods ====================
+
+    /** Ожидает загрузки контента (списка ссылок). */
+    private fun waitForInfoContent() {
+        waitForItems(TestTags.Info.LINK_ITEM)
     }
 }
