@@ -138,7 +138,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
                 mainAreaHeight,
                 index,
                 fb.app.BookTextView as FBReaderView.CustomView,
-                fb.book.info
+                fb.book!!.info!!
             )
             var info: Reflow.Info? = null
             val position: ZLTextPosition
@@ -163,7 +163,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             val l = FBReaderView.LinksView(fb, fb.pluginview!!.getLinks(page), info)
             val lold = links.put(position, l)
             lold?.close()
-            val b = FBReaderView.BookmarksView(fb, page, fb.book.info.bookmarks, info)
+            val b = FBReaderView.BookmarksView(fb, page, fb.book!!.info!!.bookmarks, info)
             val bold = bookmarks.put(position, b)
             bold?.close()
             if (fb.tts != null) {
@@ -319,7 +319,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
                     h,
                     page,
                     fb.app.BookTextView as FBReaderView.CustomView,
-                    fb.book.info
+                    fb.book!!.info!!
                 )
                 val bm = fb.pluginview!!.render(
                     fb.pluginview!!.reflower!!.rw,
@@ -445,8 +445,8 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
                         val y = dst.top
                         if (fb.pluginview!!.reflow)
                             x += getInfo()!!.margin.left
-                        fb.selection.update(
-                            fb.selection.getChildAt(0) as SelectionView.PageView,
+                        fb.selection!!.update(
+                            fb.selection!!.getChildAt(0) as SelectionView.PageView,
                             x,
                             y
                         )
@@ -483,7 +483,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
                         fb.app.BookTextView as FBReaderView.CustomView,
                         setter
                     )
-                    fb.selection.add(view)
+                    fb.selection!!.add(view)
                     run()
                 }
                 return true

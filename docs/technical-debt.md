@@ -16,26 +16,21 @@
 
 ## Миграция на Kotlin
 
-### 🟡 P2: Завершить миграцию Java → Kotlin
+### ✅ Завершить миграцию Java → Kotlin (выполнено 2026-08-29)
 
 **Модуль:** bookreader
-**Оставшиеся файлы:**
+**Исходные оставшиеся файлы** (все мигрированы в Kotlin):
 
-- `app/Storage.java` (1392 строки) - наследуется от внешней Java библиотеки
-- `widgets/ScrollWidget.java` (1717 строк) - много внутренних классов
-- `widgets/FBReaderView.java` (2158 строк) - декомпозируется
+- ~~`app/Storage.java`~~ → `app/Storage.kt`
+- ~~`widgets/ScrollWidget.java`~~ → `widgets/ScrollWidget.kt`
+- ~~`widgets/FBReaderView.java`~~ → `widgets/FBReaderView.kt`
 
-**Сложности:**
+Дополнительно мигрированы ~100 файлов модуля `fbreader` (пакеты `zip`, `dict`, `book`,
+`filetypes`, `fonts`, `language`, `util`, `view`, `xml`, `text`, `drm`, `encodings`).
+Подробности миграции и возникшие сложности — в `bookreader/CLAUDE.md` (раздел «Миграция на Kotlin»).
 
-- Storage.java наследуется от `com.github.axet.androidlibrary.app.Storage`
-- Много статических методов, вызываемых из Kotlin
-- Внутренние классы: `Info`, `Progress`, `Bookmark`, etc.
-
-**Решение:**
-
-1. Создать обёртки для статических методов
-2. Добавить `@JvmStatic` для companion object методов
-3. Использовать `lateinit` для lazy-инициализации
+> **Примечание:** в `fbreader` остаётся ~160 Java-файлов — это ядро движка FBReader
+> (`ZLTextView`, `ZLTextParagraph` и др.), которое не входило в скоуп данной миграции.
 
 ---
 
