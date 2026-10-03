@@ -114,15 +114,13 @@
 
 ## Этап 4: Очистка legacy кода 🔄
 
-### 4.1 Удаление deprecated API
+### 4.1 Удаление deprecated API ✅ (выполнено 2026-10-03)
 
-После завершения миграции всех экранов:
-
-- [ ] Удалить deprecated версию `SVAPPTheme(darkTheme: Boolean)`
-- [ ] Удалить старые цветовые константы (Purple80, Grey80 и т.д.)
-- [ ] Удалить старый `FullScreenError.kt` из `commonui/ui/`
-- [ ] Удалить старый `FullScreenLoading.kt` из `commonui/ui/`
-- [ ] Удалить старый `LoadingIndicator.kt` из `commonui/ui/`
+- [x] Удалить deprecated версию `SVAPPTheme(darkTheme: Boolean)` — отсутствовала, осталась единственная сигнатура `SVAPPTheme(themeMode, useDynamicColors, customColors, content)`
+- [x] Удалить старые цветовые константы (Purple80, Grey80 и т.д.) — отсутствовали
+- [x] Удалить старый `FullScreenError.kt` из `commonui/ui/` — удалён; 2 использования (`wiki/ArticleScreenContent.kt`, `books/BookmarksScreen.kt`) переведены на `commonui.ui.components.FullScreenError`
+- [x] Удалить старый `FullScreenLoading.kt` из `commonui/ui/` — отсутствовал (осталась только версия в `components/AppStates.kt`)
+- [x] Удалить старый `LoadingIndicator.kt` из `commonui/ui/` — удалён (без использований)
 
 ### 4.2 Удаление legacy network кода ✅
 
@@ -192,7 +190,7 @@
 | Этап 3.3: Wiki           | ✅ Выполнено   |
 | Этап 3.4: Info           | ✅ Выполнено   |
 | Этап 3.5: BookReader     | ✅ Выполнено   |
-| Этап 4: Очистка          | 🔄 В процессе |
+| Этап 4: Очистка          | ✅ Выполнено   |
 
 ---
 
@@ -212,4 +210,4 @@
 2. ~~Провести миграцию Books~~ ✅ Выполнено
 3. ~~Продолжить с Wiki и Info~~ ✅ Выполнено
 4. ~~Завершить BookReader~~ ✅ Выполнено
-5. Очистить legacy код (в процессе)
+5. ~~Очистить legacy код~~ ✅ Выполнено
