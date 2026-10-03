@@ -28,13 +28,13 @@ interface ZLApplicationWindow {
 
     fun showErrorMessage(resourceKey: String, parameter: String)
 
-    fun createExecutor(key: String): ZLApplication.SynchronousExecutor
+    fun createExecutor(key: String): ZLApplication.SynchronousExecutor?
 
     fun processException(e: Exception)
 
     fun refresh()
 
-    fun getViewWidget(): ZLViewWidget
+    fun getViewWidget(): ZLViewWidget?
 
     fun close()
 

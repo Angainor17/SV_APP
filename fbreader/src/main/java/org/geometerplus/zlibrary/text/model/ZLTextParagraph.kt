@@ -20,7 +20,7 @@
 package org.geometerplus.zlibrary.text.model
 
 interface ZLTextParagraph {
-    fun iterator(): EntryIterator
+    fun iterator(): EntryIterator?
 
     fun getKind(): Byte
 

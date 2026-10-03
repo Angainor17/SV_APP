@@ -56,7 +56,7 @@ abstract class ZLOption protected constructor(
         }
     }
 
-    class ConfigInstance {
-        fun Instance(): Config = org.geometerplus.zlibrary.core.options.Config.Instance()
+    open class ConfigInstance {
+        open fun Instance(): Config = org.geometerplus.zlibrary.core.options.Config.Instance()
     }
 }
