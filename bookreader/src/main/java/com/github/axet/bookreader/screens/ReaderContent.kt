@@ -1,90 +1,51 @@
 package com.github.axet.bookreader.screens
 
 import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
-import android.os.BatteryManager
-import android.os.Build
-import androidx.preference.PreferenceManager
-import android.view.KeyEvent
-import android.view.Window
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.BookReaderInitializer
-import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Storage
-import com.github.axet.bookreader.screens.testing.ReaderTestTags
+import com.github.axet.bookreader.screens.ui.BatteryReceiver
 import com.github.axet.bookreader.screens.ui.BookmarkBottomSheet
 import com.github.axet.bookreader.screens.ui.BookmarksComposeDialog
+import com.github.axet.bookreader.screens.ui.FontsComposeBottomSheet
 import com.github.axet.bookreader.screens.ui.NavigationComposeDialog
 import com.github.axet.bookreader.screens.ui.ReaderTopBar
 import com.github.axet.bookreader.screens.ui.SelectionComposePanel
+import com.github.axet.bookreader.screens.ui.TocComposeDialog
+import com.github.axet.bookreader.screens.ui.VolumeKeysHandler
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
 import com.github.axet.bookreader.screens.viewmodel.ReaderViewModel
 import com.github.axet.bookreader.widgets.FBReaderView
-import org.geometerplus.fbreader.bookmodel.TOCTree
-import org.geometerplus.fbreader.fbreader.ActionCode
 import org.geometerplus.zlibrary.core.view.ZLViewEnums
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition
-import org.geometerplus.zlibrary.text.view.ZLTextPosition
 import timber.log.Timber
 
 /**
@@ -482,484 +443,6 @@ fun ReaderContent(
             ) {
                 Text(stringResource(R.string.sv_error_prefix, currentState.message))
             }
-        }
-    }
-}
-
-/**
- * Compose диалог содержания (TOC) с вложенной иерархией
- */
-@Composable
-private fun TocComposeDialog(
-    fbReaderView: FBReaderView?,
-    onDismiss: () -> Unit,
-    onNavigate: (ZLTextPosition) -> Unit,
-) {
-    // Собираем TOC элементы с информацией о дочерних элементах
-    val tocItems = remember(fbReaderView) {
-        val items = mutableListOf<ExpandableTocItem>()
-        fbReaderView?.app?.Model?.TOCTree?.let { tree ->
-            collectExpandableTocItems(tree, items, 0)
-        }
-        items
-    }
-
-    // Состояние раскрытия для каждого элемента
-    val expandedStates = remember { mutableStateListOf<String>() }
-
-    // Функция для проверки видимости элемента
-    fun isItemVisible(item: ExpandableTocItem): Boolean {
-        // Элементы уровня 0 всегда видимы
-        if (item.parentId == null) return true
-        // Проверяем все родительские цепочки
-        var currentParentId: String? = item.parentId
-        while (currentParentId != null) {
-            if (!expandedStates.contains(currentParentId)) return false
-            // Находим parentId родителя
-            val parentItem = tocItems.find { it.id == currentParentId }
-            currentParentId = parentItem?.parentId
-        }
-        return true
-    }
-
-    if (tocItems.isEmpty()) {
-        AlertDialog(
-            modifier = Modifier.testTag(ReaderTestTags.Toc.DIALOG),
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(R.string.sv_toc_title)) },
-            text = {
-                Text(
-                    modifier = Modifier.testTag(ReaderTestTags.Toc.EMPTY_STATE),
-                    text = stringResource(R.string.sv_toc_not_available)
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.sv_close))
-                }
-            }
-        )
-    } else {
-        AlertDialog(
-            modifier = Modifier.testTag(ReaderTestTags.Toc.DIALOG),
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(R.string.sv_toc_title)) },
-            text = {
-                LazyColumn {
-                    items(tocItems, key = { it.id }) { item ->
-                        // Анимированное появление/исчезновение
-                        AnimatedVisibility(
-                            visible = isItemVisible(item),
-                            enter = expandVertically(),
-                            exit = shrinkVertically()
-                        ) {
-                            TocItemRow(
-                                item = item,
-                                isExpanded = expandedStates.contains(item.id),
-                                onToggleExpand = {
-                                    if (expandedStates.contains(item.id)) {
-                                        expandedStates.remove(item.id)
-                                    } else {
-                                        expandedStates.add(item.id)
-                                    }
-                                },
-                                onNavigate = onNavigate
-                            )
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.sv_close))
-                }
-            }
-        )
-    }
-}
-
-/**
- * Элемент оглавления с возможностью раскрытия
- */
-@Composable
-private fun TocItemRow(
-    item: ExpandableTocItem,
-    isExpanded: Boolean,
-    onToggleExpand: () -> Unit,
-    onNavigate: (ZLTextPosition) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onNavigate(item.position) }
-            .padding(
-                vertical = 12.dp,
-                horizontal = 8.dp + (item.level * 16).dp
-            ),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Иконка главы
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.List,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 8.dp),
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-
-        // Заголовок главы
-        Text(
-            text = item.title,
-            fontWeight = if (item.level == 0) FontWeight.Bold else FontWeight.Normal,
-            modifier = Modifier.weight(1f)
-        )
-
-        // Иконка раскрытия/закрытия для элементов с дочерними
-        if (item.hasChildren) {
-            IconButton(onClick = onToggleExpand) {
-                Icon(
-                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = stringResource(
-                        if (isExpanded) R.string.sv_collapse_content else R.string.sv_expand_content
-                    ),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-            }
-        }
-    }
-}
-
-/**
- * Модель элемента оглавления с поддержкой раскрытия
- */
-private data class ExpandableTocItem(
-    val id: String,
-    val title: String,
-    val position: ZLTextPosition,
-    val level: Int = 0,
-    val hasChildren: Boolean = false,
-    val parentId: String? = null,  // ID родительского элемента
-)
-
-private fun collectExpandableTocItems(
-    tree: TOCTree,
-    items: MutableList<ExpandableTocItem>,
-    level: Int,
-    parentId: String? = null
-) {
-    for (child in tree.subtrees()) {
-        val text = child.text
-        val ref = child.reference
-        if (text != null && ref != null) {
-            val hasChildren = child.subtrees().iterator().hasNext()
-            val itemId = "${level}_${ref.ParagraphIndex}_${text.hashCode()}"
-            items.add(
-                ExpandableTocItem(
-                    id = itemId,
-                    title = text,
-                    position = ZLTextFixedPosition(ref.ParagraphIndex, 0, 0),
-                    level = level,
-                    hasChildren = hasChildren,
-                    parentId = parentId
-                )
-            )
-            // Рекурсивно собираем дочерние элементы с текущим parentId
-            collectExpandableTocItems(child, items, level + 1, itemId)
-        } else {
-            // Если нет текста/рефа, продолжаем обход с тем же parentId
-            collectExpandableTocItems(child, items, level, parentId)
-        }
-    }
-}
-
-private data class TocItem(
-    val title: String,
-    val position: ZLTextPosition,
-    val level: Int = 0
-)
-
-private fun collectTocItems(
-    tree: TOCTree,
-    items: MutableList<TocItem>,
-    level: Int
-) {
-    for (child in tree.subtrees()) {
-        val text = child.text
-        val ref = child.reference
-        if (text != null && ref != null) {
-            items.add(
-                TocItem(
-                    title = "${"  ".repeat(level)}$text",
-                    position = ZLTextFixedPosition(ref.ParagraphIndex, 0, 0),
-                    level = level
-                )
-            )
-        }
-        collectTocItems(child, items, level + 1)
-    }
-}
-
-/**
- * Compose BottomSheet для настроек шрифтов
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FontsComposeBottomSheet(
-    onDismiss: () -> Unit,
-    onFontSizeChange: (Int) -> Unit,
-    onFontFamilyChange: (String) -> Unit,
-    onIgnoreEmbeddedFontsChange: (Boolean) -> Unit,
-) {
-    val context = LocalContext.current
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    val shared = remember {
-        PreferenceManager.getDefaultSharedPreferences(context)
-    }
-
-    var fontSize by remember {
-        mutableFloatStateOf(
-            shared.getInt(
-                ReaderPreferences.PREFERENCE_FONTSIZE_FBREADER,
-                16
-            ).toFloat()
-        )
-    }
-    var selectedFont by remember {
-        mutableStateOf(
-            shared.getString(
-                ReaderPreferences.PREFERENCE_FONTFAMILY_FBREADER,
-                "sans-serif"
-            ) ?: "sans-serif"
-        )
-    }
-    var ignoreEmbeddedFonts by remember {
-        mutableStateOf(
-            shared.getBoolean(
-                ReaderPreferences.PREFERENCE_IGNORE_EMBEDDED_FONTS,
-                false
-            )
-        )
-    }
-
-    // Получаем список доступных шрифтов
-    val fonts = remember {
-        val ttf = BookReaderInitializer.getTTFManager()
-        val fontList = mutableListOf("sans-serif", "serif", "monospace")
-        ttf?.let {
-            // Добавляем системные шрифты
-            org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil.ourFontFileMap.keys.forEach { name ->
-                if (!fontList.contains(name)) {
-                    fontList.add(name)
-                }
-            }
-        }
-        fontList.sorted()
-    }
-
-    ModalBottomSheet(
-        modifier = Modifier.testTag(ReaderTestTags.FontSettings.SHEET),
-        onDismissRequest = onDismiss,
-        sheetState = sheetState
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.sv_font_settings_title),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // Размер шрифта
-            Text(
-                modifier = Modifier.testTag(ReaderTestTags.FontSettings.SIZE_VALUE),
-                text = stringResource(R.string.sv_font_size_label, fontSize.toInt()),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Slider(
-                modifier = Modifier.testTag(ReaderTestTags.FontSettings.SIZE_SLIDER),
-                value = fontSize,
-                onValueChange = { newSize ->
-                    fontSize = newSize
-                    onFontSizeChange(newSize.toInt())
-                },
-                valueRange = 8f..48f,
-                steps = 40
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Выбор шрифта
-            Text(
-                text = stringResource(R.string.sv_font_label),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            ) {
-                items(
-                    items = fonts,
-                    key = { font -> font },
-                ) { font ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                selectedFont = font
-                                onFontFamilyChange(font)
-                            }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = selectedFont == font,
-                            onClick = {
-                                selectedFont = font
-                                onFontFamilyChange(font)
-                            }
-                        )
-                        Text(
-                            text = font,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Игнорировать встроенные шрифты
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        ignoreEmbeddedFonts = !ignoreEmbeddedFonts
-                        onIgnoreEmbeddedFontsChange(ignoreEmbeddedFonts)
-                    }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Switch(
-                    checked = ignoreEmbeddedFonts,
-                    onCheckedChange = { checked ->
-                        ignoreEmbeddedFonts = checked
-                        onIgnoreEmbeddedFontsChange(checked)
-                    }
-                )
-                Text(
-                    text = stringResource(R.string.sv_ignore_embedded_fonts),
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-    }
-}
-
-/**
- * Приёмник изменений уровня батареи
- */
-@Composable
-private fun BatteryReceiver(fbReaderView: FBReaderView?) {
-    val context = LocalContext.current
-
-    DisposableEffect(fbReaderView) {
-        if (fbReaderView == null) return@DisposableEffect onDispose {}
-
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(ctx: Context?, intent: Intent) {
-                val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-                val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-                fbReaderView.battery = level * 100 / scale
-                fbReaderView.invalidateFooter()
-            }
-        }
-
-        val batteryIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(
-                receiver,
-                IntentFilter(Intent.ACTION_BATTERY_CHANGED),
-                Context.RECEIVER_NOT_EXPORTED
-            )
-        } else {
-            context.registerReceiver(
-                receiver,
-                IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            )
-        }
-
-        receiver.onReceive(context, batteryIntent ?: return@DisposableEffect onDispose {
-            context.unregisterReceiver(receiver)
-        })
-
-        onDispose {
-            try {
-                context.unregisterReceiver(receiver)
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to unregister battery receiver")
-            }
-        }
-    }
-}
-
-/**
- * Обработчик клавиш громкости для навигации по страницам.
- *
- * Использует Window.Callback.dispatchKeyEvent вместо View.OnKeyListener,
- * чтобы перехватывать события громкости ДО того, как они попадут в иерархию View.
- * Это надёжнее, потому что:
- * - View.OnKeyListener требует, чтобы view имела фокус
- * - PagerWidget (дочерняя view FBReaderView) имеет isFocusable=true и забирает фокус
- * - Window.Callback перехватывает события независимо от фокуса
- */
-@Composable
-private fun VolumeKeysHandler(
-    fbReaderView: FBReaderView?,
-    viewModel: ReaderViewModel
-) {
-    val context = LocalContext.current
-    val activity = remember(context) { context as? Activity } ?: return
-
-    val volumeKeysEnabled = remember {
-        val shared = PreferenceManager.getDefaultSharedPreferences(context)
-        shared.getBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, false)
-    }
-
-    DisposableEffect(fbReaderView, volumeKeysEnabled, activity) {
-        if (fbReaderView == null || !volumeKeysEnabled) {
-            return@DisposableEffect onDispose {}
-        }
-
-        val originalCallback = activity.window.callback
-        val wrapper = object : Window.Callback by originalCallback {
-            override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-                if (viewModel.volumeKeysEnabled) {
-                    when (event.keyCode) {
-                        KeyEvent.KEYCODE_VOLUME_DOWN if event.action == KeyEvent.ACTION_DOWN -> {
-                            fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
-                            return true
-                        }
-
-                        KeyEvent.KEYCODE_VOLUME_UP if event.action == KeyEvent.ACTION_DOWN -> {
-                            fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
-                            return true
-                        }
-                    }
-                }
-                return originalCallback.dispatchKeyEvent(event)
-            }
-        }
-        activity.window.callback = wrapper
-
-        onDispose {
-            activity.window.callback = originalCallback
         }
     }
 }
