@@ -23,9 +23,9 @@ class ZLTextHyperlinkRegionSoul(
     position: ZLTextPosition,
     @JvmField val Hyperlink: ZLTextHyperlink
 ) : ZLTextRegion.Soul(
-    position.getParagraphIndex(),
-    startElementIndex(Hyperlink, position.getElementIndex()),
-    endElementIndex(Hyperlink, position.getElementIndex())
+    position.paragraphIndex,
+    startElementIndex(Hyperlink, position.elementIndex),
+    endElementIndex(Hyperlink, position.elementIndex)
 ) {
     companion object {
         private fun startElementIndex(hyperlink: ZLTextHyperlink, fallback: Int): Int {

@@ -48,7 +48,7 @@ class BookmarkHighlighting internal constructor(
 
     private companion object {
         private fun startPosition(bookmark: Bookmark): ZLTextPosition =
-            ZLTextFixedPosition(bookmark.getParagraphIndex(), bookmark.getElementIndex(), 0)
+            ZLTextFixedPosition(bookmark.paragraphIndex, bookmark.elementIndex, 0)
 
         private fun endPosition(bookmark: Bookmark): ZLTextPosition {
             val end: ZLTextPosition? = bookmark.getEnd()
