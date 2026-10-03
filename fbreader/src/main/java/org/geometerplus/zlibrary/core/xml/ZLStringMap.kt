@@ -17,66 +17,55 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.xml;
+package org.geometerplus.zlibrary.core.xml
 
-import org.geometerplus.zlibrary.core.util.ZLArrayUtils;
+import org.geometerplus.zlibrary.core.util.ZLArrayUtils
 
 // optimized partially implemented map String -> String
 // key must be interned
 // there is no remove() in this implementation
 // put with the same key does not remove old entry
 
-public final class ZLStringMap {
-    private String[] myKeys;
-    private String[] myValues;
-    private int mySize;
+class ZLStringMap {
+    private var myKeys: Array<String?> = arrayOfNulls(8)
+    private var myValues: Array<String?> = arrayOfNulls(8)
+    private var mySize: Int = 0
 
-    public ZLStringMap() {
-        myKeys = new String[8];
-        myValues = new String[8];
-    }
-
-    public void put(String key, String value) {
-        final int size = mySize++;
-        String[] keys = myKeys;
-        if (keys.length == size) {
-            keys = ZLArrayUtils.createCopy(keys, size, size << 1);
-            myKeys = keys;
-            myValues = ZLArrayUtils.createCopy(myValues, size, size << 1);
+    fun put(key: String, value: String) {
+        val size = mySize++
+        var keys = myKeys
+        if (keys.size == size) {
+            keys = ZLArrayUtils.createCopy(keys, size, size shl 1)
+            myKeys = keys
+            myValues = ZLArrayUtils.createCopy(myValues, size, size shl 1)
         }
-        keys[size] = key;
-        myValues[size] = value;
+        keys[size] = key
+        myValues[size] = value
     }
 
     /*
      * Parameter `key` must be an interned string.
      */
-    public String getValue(String key) {
-        int index = mySize;
+    fun getValue(key: String): String? {
+        var index = mySize
         if (index > 0) {
-            final String[] keys = myKeys;
+            val keys = myKeys
             while (--index >= 0) {
-                if (keys[index] == key) {
-                    return myValues[index];
+                if (keys[index] === key) {
+                    return myValues[index]
                 }
             }
         }
-        return null;
+        return null
     }
 
-    public int getSize() {
-        return mySize;
-    }
+    fun getSize(): Int = mySize
 
-    public String getKey(int index) {
-        return myKeys[index];
-    }
+    fun getKey(index: Int): String? = myKeys[index]
 
-    String getValue(int index) {
-        return myValues[index];
-    }
+    fun getValue(index: Int): String? = myValues[index]
 
-    public void clear() {
-        mySize = 0;
+    fun clear() {
+        mySize = 0
     }
 }
