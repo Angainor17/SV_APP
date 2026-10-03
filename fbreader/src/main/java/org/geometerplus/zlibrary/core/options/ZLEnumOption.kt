@@ -17,36 +17,37 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.zlibrary.core.options;
+package org.geometerplus.zlibrary.core.options
 
-public final class ZLEnumOption<T extends Enum<T>> extends ZLOption {
-    private T myValue;
-    private String myStringValue;
-    private Class<T> myEnumClass;
+class ZLEnumOption<T : Enum<T>>(
+    group: String,
+    optionName: String,
+    defaultValue: T,
+) : ZLOption(group, optionName, defaultValue.toString()) {
 
-    public ZLEnumOption(String group, String optionName, T defaultValue) {
-        super(group, optionName, String.valueOf(defaultValue));
-        myEnumClass = defaultValue.getDeclaringClass();
-    }
+    private var myValue: T? = null
+    private var myStringValue: String? = null
+    private val myEnumClass: Class<T> = defaultValue.declaringJavaClass
+    private val myDefaultValue: T = defaultValue
 
-    public T getValue() {
-        final String stringValue = getConfigValue();
-        if (!stringValue.equals(myStringValue)) {
-            myStringValue = stringValue;
+    fun getValue(): T {
+        val stringValue = getConfigValue()
+        if (stringValue != myStringValue) {
+            myStringValue = stringValue
             try {
-                myValue = T.valueOf(myEnumClass, stringValue);
-            } catch (Throwable t) {
+                myValue = java.lang.Enum.valueOf(myEnumClass, stringValue)
+            } catch (t: Throwable) {
             }
         }
-        return myValue;
+        return myValue ?: myDefaultValue
     }
 
-    public void setValue(T value) {
+    fun setValue(value: T?) {
         if (value == null) {
-            return;
+            return
         }
-        myValue = value;
-        myStringValue = String.valueOf(value);
-        setConfigValue(myStringValue);
+        myValue = value
+        myStringValue = value.toString()
+        setConfigValue(value.toString())
     }
 }
