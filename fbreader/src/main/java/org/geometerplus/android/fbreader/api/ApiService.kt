@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2015 FBReader.ORG Limited <contact@fbreader.org>
+ * Copyright (C) 2009-2015 FBReader.ORG Limited <contact@fbreader.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,12 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.android.fbreader.config;
+package org.geometerplus.android.fbreader.api
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
 
-public class ConfigService extends Service {
-    private ConfigInterface.Stub myConfig;
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return myConfig;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        myConfig = new SQLiteConfig(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        if (myConfig != null) {
-            // TODO: close db
-            myConfig = null;
-        }
-        super.onDestroy();
-    }
+class ApiService : Service() {
+    override fun onBind(intent: Intent): IBinder? = ApiServerImplementation(this)
 }
