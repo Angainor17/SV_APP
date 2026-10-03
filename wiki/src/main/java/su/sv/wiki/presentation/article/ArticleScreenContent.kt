@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,11 +41,12 @@ import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
 import su.sv.commonui.theme.favorite
-import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.commonui.ui.components.FullScreenError
 import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.wiki.R
 import su.sv.wiki.presentation.root.ui.ArticleContent
+import su.sv.wiki.testing.WikiTestTags
 
 /**
  * Контент экрана статьи (для modo)
@@ -66,6 +68,7 @@ fun ArticleScreenContent(
     }
 
     Scaffold(
+        modifier = Modifier.testTag(WikiTestTags.Article.ROOT),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
@@ -144,9 +147,9 @@ fun ArticleScreenContent(
             }
 
             is ArticleState.Error -> {
-                FullScreenError {
+                FullScreenError(onRetry = {
                     viewModel.loadArticle(articleTitle)
-                }
+                })
             }
         }
     }

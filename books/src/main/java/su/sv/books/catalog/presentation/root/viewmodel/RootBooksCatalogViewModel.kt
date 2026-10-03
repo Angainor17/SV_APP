@@ -90,6 +90,7 @@ class RootBooksCatalogViewModel @Inject constructor(
                             filters = currentFilters,
                             selectedFilters = selectedFilters,
                             hasDownloadedBooks = uiBooks.any { it.fileUri != null },
+                            searchQuery = currentState?.searchQuery ?: "",
                             filterScrollResetKey = currentState?.filterScrollResetKey ?: 0,
                         )
                     } else {
@@ -165,6 +166,19 @@ class RootBooksCatalogViewModel @Inject constructor(
             is RootBookActions.OnFilterRemove -> {
                 handleFilterRemove(action.filter)
             }
+
+            is RootBookActions.OnSearchQueryChange -> {
+                updateState { state ->
+                    UiRootBooksState.Content.create(
+                        books = state.books,
+                        filters = state.filters,
+                        selectedFilters = state.selectedFilters,
+                        hasDownloadedBooks = state.hasDownloadedBooks,
+                        searchQuery = action.query,
+                        filterScrollResetKey = state.filterScrollResetKey,
+                    )
+                }
+            }
         }
     }
 
@@ -202,6 +216,7 @@ class RootBooksCatalogViewModel @Inject constructor(
                 filters = updatedUiFilters,
                 selectedFilters = finalSelectedFilters,
                 hasDownloadedBooks = state.hasDownloadedBooks,
+                searchQuery = state.searchQuery,
                 filterScrollResetKey = state.filterScrollResetKey + 1,
             )
         }
@@ -230,6 +245,7 @@ class RootBooksCatalogViewModel @Inject constructor(
                 filters = updatedUiFilters,
                 selectedFilters = finalSelectedFilters,
                 hasDownloadedBooks = state.hasDownloadedBooks,
+                searchQuery = state.searchQuery,
                 filterScrollResetKey = state.filterScrollResetKey + 1,
             )
         }
@@ -285,6 +301,7 @@ class RootBooksCatalogViewModel @Inject constructor(
                 filters = state.filters,
                 selectedFilters = state.selectedFilters,
                 hasDownloadedBooks = updatedBooks.any { it.fileUri != null },
+                searchQuery = state.searchQuery,
             )
         }
     }
@@ -342,6 +359,7 @@ class RootBooksCatalogViewModel @Inject constructor(
                 filters = state.filters,
                 selectedFilters = state.selectedFilters,
                 hasDownloadedBooks = updatedBooks.any { it.fileUri != null },
+                searchQuery = state.searchQuery,
             )
         }
     }

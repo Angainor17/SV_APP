@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -34,6 +35,7 @@ import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPThemeLightPreview
 import su.sv.info.R
 import su.sv.info.rootinfo.model.UiLinkItem
+import su.sv.info.testing.InfoTestTags
 
 /**
  * Элемент списка ссылок
@@ -68,14 +70,16 @@ fun InfoItem(item: UiLinkItem) {
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .height(dimensions.listItemHeight)
             .fillMaxWidth()
-            .padding(horizontal = dimensions.itemSpacingLarge),
+            .padding(horizontal = dimensions.itemSpacingLarge)
+            .testTag(InfoTestTags.LINK_ITEM),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(item.logo),
             modifier = Modifier
-                .size(dimensions.iconSizeLarge),
+                .size(dimensions.iconSizeLarge)
+                .testTag(InfoTestTags.LINK_ICON),
             alignment = Alignment.Center,
             contentDescription = stringResource(R.string.resource_logo_content_description),
             contentScale = ContentScale.Crop,
@@ -85,7 +89,9 @@ fun InfoItem(item: UiLinkItem) {
             text = item.text,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = dimensions.itemSpacingMedium)
+            modifier = Modifier
+                .padding(start = dimensions.itemSpacingMedium)
+                .testTag(InfoTestTags.LINK_TITLE),
         )
     }
 }

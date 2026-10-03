@@ -38,4 +38,7 @@ sealed class RootBookActions {
 
     /** Удаление фильтра */
     data class OnFilterRemove(val filter: BookFilter) : RootBookActions()
+
+    /** Изменение текста поискового запроса */
+    data class OnSearchQueryChange(val query: String) : RootBookActions()
 }

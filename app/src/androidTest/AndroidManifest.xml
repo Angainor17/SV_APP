@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Используем стандартное Hilt тестовое приложение -->
-    <application android:name="dagger.hilt.android.testing.HiltTestApplication" />
+    <!--
+      ВАЖНО: НЕ объявляем здесь HiltTestApplication.
+      HiltTestApplication подставляется кастомным раннером HiltTestRunner
+      (newApplication) в процессе приложения.
+
+      Если объявить <application android:name="...HiltTestApplication"/> здесь,
+      то при запуске пустой Activity InstrumentationActivityInvoker$EmptyActivity
+      поднимается ОТДЕЛЬНЫЙ процесс su.sv.app.dev.test, в classpath которого не
+      входят зависимости приложения (hilt-core), из-за чего HiltTestApplication
+      падает с NoClassDefFoundError: GeneratedComponentManager.
+    -->
 
 </manifest>

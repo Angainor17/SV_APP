@@ -6,4 +6,5 @@ data class BottomNavigationItem(
     val label: String,
     val icon: ImageVector,
     val route: String,
+    val testTag: String? = null,
 )

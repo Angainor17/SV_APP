@@ -66,4 +66,7 @@ dependencies {
     implementation(libs.androidx.window.core)
 
     implementation(libs.threetenabp)
+
+    // Test
+    testImplementation(libs.bundles.test)
 }

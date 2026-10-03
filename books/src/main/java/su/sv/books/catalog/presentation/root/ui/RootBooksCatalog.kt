@@ -27,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +48,7 @@ import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions.OnBookStateHandle
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
 import su.sv.books.catalog.presentation.root.viewmodel.effects.BooksListOneTimeEffect
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbar
 import su.sv.commonui.ui.components.FullScreenError
@@ -67,7 +69,9 @@ fun RootBooksCatalog(
     HandleEffects(viewModel, snackbarHostState)
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .testTag(BooksTestTags.BooksCatalog.ROOT),
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             when (val currentState = state.value) {
@@ -132,7 +136,8 @@ private fun BooksCatalogTopBar(
         actions = {
             // Иконка заметок (закладки)
             IconButton(
-                onClick = { actions.onAction(RootBookActions.OnToolbarBookmarksClick) }
+                onClick = { actions.onAction(RootBookActions.OnToolbarBookmarksClick) },
+                modifier = Modifier.testTag(BooksTestTags.BooksCatalog.BOOKMARKS_BUTTON),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Bookmark,
@@ -143,7 +148,8 @@ private fun BooksCatalogTopBar(
             // Иконка скачанных книг
             if (hasDownloadedBooks) {
                 IconButton(
-                    onClick = { actions.onAction(RootBookActions.OnToolbarBooksClick) }
+                    onClick = { actions.onAction(RootBookActions.OnToolbarBooksClick) },
+                    modifier = Modifier.testTag(BooksTestTags.BooksCatalog.DOWNLOADED_BUTTON),
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Download,

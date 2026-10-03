@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +56,7 @@ import su.sv.commonui.ui.shimmerBrush
 import su.sv.news.R
 import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiNewsMedia
+import su.sv.news.testing.NewsTestTags
 
 /**
  * Карточка новости
@@ -125,11 +127,13 @@ private fun NewsItemPhone(
                         text = item.description,
                         minimizedMaxLines = 4,
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                        modifier = Modifier.padding(
-                            start = dimensions.cardContentPaddingHorizontal,
-                            end = dimensions.cardContentPaddingHorizontal,
-                            top = dimensions.cardContentPaddingHorizontal,
-                        ),
+                        modifier = Modifier
+                            .padding(
+                                start = dimensions.cardContentPaddingHorizontal,
+                                end = dimensions.cardContentPaddingHorizontal,
+                                top = dimensions.cardContentPaddingHorizontal,
+                            )
+                            .testTag(NewsTestTags.ITEM_TITLE),
                     )
                 }
             }
@@ -294,7 +298,8 @@ private fun SingleImage(
                 indication = ripple()
             ) {
                 item.images.firstOrNull()?.let { onItemClick(it) }
-            },
+            }
+            .testTag(NewsTestTags.ITEM_IMAGE),
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
             .build(),
@@ -342,7 +347,8 @@ private fun SingleVideo(
                     indication = ripple()
                 ) {
                     video?.let { onVideoClick(it) }
-                },
+                }
+                .testTag(NewsTestTags.ITEM_VIDEO),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(url)
                 .build(),
@@ -529,7 +535,8 @@ private fun MediaGridItem(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple()
-                ) { onItemClick.invoke(media) },
+                ) { onItemClick.invoke(media) }
+                .testTag(if (isVideo) NewsTestTags.ITEM_VIDEO else NewsTestTags.ITEM_IMAGE),
             contentScale = ContentScale.Crop,
             onState = { state ->
                 if (state is State.Success) {
@@ -661,7 +668,8 @@ private fun AdaptiveMediaItem(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple()
-                ) { onItemClick.invoke(media) },
+                ) { onItemClick.invoke(media) }
+                .testTag(if (isVideo) NewsTestTags.ITEM_VIDEO else NewsTestTags.ITEM_IMAGE),
             contentScale = ContentScale.Crop,
             onState = { state ->
                 if (state is State.Success) {

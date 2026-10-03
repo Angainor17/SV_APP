@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,12 +47,13 @@ import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksAction
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksEffect
 import su.sv.books.catalog.presentation.bookmarks.viewmodel.BookmarksViewModel
 import su.sv.books.catalog.presentation.detail.nav.BookDetailScreen
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPTheme
-import su.sv.commonui.ui.FullScreenError
 import su.sv.commonui.ui.OneTimeEffect
 import su.sv.commonui.ui.components.AppToolbarWithBack
+import su.sv.commonui.ui.components.FullScreenError
 import su.sv.commonui.ui.components.FullScreenEmpty
 import su.sv.commonui.ui.components.FullScreenLoading
 import su.sv.models.ui.book.UIBookState
@@ -112,6 +114,7 @@ fun BookmarksCompactScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.statusBars,
+        modifier = Modifier.testTag(BooksTestTags.Bookmarks.ROOT),
         topBar = {
             BookmarksTopBar(
                 viewMode = currentViewMode,
@@ -130,7 +133,8 @@ fun BookmarksCompactScreen(
                 is UiBookmarksState.Loading -> FullScreenLoading()
                 is UiBookmarksState.Empty -> FullScreenEmpty(
                     title = stringResource(R.string.bookmarks_empty_title),
-                    icon = Icons.AutoMirrored.Filled.MenuBook
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
+                    modifier = Modifier.testTag(BooksTestTags.Bookmarks.EMPTY_STATE),
                 )
 
                 is UiBookmarksState.NotesList -> NotesListContent(
@@ -155,9 +159,9 @@ fun BookmarksCompactScreen(
                     onShareClick = { viewModel.onAction(BookmarksAction.OnShareNote(it)) },
                 )
 
-                is UiBookmarksState.Error -> FullScreenError {
+                is UiBookmarksState.Error -> FullScreenError(onRetry = {
                     viewModel.onAction(BookmarksAction.OnRetryClick)
-                }
+                })
             }
         }
     }
@@ -191,7 +195,10 @@ fun BookmarksTopBar(
         onBackClick = onBackClick,
         actions = {
             if (showViewModeToggle) {
-                IconButton(onClick = onToggleViewMode) {
+                IconButton(
+                    onClick = onToggleViewMode,
+                    modifier = Modifier.testTag(BooksTestTags.Bookmarks.MODE_TOGGLE),
+                ) {
                     Icon(
                         imageVector = if (viewMode == NotesViewMode.LIST) {
                             Icons.Default.ViewAgenda

@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import su.sv.commonui.theme.navigationBarColor
@@ -24,6 +25,7 @@ data class NavigationItem(
     val icon: ImageVector,
     val route: String,
     val showBadge: Boolean = false,
+    val testTag: String? = null,
 )
 
 /**
@@ -51,6 +53,7 @@ fun CompactNavigation(
     ) {
         items.forEachIndexed { index, navigationItem ->
             NavigationBarItem(
+                modifier = navigationItem.testTag?.let { Modifier.testTag(it) } ?: Modifier,
                 selected = index == selectedItem,
                 label = {
                     Text(

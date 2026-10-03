@@ -20,11 +20,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import su.sv.books.catalog.domain.model.BookFilter
 import su.sv.books.catalog.presentation.root.model.UiBookFilter
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.SVAPPThemeLightPreview
 
@@ -56,7 +58,9 @@ fun BookFiltersChips(
 
     AnimatedVisibility(visible = isVisible) {
         LazyRow(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .fillMaxWidth()
+                .testTag(BooksTestTags.BooksCatalog.CATEGORY_FILTER),
             state = scrollState,
             horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
             contentPadding = PaddingValues(horizontal = dimensions.screenPaddingHorizontal / 2),
@@ -126,7 +130,9 @@ private fun BookFilterChip(
                 overflow = TextOverflow.Ellipsis,
             )
         },
-        modifier = Modifier.padding(vertical = dimensions.itemSpacingSmall),
+        modifier = Modifier
+            .padding(vertical = dimensions.itemSpacingSmall)
+            .testTag(BooksTestTags.BooksCatalog.CATEGORY_CHIP),
         shape = MaterialTheme.shapes.small,
         border = FilterChipDefaults.filterChipBorder(
             enabled = filter.isAvailable,

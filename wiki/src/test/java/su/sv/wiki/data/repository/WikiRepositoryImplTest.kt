@@ -13,6 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
+import su.sv.commonarchitecture.managers.ResourcesRepository
 import su.sv.wiki.data.api.WikiApi
 import su.sv.wiki.data.api.model.ApiError
 import su.sv.wiki.data.api.model.ApiLink
@@ -45,6 +46,7 @@ class WikiRepositoryImplTest {
 
     // ========== Mocks ==========
 
+    private val resourcesRepository: ResourcesRepository = mockk(relaxed = true)
     private val api: WikiApi = mockk()
     private val favoriteDao: FavoriteDao = mockk()
     private val historyDao: HistoryDao = mockk()
@@ -52,6 +54,7 @@ class WikiRepositoryImplTest {
     private val gson: Gson = Gson()
 
     private val repository = WikiRepositoryImpl(
+        resourcesRepository = resourcesRepository,
         api = api,
         favoriteDao = favoriteDao,
         historyDao = historyDao,

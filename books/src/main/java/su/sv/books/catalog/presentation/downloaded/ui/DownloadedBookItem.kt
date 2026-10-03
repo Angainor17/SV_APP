@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +30,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import su.sv.books.R
 import su.sv.books.catalog.presentation.downloaded.model.UiDownloadedBook
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.theme.LocalAppDimensions
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.theme.SVAPPThemeLightPreview
@@ -86,6 +88,7 @@ fun DownloadedBookItemCompact(
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable(onClick = onBookClick)
+            .testTag(BooksTestTags.DownloadedBooks.ITEM)
             .padding(
                 horizontal = dimensions.itemSpacingMedium,
                 vertical = dimensions.itemSpacingMedium
@@ -172,6 +175,7 @@ fun DownloadedBookItemTablet(
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable(onClick = onBookClick)
+            .testTag(BooksTestTags.DownloadedBooks.ITEM)
             .padding(16.dp),
     ) {
         // Левая колонка: картинка + кнопка

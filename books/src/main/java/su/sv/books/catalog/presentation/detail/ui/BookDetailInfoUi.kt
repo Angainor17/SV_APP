@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,7 @@ import su.sv.books.R
 import su.sv.books.catalog.presentation.detail.actions.DetailBookActions
 import su.sv.books.catalog.presentation.detail.actions.DetailBooksActionsHandler
 import su.sv.books.catalog.presentation.detail.model.UiBookDetailState
+import su.sv.books.testing.BooksTestTags
 import su.sv.commonui.theme.LocalDeviceFormFactor
 import su.sv.commonui.ui.LoadingButton
 import su.sv.models.ui.book.UIBookState
@@ -82,6 +84,7 @@ fun BookDetailInfoUiCompact(
                     placeholder = painterResource(R.drawable.ic_book_placeholder),
                     contentDescription = stringResource(R.string.books_item_image_content_description),
                     contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.testTag(BooksTestTags.BookDetail.COVER),
                 )
             }
             Text(
@@ -89,7 +92,7 @@ fun BookDetailInfoUiCompact(
                     top = 8.dp,
                     start = 12.dp,
                     end = 12.dp,
-                ),
+                ).testTag(BooksTestTags.BookDetail.TITLE),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
@@ -100,7 +103,7 @@ fun BookDetailInfoUiCompact(
                 modifier = Modifier.padding(
                     start = 12.dp,
                     end = 12.dp,
-                ),
+                ).testTag(BooksTestTags.BookDetail.AUTHOR),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
@@ -117,7 +120,8 @@ fun BookDetailInfoUiCompact(
                     loading = state.isActionLoading,
                     onClick = {
                         actionsHandler.onAction(DetailBookActions.OnActionClick(uiBook))
-                    }
+                    },
+                    modifier = Modifier.testTag(BooksTestTags.BookDetail.READ_BUTTON),
                 )
             }
 
@@ -126,7 +130,7 @@ fun BookDetailInfoUiCompact(
                     top = 4.dp,
                     start = 12.dp,
                     end = 12.dp,
-                ),
+                ).testTag(BooksTestTags.BookDetail.DESCRIPTION),
                 fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 text = uiBook.description,
             )
@@ -191,7 +195,8 @@ fun BookDetailInfoUiTablet(
                         loading = state.isActionLoading,
                         onClick = {
                             actionsHandler.onAction(DetailBookActions.OnActionClick(uiBook))
-                        }
+                        },
+                        modifier = Modifier.testTag(BooksTestTags.BookDetail.READ_BUTTON),
                     )
                 }
             }

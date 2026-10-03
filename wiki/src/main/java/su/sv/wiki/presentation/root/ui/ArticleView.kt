@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import su.sv.wiki.R
 import su.sv.wiki.presentation.root.model.UiExternalLink
 import su.sv.wiki.presentation.root.model.UiWikiArticle
 import su.sv.wiki.presentation.root.model.UiWikiLink
+import su.sv.wiki.testing.WikiTestTags
 
 /**
  * Карточка статьи с кликабельными ссылками
@@ -44,7 +46,8 @@ fun ArticleView(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .testTag(WikiTestTags.Article.ROOT),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
@@ -58,10 +61,15 @@ fun ArticleView(
                 Text(
                     text = article.title,
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(WikiTestTags.Article.TITLE),
                 )
 
-                IconButton(onClick = { onFavoriteClick(article.title, isFavorite) }) {
+                IconButton(
+                    onClick = { onFavoriteClick(article.title, isFavorite) },
+                    modifier = Modifier.testTag(WikiTestTags.Article.FAVORITE_BUTTON),
+                ) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = if (isFavorite) {
@@ -84,6 +92,7 @@ fun ArticleView(
                 imageUrl = article.imageUrl,
                 onLinkClick = onLinkClick,
                 onExternalLinkClick = onExternalLinkClick,
+                modifier = Modifier.testTag(WikiTestTags.Article.CONTENT),
             )
         }
     }

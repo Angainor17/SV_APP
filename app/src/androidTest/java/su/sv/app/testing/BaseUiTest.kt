@@ -87,6 +87,26 @@ abstract class BaseUiTest {
     }
 
     /**
+     * Проверяет, загрузились ли новости. VK API может не отдавать данные в эмуляторе
+     * (нет сети/доступа к сервису), поэтому тесты, зависящие от списка новостей,
+     * пропускаются, если данных нет.
+     *
+     * @return true, если есть хотя бы один элемент списка новостей
+     */
+    protected fun newsItemsAvailable(timeoutMs: Long = 10000): Boolean {
+        return try {
+            composeRule.waitUntil(timeoutMs) {
+                composeRule.onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
+            }
+            true
+        } catch (e: Throwable) {
+            false
+        }
+    }
+
+    /**
      * Ожидание в миллисекундах.
      * Использовать с осторожностью - только когда нет другого способа.
      */

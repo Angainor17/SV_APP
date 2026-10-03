@@ -41,6 +41,8 @@ object TestTags {
         const val CATEGORY_CHIP = "category_chip"
         const val LOADING = "books_loading"
         const val ERROR = "books_error"
+        const val BOOKMARKS_BUTTON = "books_bookmarks_button"
+        const val DOWNLOADED_BUTTON = "books_downloaded_button"
     }
 
     object BookDetail {
