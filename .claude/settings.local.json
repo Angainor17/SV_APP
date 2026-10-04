@@ -104,7 +104,8 @@
       "Bash(python3 -c \"import sys; print\\('python:', sys.version\\)\")",
       "Bash(adb shell *)",
       "Bash(adb exec-out *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "WebFetch(domain:svremya.org)"
     ]
   }
 }
