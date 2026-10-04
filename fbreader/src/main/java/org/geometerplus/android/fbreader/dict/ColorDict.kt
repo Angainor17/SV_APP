@@ -24,7 +24,7 @@ import android.content.Intent
 
 import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication
 
-class ColorDict(id: String, title: String) : DictionaryUtil.PackageInfo(id, title) {
+class ColorDict(id: String?, title: String?) : DictionaryUtil.PackageInfo(id, title) {
     override fun open(text: String, outliner: Runnable, fbreader: Activity, frameMetrics: DictionaryUtil.PopupFrameMetric) {
         val intent = getActionIntent(text)
         intent.putExtra(ColorDict3.HEIGHT, frameMetrics.Height)
