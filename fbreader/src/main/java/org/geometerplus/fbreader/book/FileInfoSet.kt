@@ -100,7 +100,7 @@ class FileInfoSet private constructor(
         val entries = LinkedList<ZLFile>()
         for (child in info.subtrees()) {
             if (!myInfosToRemove.contains(child)) {
-                entries.add(ZLArchiveEntryFile.createArchiveEntryFile(file, child.Name))
+                entries.add(ZLArchiveEntryFile.createArchiveEntryFile(file, child.Name)!!)
             }
         }
         return entries
