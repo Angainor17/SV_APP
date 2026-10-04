@@ -126,7 +126,7 @@ class ZLFileImage(
                     lengths[i] = data[3 + count + i].toInt()
                 }
                 return ZLFileImage(
-                    ZLFile.createFileByPath(data[0]),
+                    ZLFile.createFileByPath(data[0])!!,
                     data[1],
                     offsets,
                     lengths,

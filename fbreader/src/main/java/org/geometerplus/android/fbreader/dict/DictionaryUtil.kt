@@ -333,11 +333,11 @@ object DictionaryUtil {
                     return
                 }
                 XmlUtil.parseQuietly(
-                    ZLFile.createFileByPath("dictionaries/main.xml"),
+                    ZLFile.createFileByPath("dictionaries/main.xml")!!,
                     InfoReader(),
                 )
                 XmlUtil.parseQuietly(
-                    ZLFile.createFileByPath("dictionaries/bitknights.xml"),
+                    ZLFile.createFileByPath("dictionaries/bitknights.xml")!!,
                     BitKnightsInfoReader(myActivity),
                 )
                 myActivity.runOnUiThread {

@@ -78,9 +78,9 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     @Throws(BookReadingException::class)
     override fun readMetainfo(book: AbstractBook) {
         val f = BookUtil.fileByBook(book)
-        val file = File(f.path)
-        if (!file.exists()) throw IllegalStateException("File does not exist: ${f.path}")
-        if (file.length() == 0L) throw IllegalStateException("File is empty: ${f.path}")
+        val file = File(f.getPath())
+        if (!file.exists()) throw IllegalStateException("File does not exist: ${f.getPath()}")
+        if (file.length() == 0L) throw IllegalStateException("File is empty: ${f.getPath()}")
         try {
             val fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
             val document = PdfiumCore(config = PDFIUM_CONFIG).newDocument(fd)
@@ -90,7 +90,7 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
             document.close()
             fd.close()
         } catch (e: IOException) {
-            Timber.tag(TAG).e(e, "readMetainfo() failed for ${f.path}")
+            Timber.tag(TAG).e(e, "readMetainfo() failed for ${f.getPath()}")
             throw IllegalStateException(e)
         }
     }
@@ -758,15 +758,15 @@ class PDFPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
         var fd: ParcelFileDescriptor
 
         init {
-            val file = File(f.path)
-            if (!file.exists()) throw IllegalStateException("File does not exist: ${f.path}")
-            if (file.length() == 0L) throw IllegalStateException("File is empty: ${f.path}")
+            val file = File(f.getPath())
+            if (!file.exists()) throw IllegalStateException("File does not exist: ${f.getPath()}")
+            if (file.length() == 0L) throw IllegalStateException("File is empty: ${f.getPath()}")
             try {
                 fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
                 document = PdfiumCore(config = PDFIUM_CONFIG).newDocument(fd)
                 current = PdfiumPage(document)
             } catch (e: IOException) {
-                Timber.tag(TAG).e(e, "PdfiumView.init() failed for ${f.path}")
+                Timber.tag(TAG).e(e, "PdfiumView.init() failed for ${f.getPath()}")
                 throw IllegalStateException(e)
             }
         }

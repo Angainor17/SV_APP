@@ -35,7 +35,7 @@ object CoverUtil {
             return null
         }
         return synchronized(book) {
-            getCover(ZLFile.createFileByPath(book.getPath()), collection)
+            getCover(ZLFile.createFileByPath(book.getPath())!!, collection)
         }
     }
 

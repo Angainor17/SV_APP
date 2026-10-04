@@ -122,7 +122,7 @@ class Storage(context: Context) : AxetStorage(context) {
         fun getPlugin(info: Info, b: FBook): FormatPlugin {
             val c = PluginCollection.Instance(info)
             val f = BookUtil.fileByBook(b.book!!)
-            return when (f.extension) {
+            return when (f.getExtension()) {
                 PDFPlugin.EXT -> PDFPlugin.create(info)
                 DjvuPlugin.EXT -> DjvuPlugin.create(info)
                 ComicsPlugin.CBZ, ComicsPlugin.CBR -> ComicsPlugin(info)
