@@ -17,37 +17,36 @@
  * 02110-1301, USA.
  */
 
-package org.geometerplus.fbreader.book;
+package org.geometerplus.fbreader.book
 
-public final class Book extends AbstractBook {
-    private final String myPath;
+class Book(
+    id: Long,
+    path: String?,
+    title: String?,
+    encoding: String?,
+    language: String?,
+) : AbstractBook(id, title, encoding, language) {
 
-    public Book(long id, String path, String title, String encoding, String language) {
-        super(id, title, encoding, language);
+    private val myPath: String
+
+    init {
         if (path == null) {
-            throw new IllegalArgumentException("Creating book with no file");
+            throw IllegalArgumentException("Creating book with no file")
         }
-        myPath = path;
+        myPath = path
     }
 
-    @Override
-    public String getPath() {
-        return myPath;
-    }
+    override fun getPath(): String = myPath
 
-    @Override
-    public int hashCode() {
-        return myPath.hashCode();
-    }
+    override fun hashCode(): Int = myPath.hashCode()
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
         }
-        if (!(o instanceof Book)) {
-            return false;
+        if (other !is Book) {
+            return false
         }
-        return myPath.equals(((Book) o).myPath);
+        return myPath == other.myPath
     }
 }
