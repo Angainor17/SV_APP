@@ -76,7 +76,7 @@ class TTSPopup(val fb: FBReaderView) {
         @JvmStatic
         fun isStopSymbol(e: ZLTextElement): Boolean {
             if (e is ZLTextWord) {
-                val str = e.string
+                val str = e.getString()
                 return isStopSymbol(str)
             }
             return false
@@ -94,7 +94,7 @@ class TTSPopup(val fb: FBReaderView) {
         @JvmStatic
         fun stopOnLeft(e: ZLTextElement): Boolean {
             if (e is ZLTextWord) {
-                val str = e.string
+                val str = e.getString()
                 return stopOnLeft(str)
             }
             return false
@@ -112,7 +112,7 @@ class TTSPopup(val fb: FBReaderView) {
         @JvmStatic
         fun stopOnRight(e: ZLTextElement): Boolean {
             if (e is ZLTextWord) {
-                val str = e.string
+                val str = e.getString()
                 return stopOnRight(str)
             }
             return false
@@ -857,7 +857,7 @@ class TTSPopup(val fb: FBReaderView) {
                 var e: ZLTextElement = wordCursor.element
                 while (wordCursor.compareTo(bm.end!!) < 0) {
                     if (e is ZLTextWord) {
-                        val z = e.string
+                        val z = e.getString()
                         val b = Bookmark(
                             z,
                             ZLTextFixedPosition(wordCursor),
