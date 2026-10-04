@@ -28,7 +28,7 @@ import java.util.Locale
 class ZLTTFInfoDetector {
     private var myPosition: Int = 0
 
-    fun collectFonts(files: Iterable<File>?): Map<String, Array<File?>> {
+    fun collectFonts(files: Iterable<File>?): HashMap<String, Array<File?>> {
         val fonts = HashMap<String, Array<File?>>()
         if (files == null) {
             return fonts

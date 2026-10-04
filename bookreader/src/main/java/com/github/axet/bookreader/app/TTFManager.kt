@@ -175,7 +175,7 @@ class TTFManager(val context: Context) {
                     val tf = TTCFile(f.uri, f.index)
                     val ttf = load(tf)
                     AndroidFontUtil.ourTypefaces[f.name] = arrayOf(ttf, null, null, null)
-                    AndroidFontUtil.ourFontFileMap[f.name] = arrayOf(tf, null, null, null)
+                    AndroidFontUtil.ourFontFileMap!![f.name] = arrayOf(tf, null, null, null)
                     ourFontFileMap[tf] = ttf
                 } catch (e: Exception) {
                     Timber.w(e)
