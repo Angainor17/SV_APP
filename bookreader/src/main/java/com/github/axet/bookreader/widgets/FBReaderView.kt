@@ -309,7 +309,7 @@ open class FBReaderView @JvmOverloads constructor(
                     gotoPluginPosition(book!!.info!!.position)
             } else {
                 val model = BookModel.createModel(fbook.book!!, plugin)
-                ZLTextHyphenator.Instance().load(fbook.book!!.language)
+                ZLTextHyphenator.Instance().load(fbook.book!!.getLanguage())
                 app.BookTextView.setModel(model.textModel)
                 app.Model = model
                 if (book!!.info!!.position != null)
