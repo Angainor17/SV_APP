@@ -114,12 +114,12 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
                 )
                 if (!app.isActionEnabled(z))
                     continue
-                val r = maps[z]
+                val r = maps[z!!]
                 val xx = w * x // смещение по x
                 val yy = h * y // смещение по y
                 val c = Rect(xx, yy, xx + w, yy + h)
                 if (r == null)
-                    maps[z] = c
+                    maps[z!!] = c
                 else
                     r.union(c)
             }
