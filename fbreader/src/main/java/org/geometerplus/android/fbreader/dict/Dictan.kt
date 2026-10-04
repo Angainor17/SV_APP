@@ -25,7 +25,7 @@ import android.content.Intent
 
 import org.geometerplus.zlibrary.core.resources.ZLResource
 
-class Dictan(id: String, title: String) : DictionaryUtil.PackageInfo(id, title) {
+class Dictan(id: String?, title: String?) : DictionaryUtil.PackageInfo(id, title) {
     override fun open(text: String, outliner: Runnable, fbreader: Activity, frameMetrics: DictionaryUtil.PopupFrameMetric) {
         val intent = getActionIntent(text)
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
