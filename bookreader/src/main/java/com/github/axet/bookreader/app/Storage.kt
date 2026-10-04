@@ -159,7 +159,7 @@ class Storage(context: Context) : AxetStorage(context) {
 
         @JvmStatic
         fun getTitle(book: Book, fbook: FBook): String? {
-            var t: String? = fbook.book!!.title
+            var t: String? = fbook.book!!.getTitle()
             if (t == book.md5)
                 t = null
             return t
@@ -654,7 +654,7 @@ class Storage(context: Context) : AxetStorage(context) {
             }
             val authors = fbook.book!!.authors()
             val a = authors != null && authors.isNotEmpty()
-            val title = fbook.book!!.title
+            val title = fbook.book!!.getTitle()
             val t = title != null && title.isNotEmpty()
             if (bm == null && (a || t)) {
                 val inflater = LayoutInflater.from(context)
@@ -662,7 +662,7 @@ class Storage(context: Context) : AxetStorage(context) {
                 val aa = v.findViewById<TextView>(R.id.author)
                 aa.text = fbook.book!!.authorsString(", ")
                 val tt = v.findViewById<TextView>(R.id.title)
-                tt.text = fbook.book!!.title
+                tt.text = fbook.book!!.getTitle()
                 bm = renderView(v)
             }
             if (bm == null) {
