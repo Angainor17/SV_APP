@@ -60,7 +60,7 @@ open class SelectionView(
          */
         @JvmStatic
         fun rectHandle(which: SelectionCursor.Which, x: Int, y: Int): HotRect {
-            val dpi = ZLibrary.Instance().displayDPI
+            val dpi = ZLibrary.Instance().getDisplayDPI()
             val unit = dpi / 120
             val xCenter = if (which == SelectionCursor.Which.Left) x - unit - 1 else x + unit + 1
             val rect = HotRect(xCenter - unit, y - dpi / 8, xCenter + unit, y + dpi / 8, x, y)
@@ -82,7 +82,7 @@ open class SelectionView(
             y: Int,
             handles: Paint
         ) {
-            val dpi = ZLibrary.Instance().displayDPI
+            val dpi = ZLibrary.Instance().getDisplayDPI()
             val unit = dpi / 120
             val xCenter = if (which == SelectionCursor.Which.Left) x - unit - 1 else x + unit + 1
             canvas.drawRect(
