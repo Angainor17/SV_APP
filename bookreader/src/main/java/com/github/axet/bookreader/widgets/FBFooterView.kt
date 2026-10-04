@@ -58,7 +58,7 @@ class FBFooterView @JvmOverloads constructor(
         this.fb = fb
         update()
         orientation = HORIZONTAL
-        val cProfile: ColorProfile = fb.app.ViewOptions.getColorProfile()
+        val cProfile: ColorProfile = fb.app.ViewOptions.colorProfile
         setBackgroundColor(
             0xffffff and cProfile.FooterNGBackgroundOption.getValue()!!
                 .intValue() or 0xff000000.toInt()
@@ -66,7 +66,7 @@ class FBFooterView @JvmOverloads constructor(
         val lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
         lp.gravity = Gravity.CENTER
         addView(TOCMarks(context), lp)
-        val footerOptions = fb.app.ViewOptions.getFooterOptions()
+        val footerOptions = fb.app.ViewOptions.footerOptions
         val lpText = LayoutParams(LayoutParams.WRAP_CONTENT, footer!!.height)
         lpText.gravity = Gravity.CENTER
         if (footerOptions.showProgressAsPages())
@@ -102,7 +102,7 @@ class FBFooterView @JvmOverloads constructor(
         customview = fb!!.app.BookTextView as FBReaderView.CustomView
         footer = customview!!.footer
         pagePosition = customview!!.pagePosition()
-        family = fb!!.app.ViewOptions.getFooterOptions().Font.getValue()
+        family = fb!!.app.ViewOptions.footerOptions.Font.getValue()
         tf = AndroidFontUtil.typeface(
             fb!!.app.SystemInfo,
             FontEntry.systemEntry(family!!),
@@ -172,7 +172,7 @@ class FBFooterView @JvmOverloads constructor(
         open fun update() {
             paint.typeface = tf
             paint.textSize = footer!!.height + 2f
-            val cProfile: ColorProfile = fb!!.app.ViewOptions.getColorProfile()
+            val cProfile: ColorProfile = fb!!.app.ViewOptions.colorProfile
             paint.color = 0xffffff and cProfile.FooterNGForegroundOption.getValue()!!
                 .intValue() or 0xff000000.toInt()
         }

@@ -25,7 +25,7 @@ internal class ChangeFontSizeAction(fbreader: FBReaderApp, private val myDelta: 
     FBAction(fbreader) {
     override fun run(vararg params: Any?) {
         val option: ZLIntegerRangeOption =
-            Reader.ViewOptions.getTextStyleCollection().baseStyle.FontSizeOption
+            Reader.ViewOptions.textStyleCollection.baseStyle.FontSizeOption
         option.setValue(option.getValue() + myDelta)
         Reader.clearTextCaches()
         Reader.getViewWidget().repaint()
