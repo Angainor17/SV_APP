@@ -97,7 +97,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
     override fun readMetainfo(book: AbstractBook) {
         val f = BookUtil.fileByBook(book)
         try {
-            val `is` = FileInputStream(f.path)
+            val `is` = FileInputStream(f.getPath())
             val doc = DjvuLibre(`is`.fd)
             book.setTitle(doc.getMeta(LibDjvu.META_TITLE))
             book.addAuthor(doc.getMeta(LibDjvu.META_AUTHOR))
@@ -737,7 +737,7 @@ class DjvuPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, EXT), Plugin {
 
         init {
             try {
-                `is` = FileInputStream(File(f.path))
+                `is` = FileInputStream(File(f.getPath()))
                 doc = DjvuLibre(`is`.fd)
                 current = DjvuPage(doc)
             } catch (e: IOException) {

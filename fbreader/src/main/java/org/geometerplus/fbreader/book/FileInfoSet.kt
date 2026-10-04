@@ -146,7 +146,7 @@ class FileInfoSet private constructor(
         }
         var file = myFilesByInfo[info]
         if (file == null) {
-            file = ZLFile.createFile(getFile(info.Parent), info.Name)
+            file = ZLFile.createFile(getFile(info.Parent), info.Name)!!
             myFilesByInfo[info] = file
         }
         return file

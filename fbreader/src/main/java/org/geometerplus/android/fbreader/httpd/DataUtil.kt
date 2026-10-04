@@ -32,7 +32,7 @@ object DataUtil {
             }
             path.append(item.toShort(16).toChar())
         }
-        return ZLFile.createFileByPath(path.toString())
+        return ZLFile.createFileByPath(path.toString())!!
     }
 
     @JvmStatic

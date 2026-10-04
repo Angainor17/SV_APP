@@ -439,7 +439,7 @@ class ComicsPlugin(info: Storage.Info) : BuiltinFormatPlugin(info, CBZ), Plugin 
         var doc: Decoder? = null
 
         init {
-            val file = File(f.path)
+            val file = File(f.getPath())
             if (file.path.lowercase().endsWith(".$CBZ"))
                 doc = ZipDecoder(file)
             if (file.path.lowercase().endsWith(".$CBR"))

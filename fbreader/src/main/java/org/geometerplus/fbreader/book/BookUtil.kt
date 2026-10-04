@@ -172,7 +172,7 @@ object BookUtil {
         return if (book is DbBook) {
             book.File
         } else {
-            ZLFile.createFileByPath(book!!.getPath())
+            ZLFile.createFileByPath(book!!.getPath())!!
         }
     }
 }
