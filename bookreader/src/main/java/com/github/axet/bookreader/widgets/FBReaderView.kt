@@ -1392,11 +1392,11 @@ open class FBReaderView @JvmOverloads constructor(
             dpiValue = book!!.info!!.fontsize!!
         else
             dpiValue = app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption.getValue()
-        return dpiValue * 160 / ZLibrary.Instance().displayDPI
+        return dpiValue * 160 / ZLibrary.Instance().getDisplayDPI()
     }
 
     fun setFontsizeFB(p: Int) {
-        val dpiScaled = p * ZLibrary.Instance().displayDPI / 160
+        val dpiScaled = p * ZLibrary.Instance().getDisplayDPI() / 160
         book!!.info!!.fontsize = dpiScaled
         config.setValue(app.ViewOptions.textStyleCollection.baseStyle.FontSizeOption, dpiScaled)
         val scrollDelayed = position
