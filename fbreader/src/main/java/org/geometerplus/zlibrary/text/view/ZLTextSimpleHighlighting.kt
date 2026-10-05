@@ -33,9 +33,9 @@ abstract class ZLTextSimpleHighlighting protected constructor(
 
     override fun getEndPosition(): ZLTextPosition = myEndPosition
 
-    override fun getStartArea(page: ZLTextPage): ZLTextElementArea =
+    override fun getStartArea(page: ZLTextPage): ZLTextElementArea? =
         page.TextElementMap.getFirstAfter(myStartPosition)
 
-    override fun getEndArea(page: ZLTextPage): ZLTextElementArea =
+    override fun getEndArea(page: ZLTextPage): ZLTextElementArea? =
         page.TextElementMap.getLastBefore(myEndPosition)
 }

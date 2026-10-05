@@ -85,7 +85,7 @@ class ZLTextWordCursor : ZLTextPosition {
     }
 
     val element: ZLTextElement
-        get() = myParagraphCursor!!.getElement(myElementIndex)
+        get() = myParagraphCursor!!.getElement(myElementIndex)!!
 
     fun getParagraphCursor(): ZLTextParagraphCursor? = myParagraphCursor
 
