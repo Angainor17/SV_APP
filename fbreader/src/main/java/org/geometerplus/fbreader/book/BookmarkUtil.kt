@@ -59,12 +59,12 @@ object BookmarkUtil {
         var count = bookmark.getLength()
         mainLoop@
         while (count > 0) {
-            while (cursor.isEndOfParagraph()) {
+            while (cursor.isEndOfParagraph) {
                 if (!cursor.nextParagraph()) {
                     break@mainLoop
                 }
             }
-            val element = cursor.getElement()
+            val element = cursor.element
             if (element is ZLTextWord) {
                 if (word != null) {
                     --count
