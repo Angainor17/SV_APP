@@ -103,8 +103,8 @@ class BookContextService @Inject constructor(
             val plugin = Storage.getPlugin(info, fbook)
 
             // 4. Создаём BookModel
-            val bookModel = BookModel.createModel(fbook.book, plugin)
-            val textModel = bookModel.getTextModel()
+            val bookModel = BookModel.createModel(fbook.book!!, plugin)
+            val textModel = bookModel.textModel
 
             if (textModel == null) {
                 Timber.w("TextModel is null for book: ${storageBook.md5}")

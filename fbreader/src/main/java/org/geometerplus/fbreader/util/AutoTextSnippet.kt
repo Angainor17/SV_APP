@@ -52,11 +52,11 @@ class AutoTextSnippet(start: ZLTextWordCursor, maxChars: Int) : TextSnippet {
         while (buffer.Builder.length + sentenceBuffer.Builder.length + phraseBuffer.Builder.length < maxChars &&
             sentenceCounter < maxChars / 20
         ) {
-            while (cursor.isEndOfParagraph()) {
+            while (cursor.isEndOfParagraph) {
                 if (!cursor.nextParagraph()) {
                     break@mainLoop
                 }
-                if (!buffer.isEmpty() && cursor.getParagraphCursor().isLikeEndOfSection()) {
+                if (!buffer.isEmpty() && cursor.getParagraphCursor()!!.isLikeEndOfSection()) {
                     break@mainLoop
                 }
                 if (!phraseBuffer.isEmpty()) {
@@ -76,7 +76,7 @@ class AutoTextSnippet(start: ZLTextWordCursor, maxChars: Int) : TextSnippet {
                 }
             }
 
-            val element = cursor.getElement()
+            val element = cursor.element
             when {
                 element === ZLTextElement.HSpace -> {
                     if (lineIsNonEmpty) {
@@ -124,7 +124,7 @@ class AutoTextSnippet(start: ZLTextWordCursor, maxChars: Int) : TextSnippet {
         }
 
         IsEndOfText =
-            cursor.isEndOfText() || cursor.getParagraphCursor().isLikeEndOfSection()
+            cursor.isEndOfText() || cursor.getParagraphCursor()!!.isLikeEndOfSection()
 
         if (IsEndOfText) {
             sentenceBuffer.append(phraseBuffer)

@@ -46,7 +46,7 @@ abstract class ZLTextHighlighting : Comparable<ZLTextHighlighting> {
             page.EndCursor.compareTo(getStartPosition()) > 0
 
     fun intersects(region: ZLTextRegion): Boolean {
-        val soul = region.getSoul()
+        val soul = region.soul
         return !isEmpty() &&
             soul.compareTo(getStartPosition()) >= 0 &&
             soul.compareTo(getEndPosition()) <= 0

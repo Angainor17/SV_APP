@@ -855,8 +855,8 @@ open class FBReaderView @JvmOverloads constructor(
     }
 
     fun showHyperlink(hyperlink: ZLTextHyperlink) {
-        val label = app.Model!!.getLabel(hyperlink.Id)
-        showHyperlink(label)
+        val label = app.Model!!.getLabel(hyperlink.Id!!)
+        showHyperlink(label!!)
     }
 
     fun showHyperlink(label: BookModel.Label) {
@@ -901,8 +901,8 @@ open class FBReaderView @JvmOverloads constructor(
                         FBHyperlinkType.EXTERNAL ->
                             AboutPreferenceCompat.openUrlDialog(context, hyperlink.Id)
                         FBHyperlinkType.INTERNAL, FBHyperlinkType.FOOTNOTE -> {
-                            val label = r.app.Model!!.getLabel(hyperlink.Id)
-                            r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0)
+                            val label = r.app.Model!!.getLabel(hyperlink.Id!!)
+                            r.app.BookTextView.gotoPosition(label!!.ParagraphIndex, 0, 0)
                             r.resetNewPosition()
                         }
                         else -> {}
@@ -936,7 +936,7 @@ open class FBReaderView @JvmOverloads constructor(
                 r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0)
                 r.app.setView(r.app.BookTextView)
             } else {
-                val model = r.app.Model!!.getFootnoteModel(label.ModelId)
+                val model = r.app.Model!!.getFootnoteModel(label.ModelId!!)
                 r.app.BookTextView.setModel(model)
                 r.app.setView(r.app.BookTextView)
                 r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0)
