@@ -105,13 +105,13 @@ class ImagesProvider : StorageProvider() {
         val image = ZLFileImage.byUrlPath(f.path) ?: throw FileNotFoundException()
 
         try {
-            val imageData: ZLImageData = ZLImageManager.Instance().getImageData(image)
-            val bm = (imageData as ZLAndroidImageData).fullSizeBitmap
+            val imageData = ZLImageManager.Instance().getImageData(image) as ZLAndroidImageData
+            val bm = imageData.getFullSizeBitmap()
             return openInputStream(object : InputStreamWriter() {
                 override fun copy(os: OutputStream) {
                     try {
-                        bm.compress(Bitmap.CompressFormat.PNG, 100, os)
-                        bm.recycle()
+                        bm!!.compress(Bitmap.CompressFormat.PNG, 100, os)
+                        bm!!.recycle()
                     } catch (e: Throwable) {
                         throw IOException(e)
                     }

@@ -54,8 +54,8 @@ abstract class ZLImageProxy : ZLImage {
     }
 
     interface Synchronizer {
-        fun startImageLoading(image: ZLImageProxy, postAction: Runnable)
+        fun startImageLoading(image: ZLImageProxy, postAction: Runnable?)
 
-        fun synchronize(image: ZLImageProxy, postAction: Runnable)
+        fun synchronize(image: ZLImageProxy, postAction: Runnable?)
     }
 }

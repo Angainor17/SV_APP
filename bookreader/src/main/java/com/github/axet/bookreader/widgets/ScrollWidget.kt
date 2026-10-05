@@ -1594,7 +1594,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                 return false
             if (!fb.app.BookTextView.startCursor.samePositionAs(c!!.start!!))
                 fb.app.BookTextView.gotoPosition(c!!.start)
-            fb.app.BookTextView.myCurrentPage.TextElementMap = v!!.text
+            fb.app.BookTextView.myCurrentPage.TextElementMap = v!!.text!!
             return true
         }
 

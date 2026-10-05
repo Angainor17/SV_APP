@@ -94,7 +94,7 @@ abstract class ZLImageManager protected constructor() {
         ourInstance = this
     }
 
-    abstract fun getImageData(image: ZLImage): ZLImageData
+    abstract fun getImageData(image: ZLImage): ZLImageData?
 
     protected class PalmImageHeader(byteData: ByteArray) {
         @JvmField
