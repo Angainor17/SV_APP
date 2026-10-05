@@ -156,7 +156,8 @@ object BookUtil {
         book.mySaveState = AbstractBook.SaveState.NotSaved
 
         plugin.readMetainfo(book)
-        if (book.myUids == null || book.myUids.isEmpty()) {
+        val uids = book.myUids
+        if (uids == null || uids.isEmpty()) {
             plugin.readUids(book)
         }
 

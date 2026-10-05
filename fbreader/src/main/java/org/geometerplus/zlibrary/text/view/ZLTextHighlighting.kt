@@ -25,13 +25,13 @@ import org.geometerplus.zlibrary.core.view.Hull
 abstract class ZLTextHighlighting : Comparable<ZLTextHighlighting> {
     abstract fun isEmpty(): Boolean
 
-    abstract fun getStartPosition(): ZLTextPosition
+    abstract fun getStartPosition(): ZLTextPosition?
 
-    abstract fun getEndPosition(): ZLTextPosition
+    abstract fun getEndPosition(): ZLTextPosition?
 
-    abstract fun getStartArea(page: ZLTextPage): ZLTextElementArea
+    abstract fun getStartArea(page: ZLTextPage): ZLTextElementArea?
 
-    abstract fun getEndArea(page: ZLTextPage): ZLTextElementArea
+    abstract fun getEndArea(page: ZLTextPage): ZLTextElementArea?
 
     abstract fun getForegroundColor(): ZLColor?
 
@@ -42,19 +42,19 @@ abstract class ZLTextHighlighting : Comparable<ZLTextHighlighting> {
     fun intersects(page: ZLTextPage): Boolean =
         !isEmpty() &&
             !page.StartCursor.isNull() && !page.EndCursor.isNull() &&
-            page.StartCursor.compareTo(getEndPosition()) < 0 &&
-            page.EndCursor.compareTo(getStartPosition()) > 0
+            page.StartCursor.compareTo(getEndPosition()!!) < 0 &&
+            page.EndCursor.compareTo(getStartPosition()!!) > 0
 
     fun intersects(region: ZLTextRegion): Boolean {
         val soul = region.soul
         return !isEmpty() &&
-            soul.compareTo(getStartPosition()) >= 0 &&
-            soul.compareTo(getEndPosition()) <= 0
+            soul.compareTo(getStartPosition()!!) >= 0 &&
+            soul.compareTo(getEndPosition()!!) <= 0
     }
 
     fun hull(page: ZLTextPage): Hull {
-        val startPosition = getStartPosition()
-        val endPosition = getEndPosition()
+        val startPosition = getStartPosition()!!
+        val endPosition = getEndPosition()!!
         val areas = page.TextElementMap.areas()
         var startIndex = 0
         var endIndex = 0
@@ -71,7 +71,7 @@ abstract class ZLTextHighlighting : Comparable<ZLTextHighlighting> {
     }
 
     override fun compareTo(highlighting: ZLTextHighlighting): Int {
-        val cmp = getStartPosition().compareTo(highlighting.getStartPosition())
-        return if (cmp != 0) cmp else getEndPosition().compareTo(highlighting.getEndPosition())
+        val cmp = getStartPosition()!!.compareTo(highlighting.getStartPosition()!!)
+        return if (cmp != 0) cmp else getEndPosition()!!.compareTo(highlighting.getEndPosition()!!)
     }
 }
