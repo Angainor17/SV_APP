@@ -84,7 +84,7 @@ internal fun FontsComposeBottomSheet(
         val fontList = mutableListOf("sans-serif", "serif", "monospace")
         ttf?.let {
             // Добавляем системные шрифты
-            org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil.ourFontFileMap.keys.forEach { name ->
+            org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil.ourFontFileMap?.keys?.forEach { name ->
                 if (!fontList.contains(name)) {
                     fontList.add(name)
                 }
