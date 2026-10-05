@@ -24,8 +24,8 @@ class ZLStringOption(group: String, optionName: String, defaultValue: String?) :
 
     fun getValue(): String {
         val specialName = mySpecialName
-        return if (specialName != null && !org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized) {
-            org.geometerplus.zlibrary.core.options.Config.Instance().getSpecialStringValue(specialName, myDefaultStringValue)
+        return if (specialName != null && !org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized()) {
+            org.geometerplus.zlibrary.core.options.Config.Instance().getSpecialStringValue(specialName, myDefaultStringValue) ?: myDefaultStringValue
         } else {
             getConfigValue()
         }
@@ -44,7 +44,7 @@ class ZLStringOption(group: String, optionName: String, defaultValue: String?) :
 
     override fun saveSpecialValue() {
         val specialName = mySpecialName
-        if (specialName != null && org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized) {
+        if (specialName != null && org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized()) {
             org.geometerplus.zlibrary.core.options.Config.Instance().setSpecialStringValue(specialName, getValue())
         }
     }

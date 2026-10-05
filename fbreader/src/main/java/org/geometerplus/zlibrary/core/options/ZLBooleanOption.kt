@@ -26,7 +26,7 @@ class ZLBooleanOption(group: String, optionName: String, defaultValue: Boolean) 
 
     fun getValue(): Boolean {
         val specialName = mySpecialName
-        return if (specialName != null && !org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized) {
+        return if (specialName != null && !org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized()) {
             org.geometerplus.zlibrary.core.options.Config.Instance().getSpecialBooleanValue(specialName, myDefaultValue)
         } else {
             "true" == getConfigValue()
@@ -43,7 +43,7 @@ class ZLBooleanOption(group: String, optionName: String, defaultValue: Boolean) 
 
     override fun saveSpecialValue() {
         val specialName = mySpecialName
-        if (specialName != null && org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized) {
+        if (specialName != null && org.geometerplus.zlibrary.core.options.Config.Instance().isInitialized()) {
             org.geometerplus.zlibrary.core.options.Config.Instance().setSpecialBooleanValue(specialName, getValue())
         }
     }
