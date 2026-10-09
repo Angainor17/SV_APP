@@ -386,7 +386,7 @@ open class FBReaderView @JvmOverloads constructor(
                         val top = -p.top
                         for (a in p.text!!.areas()) {
                             if (a.YStart > top || (a.YStart < top && a.YEnd > top)) {
-                                val paragraphCursor = ZLTextParagraphCursor(app.Model!!.textModel, a.paragraphIndex)
+                                val paragraphCursor = ZLTextParagraphCursor(app.Model!!.textModel!!, a.paragraphIndex)
                                 val wordCursor = ZLTextWordCursor(paragraphCursor)
                                 wordCursor.moveTo(a)
                                 var last: ZLTextFixedPosition

@@ -487,7 +487,7 @@ class TTSPopup(val fb: FBReaderView) {
         } else {
             var start = bm.end!!
             val paragraphCursor =
-                ZLTextParagraphCursor(fb.app.Model.textModel, start.paragraphIndex)
+                ZLTextParagraphCursor(fb.app.Model.textModel!!, start.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(start)
             if (wordCursor.isEndOfParagraph) wordCursor.nextParagraph() else wordCursor.nextWord()
@@ -509,7 +509,7 @@ class TTSPopup(val fb: FBReaderView) {
             return bm
         } else {
             var end = bm.start!!
-            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.textModel, end.paragraphIndex)
+            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.textModel!!, end.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(end)
             wordCursor.previousWord()
@@ -758,7 +758,7 @@ class TTSPopup(val fb: FBReaderView) {
             return last
         } else {
             val paragraphCursor =
-                ZLTextParagraphCursor(fb.app.Model.textModel, start.paragraphIndex)
+                ZLTextParagraphCursor(fb.app.Model.textModel!!, start.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(start)
             wordCursor.setCharIndex(0)
@@ -792,7 +792,7 @@ class TTSPopup(val fb: FBReaderView) {
             k.close()
             return result
         } else {
-            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.textModel, end.paragraphIndex)
+            val paragraphCursor = ZLTextParagraphCursor(fb.app.Model.textModel!!, end.paragraphIndex)
             val wordCursor = ZLTextWordCursor(paragraphCursor)
             wordCursor.moveTo(end)
             var count = 0
@@ -851,7 +851,7 @@ class TTSPopup(val fb: FBReaderView) {
                 k.close()
             } else {
                 val paragraphCursor =
-                    ZLTextParagraphCursor(fb.app.Model.textModel, bm.start!!.paragraphIndex)
+                    ZLTextParagraphCursor(fb.app.Model.textModel!!, bm.start!!.paragraphIndex)
                 val wordCursor = ZLTextWordCursor(paragraphCursor)
                 wordCursor.moveTo(bm.start!!)
                 var e: ZLTextElement = wordCursor.element
