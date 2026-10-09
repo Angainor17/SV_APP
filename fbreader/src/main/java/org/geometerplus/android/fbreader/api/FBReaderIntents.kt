@@ -82,8 +82,6 @@ object FBReaderIntents {
         const val API_CALLBACK = "android.fbreader.action.API_CALLBACK"
         const val VIEW = "android.fbreader.action.VIEW"
         const val CANCEL_MENU = "android.fbreader.action.CANCEL_MENU"
-        const val CONFIG_SERVICE = "android.fbreader.action.CONFIG_SERVICE"
-        const val LIBRARY_SERVICE = "android.fbreader.action.LIBRARY_SERVICE"
         const val BOOK_INFO = "android.fbreader.action.BOOK_INFO"
         const val LIBRARY = "android.fbreader.action.LIBRARY"
         const val EXTERNAL_LIBRARY = "android.fbreader.action.EXTERNAL_LIBRARY"
@@ -112,12 +110,6 @@ object FBReaderIntents {
     }
 
     object Event {
-        const val CONFIG_OPTION_CHANGE = "fbreader.config_service.option_change_event"
-
-        const val LIBRARY_BOOK = "fbreader.library_service.book_event"
-        const val LIBRARY_BUILD = "fbreader.library_service.build_event"
-        const val LIBRARY_COVER_READY = "fbreader.library_service.cover_ready"
-
         const val SYNC_UPDATED = "android.fbreader.event.sync.UPDATED"
     }
 
