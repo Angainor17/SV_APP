@@ -19,88 +19,31 @@
 
 package org.geometerplus.android.fbreader.config
 
-import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.ServiceConnection
-import android.os.IBinder
-import android.os.RemoteException
-import androidx.core.content.ContextCompat
-import org.geometerplus.android.fbreader.api.FBReaderIntents
 import org.geometerplus.zlibrary.core.options.Config
 import org.geometerplus.zlibrary.core.options.Config.NotAvailableException
-import java.util.ArrayList
-import java.util.HashMap
-import java.util.LinkedList
 
-class ConfigShadow(private val myContext: Context) : Config(), ServiceConnection {
-    private val myDeferredActions = LinkedList<Runnable>()
-
-    private val myReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            try {
-                setToCache(
-                    intent.getStringExtra("group")!!,
-                    intent.getStringExtra("name")!!,
-                    intent.getStringExtra("value"),
-                )
-            } catch (e: Exception) {
-                // ignore
-            }
-        }
-    }
-
-    @Volatile
-    private var myInterface: ConfigInterface? = null
-
-    init {
-        myContext.bindService(
-            FBReaderIntents.internalIntent(FBReaderIntents.Action.CONFIG_SERVICE),
-            this,
-            Service.BIND_AUTO_CREATE,
-        )
-    }
-
-    override fun isInitialized(): Boolean = myInterface != null
+/**
+ * Local configuration for regular option values.
+ *
+ * The original implementation bound to a {@code ConfigService} via AIDL. That service
+ * is no longer registered in the app, so regular option reads always fell back to their
+ * defaults and writes were dropped. Special option values (a small set of UI options)
+ * were already stored directly in SharedPreferences and continue to do so here.
+ */
+class ConfigShadow(private val myContext: Context) : Config() {
+    override fun isInitialized(): Boolean = false
 
     override fun runOnConnect(runnable: Runnable) {
-        if (myInterface != null) {
-            runnable.run()
-        } else {
-            synchronized(myDeferredActions) {
-                myDeferredActions.add(runnable)
-            }
-        }
+        // no remote service to connect to
     }
 
-    override fun listGroups(): List<String>? {
-        val i = myInterface ?: return emptyList()
-        return try {
-            i.listGroups()
-        } catch (e: RemoteException) {
-            emptyList()
-        }
-    }
+    override fun listGroups(): List<String>? = emptyList()
 
-    override fun listNames(group: String): List<String>? {
-        val i = myInterface ?: return emptyList()
-        return try {
-            i.listNames(group)
-        } catch (e: RemoteException) {
-            emptyList()
-        }
-    }
+    override fun listNames(group: String): List<String>? = emptyList()
 
     override fun removeGroup(name: String) {
-        val i = myInterface ?: return
-        try {
-            i.removeGroup(name)
-        } catch (e: RemoteException) {
-            // ignore
-        }
+        // no-op
     }
 
     override fun getSpecialBooleanValue(name: String, defaultValue: Boolean): Boolean =
@@ -122,70 +65,18 @@ class ConfigShadow(private val myContext: Context) : Config(), ServiceConnection
     }
 
     @Throws(NotAvailableException::class)
-    protected override fun getValueInternal(group: String, name: String): String? {
-        val i = myInterface ?: throw NotAvailableException("Config is not initialized for $group:$name")
-        return try {
-            i.getValue(group, name)
-        } catch (e: RemoteException) {
-            throw NotAvailableException("RemoteException for $group:$name")
-        }
-    }
+    protected override fun getValueInternal(group: String, name: String): String? =
+        throw NotAvailableException("Config is not initialized for $group:$name")
 
     protected override fun setValueInternal(group: String, name: String, value: String) {
-        val i = myInterface ?: return
-        try {
-            i.setValue(group, name, value)
-        } catch (e: RemoteException) {
-            // ignore
-        }
+        // no persistent storage
     }
 
     protected override fun unsetValueInternal(group: String, name: String) {
-        val i = myInterface ?: return
-        try {
-            i.unsetValue(group, name)
-        } catch (e: RemoteException) {
-            // ignore
-        }
+        // no persistent storage
     }
 
     @Throws(NotAvailableException::class)
-    protected override fun requestAllValuesForGroupInternal(group: String): Map<String, String>? {
-        val i = myInterface ?: throw NotAvailableException("Config is not initialized for $group")
-        try {
-            val values = HashMap<String, String>()
-            for (pair in i.requestAllValuesForGroup(group)) {
-                val split = pair.split("\u0000")
-                when (split.size) {
-                    1 -> values[split[0]] = ""
-                    2 -> values[split[0]] = split[1]
-                }
-            }
-            return values
-        } catch (e: RemoteException) {
-            throw NotAvailableException("RemoteException for $group")
-        }
-    }
-
-    override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        synchronized(this) {
-            myInterface = ConfigInterface.Stub.asInterface(service)
-            val filter = IntentFilter(FBReaderIntents.Event.CONFIG_OPTION_CHANGE)
-            ContextCompat.registerReceiver(myContext, myReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
-        }
-
-        val actions: List<Runnable> = synchronized(myDeferredActions) {
-            val result = ArrayList(myDeferredActions)
-            myDeferredActions.clear()
-            result
-        }
-        for (a in actions) {
-            a.run()
-        }
-    }
-
-    @Synchronized
-    override fun onServiceDisconnected(name: ComponentName) {
-        myContext.unregisterReceiver(myReceiver)
-    }
+    protected override fun requestAllValuesForGroupInternal(group: String): Map<String, String>? =
+        throw NotAvailableException("Config is not initialized for $group")
 }
