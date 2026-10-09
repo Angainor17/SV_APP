@@ -169,11 +169,6 @@ object BookUtil {
     }
 
     @JvmStatic
-    fun fileByBook(book: AbstractBook?): ZLFile {
-        return if (book is DbBook) {
-            book.File
-        } else {
-            ZLFile.createFileByPath(book!!.getPath())!!
-        }
-    }
+    fun fileByBook(book: AbstractBook?): ZLFile =
+        ZLFile.createFileByPath(book!!.getPath())!!
 }
