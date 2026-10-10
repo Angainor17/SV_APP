@@ -67,12 +67,12 @@ class Reflow(
     /**
      * Возвращает левый отступ.
      */
-    fun getLeftMargin(): Int = custom.leftMargin
+    fun getLeftMargin(): Int = custom.getLeftMargin()
 
     /**
      * Возвращает правый отступ.
      */
-    fun getRightMargin(): Int = custom.rightMargin
+    fun getRightMargin(): Int = custom.getRightMargin()
 
     /**
      * Сбрасывает состояние reflow.

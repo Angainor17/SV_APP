@@ -29,10 +29,10 @@ internal class MoveCursorAction(
     private val myDirection: ZLViewEnums.Direction,
 ) : FBAction(fbreader) {
 
-    override fun run(vararg params: Any?) {
-        val fbView = Reader.getTextView()
+    public override fun run(vararg params: Any?) {
+        val fbView = Reader.textView
         val filter =
-            if (fbView.getOutlinedRegion()?.soul is ZLTextWordRegionSoul ||
+            if (fbView.outlinedRegion?.soul is ZLTextWordRegionSoul ||
                 Reader.MiscOptions.NavigateAllWords.getValue()
             ) {
                 ZLTextRegion.AnyRegionFilter
@@ -55,7 +55,7 @@ internal class MoveCursorAction(
             }
         }
 
-        Reader.getViewWidget().reset()
-        Reader.getViewWidget().repaint()
+        Reader.getViewWidget()!!.reset()
+        Reader.getViewWidget()!!.repaint()
     }
 }

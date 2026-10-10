@@ -21,7 +21,7 @@ package org.geometerplus.fbreader.fbreader
 
 internal class ExitAction(fbreader: FBReaderApp) : FBAction(fbreader) {
     override fun run(vararg params: Any?) {
-        if (Reader.currentView !== Reader.BookTextView) {
+        if (Reader.getCurrentView() !== Reader.BookTextView) {
             Reader.showBookTextView()
         } else {
             Reader.closeWindow()

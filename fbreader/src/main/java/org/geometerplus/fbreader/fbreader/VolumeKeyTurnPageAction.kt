@@ -25,7 +25,7 @@ internal class VolumeKeyTurnPageAction(fbreader: FBReaderApp, private val myForw
     FBAction(fbreader) {
     override fun run(vararg params: Any?) {
         val preferences = Reader.PageTurningOptions
-        Reader.getViewWidget().startAnimatedScrolling(
+        Reader.getViewWidget()!!.startAnimatedScrolling(
             if (myForward) ZLViewEnums.PageIndex.next else ZLViewEnums.PageIndex.previous,
             if (preferences.horizontal.getValue()) {
                 ZLViewEnums.Direction.rightToLeft

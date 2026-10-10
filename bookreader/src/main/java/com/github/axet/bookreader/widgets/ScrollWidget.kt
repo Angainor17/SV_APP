@@ -393,7 +393,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
             if (footer == null)
                 return
             val context = ZLAndroidPaintContext(
-                fb.app.SystemInfo,
+                fb.app.SystemInfo!!,
                 c,
                 ZLAndroidPaintContext.Geometry(
                     width,
@@ -946,7 +946,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                 else {
                     val cc = getCurrent()
                     if (!cc.equals(c)) {
-                        fb.app.BookTextView.gotoPosition(c.start, c.end)
+                        fb.app.BookTextView.gotoPosition(c.start!!, c.end)
                     }
                 }
             }
@@ -1344,7 +1344,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                             if (fb.pluginview!!.reflower!!.count() > 0) {
                                 val bm = fb.pluginview!!.reflower!!.render(c.start!!.elementIndex)
                                 val src = Rect(0, 0, bm.width, bm.height)
-                                val dst = Rect(fb.app.BookTextView.leftMargin, 0, fb.app.BookTextView.leftMargin + fb.pluginview!!.reflower!!.rw, fb.pluginview!!.reflower!!.h)
+                                val dst = Rect(fb.app.BookTextView.getLeftMargin(), 0, fb.app.BookTextView.getLeftMargin() + fb.pluginview!!.reflower!!.rw, fb.pluginview!!.reflower!!.h)
                                 canvas.drawColor(Color.WHITE) // cache color always white
                                 canvas.drawBitmap(bm, src, dst, null) // cache paint always clean
                                 info = Reflow.Info(fb.pluginview!!.reflower!!, c.start!!.elementIndex)
@@ -1364,7 +1364,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                 } else {
                     open(c)
                     val context = ZLAndroidPaintContext(
-                        fb.app.SystemInfo,
+                        fb.app.SystemInfo!!,
                         draw,
                         ZLAndroidPaintContext.Geometry(
                             width,

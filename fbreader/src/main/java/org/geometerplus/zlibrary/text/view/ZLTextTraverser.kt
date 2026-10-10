@@ -35,7 +35,7 @@ abstract class ZLTextTraverser(view: ZLTextView) {
     fun traverse(from: ZLTextPosition, to: ZLTextPosition) {
         val fromParagraph = from.paragraphIndex
         val toParagraph = to.paragraphIndex
-        var cursor = myView.cursor(fromParagraph)
+        var cursor = myView.cursor(fromParagraph)!!
         for (i in fromParagraph..toParagraph) {
             val fromElement = if (i == fromParagraph) from.elementIndex else 0
             val toElement = if (i == toParagraph) to.elementIndex else cursor.getParagraphLength() - 1
@@ -52,7 +52,7 @@ abstract class ZLTextTraverser(view: ZLTextView) {
             }
             if (i < toParagraph) {
                 processEndOfParagraph()
-                cursor = cursor.next()
+                cursor = cursor.next()!!
             }
         }
     }

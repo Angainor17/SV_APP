@@ -21,11 +21,10 @@ package org.geometerplus.fbreader.fbreader
 
 internal class FindNextAction(fbreader: FBReaderApp) : FBAction(fbreader) {
     override fun isEnabled(): Boolean {
-        val view = Reader.getTextView()
-        return view != null && view.canFindNext()
+        return Reader.textView.canFindNext()
     }
 
     override fun run(vararg params: Any?) {
-        Reader.getTextView().findNext()
+        Reader.textView.findNext()
     }
 }

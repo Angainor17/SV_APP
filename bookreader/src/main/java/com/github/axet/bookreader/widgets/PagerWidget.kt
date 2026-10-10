@@ -125,9 +125,9 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
         updateColorLevel()
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean = false
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean = false
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean = false
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean = false
 
     override fun drawOnBitmap(bitmap: Bitmap, index: ZLViewEnums.PageIndex) {
         if (fb.pluginview != null) {
@@ -411,7 +411,7 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
         )]
     }
 
-    override fun onLongClick(v: View): Boolean {
+    override fun onLongClick(v: View?): Boolean {
         if (fb.pluginview != null) {
             val dst = getPageRect()
             val pos = getPosition()

@@ -72,14 +72,14 @@ abstract class PopupPanel(fbReader: FBReaderApp) : ZLApplication.PopupPanel(fbRe
 
     fun initPosition() {
         if (StartPosition == null) {
-            StartPosition = ZLTextWordCursor(getReader().getTextView().getStartCursor())
+            StartPosition = ZLTextWordCursor(getReader().textView.startCursor)
         }
     }
 
     fun storePosition() {
         val start = StartPosition ?: return
         val reader = getReader()
-        if (!start.equals(reader.getTextView().getStartCursor())) {
+        if (!start.equals(reader.textView.startCursor)) {
             reader.addInvisibleBookmark(start)
             reader.storePosition()
         }

@@ -303,14 +303,14 @@ open class FBReaderView @JvmOverloads constructor(
             if (plugin is Plugin) {
                 pluginview = plugin.create(fbook)
                 val model = BookModel.createModel(fbook.book!!, plugin)
-                app.BookTextView.setModel(model.textModel)
+                app.BookTextView.model = model.textModel
                 app.Model = model
                 if (book!!.info!!.position != null)
                     gotoPluginPosition(book!!.info!!.position)
             } else {
                 val model = BookModel.createModel(fbook.book!!, plugin)
                 ZLTextHyphenator.Instance().load(fbook.book!!.getLanguage())
-                app.BookTextView.setModel(model.textModel)
+                app.BookTextView.model = model.textModel
                 app.Model = model
                 if (book!!.info!!.position != null)
                     app.BookTextView.gotoPosition(book!!.info!!.position!!)
@@ -333,7 +333,7 @@ open class FBReaderView @JvmOverloads constructor(
             pluginview!!.close()
             pluginview = null
         }
-        app.BookTextView.setModel(null)
+        app.BookTextView.model = null
         app.Model = null
         book = null
         if (tts != null) {
@@ -434,9 +434,9 @@ open class FBReaderView @JvmOverloads constructor(
                         FBHyperlinkType.EXTERNAL ->
                             AboutPreferenceCompat.openUrlDialog(context, hyperlink.Id)
                         FBHyperlinkType.INTERNAL, FBHyperlinkType.FOOTNOTE -> {
-                            val snippet = app.getFootnoteData(hyperlink.Id)
+                            val snippet = app.getFootnoteData(hyperlink.Id!!)
                             if (snippet != null) {
-                                app.Collection.markHyperlinkAsVisited(app.currentBook, hyperlink.Id!!)
+                                app.Collection.markHyperlinkAsVisited(app.currentBook!!, hyperlink.Id!!)
                                 val showToast = when (app.MiscOptions.ShowFootnoteToast.getValue()) {
                                     MiscOptions.FootnoteToastEnum.never -> false
                                     MiscOptions.FootnoteToastEnum.footnotesOnly -> hyperlink.Type == FBHyperlinkType.FOOTNOTE
@@ -553,7 +553,7 @@ open class FBReaderView @JvmOverloads constructor(
                 if (w != null) {
                     val controller = WindowInsetsControllerCompat(w!!, w!!.decorView)
 
-                    val bgColor = app.BookTextView.backgroundColor.intValue()
+                    val bgColor = app.BookTextView.getBackgroundColor()!!.intValue()
                     val bgColorWithAlpha = if ((bgColor and -0x1000000) == 0)
                         (0xFF shl 24) or bgColor
                     else
@@ -937,7 +937,7 @@ open class FBReaderView @JvmOverloads constructor(
                 r.app.setView(r.app.BookTextView)
             } else {
                 val model = r.app.Model!!.getFootnoteModel(label.ModelId!!)
-                r.app.BookTextView.setModel(model)
+                r.app.BookTextView.model = model
                 r.app.setView(r.app.BookTextView)
                 r.app.BookTextView.gotoPosition(label.ParagraphIndex, 0, 0)
             }
@@ -961,7 +961,7 @@ open class FBReaderView @JvmOverloads constructor(
 
     fun gotoPosition(p: TOCTree.Reference) {
         if (p.Model != null)
-            app.BookTextView.setModel(p.Model)
+            app.BookTextView.model = p.Model
         gotoPosition(ZLTextFixedPosition(p.ParagraphIndex, 0, 0))
     }
 
@@ -1067,7 +1067,7 @@ open class FBReaderView @JvmOverloads constructor(
             (widget as ScrollWidget).updateOverlays()
             sv.setClipHeight((widget as ScrollWidget).getMainAreaHeight())
         } else {
-            sv.setClipHeight((widget as ZLAndroidWidget).getMainAreaHeight())
+            sv.setClipHeight((widget as ZLAndroidWidget).mainAreaHeight)
         }
         app.runAction(ActionCode.SELECTION_SHOW_PANEL)
     }
@@ -1098,7 +1098,7 @@ open class FBReaderView @JvmOverloads constructor(
         if (widget is ScrollWidget) {
             selection!!.setClipHeight((widget as ScrollWidget).getMainAreaHeight())
         } else if (widget is PagerWidget) {
-            selection!!.setClipHeight((widget as PagerWidget).getMainAreaHeight())
+            selection!!.setClipHeight((widget as PagerWidget).mainAreaHeight)
         }
 
         if (widget is PagerWidget) {
@@ -1836,7 +1836,7 @@ open class FBReaderView @JvmOverloads constructor(
             clip = if (fb.widget is ScrollWidget)
                 (fb.widget as ScrollWidget).getMainAreaHeight()
             else
-                (fb.widget as ZLAndroidWidget).getMainAreaHeight()
+                (fb.widget as ZLAndroidWidget).mainAreaHeight
             run build@{
                 if (bms == null)
                     return@build
@@ -1863,7 +1863,7 @@ open class FBReaderView @JvmOverloads constructor(
                         v.setOnClickListener {
                             fb.listener?.onEditBookmark(l)
                         }
-                        val color = if (l.color == 0) fb.app.BookTextView.highlightingBackgroundColor.intValue() else l.color
+                        val color = if (l.color == 0) fb.app.BookTextView.getHighlightingBackgroundColor()!!.intValue() else l.color
                         v.setBackgroundColor(SelectionView.SELECTION_ALPHA shl 24 or (color and 0xffffff))
                         addView(v)
                     }
@@ -1934,7 +1934,7 @@ open class FBReaderView @JvmOverloads constructor(
             clip = if (fb.widget is ScrollWidget)
                 (fb.widget as ScrollWidget).getMainAreaHeight()
             else
-                (fb.widget as ZLAndroidWidget).getMainAreaHeight()
+                (fb.widget as ZLAndroidWidget).mainAreaHeight
             padding = ThemeUtils.dp2px(fb.context, SelectionView.SELECTION_PADDING.toFloat())
             run build@{
                 if (bb == null || bb.rr == null)
@@ -1955,7 +1955,7 @@ open class FBReaderView @JvmOverloads constructor(
                     if (hh != null && hh.contains(l))
                         v.setBackgroundColor(SelectionView.SELECTION_ALPHA shl 24 or 0x00AA00)
                     else
-                        v.setBackgroundColor(SelectionView.SELECTION_ALPHA shl 24 or fb.app.BookTextView.highlightingBackgroundColor.intValue())
+                        v.setBackgroundColor(SelectionView.SELECTION_ALPHA shl 24 or fb.app.BookTextView.getHighlightingBackgroundColor()!!.intValue())
                     words.add(v)
                     fb.addView(v)
                 }
@@ -2007,7 +2007,7 @@ open class FBReaderView @JvmOverloads constructor(
     inner class CustomView(reader: FBReaderApp) : FBView(reader) {
         fun createContext(c: Canvas): ZLAndroidPaintContext {
             return ZLAndroidPaintContext(
-                app.SystemInfo,
+                app.SystemInfo!!,
                 c,
                 ZLAndroidPaintContext.Geometry(
                     this@FBReaderView.width,
@@ -2064,7 +2064,7 @@ open class FBReaderView @JvmOverloads constructor(
             }
         }
 
-        override fun findRegion(x: Int, y: Int, maxDistance: Int, filter: ZLTextRegion.Filter): ZLTextRegion {
+        override fun findRegion(x: Int, y: Int, maxDistance: Int, filter: ZLTextRegion.Filter): ZLTextRegion? {
             return super.findRegion(x, y, maxDistance, filter)
         }
 
@@ -2145,24 +2145,26 @@ open class FBReaderView @JvmOverloads constructor(
             super.paint(context, pageIndex)
         }
 
-        override fun getSelectionStartY(): Int {
-            if (selection != null)
-                return selection!!.getSelectionStartY()
-            return super.getSelectionStartY()
-        }
+        override val selectionStartY: Int
+            get() {
+                if (selection != null)
+                    return selection!!.getSelectionStartY()
+                return super.selectionStartY
+            }
 
-        override fun getSelectionEndY(): Int {
-            if (selection != null)
-                return selection!!.getSelectionEndY()
-            return super.getSelectionEndY()
-        }
+        override val selectionEndY: Int
+            get() {
+                if (selection != null)
+                    return selection!!.getSelectionEndY()
+                return super.selectionEndY
+            }
 
         inner class FooterNew : FBView.FooterNewStyle() {
-            override fun buildInfoString(pagePosition: ZLTextView.PagePosition, separator: String): String = ""
+            override fun buildInfoString(pagePosition: ZLTextView.PagePosition, separator: String?): String = ""
         }
 
         inner class FooterOld : FBView.FooterOldStyle() {
-            override fun buildInfoString(pagePosition: ZLTextView.PagePosition, separator: String): String = ""
+            override fun buildInfoString(pagePosition: ZLTextView.PagePosition, separator: String?): String = ""
         }
     }
 
@@ -2196,14 +2198,15 @@ open class FBReaderView @JvmOverloads constructor(
     }
 
     inner class FBReaderApp(context: Context) : org.geometerplus.fbreader.fbreader.FBReaderApp(Storage.Info(context), BookCollectionShadow()) {
-        override fun getCurrentTOCElement(): TOCTree? {
-            if (Model == null)
-                return null
-            if (pluginview != null)
-                return pluginview!!.getCurrentTOCElement(Model!!.TOCTree)
-            else
-                return super.getCurrentTOCElement()
-        }
+        override val currentTOCElement: TOCTree?
+            get() {
+                if (Model == null)
+                    return null
+                if (pluginview != null)
+                    return pluginview!!.getCurrentTOCElement(Model!!.TOCTree)
+                else
+                    return super.currentTOCElement
+            }
     }
 
     private fun imageFitting(name: String): Enum<*> {

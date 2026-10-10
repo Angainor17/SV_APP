@@ -45,9 +45,9 @@ object BookmarkUtil {
         if (bookmark.getEnd() != null) {
             return
         }
-        var cursor = view.getStartCursor()
+        var cursor = view.startCursor
         if (cursor.isNull()) {
-            cursor = view.getEndCursor()
+            cursor = view.endCursor
         }
         if (cursor.isNull()) {
             return
