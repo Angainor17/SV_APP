@@ -92,7 +92,7 @@ class FBFooterView @JvmOverloads constructor(
             addView(image, lpImage)
             addView(Battery(context), lpText)
         }
-        setPadding(0, 0, customview!!.rightMargin, 0)
+        setPadding(0, 0, customview!!.getRightMargin(), 0)
     }
 
     /**
@@ -104,7 +104,7 @@ class FBFooterView @JvmOverloads constructor(
         pagePosition = customview!!.pagePosition()
         family = fb!!.app.ViewOptions.footerOptions.Font.getValue()
         tf = AndroidFontUtil.typeface(
-            fb!!.app.SystemInfo,
+            fb!!.app.SystemInfo!!,
             FontEntry.systemEntry(family!!),
             footer!!.height > 10,
             false
@@ -139,7 +139,7 @@ class FBFooterView @JvmOverloads constructor(
         @Suppress("DrawAllocation")
         override fun onDraw(c: Canvas) {
             val paintContext = ZLAndroidPaintContext(
-                fb!!.app.SystemInfo,
+                fb!!.app.SystemInfo!!,
                 c,
                 ZLAndroidPaintContext.Geometry(
                     width,
@@ -235,7 +235,7 @@ class FBFooterView @JvmOverloads constructor(
     inner class Battery(context: Context) : FontTextView(context) {
         override fun update() {
             super.update()
-            updateText("${fb!!.app.batteryLevel}%")
+            updateText("${fb!!.app.getBatteryLevel()}%")
         }
     }
 }

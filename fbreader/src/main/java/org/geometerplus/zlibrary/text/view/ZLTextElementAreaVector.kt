@@ -189,7 +189,7 @@ class ZLTextElementAreaVector {
         return pair
     }
 
-    protected fun nextRegion(
+    fun nextRegion(
         currentRegion: ZLTextRegion?,
         direction: ZLViewEnums.Direction,
         filter: ZLTextRegion.Filter,

@@ -152,13 +152,13 @@ class ZLTextSelection(private val myView: ZLTextView) : ZLTextHighlighting() {
         if (myCursorInMovement == SelectionCursor.Which.Right) {
             if (hasPartAfterPage(page)) {
                 myView.turnPage(true, ZLTextView.ScrollingMode.SCROLL_LINES, 1)
-                myView.Application.getViewWidget().reset()
+                myView.Application.getViewWidget()!!.reset()
                 myView.preparePaintInfo()
             }
         } else {
             if (hasPartBeforePage(page)) {
                 myView.turnPage(false, ZLTextView.ScrollingMode.SCROLL_LINES, 1)
-                myView.Application.getViewWidget().reset()
+                myView.Application.getViewWidget()!!.reset()
                 myView.preparePaintInfo()
             }
         }
@@ -178,7 +178,7 @@ class ZLTextSelection(private val myView: ZLTextView) : ZLTextHighlighting() {
         }
         val soul = myRightMostRegionSoul!!
         val cursor = myView.cursor(soul.ParagraphIndex)
-        val element = cursor.getElement(soul.EndElementIndex)
+        val element = cursor!!.getElement(soul.EndElementIndex)
         return ZLTextFixedPosition(
             soul.ParagraphIndex,
             soul.EndElementIndex,
@@ -285,8 +285,8 @@ class ZLTextSelection(private val myView: ZLTextView) : ZLTextHighlighting() {
             myView.turnPage(myScrollForward, ZLTextView.ScrollingMode.SCROLL_LINES, 1)
             myView.preparePaintInfo()
             expandTo(myPage, myX, myY)
-            myView.Application.getViewWidget().reset()
-            myView.Application.getViewWidget().repaint()
+            myView.Application.getViewWidget()!!.reset()
+            myView.Application.getViewWidget()!!.repaint()
         }
 
         fun stop() {

@@ -15,7 +15,7 @@ open class ZLBookmark(
     override fun getBackgroundColor(): ZLColor {
         if (b.color != 0)
             return ZLColor(b.color)
-        return view.highlightingBackgroundColor
+        return view.getHighlightingBackgroundColor()!!
     }
 
     override fun getOutlineColor(): ZLColor? = null

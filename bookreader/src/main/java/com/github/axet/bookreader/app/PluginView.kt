@@ -73,7 +73,7 @@ open class PluginView {
                 this.wallpaper = BitmapFactory.decodeStream(wallpaper.getInputStream())
             else
                 this.wallpaper = null
-            wallpaperColor = (0xff shl 24) or app.BookTextView.backgroundColor.intValue()
+            wallpaperColor = (0xff shl 24) or app.BookTextView.getBackgroundColor()!!.intValue()
             if (ColorUtils.calculateLuminance(wallpaperColor) < 0.5f && this !is ComicsPlugin.ComicsView)
                 paint.colorFilter = ColorMatrixColorFilter(NEGATIVE)
             else

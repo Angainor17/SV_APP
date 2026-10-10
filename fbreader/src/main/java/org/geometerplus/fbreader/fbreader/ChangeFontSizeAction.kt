@@ -28,6 +28,6 @@ internal class ChangeFontSizeAction(fbreader: FBReaderApp, private val myDelta: 
             Reader.ViewOptions.textStyleCollection.baseStyle.FontSizeOption
         option.setValue(option.getValue() + myDelta)
         Reader.clearTextCaches()
-        Reader.getViewWidget().repaint()
+        Reader.getViewWidget()!!.repaint()
     }
 }

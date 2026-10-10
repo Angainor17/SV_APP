@@ -165,7 +165,7 @@ fun ReaderContent(
                 val pagePosition = fbReaderView?.app?.textView?.pagePosition()
                 val currentPage = pagePosition?.Current ?: 1
                 val totalPages = pagePosition?.Total ?: 1
-                val chapterTitle = fbReaderView?.app?.getCurrentTOCElement()?.text
+                val chapterTitle = fbReaderView?.app?.currentTOCElement?.text
 
                 NavigationComposeDialog(
                     currentPage = currentPage,

@@ -390,7 +390,7 @@ class ReaderViewModel @Inject constructor(
 
     private fun goToPage(page: Int) {
         fbReaderView?.let { view ->
-            val textView = view.app?.getTextView() ?: return
+            val textView = view.app?.textView ?: return
             if (page == 1) textView.gotoHome() else textView.gotoPage(page)
             view.app?.getViewWidget()?.reset()
             view.app?.getViewWidget()?.repaint()

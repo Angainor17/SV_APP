@@ -22,7 +22,7 @@ package org.geometerplus.zlibrary.text.view
 import org.geometerplus.zlibrary.core.view.ZLPaintContext
 
 abstract class ExtensionElement : ZLTextElement() {
-    protected abstract fun getWidth(): Int
-    protected abstract fun getHeight(): Int
-    protected abstract fun draw(context: ZLPaintContext, area: ZLTextElementArea)
+    abstract fun getWidth(): Int
+    abstract fun getHeight(): Int
+    abstract fun draw(context: ZLPaintContext, area: ZLTextElementArea)
 }

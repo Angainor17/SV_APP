@@ -125,8 +125,8 @@ class ActiveAreasView(context: Context) : RelativeLayout(context) {
             }
         }
         if (app.MiscOptions.AllowScreenBrightnessAdjustment.getValue()) {
-            val bw = if (app.viewWidget is ScrollWidget)
-                (app.viewWidget as ScrollWidget).gesturesListener.brightness.areaWidth * PERC / ww
+            val bw = if (app.getViewWidget() is ScrollWidget)
+                (app.getViewWidget() as ScrollWidget).gesturesListener.brightness.areaWidth * PERC / ww
             else
                 PERC / 10 // FBView.onFingerPress
             val r = Rect(0, 0, bw, PERC)

@@ -23,11 +23,10 @@ import org.geometerplus.zlibrary.text.view.ZLTextView
 
 internal class FindPreviousAction(fbreader: FBReaderApp) : FBAction(fbreader) {
     override fun isEnabled(): Boolean {
-        val view: ZLTextView? = Reader.getTextView()
-        return view != null && view.canFindPrevious()
+        return Reader.textView.canFindPrevious()
     }
 
     override fun run(vararg params: Any?) {
-        Reader.getTextView().findPrevious()
+        Reader.textView.findPrevious()
     }
 }
