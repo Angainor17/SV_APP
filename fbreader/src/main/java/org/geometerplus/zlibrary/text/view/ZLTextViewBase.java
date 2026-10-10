@@ -31,7 +31,7 @@ import org.geometerplus.zlibrary.text.view.style.ZLTextNGStyle;
 import org.geometerplus.zlibrary.text.view.style.ZLTextNGStyleDescription;
 import org.geometerplus.zlibrary.text.view.style.ZLTextStyleCollection;
 
-abstract class ZLTextViewBase extends ZLView {
+public abstract class ZLTextViewBase extends ZLView {
     private ZLTextStyle myTextStyle;
     private int myWordHeight = -1;
     private ZLTextMetrics myMetrics;

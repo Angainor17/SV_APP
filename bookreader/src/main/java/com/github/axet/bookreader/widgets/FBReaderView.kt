@@ -436,7 +436,7 @@ open class FBReaderView @JvmOverloads constructor(
                         FBHyperlinkType.INTERNAL, FBHyperlinkType.FOOTNOTE -> {
                             val snippet = app.getFootnoteData(hyperlink.Id)
                             if (snippet != null) {
-                                app.Collection.markHyperlinkAsVisited(app.currentBook, hyperlink.Id)
+                                app.Collection.markHyperlinkAsVisited(app.currentBook, hyperlink.Id!!)
                                 val showToast = when (app.MiscOptions.ShowFootnoteToast.getValue()) {
                                     MiscOptions.FootnoteToastEnum.never -> false
                                     MiscOptions.FootnoteToastEnum.footnotesOnly -> hyperlink.Type == FBHyperlinkType.FOOTNOTE
