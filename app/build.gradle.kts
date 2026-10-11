@@ -28,6 +28,14 @@ android {
 
         // Локализация: только русский
         androidResources.localeFilters.add("ru")
+
+        // Только живые ABI. armeabi (нет устройств, и в AAR от axet лежит лишь
+        // часть библиотек — приложение на нём всё равно не запустилось бы) и x86
+        // (нет устройств, 32-битный эмулятор не используется) — мёртвый вес в APK.
+        // x86_64 оставлен для эмулятора на Intel Mac.
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        }
     }
     buildTypes {
         release {
