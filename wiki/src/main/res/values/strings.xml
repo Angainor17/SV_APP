@@ -48,4 +48,7 @@
     <string name="wiki_error_network">Ошибка сети: %s</string>
     <string name="wiki_error_unknown">Неизвестная ошибка</string>
     <string name="wiki_error_empty_response">Пустой ответ от сервера</string>
+
+    <!-- Шпаргалки -->
+    <string name="wiki_shpargalki">Шпаргалки</string>
 </resources>

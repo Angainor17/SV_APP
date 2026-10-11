@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.AutoStories
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +71,7 @@ import su.sv.wiki.presentation.root.viewmodel.RootWikiViewModel
 import su.sv.wiki.presentation.root.viewmodel.actions.WikiActions
 import su.sv.wiki.presentation.root.viewmodel.effects.WikiOneTimeEffect
 import su.sv.wiki.testing.WikiTestTags
+import su.sv.shpargalki.presentation.root.ShpargalkiRootScreen
 
 /**
  * Главный экран Wiki
@@ -174,6 +176,22 @@ fun WikiCompactScreen(
                         },
                         modifier = Modifier.weight(1f),
                     )
+
+                    // Иконка «Шпаргалки» — всегда видна справа от поиска
+                    IconButton(
+                        onClick = {
+                            focusManager.clearFocus()
+                            stackNavigation.forward(ShpargalkiRootScreen())
+                        },
+                        modifier = Modifier
+                            .padding(end = dimensions.screenPaddingHorizontal / 2)
+                            .testTag(WikiTestTags.SHPARGALKI_BUTTON),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.AutoStories,
+                            contentDescription = stringResource(R.string.wiki_shpargalki),
+                        )
+                    }
 
                     // Иконка избранного с анимацией
                     AnimatedVisibility(

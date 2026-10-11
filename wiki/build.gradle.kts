@@ -23,10 +23,12 @@ dependencies {
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
+    implementation(project(":shpargalki"))
 
     // Compose
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material.icons.extended)
 
     // Image loading
     implementation(libs.bundles.coil)

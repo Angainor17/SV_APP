@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Общие -->
+    <string name="shpargalki_title">Шпаргалки</string>
+    <string name="shpargalki_back">Назад</string>
+    <string name="shpargalki_loading">Загрузка…</string>
+    <string name="shpargalki_error">Не удалось загрузить шпаргалки</string>
+    <string name="shpargalki_retry">Повторить</string>
+
+    <!-- Темы -->
+    <string name="shpargalki_theme_dialectics">Диалектика</string>
+
+    <!-- Разделы -->
+    <string name="shpargalki_section_being">Учение о бытии</string>
+    <string name="shpargalki_section_essence">Учение о сущности</string>
+    <string name="shpargalki_section_concept">Учение о понятии</string>
+
+    <!-- Поля понятия в шторке -->
+    <string name="shpargalki_field_derivation">Выведение</string>
+    <string name="shpargalki_field_popov">По М. В. Попову</string>
+    <string name="shpargalki_field_hegel">Гегель (исходный текст)</string>
+    <string name="shpargalki_field_svremya">Шпаргалка (svremya.org)</string>
+</resources>
