@@ -1,7 +1,7 @@
 # Технический долг SV APP
 
 **Дата создания:** 2026-07-27
-**Последнее обновление:** 2026-08-13
+**Последнее обновление:** 2026-10-11
 
 ---
 
@@ -128,35 +128,28 @@ NewerVersionAvailable) на 2026-08-13 показывает:
 
 ---
 
-### 🟡 P2: Лишние ABI в APK (armeabi, x86, x86_64)
+### ✅ Лишние ABI в APK (исправлено 2026-10-11)
 
-**Проблема:** Ни в `app/build.gradle.kts`, ни в `fbreader` нет `abiFilters`. В APK попадают:
-- `armeabi` — полностью мёртвая ABI (нет живых устройств), приезжает из AAR (axet djvu/k2pdfopt);
-- `x86`, `x86_64` — нужны только эмулятору, в релизе это мёртвый вес;
-- локальные `.so` из `fbreader` собираются под 4 ABI (`APP_ABI := armeabi-v7a arm64-v8a x86 x86_64`).
+**Было:** В APK попадали мёртвые ABI `armeabi` (нет устройств) и `x86` (нет устройств), а также
+`x86_64` (нужен только эмулятору).
 
-**Модуль:** app / fbreader
+**Сделано:**
+- `app/build.gradle.kts` — `ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }`;
+- `fbreader/src/main/jni/Application.mk` — `APP_ABI := armeabi-v7a arm64-v8a x86_64` (убран `x86`).
 
-**Решение:** В `app/build.gradle.kts` задать
-`ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }` (при необходимости добавить `x86_64`
-для эмулятора), а в `fbreader/src/main/jni/Application.mk` сократить `APP_ABI`.
-
-**Риски:** Если эмулятор x86_64 используется для разработки — оставить `x86_64` в debug,
-отфильтровать в release.
+**Проверено на `:app:assembleRelease`:** в APK осталось 3 ABI (по 13 `.so`), `zipalign -c -P 16` → OK.
+`x86_64` оставлен намеренно — для эмулятора на Intel Mac.
 
 ---
 
-### 🟢 P3: Устаревшие флаги в gradle.properties
+### ✅ Устаревшие флаги в gradle.properties (частично исправлено 2026-10-11)
 
-**Проблема:** Остались мёртвые флаги:
-- `android.experimental.enableNative16KbAlignment=true` — был нужен в переходный период AGP
-  (8.5.1); в AGP 9.x выравнивание нативных библиотек на 16 KB включено по умолчанию;
-- `android.uniquePackageNames=false` — свойство удалено ещё в AGP 8.0, эффекта не имеет.
+**Сделано:** удалён `android.uniquePackageNames=false` (свойство удалено ещё в AGP 8.0, эффекта не
+имело).
 
-**Решение:** Удалить обе строки, пересобрать APK и убедиться, что выравнивание `.so` не
-изменилось (`llvm-readelf -l` / `zipalign -c -P 16`).
-
-**Риски:** Минимальные — оба флага не влияют на AGP 9.3.1.
+**Оставлен намеренно:** `android.experimental.enableNative16KbAlignment=true` — в AGP 9.x это уже
+дефолт (флаг фактически no-op), но оставлен как страховка от случайного регресса выравнивания
+нативных библиотек. Безвреден.
 
 ---
 
@@ -507,6 +500,68 @@ scroll/two-column режим на затронутых устройствах.
 1. Ограничить ширину формы (maxWidth = 600dp)
 2. Компактный layout для планшетов
 3. Центрировать форму на экране
+
+---
+
+## Foldables и новые версии Android
+
+**Контекст (актуально на 2026-10):** compileSdk/targetSdk = 37 (Android 17). Адаптивный UI уже есть
+(`DeviceFormFactor`, `NavigationRail`, `MasterDetailLayout`), форм-фактор определяется через Jetpack
+`WindowSizeClass` по размеру **окна** (не экрана). Не покрыт только hinge (`WindowLayoutInfo`/`FoldingFeature`).
+
+### ✅ P2 (решено): `androidx.window:window-core` — WindowSizeClass внедрён
+
+**Сделано (2026-10-11):** Форм-фактор теперь определяется через `WindowSizeClass.compute(...)` по
+фактическому размеру окна (`LocalWindowInfo.current.containerSize`), а не по
+`LocalConfiguration.current.screenWidthDp`. Добавлен `rememberWindowSizeClass()` в
+`commonui/util/WindowSizeClassProvider.kt`; `rememberDeviceFormFactor()` маппит
+`WindowWidthSizeClass` (COMPACT/MEDIUM/EXPANDED) → существующий `DeviceFormFactor`, поэтому все
+существующие точки вызова (`ProvideAdaptiveDimensions` / `LocalDeviceFormFactor`) не изменились.
+В split-screen/multi-window и на foldable в позе «book» форм-фактор теперь определяется по окну.
+
+**Осталось (hinge, отложено):** `WindowLayoutInfo`/`FoldingFeature` (позиция сгиба) не используются.
+Это нужно только для будущего двухстраничного режима, чтобы не размещать контент поперёк сгиба.
+Подписка на `WindowInfoTracker` сейчас не заводится — нет экрана, который её использовал бы.
+
+### 🟡 P2: Потеря позиции чтения при fold/unfold (recreate Activity)
+
+**Проблема:** В манифестах нет `android:configChanges` и `android:screenOrientation` — приложение
+resizeable (это хорошо для foldable/multi-window), но при складывании/раскладывании Activity
+пересоздаётся по умолчанию, а позиция чтения/скролла не сохраняется (`savedInstanceState`/
+`rememberSaveable` для неё не заведён) — после fold читалка открывается не на той странице.
+
+**Пересечение:** «Потенциальный crash при смене конфигурации» (P2) и «PDF-страница не применяется»
+(P1) в этом же документе.
+
+**Решение:** Хранить позицию (глава/абзац/смещение) в `ReaderViewModel` (он переживает config
+change) и восстанавливать после пересоздания `FBReaderView`; для прочих экранов — штатный
+`rememberSaveable`.
+
+### 🟢 P3: Predictive back (Android 16+) — жесты читалки у краёв экрана
+
+**Проблема:** targetSdk 37 → predictive back включён принудительно. Навигация назад корректна
+(`BackHandler` в `ReaderContent.kt:418-432`), но читалка обрабатывает собственные touch-жесты
+(зум/пан/выделение) у краёв экрана — потенциальный конфликт с системной зоной back-жеста.
+
+**Решение:** Ручная проверка на устройстве Android 16+ (fullscreen/zoom/search + back-жест);
+убедиться, что `FBReaderView` не перехватывает системный back-жест.
+
+### ℹ️ P3 (разобрано, не баг): `WindowInsets(0.dp)` в root-экранах — осознанный паттерн
+
+**Вывод (2026-10-11):** `contentWindowInsets = WindowInsets(0.dp)` / `windowInsets = WindowInsets(0.dp)`
+в `RootWiki`/`RootBooksCatalog`/`RootInfo`/`RootNews` — не баг, а защита от двойных отступов. Эти
+четыре экрана вложены во внешний `Scaffold` в `main/.../BottomNavigationUi.kt` (`CompactNavLayout` /
+`RailNavLayout`), который уже применяет системные инсеты: дефолтный `contentWindowInsets` →
+`paddingValues` → `Modifier.padding(paddingValues)` на `NavHost`. Поэтому вложенные
+`Scaffold`/`TopAppBar` зануляют инсеты, чтобы статус-бар не отступал дважды.
+
+Полноэкранные экраны, открываемые поверх bottom-nav через Modo-стек (`ArticleScreen`,
+`FavoritesScreen`, `BookmarksScreen`, `DownloadedBooksScreen`, `BookDetail`), корректно используют
+`contentWindowInsets = WindowInsets.statusBars` — они не под внешним `Scaffold` и сами отвечают за
+инсет. Разница в паттернах осознанная.
+
+**Удалять `WindowInsets(0.dp)` из root-экранов нельзя** — это даст двойной отступ сверху (пустая
+статус-барная зона над тулбаром).
 
 ---
 
