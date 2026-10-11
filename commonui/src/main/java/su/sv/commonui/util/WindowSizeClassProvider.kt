@@ -3,6 +3,10 @@ package su.sv.commonui.util
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import su.sv.commonui.theme.AdaptiveDimensions
 import su.sv.commonui.theme.AppDimensions
 import su.sv.commonui.theme.DeviceFormFactor
@@ -15,19 +19,44 @@ import su.sv.commonui.theme.LocalDeviceFormFactor
  */
 
 /**
- * Запомнить форм-фактор устройства на основе текущей конфигурации
+ * Текущий класс размера окна приложения через androidx.window (WindowSizeClass).
  *
- * Автоматически обновляется при изменении размера экрана
- * (поворот, fold/unfold на foldables)
+ * В отличие от `LocalConfiguration.screenWidthDp` (ширина всего экрана) учитывает
+ * фактический размер окна — корректно работает в split-screen/multi-window и на
+ * foldable при складывании/раскладывании.
+ */
+@Composable
+fun rememberWindowSizeClass(): WindowSizeClass {
+    val windowInfo = LocalWindowInfo.current
+    val density = LocalDensity.current
+    val size = windowInfo.containerSize
+
+    return remember(size, density.density) {
+        WindowSizeClass.compute(
+            size.width.toInt(),
+            size.height.toInt(),
+            density.density,
+        )
+    }
+}
+
+/**
+ * Запомнить форм-фактор устройства на основе класса размера окна.
  *
- * @return текущий форм-фактор устройства
+ * Автоматически обновляется при изменении размера окна
+ * (поворот, fold/unfold на foldables, split-screen).
  */
 @Composable
 fun rememberDeviceFormFactor(): DeviceFormFactor {
-    val configuration = LocalConfiguration.current
+    val windowSizeClass = rememberWindowSizeClass()
+    val widthClass = windowSizeClass.windowWidthSizeClass
 
-    return remember(configuration.screenWidthDp) {
-        DeviceFormFactor.fromWidthDp(configuration.screenWidthDp)
+    return remember(widthClass) {
+        when {
+            widthClass == WindowWidthSizeClass.COMPACT -> DeviceFormFactor.Compact
+            widthClass == WindowWidthSizeClass.MEDIUM -> DeviceFormFactor.Medium
+            else -> DeviceFormFactor.Expanded
+        }
     }
 }
 
