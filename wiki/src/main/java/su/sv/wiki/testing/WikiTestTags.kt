@@ -11,6 +11,7 @@ object WikiTestTags {
     const val HISTORY_LIST = "wiki_history_list"
     const val HISTORY_ITEM = "wiki_history_item"
     const val FAVORITES_BUTTON = "wiki_favorites_button"
+    const val SHPARGALKI_BUTTON = "wiki_shpargalki_button"
 
     object Article {
         const val ROOT = "wiki_article_root"
