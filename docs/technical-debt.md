@@ -686,37 +686,37 @@ change) и восстанавливать после пересоздания `F
 
 ## SharedPreferences → DataStore (двойная персистентность)
 
-### 🟠 P1: ThemeRepositoryImpl — dual persistence (SharedPreferences + DataStore)
+### ✅ P1 (решено 2026-10-12): ThemeRepositoryImpl — dual persistence → один DataStore
 
-**Проблема:** Класс хранит `SharedPreferences` для синхронных читалок (тема до создания Activity) и
-отдельный DataStore для асинхронных Flow-читалок. Дублируются записи и поддержка двух слоёв.
+**Было:** Класс хранил `SharedPreferences` (синхронное чтение темы при старте) параллельно с
+DataStore (асинхронные Flow-читалки) — двойная запись в `setThemeMode`, две пары ключей
+(`theme_mode_sync` в SP и `theme_mode` в DataStore), риск рассинхронизации.
 
-**Файлы:**
+**Сделано:** Оставлен один DataStore. Начальное значение темы читается синхронно один раз в `init`
+через `runBlocking { dataStore.data.first() }` и кэшируется в `@Volatile`-поле; `ThemeViewModel`
+берёт стартовое значение из кэша. `SharedPreferences` полностью убран.
 
-- `managers/src/main/java/su/sv/managers/theme/ThemeRepositoryImpl.kt` (~40-60)
-
-**Решение:** Оставить один DataStore. Синхронное чтение темы вынести в `Application.onCreate()` —
-читать DataStore до `Activity`, устанавливать `AppCompatDelegate.setDefaultNightMode()` до
-`super.onCreate()`.
+**Примечание:** прежнее «решение» здесь предлагало `AppCompatDelegate.setDefaultNightMode()`, но тема
+в проекте применяется через Compose `SVAPPTheme`, а не AppCompatDelegate — оно нерелевантно.
+`runBlocking` — осознанное исключение (однократное чтение крошечного файла на старте, до первого
+кадра), чтобы не мигать системной темой.
 
 ---
 
-### 🟠 P1: bookreader — SharedPreferences в Compose (OnSharedPreferenceChangeListener)
+### ✅ P1 (решено 2026-10-12): bookreader — SharedPreferences в Compose → StateFlow
 
-**Проблема:** `ReaderSettingsContent` — Composable-компонент — подписывается на
-`SharedPreferences.OnSharedPreferenceChangeListener` через `DisposableEffect`. Это нарушение
-реактивного паттерна: Compose требует `StateFlow`/`Flow`, а SharedPreferences даёт коллбеки.
+**Было:** `ReaderSettingsContent` (Composable) подписывался на
+`SharedPreferences.OnSharedPreferenceChangeListener` через `DisposableEffect` — нарушение реактивного
+паттерна.
 
-**Файлы:**
+**Сделано:** Создан `ReaderSettingsViewModel` (`@HiltViewModel`), который владеет SharedPreferences,
+подписывается на изменения сам (в `init`/`onCleared`) и отдаёт `StateFlow` для `viewMode`,
+`volumeKeys`, `twoColumnView`; методы `toggleViewMode()`/`setVolumeKeys()`/`cycleTwoColumnView()`.
+Экран собирает их через `collectAsStateWithLifecycle()`.
 
-- `bookreader/screens/ReaderSettingsContent.kt` (~50-100)
-- `bookreader/app/BookReaderInitializer.kt`
-- `bookreader/widgets/TTSPopup.kt` (~140)
-- `bookreader/app/Reflow.kt`
-- `bookreader/screens/viewmodel/ReaderViewModel.kt`
-
-**Решение:** Мигрировать `getDefaultSharedPreferences` на `preferencesDataStore`, заменить
-`OnSharedPreferenceChangeListener` на `collectAsStateWithLifecycle()`.
+**Примечание:** хранилище оставлено SharedPreferences (не DataStore, как предлагалось ранее) —
+нативный код FBReader (`FBReaderView`, `Reflow`, `ConfigShadow` и др.) читает те же настройки
+напрямую из `getDefaultSharedPreferences`, миграция на DataStore сломала бы этот слой.
 
 ---
 
@@ -738,15 +738,22 @@ change) и восстанавливать после пересоздания `F
 
 ## Handler/Runnable → Coroutines
 
-### 🟠 P1: TTSPopup — Handler + Runnable (971 строка)
+### 🟠 P1: TTSPopup — Handler + Runnable (1035 строк)
 
-**Проблема:** Много `Handler(Looper.getMainLooper())`, `Runnable`, `postDelayed`, `removeCallbacks`.
-Метод `updateGravity` (строка ~551) создаёт бесконечный цикл через `postDelayed`. Класс использует
-`java.util.Arrays`, `Collections` вместо Kotlin stdlib.
+**Проблема:** `Handler(Looper.getMainLooper())` + `Runnable` + `postDelayed`/`removeCallbacks`.
+Реальный removable-долг — два `postDelayed`: 200мс дебаунс `updateGravity(g)` и отложенный ретрай
+`speakRetry` в `ttsShowError`.
 
 **Файл:** `bookreader/widgets/TTSPopup.kt`
 
-**Решение:** Конвертировать в `LaunchedEffect` + Flow с `kotlinx.coroutines.delay`.
+**Решение (уточнено 2026-10-12):** класс НЕ Composable, поэтому прежняя рекомендация «LaunchedEffect +
+Flow» неверна; «бесконечный цикл» в `updateGravity` — на деле обычный дебаунс (remove + re-post).
+Нужен `CoroutineScope(SupervisorJob() + Dispatchers.Main)` + `Job` + `delay`. Часть `Runnable`-ов
+убрать нельзя: внешняя библиотека `com.github.axet.androidlibrary.sound.TTS` принимает колбэки
+`Runnable` (`playSpeech(..., done)`, `onError(done)`), а `onScrollFinished: ArrayList<Runnable>` —
+паттерн «выполнить после завершения скролла». Дополнительно `handler.removeCallbacks(delayed)` чистит
+поле `delayed` внешнего TTS — трогать вслепую рискованно. Требует ручной проверки TTS на устройстве
+(на эмуляторе TTS-движок ненадёжен).
 
 **Дополнительно:**
 
