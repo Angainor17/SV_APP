@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Общие -->
+    <string name="quiz_title">Квизы</string>
+    <string name="quiz_propose_question">Предложить вопрос</string>
+    <string name="quiz_loading">Загрузка…</string>
+    <string name="quiz_error">Не удалось загрузить квизы</string>
+
+    <!-- Корневой экран -->
+    <string name="quiz_new_quizzes">Новые квизы</string>
+    <string name="quiz_themes">Темы</string>
+    <string name="quiz_new_badge">Новое</string>
+    <plurals name="quiz_question_count">
+        <item quantity="one">%1$d вопрос</item>
+        <item quantity="few">%1$d вопроса</item>
+        <item quantity="many">%1$d вопросов</item>
+        <item quantity="other">%1$d вопросов</item>
+    </plurals>
+    <plurals name="quiz_count">
+        <item quantity="one">%1$d квиз</item>
+        <item quantity="few">%1$d квиза</item>
+        <item quantity="many">%1$d квизов</item>
+        <item quantity="other">%1$d квизов</item>
+    </plurals>
+
+    <!-- Прохождение квиза -->
+    <string name="quiz_back">Назад</string>
+    <string name="quiz_next">Вперёд</string>
+    <string name="quiz_result_button">Результат</string>
+    <string name="quiz_question_counter">%1$d / %2$d</string>
+    <string name="quiz_correct">Верно!</string>
+    <string name="quiz_incorrect">Неверно</string>
+    <string name="quiz_correct_answer">Правильный ответ: %1$s</string>
+    <string name="quiz_explanation">Пояснение</string>
+    <plurals name="quiz_remaining">
+        <item quantity="one">Остался %1$d вопрос без ответа</item>
+        <item quantity="few">Осталось %1$d вопроса без ответа</item>
+        <item quantity="many">Осталось %1$d вопросов без ответа</item>
+        <item quantity="other">Осталось %1$d вопросов без ответа</item>
+    </plurals>
+
+    <!-- Результат -->
+    <string name="quiz_result_title">Ваш результат!</string>
+    <string name="quiz_result_score">%1$d из %2$d</string>
+    <string name="quiz_result_percentage">%1$d%%</string>
+    <string name="quiz_retry">Пройти заново</string>
+    <string name="quiz_back_to_list">К списку квизов</string>
+
+    <!-- Мои квизы -->
+    <string name="quiz_history_title">Мои квизы</string>
+    <string name="quiz_history_empty">Вы ещё не проходили квизы</string>
+
+    <!-- Предложить вопрос -->
+    <string name="quiz_submit_stub">Форма предложения вопроса — в разработке</string>
+</resources>
