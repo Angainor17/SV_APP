@@ -105,7 +105,9 @@
       "Bash(adb shell *)",
       "Bash(adb exec-out *)",
       "Bash(python3 *)",
-      "WebFetch(domain:svremya.org)"
+      "WebFetch(domain:svremya.org)",
+      "WebFetch(domain:raspinovki.ru)",
+      "WebFetch(domain:vw-portal.vercel.app)"
     ]
   }
 }

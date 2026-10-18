@@ -36,11 +36,13 @@
             <option value="$PROJECT_DIR$/models" />
             <option value="$PROJECT_DIR$/news" />
             <option value="$PROJECT_DIR$/qa" />
+            <option value="$PROJECT_DIR$/shpargalki" />
             <option value="$PROJECT_DIR$/util" />
             <option value="$PROJECT_DIR$/wiki" />
           </set>
         </option>
       </GradleProjectSettings>
     </option>
+    <option name="offlineMode" value="true" />
   </component>
 </project>
