@@ -26,6 +26,8 @@ tracerVersion = "1.3.4"
 uiTooling = "1.8.3"
 datastore = "1.1.7"
 window = "1.3.0"
+baselineprofile = "1.5.0"
+uiautomator = "2.3.0"
 
 appcompat = "1.7.1"
 material = "1.12.0"
@@ -137,6 +139,8 @@ androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "composeTest" }
 androidx-test-runner = { module = "androidx.test:runner", version = "1.5.2" }
 androidx-test-rules = { module = "androidx.test:rules", version = "1.5.0" }
+androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "baselineprofile" }
+androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -149,6 +153,8 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 tracer = { id = "ru.ok.tracer", version.ref = "tracerVersion" }
+android-test = { id = "com.android.test", version.ref = "agp" }
+androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
 
 [bundles]
 compose = [

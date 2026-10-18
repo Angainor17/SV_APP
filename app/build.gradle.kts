@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.tracer)
     id("kotlin-parcelize")
+    alias(libs.plugins.androidx.baselineprofile)
 }
 
 android {
@@ -106,6 +107,9 @@ tracer {
 }
 
 dependencies {
+    // Baseline Profiles: ускоряют холодный старт (AOT-компиляция горячего кода ART).
+    // Профиль генерируется модулем :baselineprofile → ./gradlew :app:generateReleaseBaselineProfile
+    baselineProfile(project(":baselineprofile"))
 
     // Модули-фичи
     implementation(project(":main"))

@@ -54,6 +54,7 @@ dependencyResolutionManagement {
 rootProject.name = "SV APP"
 
 include(":app")
+include(":baselineprofile")
 include(":commonarchitecture")
 include(":commonui")
 include(":main")
