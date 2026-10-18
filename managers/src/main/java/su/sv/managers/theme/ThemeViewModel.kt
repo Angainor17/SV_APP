@@ -39,8 +39,8 @@ class ThemeViewModel @Inject constructor(
     private val themeRepository: ThemeRepository
 ) : ViewModel() {
 
-    // Синхронное чтение начального значения темы из SharedPreferences
-    private val initialThemeMode: ThemeMode = ThemeRepositoryImpl.getThemeModeSync(context)
+    // Начальное значение темы уже считано синхронно в ThemeRepositoryImpl (кэш в памяти)
+    private val initialThemeMode: ThemeMode = ThemeRepositoryImpl.getInitialThemeMode()
 
     /**
      * Текущая конфигурация темы

@@ -9,7 +9,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import su.sv.commonui.theme.ThemeConfig
 import su.sv.commonui.theme.ThemeMode
 import su.sv.commonui.theme.ThemeRepository
@@ -21,10 +23,13 @@ private val Context.themeDataStore: DataStore<Preferences> by preferencesDataSto
 )
 
 /**
- * Реализация ThemeRepository на основе DataStore и SharedPreferences
+ * Реализация [ThemeRepository] на основе одного DataStore.
  *
- * SharedPreferences используется для синхронного чтения темы при запуске приложения.
- * Это необходимо для применения темы до создания Activity через AppCompatDelegate.
+ * Единственный источник правды — DataStore. Для синхронного применения темы до первого
+ * кадра приложение должно знать режим сразу, поэтому в [init] значение читается один раз
+ * через `runBlocking` и кэшируется в памяти. Это осознанное исключение: однократное чтение
+ * крошечного файла на старте, до создания первой Activity, чтобы не мигать системной темой.
+ * Повторные чтения не нужны — после первого [setThemeMode] кэш обновляется синхронно.
  */
 @Singleton
 class ThemeRepositoryImpl @Inject constructor(
@@ -37,26 +42,30 @@ class ThemeRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        private const val SHARED_PREFS_NAME = "theme_prefs"
-        private const val KEY_THEME_MODE = "theme_mode_sync"
+        @Volatile
+        private var cachedThemeMode: ThemeMode? = null
 
         /**
-         * Синхронное чтение режима темы из SharedPreferences
-         * Используется при запуске приложения до создания Activity
+         * Начальный режим темы для стартового значения StateFlow. Значение уже считано
+         * синхронно в [ThemeRepositoryImpl.init] до создания ViewModel.
          */
-        fun getThemeModeSync(context: Context): ThemeMode {
-            val prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-            val modeString = prefs.getString(KEY_THEME_MODE, null)
-            return runCatching { ThemeMode.valueOf(modeString ?: ThemeMode.SYSTEM.name) }
-                .getOrDefault(ThemeMode.SYSTEM)
-        }
+        fun getInitialThemeMode(): ThemeMode = cachedThemeMode ?: ThemeMode.SYSTEM
+    }
 
-        /**
-         * Синхронное сохранение режима темы в SharedPreferences
-         */
-        private fun saveThemeModeSync(context: Context, mode: ThemeMode) {
-            val prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-            prefs.edit().putString(KEY_THEME_MODE, mode.name).apply()
+    init {
+        if (cachedThemeMode == null) {
+            cachedThemeMode = runCatching {
+                runBlocking {
+                    context.themeDataStore.data
+                        .first()
+                        .let { preferences ->
+                            val raw = preferences[PreferencesKeys.THEME_MODE]
+                                ?: ThemeMode.SYSTEM.name
+                            runCatching { ThemeMode.valueOf(raw) }
+                                .getOrDefault(ThemeMode.SYSTEM)
+                        }
+                }
+            }.getOrDefault(ThemeMode.SYSTEM)
         }
     }
 
@@ -88,12 +97,11 @@ class ThemeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun setThemeMode(mode: ThemeMode) {
-        // Сохраняем в DataStore (асинхронно для Flow)
         context.themeDataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = mode.name
         }
-        // Сохраняем в SharedPreferences (синхронно для быстрого запуска)
-        saveThemeModeSync(context, mode)
+        // Кэш обновляем синхронно — для следующего холодного старта значение уже известно.
+        cachedThemeMode = mode
     }
 
     override suspend fun setUseDynamicColors(use: Boolean) {
