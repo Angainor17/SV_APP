@@ -1,7 +1,5 @@
 package com.github.axet.bookreader.screens
 
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,19 +16,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.edit
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.axet.bookreader.R
-import com.github.axet.bookreader.app.ReaderPreferences
+import com.github.axet.bookreader.screens.viewmodel.ReaderSettingsViewModel
 import com.github.terrakok.modo.stack.LocalStackNavigation
 import com.github.terrakok.modo.stack.back
 import su.sv.commonui.theme.LocalDeviceFormFactor
@@ -43,68 +37,14 @@ import su.sv.commonui.ui.components.AppToolbarWithBack
 @Composable
 fun ReaderSettingsContent(
     modifier: Modifier = Modifier,
+    viewModel: ReaderSettingsViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
     val stackNavigation = LocalStackNavigation.current
     val formFactor = LocalDeviceFormFactor.current
 
-    // Получаем SharedPreferences для настроек
-    val shared = remember {
-        PreferenceManager.getDefaultSharedPreferences(context)
-    }
-
-    // Состояния настроек (кроме темы - она через ThemeViewModel)
-    var viewMode by remember {
-        mutableStateOf(
-            shared.getString(ReaderPreferences.PREFERENCE_VIEW_MODE, "PAGING") ?: "PAGING"
-        )
-    }
-    var volumeKeys by remember {
-        mutableStateOf(shared.getBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, false))
-    }
-    var screenLock by remember {
-        mutableStateOf(shared.getString(ReaderPreferences.PREFERENCE_SCREENLOCK, "0") ?: "0")
-    }
-    // Two column view: null = auto, true = enable, false = disable
-    var twoColumnView by remember {
-        mutableStateOf(
-            when (shared.getString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, "auto")) {
-                "true" -> "true"
-                "false" -> "false"
-                else -> "auto"
-            }
-        )
-    }
-
-    // Слушатель изменений (без темы)
-    val listener = remember {
-        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            when (key) {
-                ReaderPreferences.PREFERENCE_VIEW_MODE ->
-                    viewMode = sharedPreferences.getString(key, "PAGING") ?: "PAGING"
-
-                ReaderPreferences.PREFERENCE_VOLUME_KEYS ->
-                    volumeKeys = sharedPreferences.getBoolean(key, false)
-
-                ReaderPreferences.PREFERENCE_SCREENLOCK ->
-                    screenLock = sharedPreferences.getString(key, "0") ?: "0"
-
-                ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW ->
-                    twoColumnView = when (sharedPreferences.getString(key, "auto")) {
-                        "true" -> "true"
-                        "false" -> "false"
-                        else -> "auto"
-                    }
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        shared.registerOnSharedPreferenceChangeListener(listener)
-        onDispose {
-            shared.unregisterOnSharedPreferenceChangeListener(listener)
-        }
-    }
+    val viewMode by viewModel.viewMode.collectAsStateWithLifecycle()
+    val volumeKeys by viewModel.volumeKeys.collectAsStateWithLifecycle()
+    val twoColumnView by viewModel.twoColumnView.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -130,10 +70,7 @@ fun ReaderSettingsContent(
                 } else {
                     stringResource(R.string.sv_view_mode_paging)
                 },
-                onClick = {
-                    val newMode = if (viewMode == "PAGING") "CONTINUOUS" else "PAGING"
-                    shared.edit { putString(ReaderPreferences.PREFERENCE_VIEW_MODE, newMode) }
-                },
+                onClick = viewModel::toggleViewMode,
             )
 
             // Кнопки громкости
@@ -141,9 +78,7 @@ fun ReaderSettingsContent(
                 title = stringResource(R.string.sv_pref_volume_title),
                 subtitle = stringResource(R.string.sv_pref_volume_summary),
                 checked = volumeKeys,
-                onCheckedChange = { checked ->
-                    shared.edit { putBoolean(ReaderPreferences.PREFERENCE_VOLUME_KEYS, checked) }
-                },
+                onCheckedChange = viewModel::setVolumeKeys,
             )
 
             // Двухстраничный режим — только для планшетов
@@ -155,20 +90,7 @@ fun ReaderSettingsContent(
                         "false" -> stringResource(R.string.sv_view_mode_continuous) // Выключено (одна колонка)
                         else -> stringResource(R.string.sv_pref_two_column_auto)
                     },
-                    onClick = {
-                        // Циклический переключатель: auto -> true -> false -> auto
-                        val newValue = when (twoColumnView) {
-                            "auto" -> "true"
-                            "true" -> "false"
-                            else -> "auto"
-                        }
-                        shared.edit {
-                            putString(
-                                ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW,
-                                newValue
-                            )
-                        }
-                    },
+                    onClick = viewModel::cycleTwoColumnView,
                 )
             }
 
