@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -25,6 +27,13 @@ android {
         resources {
             excludes.add("META-INF/DEPENDENCIES")
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("11")
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
