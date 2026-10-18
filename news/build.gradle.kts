@@ -23,6 +23,7 @@ dependencies {
 
     // Модули-фичи
     implementation(project(":api"))
+    implementation(project(":quiz"))
 
     // Модули-utils
     implementation(project(":commonarchitecture"))
@@ -33,6 +34,7 @@ dependencies {
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.browser)
     debugImplementation(libs.androidx.ui.tooling)

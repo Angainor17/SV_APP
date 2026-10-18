@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -51,6 +55,7 @@ import su.sv.news.presentation.root.model.UiNewsMedia
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.effects.NewsListOneTimeEffect
 import su.sv.news.testing.NewsTestTags
+import su.sv.quiz.presentation.root.QuizRootScreen
 
 /**
  * Состояние для полноэкранного просмотра изображений
@@ -106,6 +111,14 @@ fun RootNews(
                 onThemeLongPress = {
                     // Открыть редактор темы при долгом нажатии
                     stackNavigation.forward(ThemeEditorScreen())
+                },
+                additionalActions = {
+                    IconButton(onClick = { stackNavigation.forward(QuizRootScreen()) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Quiz,
+                            contentDescription = stringResource(R.string.news_open_quiz),
+                        )
+                    }
                 }
             )
         },
