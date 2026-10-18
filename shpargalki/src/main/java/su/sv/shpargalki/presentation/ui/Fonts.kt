@@ -8,9 +8,9 @@ import su.sv.shpargalki.R
 /**
  * Готический (Fraktur) шрифт для немецких названий понятий.
  *
- * UnifrakturMaguntia — открытый шрифт под лицензией SIL OFL,
+ * UnifrakturCook — открытый шрифт под лицензией SIL OFL,
  * имитирует классическую немецкую готическую печать.
  */
 val GothicFontFamily = FontFamily(
-    Font(R.font.unifrakturmaguntia, FontWeight.Normal),
+    Font(R.font.unifrakturcook, FontWeight.Normal),
 )

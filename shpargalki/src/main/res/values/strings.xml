@@ -16,6 +16,7 @@
     <string name="shpargalki_section_concept">Учение о понятии</string>
 
     <!-- Поля понятия в шторке -->
+    <string name="shpargalki_field_pair">Парная категория</string>
     <string name="shpargalki_field_derivation">Выведение</string>
     <string name="shpargalki_field_popov">По М. В. Попову</string>
     <string name="shpargalki_field_hegel">Гегель (исходный текст)</string>

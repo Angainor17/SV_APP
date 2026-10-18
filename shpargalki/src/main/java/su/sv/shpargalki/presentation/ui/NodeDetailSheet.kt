@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -43,46 +44,56 @@ fun NodeDetailSheet(
         sheetState = sheetState,
         modifier = Modifier.testTag(ShpargalkiTestTags.NODE_SHEET),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = dimensions.screenPaddingHorizontal)
-                .padding(bottom = dimensions.itemSpacingXXLarge),
-        ) {
-            Text(
-                text = node.term,
-                style = MaterialTheme.typography.headlineSmall,
-            )
-
-            if (node.german.isNotBlank()) {
-                Spacer(modifier = Modifier.height(dimensions.itemSpacingMedium))
+        // SelectionContainer — текст можно выделять и копировать
+        SelectionContainer {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = dimensions.screenPaddingHorizontal)
+                    .padding(bottom = dimensions.itemSpacingXXLarge),
+            ) {
                 Text(
-                    text = node.german,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontFamily = GothicFontFamily,
+                    text = node.term,
+                    style = MaterialTheme.typography.headlineSmall,
                 )
-            }
 
-            if (node.derivation.isNotBlank()) {
+                if (node.german.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(dimensions.itemSpacingMedium))
+                    Text(
+                        text = node.german,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = GothicFontFamily,
+                    )
+                }
+
+                if (node.pair.isNotBlank()) {
+                    SheetSection(
+                        label = stringResource(R.string.shpargalki_field_pair),
+                        text = node.pair,
+                    )
+                }
+
+                if (node.derivation.isNotBlank()) {
+                    SheetSection(
+                        label = stringResource(R.string.shpargalki_field_derivation),
+                        text = node.derivation,
+                    )
+                }
+
                 SheetSection(
-                    label = stringResource(R.string.shpargalki_field_derivation),
-                    text = node.derivation,
+                    label = stringResource(R.string.shpargalki_field_popov),
+                    text = node.popov,
+                )
+                SheetSection(
+                    label = stringResource(R.string.shpargalki_field_hegel),
+                    text = node.hegel,
+                )
+                SheetSection(
+                    label = stringResource(R.string.shpargalki_field_svremya),
+                    text = node.svremya,
                 )
             }
-
-            SheetSection(
-                label = stringResource(R.string.shpargalki_field_popov),
-                text = node.popov,
-            )
-            SheetSection(
-                label = stringResource(R.string.shpargalki_field_hegel),
-                text = node.hegel,
-            )
-            SheetSection(
-                label = stringResource(R.string.shpargalki_field_svremya),
-                text = node.svremya,
-            )
         }
     }
 }
