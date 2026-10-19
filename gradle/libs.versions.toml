@@ -23,6 +23,9 @@ navigationRuntimeKtx = "2.10.2"
 navigationCompose = "2.10.2"
 coilCompose = "3.6.3"
 tracerVersion = "1.5.1"
+# tracer-native-bindings 0.1.40 тащит bundled libz.so (4 КБ alignment → несовместимо
+# с 16 KB page size); 0.1.41-android её убрала. Явный пин до обновления tracer-platform.
+tracerNativeBindings = "0.1.41-android"
 datastore = "1.2.1"
 window = "1.5.1"
 baselineprofile = "1.5.0"
@@ -102,6 +105,7 @@ tracer-crash-report = { module = "ru.ok.tracer:tracer-crash-report" }
 tracer-disk-usage = { module = "ru.ok.tracer:tracer-disk-usage" }
 tracer-heap-dumps = { module = "ru.ok.tracer:tracer-heap-dumps" }
 tracer-platform = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracerVersion" }
+tracer-native-bindings = { module = "ru.ok.tracer:tracer-native-bindings", version.ref = "tracerNativeBindings" }
 
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }

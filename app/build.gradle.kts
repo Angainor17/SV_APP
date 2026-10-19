@@ -145,6 +145,8 @@ dependencies {
     implementation(libs.tracer.crash.report)
     // Сбор и анализ нативных крешей
     implementation(libs.tracer.crash.report.native)
+    // 0.1.40 тащит bundled libz.so (4 КБ alignment → 16 KB page size); 0.1.41-android её убрала.
+    implementation(libs.tracer.native.bindings)
     // Сбор и анализ хипдапмов при OOM
     implementation(libs.tracer.heap.dumps)
     // Анализ потребления дискового места на устройстве
