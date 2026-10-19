@@ -88,7 +88,7 @@ sealed class RootInfoActions {
 ## Структура файлов
 
 ```
-info/src/main/java/su/sv/info/
+info/src/main/kotlin/su/sv/info/
 ├── domain/
 │   ├── GetInfoLinksUseCase.kt
 │   └── model/LinkItem.kt

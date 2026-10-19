@@ -144,7 +144,7 @@ fun BookmarksComposeDialog(
 ## Структура файлов
 
 ```
-bookreader/src/main/java/com/github/axet/bookreader/
+bookreader/src/main/kotlin/com/github/axet/bookreader/
 ├── app/
 │   ├── BookReaderInitializer.kt  # Инициализация читалки
 │   ├── ComicsPlugin.kt

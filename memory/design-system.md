@@ -21,7 +21,7 @@ metadata:
 
 ## Структура
 
-Дизайн-система реализована в модуле `commonui/src/main/java/su/sv/commonui/`:
+Дизайн-система реализована в модуле `commonui/src/main/kotlin/su/sv/commonui/`:
 
 ### Тема (`theme/`)
 

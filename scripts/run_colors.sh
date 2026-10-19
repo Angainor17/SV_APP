@@ -3,7 +3,7 @@
 # Генерация скриншотов с разными цветами фона Material Design
 # Цвет применяется к: toolbar, bottomNav (4 пункта), фон под списком
 
-COLOR_FILE="commonui/src/main/java/su/sv/commonui/theme/Color.kt"
+COLOR_FILE="commonui/src/main/kotlin/su/sv/commonui/theme/Color.kt"
 SCREENSHOT_DIR="background_colors"
 PACKAGE="su.sv.app"
 ACTIVITY="$PACKAGE/.MainActivity"

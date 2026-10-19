@@ -19,7 +19,7 @@
 ### Расположение файлов
 
 ```
-wiki/src/main/java/su/sv/wiki/domain/usecase/
+wiki/src/main/kotlin/su/sv/wiki/domain/usecase/
 ├── SearchArticleUseCase.kt
 ├── GetArticleUseCase.kt
 ├── GetFavoritesUseCase.kt
@@ -42,7 +42,7 @@ wiki/src/main/java/su/sv/wiki/domain/usecase/
 ## Структура модуля wiki (текущая)
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── data/
 │   ├── api/
 │   │   ├── WikiApi.kt

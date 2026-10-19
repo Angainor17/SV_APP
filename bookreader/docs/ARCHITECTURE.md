@@ -187,7 +187,7 @@ BookReaderInitializer.init(context)
 ## Структура файлов
 
 ```
-bookreader/src/main/java/com/github/axet/bookreader/
+bookreader/src/main/kotlin/com/github/axet/bookreader/
 ├── app/                           # Инфраструктура и плагины
 │   ├── BookReaderInitializer.kt   # Singleton инициализатор
 │   ├── Plugin.kt                  # Интерфейс плагина + базовые классы

@@ -2,7 +2,7 @@
 
 ## Текущее состояние
 
-**Файл:** `bookreader/src/main/java/com/github/axet/bookreader/app/Plugin.kt`
+**Файл:** `bookreader/src/main/kotlin/com/github/axet/bookreader/app/Plugin.kt`
 **Размер:** 1101 строка
 **Роль:** API-интерфейс плагинов читалки. Определяет контракт для всех форматов книг (PDF, DjVu,
 Comics).
@@ -125,9 +125,9 @@ Plugin.kt (API definition)
 
 **Файлы:**
 
-- `bookreader/src/test/java/com/github/axet/bookreader/app/PluginViewTest.kt`
-- `bookreader/src/test/java/com/github/axet/bookreader/app/PluginPageTest.kt`
-- `bookreader/src/test/java/com/github/axet/bookreader/app/PluginSelectionTest.kt`
+- `bookreader/src/test/kotlin/com/github/axet/bookreader/app/PluginViewTest.kt`
+- `bookreader/src/test/kotlin/com/github/axet/bookreader/app/PluginPageTest.kt`
+- `bookreader/src/test/kotlin/com/github/axet/bookreader/app/PluginSelectionTest.kt`
 
 ---
 

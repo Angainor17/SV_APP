@@ -131,8 +131,8 @@ metadata:
 **Зависимости:** Tips, NetworkLibrary
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/org/geometerplus/android/fbreader/sync/`
-- `/fbreader/src/main/java/org/geometerplus/fbreader/network/sync/`
+- `/fbreader/src/main/kotlin/org/geometerplus/android/fbreader/sync/`
+- `/fbreader/src/main/kotlin/org/geometerplus/fbreader/network/sync/`
 
 **Файлы для исправления:**
 
@@ -148,8 +148,8 @@ metadata:
 **Зависимости:** Sync
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/org/geometerplus/android/fbreader/tips/`
-- `/fbreader/src/main/java/org/geometerplus/fbreader/tips/`
+- `/fbreader/src/main/kotlin/org/geometerplus/android/fbreader/tips/`
+- `/fbreader/src/main/kotlin/org/geometerplus/fbreader/tips/`
 
 **Файлы для исправления:**
 
@@ -161,8 +161,8 @@ metadata:
 **Зависимости:** NetworkLibrary
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/org/geometerplus/android/fbreader/network/litres/`
-- `/fbreader/src/main/java/org/geometerplus/fbreader/network/authentication/litres/`
+- `/fbreader/src/main/kotlin/org/geometerplus/android/fbreader/network/litres/`
+- `/fbreader/src/main/kotlin/org/geometerplus/fbreader/network/authentication/litres/`
 
 **Файлы для исправления:**
 
@@ -176,7 +176,7 @@ metadata:
 **Зависимости:** NetworkLibrary
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/org/geometerplus/fbreader/network/rss/`
+- `/fbreader/src/main/kotlin/org/geometerplus/fbreader/network/rss/`
 
 **Файлы для исправления:**
 
@@ -187,7 +187,7 @@ metadata:
 **Зависимости:** FBReader
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/org/geometerplus/android/fbreader/api/` (кроме FBReaderIntents,
+- `/fbreader/src/main/kotlin/org/geometerplus/android/fbreader/api/` (кроме FBReaderIntents,
   PluginApi)
 
 **Файлы для исправления:**
@@ -200,7 +200,7 @@ metadata:
 **Зависимости:** FBReader, LibraryService
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/org/geometerplus/android/fbreader/httpd/`
+- `/fbreader/src/main/kotlin/org/geometerplus/android/fbreader/httpd/`
 
 **Файлы для исправления:**
 
@@ -212,7 +212,7 @@ metadata:
 **Зависимости:** CatalogManagerActivity
 **Файлы для удаления:**
 
-- `/fbreader/src/main/java/com/mobeta/`
+- `/fbreader/src/main/kotlin/com/mobeta/`
 
 **Файлы для исправления:**
 

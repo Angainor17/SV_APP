@@ -15,7 +15,7 @@ metadata:
 
 ## 1. BookList.kt — `items()` вместо `forEach`
 
-**Файл:** `books/src/main/java/su/sv/books/catalog/presentation/root/ui/BookList.kt`
+**Файл:** `books/src/main/kotlin/su/sv/books/catalog/presentation/root/ui/BookList.kt`
 
 **Было:**
 
@@ -48,7 +48,7 @@ items(
 
 ## 2. InfoContent.kt — `items()` с данными вместо индекса
 
-**Файл:** `info/src/main/java/su/sv/info/rootinfo/ui/InfoContent.kt`
+**Файл:** `info/src/main/kotlin/su/sv/info/rootinfo/ui/InfoContent.kt`
 
 **Было:**
 
@@ -80,7 +80,7 @@ items(
 
 ## 3. BottomNavigationUi.kt — derivedStateOf для navigationSelectedItem
 
-**Файл:** `main/src/main/java/su/sv/main/bottomnav/BottomNavigationUi.kt`
+**Файл:** `main/src/main/kotlin/su/sv/main/bottomnav/BottomNavigationUi.kt`
 
 **Было:**
 
@@ -110,7 +110,7 @@ index.
 
 ## 4. BottomNavigationUi.kt — rememberBottomNavigationItems()
 
-**Файл:** `main/src/main/java/su/sv/main/bottomnav/BottomNavigationUi.kt`
+**Файл:** `main/src/main/kotlin/su/sv/main/bottomnav/BottomNavigationUi.kt`
 
 **Было:**
 
@@ -139,7 +139,7 @@ private fun rememberBottomNavigationItems(): List<BottomNavigationItem> {
 
 ## 5. NewsList.kt — добавлен contentType
 
-**Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/NewsList.kt`
+**Файл:** `news/src/main/kotlin/su/sv/news/presentation/root/ui/NewsList.kt`
 
 **Было:**
 
@@ -174,7 +174,7 @@ items(
 
 ## 6. RootNews.kt — упрощение логики состояний
 
-**Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/RootNews.kt`
+**Файл:** `news/src/main/kotlin/su/sv/news/presentation/root/ui/RootNews.kt`
 
 **Было:**
 

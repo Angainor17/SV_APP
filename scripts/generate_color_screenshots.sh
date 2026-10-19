@@ -3,7 +3,7 @@
 # Скрипт для генерации скриншотов с разными цветами фона
 # Запускается из корня проекта SV_APP
 
-COLOR_FILE="commonui/src/main/java/su/sv/commonui/theme/Color.kt"
+COLOR_FILE="commonui/src/main/kotlin/su/sv/commonui/theme/Color.kt"
 SCREENSHOT_DIR="background_colors"
 
 # Создаем папку для скриншотов

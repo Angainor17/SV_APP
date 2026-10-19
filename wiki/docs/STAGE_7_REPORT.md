@@ -29,7 +29,7 @@ fun bindWikiRepository(impl: WikiRepositoryImpl): WikiRepository
 ## Итоговая структура Wiki-модуля
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── data/
 │   ├── api/
 │   │   ├── WikiApi.kt

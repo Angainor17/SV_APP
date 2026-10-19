@@ -281,7 +281,7 @@ wiki (RootWiki)
 ### 3.2 Структура модуля wiki
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── di/
 │   └── WikiModule.kt                    # Hilt модуль
 ├── navigation/
@@ -664,6 +664,6 @@ data class UiWikiLink(
 
 - API документация: https://m.mediawiki.org/wiki/API:Main_page/ru
 - Примеры существующей архитектуры:
-    - `/books/src/main/java/su/sv/books/catalog/`
-    - `/news/src/main/java/su/sv/news/`
+    - `/books/src/main/kotlin/su/sv/books/catalog/`
+    - `/news/src/main/kotlin/su/sv/news/`
 - Исходный файл требований: `/wiki/wiki_for_CLAUDE.md`

@@ -20,7 +20,7 @@
 
 Сейчас в читалке при выделении текста есть 2 кнопки — "сообщить об опечатке" и "задать вопрос". Обе
 просто копируют текст в буфер обмена и открывают Telegram-канал (
-`managers/src/main/java/su/sv/managers/OnBookPagerManager.kt`), где пользователь должен вручную
+`managers/src/main/kotlin/su/sv/managers/OnBookPagerManager.kt`), где пользователь должен вручную
 вставить и отправить сообщение. Данные о книге/странице/тексте до бота реально не доходят.
 
 Цель — заменить это на полноценный цикл:
@@ -87,8 +87,8 @@ FBReader'овского `ZLTextPosition`. Ответ `/qa` мапится нап
 **Добавлено:**
 
 - `qa/build.gradle.kts` — android-library, deps: `commonarchitecture`, Room, Retrofit/Gson, Hilt.
-- `qa/src/main/java/su/sv/qa/domain/model/` — `AnsweredQuestion`, `TypoReport`, `QuestionReport`.
-- `qa/src/main/java/su/sv/qa/domain/repository/QaRepository.kt`:
+- `qa/src/main/kotlin/su/sv/qa/domain/model/` — `AnsweredQuestion`, `TypoReport`, `QuestionReport`.
+- `qa/src/main/kotlin/su/sv/qa/domain/repository/QaRepository.kt`:
   ```kotlin
   interface QaRepository {
       suspend fun submitTypoReport(report: TypoReport): Result<Unit>
@@ -137,7 +137,7 @@ FBReader'овского `ZLTextPosition`. Ответ `/qa` мапится нап
 - `commonarchitecture/.../di/module/CoroutineModule.kt` — добавить `@ApplicationScope`
   квалификатор +
   `@Provides @Singleton fun provideApplicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)`.
-- `app/src/main/java/su/sv/app/SvApp.kt` — `@Inject` `SyncAnsweredQuestionsUseCase` и
+- `app/src/main/kotlin/su/sv/app/SvApp.kt` — `@Inject` `SyncAnsweredQuestionsUseCase` и
   `@ApplicationScope CoroutineScope`; в `onCreate()` —
   `appScope.launch { syncAnsweredQuestionsUseCase() }` (best-effort, ошибки проглатываются —
   офлайн-режим остаётся на последних синхронизированных данных в Room).
@@ -209,7 +209,7 @@ id файла. Добавить параметр `catalogBookId: String?` в `Re
 
 ### 4c. Очистка
 
-**Удалить** `managers/src/main/java/su/sv/managers/OnBookPagerManager.kt` и связанные строки (
+**Удалить** `managers/src/main/kotlin/su/sv/managers/OnBookPagerManager.kt` и связанные строки (
 `misspell_clip_title`, `question_text_template`, `MISSPELL_TG_LINK`, `QUESTION_TG_LINK` и т.п.) —
 других вызывающих кроме читалки нет.
 
@@ -340,7 +340,7 @@ bookTitle, page, selectedText, catalogBookId, позиция) + маппер + `
 - `books/.../detail/viewmodel/BookDetailViewModel.kt` — точка расширения `onBookDownloadEnd()`, уже
   готовая.
 - `news/.../presentation/root/viewmodel/RootNewsViewModel.kt` — слияние ленты и фильтрация.
-- `managers/src/main/java/su/sv/managers/OnBookPagerManager.kt` — удаляется.
+- `managers/src/main/kotlin/su/sv/managers/OnBookPagerManager.kt` — удаляется.
 
 ## Проверка
 

@@ -46,7 +46,7 @@ wiki/src/main/res/values/strings.xml
 ## Структура UI-компонентов
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── root/
 │   └── RootWiki.kt                    # Главный экран
 └── presentation/root/ui/

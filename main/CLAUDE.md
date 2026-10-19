@@ -72,7 +72,7 @@ NavHost(
 ## Структура файлов
 
 ```
-main/src/main/java/su/sv/main/
+main/src/main/kotlin/su/sv/main/
 ├── Screens.kt                      # Маршруты экранов
 ├── res/
 │   └── BooksVector.kt              # Векторные иконки

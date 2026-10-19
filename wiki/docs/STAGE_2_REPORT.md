@@ -10,7 +10,7 @@
 ### 2. Создан API-интерфейс
 
 ```
-wiki/src/main/java/su/sv/wiki/data/api/WikiApi.kt
+wiki/src/main/kotlin/su/sv/wiki/data/api/WikiApi.kt
 ```
 
 - `search()` - поиск статей с параметром `srwhat=nearmatch`
@@ -19,7 +19,7 @@ wiki/src/main/java/su/sv/wiki/data/api/WikiApi.kt
 ### 3. Созданы модели данных (из Этапа 1)
 
 ```
-wiki/src/main/java/su/sv/wiki/data/api/model/
+wiki/src/main/kotlin/su/sv/wiki/data/api/model/
 ├── ApiSearchResponse.kt
 ├── ApiParseResponse.kt
 └── ApiOpenSearchResponse.kt
@@ -28,7 +28,7 @@ wiki/src/main/java/su/sv/wiki/data/api/model/
 ### 4. Созданы доменные модели
 
 ```
-wiki/src/main/java/su/sv/wiki/domain/model/WikiArticle.kt
+wiki/src/main/kotlin/su/sv/wiki/domain/model/WikiArticle.kt
 ```
 
 - `WikiArticle` - статья с заголовком, контентом и ссылками
@@ -38,7 +38,7 @@ wiki/src/main/java/su/sv/wiki/domain/model/WikiArticle.kt
 ### 5. Создан интерфейс репозитория
 
 ```
-wiki/src/main/java/su/sv/wiki/domain/repository/WikiRepository.kt
+wiki/src/main/kotlin/su/sv/wiki/domain/repository/WikiRepository.kt
 ```
 
 - `WikiResult<T>` - sealed class для результатов
@@ -47,7 +47,7 @@ wiki/src/main/java/su/sv/wiki/domain/repository/WikiRepository.kt
 ### 6. Создана реализация репозитория
 
 ```
-wiki/src/main/java/su/sv/wiki/data/repository/WikiRepositoryImpl.kt
+wiki/src/main/kotlin/su/sv/wiki/data/repository/WikiRepositoryImpl.kt
 ```
 
 - Обработка успешных ответов
@@ -57,7 +57,7 @@ wiki/src/main/java/su/sv/wiki/data/repository/WikiRepositoryImpl.kt
 ### 7. Настроен Hilt-модуль
 
 ```
-wiki/src/main/java/su/sv/wiki/di/WikiApiModule.kt
+wiki/src/main/kotlin/su/sv/wiki/di/WikiApiModule.kt
 ```
 
 - Отдельный OkHttpClient для Wiki
@@ -75,7 +75,7 @@ wiki/src/main/java/su/sv/wiki/di/WikiApiModule.kt
 ## Структура модуля wiki
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── data/
 │   ├── api/
 │   │   ├── WikiApi.kt

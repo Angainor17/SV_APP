@@ -66,7 +66,7 @@ bundle.putParcelable("book", book)
 ## Структура файлов
 
 ```
-models/src/main/java/su/sv/models/ui/book/
+models/src/main/kotlin/su/sv/models/ui/book/
 ├── UiBook.kt           # Модель книги
 └── UIBookState.kt      # Состояние скачивания
 ```

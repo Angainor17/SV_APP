@@ -43,7 +43,7 @@ enum class Boolean3 {
 ## Структура файлов
 
 ```
-util/src/main/java/org/fbreader/util/
+util/src/main/kotlin/org/fbreader/util/
 ├── Boolean3.kt
 ├── ComparisonUtil.kt
 ├── NaturalOrderComparator.kt

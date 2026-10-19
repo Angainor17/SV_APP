@@ -65,7 +65,7 @@
 ## Структура модуля wiki
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── data/
 │   ├── api/
 │   ├── local/

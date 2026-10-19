@@ -210,7 +210,7 @@ object CustomColorsModule {
 ## Структура файлов
 
 ```
-managers/src/main/java/su/sv/managers/
+managers/src/main/kotlin/su/sv/managers/
 ├── OnBookPagerManager.kt
 └── theme/
     ├── CustomColorsModule.kt       # DI модуль для кастомных цветов

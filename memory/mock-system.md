@@ -11,7 +11,7 @@ metadata:
 
 ## Расположение
 
-`commonarchitecture/src/main/java/su/sv/commonarchitecture/mock/`
+`commonarchitecture/src/main/kotlin/su/sv/commonarchitecture/mock/`
 
 ## Файлы
 

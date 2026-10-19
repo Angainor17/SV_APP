@@ -20,7 +20,7 @@ metadata:
 
 ### 1. Модель данных
 
-**Storage.Bookmark** (`bookreader/src/main/java/com/github/axet/bookreader/app/Storage.java`)
+**Storage.Bookmark** (`bookreader/src/main/kotlin/com/github/axet/bookreader/app/Storage.java`)
 
 ```java
 public static class Bookmark {
@@ -37,7 +37,7 @@ public static class Bookmark {
 
 #### BookmarksComposeDialog
 
-**Файл:** `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/BookmarksComposeDialog.kt`
+**Файл:** `bookreader/src/main/kotlin/com/github/axet/bookreader/screens/ui/BookmarksComposeDialog.kt`
 
 Диалог со списком закладок:
 
@@ -49,7 +49,7 @@ public static class Bookmark {
 
 #### BookmarkBottomSheet
 
-**Файл:** `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/BookmarkBottomSheet.kt`
+**Файл:** `bookreader/src/main/kotlin/com/github/axet/bookreader/screens/ui/BookmarkBottomSheet.kt`
 
 BottomSheet для редактирования закладки:
 

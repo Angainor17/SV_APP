@@ -298,7 +298,7 @@ companion object {
 ## Структура файлов
 
 ```
-bugreport/src/main/java/su/sv/bugreport/
+bugreport/src/main/kotlin/su/sv/bugreport/
 ├── data/
 │   ├── ImgbbUploader.kt
 │   └── BugReportWorker.kt

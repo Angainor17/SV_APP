@@ -3,7 +3,7 @@
 ## Структура тестов
 
 ```
-app/src/androidTest/java/su/sv/app/
+app/src/androidTest/kotlin/su/sv/app/
 ├── testing/
 │   ├── TestAnnotations.kt    # Аннотации для категорий тестов
 │   ├── TestTags.kt           # TestTags для UI элементов
@@ -115,7 +115,7 @@ fun NewsList(
 
 ## Написание нового теста
 
-1. Создайте файл в `app/src/androidTest/java/su/sv/app/`
+1. Создайте файл в `app/src/androidTest/kotlin/su/sv/app/`
 2. Наследуйте от `BaseUiTest` или используйте стандартный подход
 3. Добавьте нужные аннотации (`@SmokeTest`, `@ReleaseTest`)
 4. Используйте `TestTags` для поиска элементов

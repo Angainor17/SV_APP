@@ -20,7 +20,7 @@
 ### 3. Созданы модели данных
 
 ```
-wiki/src/main/java/su/sv/wiki/data/api/model/
+wiki/src/main/kotlin/su/sv/wiki/data/api/model/
 ├── ApiSearchResponse.kt      # Модели для поиска
 ├── ApiParseResponse.kt       # Модели для парсинга страницы
 └── ApiOpenSearchResponse.kt  # Модели для автодополнения

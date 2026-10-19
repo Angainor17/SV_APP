@@ -5,7 +5,7 @@
 
 set -e
 
-COLOR_FILE="commonui/src/main/java/su/sv/commonui/theme/Color.kt"
+COLOR_FILE="commonui/src/main/kotlin/su/sv/commonui/theme/Color.kt"
 SCREENSHOT_DIR="background_colors"
 PACKAGE="su.sv.app"
 ACTIVITY="$PACKAGE/.MainActivity"

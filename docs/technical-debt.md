@@ -373,7 +373,7 @@ scroll/two-column режим на затронутых устройствах.
 `app-release-unsigned.apk`: смещение данных `.so` внутри zip кратно 16384 для каждого ABI).
 
 Весь PDF-код на pdfium теперь снова единый путь (без tablet/PdfRenderer-развилки) —
-`bookreader/src/main/java/com/github/axet/bookreader/app/PDFPlugin.kt`. Полный функционал
+`bookreader/src/main/kotlin/com/github/axet/bookreader/app/PDFPlugin.kt`. Полный функционал
 (выделение, поиск, TOC) сохранён на всех устройствах.
 
 **Дополнительный фикс:** после замены библиотеки открытие PDF перестало падать, но всплыл второй
@@ -722,7 +722,7 @@ DataStore (асинхронные Flow-читалки) — двойная зап
 
 ### 🟡 P2: BadgeManager — SharedPreferences вместо DataStore
 
-**Файл:** `main/src/main/java/su/sv/main/badge/BadgeManager.kt` (строки 14, 17)
+**Файл:** `main/src/main/kotlin/su/sv/main/badge/BadgeManager.kt` (строки 14, 17)
 
 **Проблема:** `context.getSharedPreferences()` для хранения одного boolean-флага.
 
@@ -730,7 +730,7 @@ DataStore (асинхронные Flow-читалки) — двойная зап
 
 ### 🟡 P2: BooksApiModule выдаёт SharedPreferences через Hilt
 
-**Файл:** `books/src/main/java/su/sv/books/catalog/di/BooksApiModule.kt`
+**Файл:** `books/src/main/kotlin/su/sv/books/catalog/di/BooksApiModule.kt`
 
 **Проблема:** DI-модуль предоставляет SharedPreferences вместо DataStore.
 
@@ -775,8 +775,8 @@ Flow» неверна; «бесконечный цикл» в `updateGravity` �
 
 **Файлы (все уже используют Timber):**
 
-- `managers/src/main/java/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` — `Timber.e()`, `Timber.tag(TAG).w/d()`
-- `main/src/main/java/su/sv/main/continuereading/ContinueReadingViewModel.kt` — `Timber.tag(TAG).d()`
+- `managers/src/main/kotlin/su/sv/managers/theme/CustomColorsRepositoryImpl.kt` — `Timber.e()`, `Timber.tag(TAG).w/d()`
+- `main/src/main/kotlin/su/sv/main/continuereading/ContinueReadingViewModel.kt` — `Timber.tag(TAG).d()`
 - `bookreader/app/PDFPlugin.kt` — `Timber.tag(TAG).e()`
 
 Все три файла уже мигрированы на Timber.
@@ -802,7 +802,7 @@ Flow» неверна; «бесконечный цикл» в `updateGravity` �
 
 ### 🟠 P1: MockConfig — моки отключены для release
 
-**Файл:** `commonarchitecture/src/main/java/su/sv/commonarchitecture/mock/MockConfig.kt`
+**Файл:** `commonarchitecture/src/main/kotlin/su/sv/commonarchitecture/mock/MockConfig.kt`
 
 **Проблема:** TODO-комментарий: «Не забудьте выключить моки перед release сборкой!». Нет
 автоматического выключения моков через flavour/build-variant.
@@ -813,7 +813,7 @@ Flow» неверна; «бесконечный цикл» в `updateGravity` �
 
 ### 🟠 P1: RootNews — TODO open news (functional gap)
 
-**Файл:** `news/src/main/java/su/sv/news/presentation/root/ui/RootNews.kt` (строка 193)
+**Файл:** `news/src/main/kotlin/su/sv/news/presentation/root/ui/RootNews.kt` (строка 193)
 
 **Проблема:** Effect `NewsListOneTimeEffect.OpenNewsItem` триггерится, но не реализован — ничего не
 происходит при нажатии на элемент новостей.
@@ -822,7 +822,7 @@ Flow» неверна; «бесконечный цикл» в `updateGravity` �
 
 ### 🟡 P2: GetInfoLinksUseCase — stub с искусственной задержкой
 
-**Файл:** `info/src/main/java/su/sv/info/domain/GetInfoLinksUseCase.kt` (строка 20)
+**Файл:** `info/src/main/kotlin/su/sv/info/domain/GetInfoLinksUseCase.kt` (строка 20)
 
 **Проблема:** `delay(500.milliseconds)` для симуляции сетевого запроса. Заготовка под бэкенд без
 репозитория.
@@ -844,8 +844,8 @@ Flow» неверна; «бесконечный цикл» в `updateGravity` �
 
 **Файлы:**
 
-- `commonui/src/main/java/su/sv/commonui/ui/adaptive/navigation/RailNavigation.kt`
-- `commonui/src/main/java/su/sv/commonui/ui/adaptive/navigation/CompactNavigation.kt`
+- `commonui/src/main/kotlin/su/sv/commonui/ui/adaptive/navigation/RailNavigation.kt`
+- `commonui/src/main/kotlin/su/sv/commonui/ui/adaptive/navigation/CompactNavigation.kt`
 
 **Проблема:** `// TODO: Добавить поддержку badge` — `BadgeManager` не интегрирован в навигацию.
 
@@ -872,7 +872,7 @@ lock.
 
 ### 🟢 P3: LoadableResultDialog — findViewById в AlertDialog
 
-**Файл:** `commonui/src/main/java/su/sv/commonui/ui/LoadableResultDialog.kt` (строка 23)
+**Файл:** `commonui/src/main/kotlin/su/sv/commonui/ui/LoadableResultDialog.kt` (строка 23)
 
 **Решение:** М3 `AlertDialog` в Compose.
 
@@ -903,7 +903,7 @@ lock.
 
 **Файлы:**
 
-- `app/src/main/java/su/sv/app/MainActivity.kt` — `lateinit var customColorsRepository`
+- `app/src/main/kotlin/su/sv/app/MainActivity.kt` — `lateinit var customColorsRepository`
 - `books/.../BookDownloadBroadcastReceiver.kt` — два `lateinit var`
 
 **Проблема:** Риск NPE в тестах.
@@ -1011,7 +1011,7 @@ lock.
 
 ### 🟠 P1: UI-тесты на утечки памяти
 
-**Файл:** `app/src/androidTest/java/su/sv/app/memory/MemoryLeakTest.kt`
+**Файл:** `app/src/androidTest/kotlin/su/sv/app/memory/MemoryLeakTest.kt`
 
 **Проблема:** UI-тесты `androidTest` не могут использовать LeakCanary напрямую — `Instrumentation`
 держит ссылку на Activity, даже после `finish()`. Heap dump в андроид-тесте взять нельзя.

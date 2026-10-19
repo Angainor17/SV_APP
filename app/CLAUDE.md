@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 ## Структура файлов
 
 ```
-app/src/main/java/su/sv/app/
+app/src/main/kotlin/su/sv/app/
 ├── SvApp.kt               # Application класс
 ├── MainActivity.kt        # Главная Activity
 ├── AppScreenTransition.kt # Анимации переходов между экранами

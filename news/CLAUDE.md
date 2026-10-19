@@ -125,7 +125,7 @@ class ThemeEditorScreen : Screen {
 ## Структура файлов
 
 ```
-news/src/main/java/su/sv/news/
+news/src/main/kotlin/su/sv/news/
 ├── domain/
 │   ├── GetNewsListUseCase.kt
 │   ├── mapper/VideosMapper.kt

@@ -26,17 +26,17 @@ detekt {
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
     source.setFrom(
         files(
-            "app/src/main/java",
-            "commonarchitecture/src/main/java",
-            "commonui/src/main/java",
-            "main/src/main/java",
-            "books/src/main/java",
-            "wiki/src/main/java",
-            "news/src/main/java",
-            "info/src/main/java",
-            "models/src/main/java",
-            "api/src/main/java",
-            "managers/src/main/java",
+            "app/src/main/kotlin",
+            "commonarchitecture/src/main/kotlin",
+            "commonui/src/main/kotlin",
+            "main/src/main/kotlin",
+            "books/src/main/kotlin",
+            "wiki/src/main/kotlin",
+            "news/src/main/kotlin",
+            "info/src/main/kotlin",
+            "models/src/main/kotlin",
+            "api/src/main/kotlin",
+            "managers/src/main/kotlin",
         ),
     )
 }

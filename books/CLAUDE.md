@@ -233,7 +233,7 @@ class BookDownloadBroadcastReceiver : BroadcastReceiver() {
 ## Структура файлов
 
 ```
-books/src/main/java/su/sv/books/catalog/
+books/src/main/kotlin/su/sv/books/catalog/
 ├── di/BooksApiModule.kt
 ├── data/
 │   ├── api/

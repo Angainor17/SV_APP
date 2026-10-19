@@ -108,7 +108,7 @@ interface ParamUseCase<P, T> {
 ## Структура файлов
 
 ```
-commonarchitecture/src/main/java/su/sv/commonarchitecture/
+commonarchitecture/src/main/kotlin/su/sv/commonarchitecture/
 ├── data/
 │   ├── NetworkError.kt              # Класс ошибки сети
 │   └── RunCatchingApiRequest.kt     # Обёртка для API запросов

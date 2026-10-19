@@ -88,7 +88,7 @@ object NewsApiModule {
 ## Структура файлов
 
 ```
-api/src/main/java/su/sv/api/
+api/src/main/kotlin/su/sv/api/
 ├── data/
 │   ├── api/VkApi.kt              # Retrofit интерфейс
 │   ├── model/ApiNewsItem.kt      # Модель для UI

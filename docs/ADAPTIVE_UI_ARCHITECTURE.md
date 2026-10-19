@@ -65,7 +65,7 @@ fun MyScreen() {
 ## Структура файлов
 
 ```
-commonui/src/main/java/su/sv/commonui/
+commonui/src/main/kotlin/su/sv/commonui/
 ├── theme/
 │   ├── DeviceFormFactor.kt      # Sealed class для Compact/Medium/Expanded
 │   ├── AdaptiveDimensions.kt    # Размеры по форм-фактору

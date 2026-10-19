@@ -45,7 +45,7 @@ fun RootWiki(viewModel: RootWikiViewModel = hiltViewModel()) {
 ## Структура файлов
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── data/
 │   ├── api/
 │   │   ├── WikiApi.kt

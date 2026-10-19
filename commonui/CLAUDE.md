@@ -16,7 +16,7 @@
 ### Структура темы
 
 ```
-commonui/src/main/java/su/sv/commonui/theme/
+commonui/src/main/kotlin/su/sv/commonui/theme/
 ├── Color.kt           # Цветовая палитра
 ├── Theme.kt           # Главная тема (SVAPPTheme)
 ├── Type.kt            # Типографика
@@ -326,7 +326,7 @@ class DateFormatter @Inject constructor() {
 ## Структура файлов
 
 ```
-commonui/src/main/java/su/sv/commonui/
+commonui/src/main/kotlin/su/sv/commonui/
 ├── ext/
 │   ├── IntExt.kt
 │   └── LongExt.kt

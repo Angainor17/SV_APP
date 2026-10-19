@@ -95,12 +95,12 @@ fb.app.BookTextView.onFingerLongPress(x, y);
 
 ### Удалённые файлы
 
-- `fbreader/src/main/java/org/geometerplus/android/fbreader/SelectionPopup.kt` - старый popup
+- `fbreader/src/main/kotlin/org/geometerplus/android/fbreader/SelectionPopup.kt` - старый popup
 - `fbreader/src/main/res/layout/selection_panel.xml` - старый layout
 
 ### Новые файлы
 
-- `bookreader/src/main/java/com/github/axet/bookreader/screens/ui/SelectionComposePanel.kt` -
+- `bookreader/src/main/kotlin/com/github/axet/bookreader/screens/ui/SelectionComposePanel.kt` -
   Compose панель
 
 ## Flow выделения текста (после исправления)

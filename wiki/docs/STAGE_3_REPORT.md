@@ -12,7 +12,7 @@
 ### 2. Созданы Entity классы
 
 ```
-wiki/src/main/java/su/sv/wiki/data/local/entity/
+wiki/src/main/kotlin/su/sv/wiki/data/local/entity/
 ├── FavoriteEntity.kt    # Избранные статьи
 └── HistoryEntity.kt     # История поиска
 ```
@@ -35,7 +35,7 @@ wiki/src/main/java/su/sv/wiki/data/local/entity/
 ### 3. Созданы DAO
 
 ```
-wiki/src/main/java/su/sv/wiki/data/local/dao/
+wiki/src/main/kotlin/su/sv/wiki/data/local/dao/
 ├── FavoriteDao.kt    # Операции с избранным
 └── HistoryDao.kt     # Операции с историей
 ```
@@ -61,7 +61,7 @@ wiki/src/main/java/su/sv/wiki/data/local/dao/
 ### 4. Создана Database
 
 ```
-wiki/src/main/java/su/sv/wiki/data/local/database/WikiDatabase.kt
+wiki/src/main/kotlin/su/sv/wiki/data/local/database/WikiDatabase.kt
 ```
 
 - Database version: 1
@@ -71,7 +71,7 @@ wiki/src/main/java/su/sv/wiki/data/local/database/WikiDatabase.kt
 ### 5. Настроен Hilt-модуль для Database
 
 ```
-wiki/src/main/java/su/sv/wiki/di/WikiDatabaseModule.kt
+wiki/src/main/kotlin/su/sv/wiki/di/WikiDatabaseModule.kt
 ```
 
 - Предоставление WikiDatabase
@@ -108,7 +108,7 @@ wiki/src/main/java/su/sv/wiki/di/WikiDatabaseModule.kt
 ## Структура модуля wiki
 
 ```
-wiki/src/main/java/su/sv/wiki/
+wiki/src/main/kotlin/su/sv/wiki/
 ├── data/
 │   ├── api/
 │   │   ├── WikiApi.kt
