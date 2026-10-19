@@ -32,11 +32,12 @@ fun rememberWindowSizeClass(): WindowSizeClass {
     val size = windowInfo.containerSize
 
     return remember(size, density.density) {
-        WindowSizeClass.compute(
-            size.width.toInt(),
-            size.height.toInt(),
-            density.density,
-        )
+        with(density) {
+            WindowSizeClass.compute(
+                dpWidth = size.width.toDp().value,
+                dpHeight = size.height.toDp().value,
+            )
+        }
     }
 }
 

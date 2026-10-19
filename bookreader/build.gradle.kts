@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.bundles.coil)
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material.icons.extended)
     debugImplementation(libs.androidx.ui.tooling)
 
     // Navigation (Modo)

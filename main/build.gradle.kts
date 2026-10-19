@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.coil.compose)
+    implementation(libs.androidx.material.icons.extended)
 
     // Navigation
     implementation(libs.modo.compose)
