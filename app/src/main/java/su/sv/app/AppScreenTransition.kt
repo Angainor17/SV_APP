@@ -43,8 +43,13 @@ fun ComposeRendererScope<StackState>.AppScreenTransition(
     screenModifier: Modifier = Modifier,
 ) {
     val backgroundColor = MaterialTheme.colorScheme.background
+    // В modo 0.12+ StackScreen поверх основного экрана рендерит DialogPlaceHolder —
+    // прозрачный placeholder для анимации диалогов. Если навесить на контейнер фон,
+    // placeholder станет непрозрачным тёмным слоем и перекроет весь контент.
+    // Поэтому диалогам (включая placeholder) фон не применяем.
+    val isDialog = screen is DialogScreen
     ScreenTransition(
-        modifier = modifier.background(backgroundColor),
+        modifier = if (isDialog) modifier else modifier.background(backgroundColor),
         screenModifier = screenModifier.background(backgroundColor),
         transitionSpec = {
             val transitionType = calculateStackTransitionType(oldState, newState)
