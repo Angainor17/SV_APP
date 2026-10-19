@@ -14,7 +14,7 @@ import org.junit.Test
  * Сценарий — типовой путь пользователя (детерминированный, без сети):
  *   1. холодный старт → лента «Новости»;
  *   2. вкладка «Книги» → каталог (мок отдаёт список с задержкой ~1 c);
- *   3. первая книга «ОВЛ том №12» → карточка книги (обложка, описание, кнопка действия);
+ *   3. первая книга «В помощь товарищу» → карточка книги (обложка, описание, кнопка действия);
  *   4. назад в каталог;
  *   5. вкладки «Wiki» и «Наши проекты»;
  *   6. возврат на «Новости».
@@ -43,10 +43,11 @@ class BaselineProfileGenerator {
             // 1. Холодный старт → лента «Новости».
             pressHome()
             startActivityAndWait()
-            tap(By.desc("Новости"), LAUNCH_TIMEOUT_MS)
+            dismiss16kCompatibilityDialog()
+            tap(By.text("Новости"), LAUNCH_TIMEOUT_MS)
 
             // 2. Вкладка «Книги» → каталог.
-            tap(By.desc("Книги"))
+            tap(By.text("Книги"))
 
             // 3. Первая книга → карточка книги (по кнопке «Назад» понимаем, что она открылась).
             tap(By.textContains(FIRST_BOOK_TITLE), BOOKS_TIMEOUT_MS)
@@ -58,25 +59,27 @@ class BaselineProfileGenerator {
             device.waitForIdle()
 
             // 5. Остальные вкладки: Wiki и «Наши проекты».
-            tap(By.desc("Wiki"))
+            tap(By.text("Wiki"))
             device.waitForIdle()
-            tap(By.desc("Наши проекты"))
+            tap(By.text("Наши проекты"))
             device.waitForIdle()
 
             // 6. Возврат на «Новости».
-            tap(By.desc("Новости"))
+            tap(By.text("Новости"))
             device.waitForIdle()
         },
     )
 
     private companion object {
         const val PACKAGE_NAME = "su.sv.app"
-        const val FIRST_BOOK_TITLE = "ОВЛ том"
+        const val FIRST_BOOK_TITLE = "В помощь товарищу"
         const val LAUNCH_TIMEOUT_MS = 15_000L
         const val BOOKS_TIMEOUT_MS = 15_000L
         const val DETAIL_TIMEOUT_MS = 10_000L
     }
 }
+
+private const val COMPAT_DIALOG_TIMEOUT_MS = 5_000L
 
 /**
  * Ждёт появления элемента (до [timeoutMs]) и кликает по нему.
@@ -86,4 +89,26 @@ private fun MacrobenchmarkScope.tap(selector: BySelector, timeoutMs: Long = 5_00
     val found = device.wait(Until.hasObject(selector), timeoutMs)
     check(found) { "Элемент не найден за ${timeoutMs}мс: $selector" }
     device.findObject(selector).click()
+}
+
+/**
+ * На 16 КБ-эмуляторе (sdk_gphone16k_*) поверх приложения всплывает системный
+ * диалог «Совместимость приложений Android»: нативные .so (k2pdfopt, djvulibre,
+ * pdfium и др.) не выровнены под 16 КБ страниц. Диалог перекрывает контент и не
+ * даёт тапать по «Новости». Закрываем его кнопкой «Больше не показывать»
+ * (fallback — «ОК»). На обычных устройствах диалога нет — функция просто
+ * ничего не делает и не мешает.
+ */
+private fun MacrobenchmarkScope.dismiss16kCompatibilityDialog() {
+    val dontShow = By.text("Больше не показывать")
+    if (device.wait(Until.hasObject(dontShow), COMPAT_DIALOG_TIMEOUT_MS)) {
+        device.findObject(dontShow).click()
+        device.waitForIdle()
+        return
+    }
+    val ok = By.text("ОК")
+    if (device.wait(Until.hasObject(ok), 2_000L)) {
+        device.findObject(ok).click()
+        device.waitForIdle()
+    }
 }
