@@ -106,6 +106,17 @@ tracer {
     }
 }
 
+// ru.ok.tracer 1.5.x регистрирует CollectSymbolsTask (generateTracerNativeSymbols*),
+// который обращается к Task.project во время выполнения — это несовместимо с
+// configuration cache (org.gradle.configuration-cache=true). Помечаем таск как
+// несовместимый: сборка не падает, а config cache отключается только на время
+// выполнения этого таска.
+tasks.matching { it.name.startsWith("generateTracerNativeSymbols") }.configureEach {
+    notCompatibleWithConfigurationCache(
+        "ru.ok.tracer CollectSymbolsTask uses Task.project at execution time",
+    )
+}
+
 dependencies {
     // Baseline Profiles: ускоряют холодный старт (AOT-компиляция горячего кода ART).
     // Профиль генерируется модулем :baselineprofile → ./gradlew :app:generateReleaseBaselineProfile
