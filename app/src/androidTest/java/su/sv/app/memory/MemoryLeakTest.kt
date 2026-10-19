@@ -9,17 +9,16 @@ import org.junit.runner.RunWith
 /**
  * TODO: LeakCanary does not work with instrumented tests that finish activities.
  * The test runner holds a reference to Activity through Instrumentation.
- * 
+ *
  * For UI leak tests we need one of:
  * 1. Robolectric (JVM tests with fake Android context)
  * 2. Manual heap dump + MAT Analysis
  * 3. Espresso + LeakCanary on real device (check notification)
- * 
+ *
  * Adding this as a placeholder for future implementation.
  */
 @RunWith(AndroidJUnit4::class)
 class MemoryLeakTest {
-
     @get:Rule
     val composeTestRule = createEmptyComposeRule()
 

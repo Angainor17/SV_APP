@@ -21,32 +21,34 @@ import su.sv.main.continuereading.ui.ContinueReadingSnackbar
  * - Клик на "Закрыть"
  */
 class ContinueReadingSnackbarTest {
-
     @get:Rule
     val composeRule = createComposeRule()
 
     // ==================== Тестовые данные ====================
 
-    private val testBookWithCover = LastReadBookInfo(
-        title = "Тестовая книга",
-        authors = "Тестовый автор",
-        coverUrl = "https://example.com/cover.jpg",
-        bookFileUri = "content://test/book.epub",
-    )
+    private val testBookWithCover =
+        LastReadBookInfo(
+            title = "Тестовая книга",
+            authors = "Тестовый автор",
+            coverUrl = "https://example.com/cover.jpg",
+            bookFileUri = "content://test/book.epub",
+        )
 
-    private val testBookWithoutCover = LastReadBookInfo(
-        title = "Книга без обложки",
-        authors = null,
-        coverUrl = null,
-        bookFileUri = "content://test/book2.epub",
-    )
+    private val testBookWithoutCover =
+        LastReadBookInfo(
+            title = "Книга без обложки",
+            authors = null,
+            coverUrl = null,
+            bookFileUri = "content://test/book2.epub",
+        )
 
-    private val testBookLongTitle = LastReadBookInfo(
-        title = "Очень длинное название книги которое должно обрезаться при отображении",
-        authors = "Автор с очень длинным именем которое тоже должно обрезаться",
-        coverUrl = null,
-        bookFileUri = "content://test/book3.epub",
-    )
+    private val testBookLongTitle =
+        LastReadBookInfo(
+            title = "Очень длинное название книги которое должно обрезаться при отображении",
+            authors = "Автор с очень длинным именем которое тоже должно обрезаться",
+            coverUrl = null,
+            bookFileUri = "content://test/book3.epub",
+        )
 
     // ==================== Тесты отображения ====================
 

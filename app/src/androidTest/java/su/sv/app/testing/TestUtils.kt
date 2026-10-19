@@ -20,7 +20,6 @@ import androidx.compose.ui.test.swipeUp
  * Содержит расширения и хелперы для уменьшения дублирования кода.
  */
 object TestUtils {
-
     // ==================== Ожидания ====================
 
     /**
@@ -90,13 +89,12 @@ object TestUtils {
     fun ComposeTestRule.findNodeByTag(
         tag: String,
         useUnmergedTree: Boolean = true,
-    ): SemanticsNodeInteraction? {
-        return try {
+    ): SemanticsNodeInteraction? =
+        try {
             onNodeWithTag(tag, useUnmergedTree)
         } catch (e: Exception) {
             null
         }
-    }
 
     /**
      * Находит все элементы с указанным тегом.
@@ -104,14 +102,14 @@ object TestUtils {
     fun ComposeTestRule.findAllNodesByTag(
         tag: String,
         useUnmergedTree: Boolean = true,
-    ): List<SemanticsNodeInteraction> {
-        return List(
+    ): List<SemanticsNodeInteraction> =
+        List(
             onAllNodesWithTag(tag, useUnmergedTree)
-                .fetchSemanticsNodes().size
+                .fetchSemanticsNodes()
+                .size,
         ) { index ->
             onAllNodesWithTag(tag, useUnmergedTree)[index]
         }
-    }
 
     // ==================== Проверки (Assertions) ====================
 
@@ -212,7 +210,10 @@ object TestUtils {
      * Направление swipe-жеста.
      */
     enum class SwipeDirection {
-        LEFT, RIGHT, UP, DOWN
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
     }
 
     // ==================== Безопасные операции ====================
@@ -222,16 +223,13 @@ object TestUtils {
      *
      * @return true если действие успешно, false если произошла ошибка
      */
-    fun ComposeTestRule.safeAction(
-        action: () -> Unit,
-    ): Boolean {
-        return try {
+    fun ComposeTestRule.safeAction(action: () -> Unit): Boolean =
+        try {
             action()
             true
         } catch (e: Exception) {
             false
         }
-    }
 
     /**
      * Выполняет действие с повторными попытками.
@@ -266,25 +264,20 @@ object TestUtils {
 /**
  * Проверяет, что элемент существует и отображается.
  */
-fun SemanticsNodeInteraction.assertExistsAndDisplayed(): SemanticsNodeInteraction {
-    return this.assertExists().assertIsDisplayed()
-}
+fun SemanticsNodeInteraction.assertExistsAndDisplayed(): SemanticsNodeInteraction = this.assertExists().assertIsDisplayed()
 
 /**
  * Проверяет, что элемент существует и имеет действие клика.
  */
-fun SemanticsNodeInteraction.assertExistsAndClickable(): SemanticsNodeInteraction {
-    return this.assertExists().assertHasClickAction()
-}
+fun SemanticsNodeInteraction.assertExistsAndClickable(): SemanticsNodeInteraction = this.assertExists().assertHasClickAction()
 
 /**
  * Безопасно кликает на элемент, возвращая false при ошибке.
  */
-fun SemanticsNodeInteraction.safeClick(): Boolean {
-    return try {
+fun SemanticsNodeInteraction.safeClick(): Boolean =
+    try {
         performClick()
         true
     } catch (e: Exception) {
         false
     }
-}

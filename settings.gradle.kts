@@ -1,12 +1,11 @@
 pluginManagement {
-    fun useNexus(): Boolean {
-        return File(settingsDir, "local.properties")
+    fun useNexus(): Boolean =
+        File(settingsDir, "local.properties")
             .takeIf { it.exists() }
             ?.inputStream()
             ?.use { java.util.Properties().apply { load(it) } }
             ?.getProperty("useNexus", "false")
             ?.toBoolean() ?: false
-    }
 
     repositories {
         if (useNexus()) {
@@ -27,14 +26,13 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    fun useNexus(): Boolean {
-        return File(settingsDir, "local.properties")
+    fun useNexus(): Boolean =
+        File(settingsDir, "local.properties")
             .takeIf { it.exists() }
             ?.inputStream()
             ?.use { java.util.Properties().apply { load(it) } }
             ?.getProperty("useNexus", "false")
             ?.toBoolean() ?: false
-    }
 
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {

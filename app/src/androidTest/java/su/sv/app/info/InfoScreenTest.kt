@@ -21,7 +21,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class InfoScreenTest : BaseUiTest() {
-
     // ==================== Info Screen Tests ====================
 
     /**

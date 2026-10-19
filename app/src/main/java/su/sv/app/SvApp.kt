@@ -19,8 +19,10 @@ import ru.ok.tracer.heap.dumps.HeapDumpConfiguration
 import timber.log.Timber
 
 @HiltAndroidApp
-class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguration {
-
+class SvApp :
+    Application(),
+    SingletonImageLoader.Factory,
+    HasTracerConfiguration {
     override fun onCreate() {
         super.onCreate()
 
@@ -34,35 +36,36 @@ class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguratio
         Timber.plant(Timber.DebugTree())
     }
 
-    override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return ImageLoader.Builder(context)
+    override fun newImageLoader(context: PlatformContext): ImageLoader =
+        ImageLoader
+            .Builder(context)
             .memoryCache {
-                MemoryCache.Builder()
-                    .maxSizePercent(context, 0.25)  // 25% of available memory
+                MemoryCache
+                    .Builder()
+                    .maxSizePercent(context, 0.25) // 25% of available memory
                     .build()
-            }
-            .diskCache {
-                DiskCache.Builder()
+            }.diskCache {
+                DiskCache
+                    .Builder()
                     .directory(context.cacheDir.resolve("image_cache").toOkioPath())
-                    .maxSizeBytes(50L * 1024 * 1024)  // 50 MB for book covers
+                    .maxSizeBytes(50L * 1024 * 1024) // 50 MB for book covers
                     .build()
-            }
-            .build()
-    }
+            }.build()
 
     override val tracerConfiguration: List<TracerConfiguration>
-        get() = listOf(
-            CrashReportConfiguration.build {
-                // опции сборщика крэшей
-            },
-            CrashFreeConfiguration.build {
-                // опции подсчета crash free
-                setEnabled(true)
-            },
-            HeapDumpConfiguration.build {
-                // опции сборщика хипдампов при ООМ
-            },
-            DiskUsageConfiguration.build {
+        get() =
+            listOf(
+                CrashReportConfiguration.build {
+                    // опции сборщика крэшей
+                },
+                CrashFreeConfiguration.build {
+                    // опции подсчета crash free
+                    setEnabled(true)
+                },
+                HeapDumpConfiguration.build {
+                    // опции сборщика хипдампов при ООМ
+                },
+                DiskUsageConfiguration.build {
                 /* Опции анализатора дискового пространства
                 setProbability - вероятность(1/n) того, что раз в день у этого юзера в фоне будет произведена проверка
                     использования дискового места. По умолчанию 0, что равноценно включению плагина
@@ -71,6 +74,6 @@ class SvApp : Application(), SingletonImageLoader.Factory, HasTracerConfiguratio
                 setExcludePath — пути с заранее известными большими файлами которые должны быть исключены из проверки.
                     Принимает только пути сформированные через GlobalDirs
                  */
-            },
-        )
+                },
+            )
 }

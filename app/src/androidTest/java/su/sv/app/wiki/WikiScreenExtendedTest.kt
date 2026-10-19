@@ -28,7 +28,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class WikiScreenExtendedTest : BaseUiTest() {
-
     // ==================== Search Tests ====================
 
     /**
@@ -81,9 +80,10 @@ class WikiScreenExtendedTest : BaseUiTest() {
 
         // Suggestions не должны отображаться
         try {
-            val suggestions = composeRule
-                .onAllNodesWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
-                .fetchSemanticsNodes()
+            val suggestions =
+                composeRule
+                    .onAllNodesWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
+                    .fetchSemanticsNodes()
 
             // Если есть suggestions, это допустимо (зависит от реализации)
         } catch (e: Throwable) {
@@ -268,10 +268,11 @@ class WikiScreenExtendedTest : BaseUiTest() {
     fun wikiArticle_backButton_works() {
         navigateToArticle()
 
-        val hasBackButton = composeRule
-            .onAllNodesWithTag(TestTags.Common.BACK_BUTTON, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        val hasBackButton =
+            composeRule
+                .onAllNodesWithTag(TestTags.Common.BACK_BUTTON, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         assumeTrue("Статья открыта inline (кнопки «Назад» нет)", hasBackButton)
 
         composeRule

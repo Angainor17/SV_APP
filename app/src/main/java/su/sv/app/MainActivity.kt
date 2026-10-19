@@ -23,7 +23,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
-
     @Inject
     lateinit var customColorsRepository: CustomColorsRepository
 
@@ -38,9 +37,10 @@ class MainActivity : BaseActivity() {
             val themeConfig by themeViewModel.themeConfig.collectAsStateWithLifecycle()
 
             // Загрузка кастомных цветов
-            val customColors by customColorsRepository.getCustomColors(
-                themeConfig.themeMode.name
-            ).collectAsStateWithLifecycle(initialValue = null)
+            val customColors by customColorsRepository
+                .getCustomColors(
+                    themeConfig.themeMode.name,
+                ).collectAsStateWithLifecycle(initialValue = null)
 
             // Пересоздание Activity при смене темы
             OneTimeEffect(themeViewModel.effect) {
@@ -52,13 +52,14 @@ class MainActivity : BaseActivity() {
                 useDynamicColors = themeConfig.useDynamicColors,
                 customColors = customColors,
             ) {
-                val rootScreen = rememberRootScreen {
-                    AppStackScreen(
-                        StackNavModel(
-                            BottomNavScreen()
+                val rootScreen =
+                    rememberRootScreen {
+                        AppStackScreen(
+                            StackNavModel(
+                                BottomNavScreen(),
+                            ),
                         )
-                    )
-                }
+                    }
                 this@MainActivity.rootScreen = rootScreen
                 rootScreen.Content(modifier = Modifier.fillMaxSize())
             }

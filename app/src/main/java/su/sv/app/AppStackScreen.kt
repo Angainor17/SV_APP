@@ -24,9 +24,8 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 class AppStackScreen(
-    private val navModel: StackNavModel
+    private val navModel: StackNavModel,
 ) : StackScreen(navModel) {
-
     @Composable
     override fun Content(modifier: Modifier) {
         TopScreenContent(modifier) { screenModifier ->

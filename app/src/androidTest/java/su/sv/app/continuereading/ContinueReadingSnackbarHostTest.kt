@@ -21,18 +21,18 @@ import su.sv.main.continuereading.ui.ContinueReadingSnackbarHost
  * - Анимации появления/исчезновения
  */
 class ContinueReadingSnackbarHostTest {
-
     @get:Rule
     val composeRule = createComposeRule()
 
     // ==================== Тестовые данные ====================
 
-    private val testBook = LastReadBookInfo(
-        title = "Тестовая книга",
-        authors = "Тестовый автор",
-        coverUrl = null,
-        bookFileUri = "content://test/book.epub",
-    )
+    private val testBook =
+        LastReadBookInfo(
+            title = "Тестовая книга",
+            authors = "Тестовый автор",
+            coverUrl = null,
+            bookFileUri = "content://test/book.epub",
+        )
 
     // ==================== Тесты состояния ====================
 

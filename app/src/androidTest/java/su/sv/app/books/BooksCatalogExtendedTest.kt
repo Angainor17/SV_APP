@@ -30,7 +30,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class BooksCatalogExtendedTest : BaseUiTest() {
-
     // ==================== Search Tests ====================
 
     /**
@@ -144,10 +143,11 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        val chipCount = composeRule
-            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .size
+        val chipCount =
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size
         assumeTrue("Нет чипов категорий", chipCount > 1)
 
         composeRule
@@ -168,10 +168,11 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        val chipCount = composeRule
-            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .size
+        val chipCount =
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size
         assumeTrue("Нет чипов категорий", chipCount > 1)
 
         // Выбираем категорию
@@ -250,14 +251,15 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         composeRule.waitForIdle()
 
         // Проверяем, что экран не упал (детали или читалка отображаются)
-        val readerOrDetailShown = composeRule
-            .onAllNodesWithTag(TestTags.BookDetail.ROOT, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty() ||
+        val readerOrDetailShown =
             composeRule
-                .onAllNodesWithTag(TestTags.Reader.ROOT, useUnmergedTree = true)
+                .onAllNodesWithTag(TestTags.BookDetail.ROOT, useUnmergedTree = true)
                 .fetchSemanticsNodes()
-                .isNotEmpty()
+                .isNotEmpty() ||
+                composeRule
+                    .onAllNodesWithTag(TestTags.Reader.ROOT, useUnmergedTree = true)
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
         assert(readerOrDetailShown) { "Должен отображаться экран деталей или читалка" }
     }
 
@@ -384,13 +386,14 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        val buttonExists = try {
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
-                .fetchSemanticsNode() != null
-        } catch (e: Throwable) {
-            false
-        }
+        val buttonExists =
+            try {
+                composeRule
+                    .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                    .fetchSemanticsNode() != null
+            } catch (e: Throwable) {
+                false
+            }
 
         if (!buttonExists) return false
 

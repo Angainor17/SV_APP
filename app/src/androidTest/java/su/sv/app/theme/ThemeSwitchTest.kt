@@ -23,7 +23,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class ThemeSwitchTest : BaseUiTest() {
-
     // ==================== Theme Toggle Tests ====================
 
     /**

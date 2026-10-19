@@ -25,7 +25,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class NewsScreenExtendedTest : BaseUiTest() {
-
     // ==================== Pull-to-Refresh Tests ====================
 
     /**
@@ -52,7 +51,7 @@ class NewsScreenExtendedTest : BaseUiTest() {
                 .performTouchInput {
                     swipeDown(
                         startY = 100f,
-                        endY = 500f
+                        endY = 500f,
                     )
                 }
 
@@ -103,9 +102,10 @@ class NewsScreenExtendedTest : BaseUiTest() {
 
         // Ищем элемент с видео
         try {
-            val videoItems = composeRule
-                .onAllNodesWithTag(TestTags.News.ITEM_VIDEO, useUnmergedTree = true)
-                .fetchSemanticsNodes()
+            val videoItems =
+                composeRule
+                    .onAllNodesWithTag(TestTags.News.ITEM_VIDEO, useUnmergedTree = true)
+                    .fetchSemanticsNodes()
 
             if (videoItems.isNotEmpty()) {
                 composeRule
@@ -297,10 +297,11 @@ class NewsScreenExtendedTest : BaseUiTest() {
         assumeTrue("Новости не загрузились (нет данных из VK API в эмуляторе)", newsItemsAvailable())
 
         // Получаем начальное количество элементов
-        val initialCount = composeRule
-            .onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .size
+        val initialCount =
+            composeRule
+                .onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size
 
         // Скроллим вниз для триггера пагинации
         try {
@@ -315,10 +316,11 @@ class NewsScreenExtendedTest : BaseUiTest() {
             Thread.sleep(2000)
 
             // Проверяем, что загрузились новые элементы
-            val newCount = composeRule
-                .onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .size
+            val newCount =
+                composeRule
+                    .onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
+                    .fetchSemanticsNodes()
+                    .size
 
             // Новый count должен быть >= начального
             // (может быть равен если достигнут конец списка)

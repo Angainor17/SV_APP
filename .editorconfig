@@ -1,0 +1,6 @@
+root = true
+
+[*.{kt,kts}]
+# Compose-функции по конвенции именуются с заглавной буквы (PascalCase),
+# что конфликтует с правилом ktlint function-naming.
+ktlint_function_naming_ignore_when_annotated_with = Composable

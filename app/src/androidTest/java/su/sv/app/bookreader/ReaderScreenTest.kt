@@ -35,7 +35,6 @@ import su.sv.app.testing.TestTags
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class ReaderScreenTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -459,13 +458,14 @@ class ReaderScreenTest {
 
         // Кнопка «Скачанные» видна только при наличии скачанных книг.
         // Пропускаем тест, если скачанных книг нет.
-        val buttonExists = try {
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
-                .fetchSemanticsNode() != null
-        } catch (e: Throwable) {
-            false
-        }
+        val buttonExists =
+            try {
+                composeRule
+                    .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                    .fetchSemanticsNode() != null
+            } catch (e: Throwable) {
+                false
+            }
         assumeTrue("Нет скачанных книг (тестовая книга не найдена)", buttonExists)
 
         // Открываем экран скачанных книг

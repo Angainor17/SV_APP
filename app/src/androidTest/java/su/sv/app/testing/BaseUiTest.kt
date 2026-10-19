@@ -43,7 +43,6 @@ import su.sv.app.MainActivity
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 abstract class BaseUiTest {
-
     // Hilt правило должно быть первым
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -65,7 +64,10 @@ abstract class BaseUiTest {
     /**
      * Ожидание появления элемента с указанным тегом.
      */
-    protected fun waitForTag(tag: String, timeoutMs: Long = 5000) {
+    protected fun waitForTag(
+        tag: String,
+        timeoutMs: Long = 5000,
+    ) {
         composeRule.waitUntil(timeoutMs) {
             try {
                 composeRule.onNodeWithTag(tag, useUnmergedTree = true).fetchSemanticsNode() != null
@@ -78,9 +80,14 @@ abstract class BaseUiTest {
     /**
      * Ожидание появления элементов с указанным тегом.
      */
-    protected fun waitForItems(tag: String, timeoutMs: Long = 10000, minCount: Int = 1) {
+    protected fun waitForItems(
+        tag: String,
+        timeoutMs: Long = 10000,
+        minCount: Int = 1,
+    ) {
         composeRule.waitUntil(timeoutMs) {
-            composeRule.onAllNodesWithTag(tag, useUnmergedTree = true)
+            composeRule
+                .onAllNodesWithTag(tag, useUnmergedTree = true)
                 .fetchSemanticsNodes()
                 .size >= minCount
         }
@@ -93,10 +100,11 @@ abstract class BaseUiTest {
      *
      * @return true, если есть хотя бы один элемент списка новостей
      */
-    protected fun newsItemsAvailable(timeoutMs: Long = 10000): Boolean {
-        return try {
+    protected fun newsItemsAvailable(timeoutMs: Long = 10000): Boolean =
+        try {
             composeRule.waitUntil(timeoutMs) {
-                composeRule.onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
+                composeRule
+                    .onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
                     .fetchSemanticsNodes()
                     .isNotEmpty()
             }
@@ -104,7 +112,6 @@ abstract class BaseUiTest {
         } catch (e: Throwable) {
             false
         }
-    }
 
     /**
      * Ожидание в миллисекундах.

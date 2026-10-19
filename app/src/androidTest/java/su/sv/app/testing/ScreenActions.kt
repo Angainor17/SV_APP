@@ -17,8 +17,9 @@ import androidx.compose.ui.test.performTextInput
  * screenActions.searchWiki("Солнце")
  * ```
  */
-class ScreenActions(private val rule: ComposeTestRule) {
-
+class ScreenActions(
+    private val rule: ComposeTestRule,
+) {
     // ==================== Навигация ====================
 
     /** Переход на вкладку News */
@@ -68,15 +69,20 @@ class ScreenActions(private val rule: ComposeTestRule) {
     // ==================== Wiki действия ====================
 
     /** Поиск в Wiki с ожиданием результатов */
-    fun searchWiki(query: String, waitForResults: Boolean = true) {
+    fun searchWiki(
+        query: String,
+        waitForResults: Boolean = true,
+    ) {
         navigateToWiki()
 
-        rule.onNodeWithTag(TestTags.WikiRoot.SEARCH_FIELD, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.WikiRoot.SEARCH_FIELD, useUnmergedTree = true)
             .performTextInput(query)
 
         if (waitForResults) {
             rule.waitUntil(5000) {
-                rule.onAllNodesWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
+                rule
+                    .onAllNodesWithTag(TestTags.WikiRoot.SUGGESTION_ITEM, useUnmergedTree = true)
                     .fetchSemanticsNodes()
                     .isNotEmpty()
             }
@@ -91,14 +97,16 @@ class ScreenActions(private val rule: ComposeTestRule) {
 
     /** Добавление текущей статьи в избранное */
     fun addToWikiFavorites() {
-        rule.onNodeWithTag(TestTags.WikiArticle.FAVORITE_BUTTON, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.WikiArticle.FAVORITE_BUTTON, useUnmergedTree = true)
             .performClick()
         rule.waitForIdle()
     }
 
     /** Переход в избранное Wiki */
     fun openWikiFavorites() {
-        rule.onNodeWithTag(TestTags.WikiRoot.FAVORITES_BUTTON, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.WikiRoot.FAVORITES_BUTTON, useUnmergedTree = true)
             .performClick()
         rule.waitForIdle()
     }
@@ -109,7 +117,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
     fun searchBooks(query: String) {
         navigateToBooks()
 
-        rule.onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
             .performTextInput(query)
 
         rule.waitForIdle()
@@ -120,7 +129,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
         navigateToBooks()
 
         rule.waitUntil(10000) {
-            rule.onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
+            rule
+                .onAllNodesWithTag(TestTags.BooksCatalog.ITEM, useUnmergedTree = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
@@ -137,7 +147,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
         // Примечание: зависит от UI навигации
 
         rule.waitUntil(5000) {
-            rule.onAllNodesWithTag(TestTags.DownloadedBooks.ITEM, useUnmergedTree = true)
+            rule
+                .onAllNodesWithTag(TestTags.DownloadedBooks.ITEM, useUnmergedTree = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
@@ -163,7 +174,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
     /** Поиск в книге */
     fun searchInBook(query: String) {
         openReaderSearch()
-        rule.onNodeWithTag(TestTags.Reader.SEARCH_FIELD, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.Reader.SEARCH_FIELD, useUnmergedTree = true)
             .performTextInput(query)
         rule.waitForIdle()
     }
@@ -200,7 +212,8 @@ class ScreenActions(private val rule: ComposeTestRule) {
 
     /** Открытие диалога закладок */
     fun openBookmarksDialog() {
-        rule.onNodeWithTag(TestTags.Reader.BOOKMARKS_LIST_BUTTON, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.Reader.BOOKMARKS_LIST_BUTTON, useUnmergedTree = true)
             .performClick()
         rule.waitForIdle()
     }
@@ -210,10 +223,12 @@ class ScreenActions(private val rule: ComposeTestRule) {
         rule.onNodeWithTag(TestTags.Reader.BOOKMARK_BUTTON, useUnmergedTree = true).performClick()
         rule.waitForIdle()
 
-        rule.onNodeWithTag(TestTags.Reader.BOOKMARK_TITLE_FIELD, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.Reader.BOOKMARK_TITLE_FIELD, useUnmergedTree = true)
             .performTextInput(title)
 
-        rule.onNodeWithTag(TestTags.Reader.BOOKMARK_SAVE_BUTTON, useUnmergedTree = true)
+        rule
+            .onNodeWithTag(TestTags.Reader.BOOKMARK_SAVE_BUTTON, useUnmergedTree = true)
             .performClick()
         rule.waitForIdle()
     }

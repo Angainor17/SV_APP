@@ -5,7 +5,6 @@ package su.sv.app.testing
  * Используются в модификаторах Modifier.testTag() и в тестах.
  */
 object TestTags {
-
     // ==================== Bottom Navigation ====================
     object BottomNav {
         const val ROOT = "bottom_nav_root"

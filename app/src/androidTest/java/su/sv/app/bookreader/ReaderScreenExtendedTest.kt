@@ -27,7 +27,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class ReaderScreenExtendedTest : BaseUiTest() {
-
     // ==================== Fullscreen Tests ====================
 
     /**
@@ -814,24 +813,26 @@ class ReaderScreenExtendedTest : BaseUiTest() {
         // видна только при наличии хотя бы одной скачанной книги.
         navigateToBooksTab()
 
-        val catalogLoaded = try {
-            waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
-            true
-        } catch (e: Throwable) {
-            false
-        }
+        val catalogLoaded =
+            try {
+                waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
+                true
+            } catch (e: Throwable) {
+                false
+            }
         if (!catalogLoaded) {
             Assume.assumeTrue("Каталог книг не загрузился", false)
             return
         }
 
-        val buttonExists = try {
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
-                .fetchSemanticsNode() != null
-        } catch (e: Throwable) {
-            false
-        }
+        val buttonExists =
+            try {
+                composeRule
+                    .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                    .fetchSemanticsNode() != null
+            } catch (e: Throwable) {
+                false
+            }
         Assume.assumeTrue("Нет скачанных книг (тестовая книга не найдена)", buttonExists)
     }
 

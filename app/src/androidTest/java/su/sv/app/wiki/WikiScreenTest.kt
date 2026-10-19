@@ -22,7 +22,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class WikiScreenTest : BaseUiTest() {
-
     // ==================== Root Wiki Tests ====================
 
     /**

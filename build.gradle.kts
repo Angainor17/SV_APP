@@ -37,7 +37,7 @@ detekt {
             "models/src/main/java",
             "api/src/main/java",
             "managers/src/main/java",
-        )
+        ),
     )
 }
 

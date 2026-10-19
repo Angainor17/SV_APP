@@ -40,7 +40,7 @@ private const val TRANSITION_DURATION_MS = 350
 @OptIn(ExperimentalModoApi::class)
 fun ComposeRendererScope<StackState>.AppScreenTransition(
     modifier: Modifier = Modifier,
-    screenModifier: Modifier = Modifier
+    screenModifier: Modifier = Modifier,
 ) {
     val backgroundColor = MaterialTheme.colorScheme.background
     ScreenTransition(
@@ -65,25 +65,25 @@ fun ComposeRendererScope<StackState>.AppScreenTransition(
                     // Push - новый экран въезжает справа, старый уезжает влево
                     StackTransitionType.Push -> {
                         slideInHorizontally(initialOffsetX = { it }, animationSpec = slideSpec) +
-                                fadeIn(fadeSpec) togetherWith
-                                slideOutHorizontally(
-                                    targetOffsetX = { -it / 3 },
-                                    animationSpec = slideSpec
-                                ) +
-                                fadeOut(fadeSpec)
+                            fadeIn(fadeSpec) togetherWith
+                            slideOutHorizontally(
+                                targetOffsetX = { -it / 3 },
+                                animationSpec = slideSpec,
+                            ) +
+                            fadeOut(fadeSpec)
                     }
                     // Pop - предыдущий экран въезжает слева, текущий уезжает вправо
                     StackTransitionType.Pop -> {
                         slideInHorizontally(
                             initialOffsetX = { -it / 3 },
-                            animationSpec = slideSpec
+                            animationSpec = slideSpec,
                         ) +
-                                fadeIn(fadeSpec) togetherWith
-                                slideOutHorizontally(
-                                    targetOffsetX = { it },
-                                    animationSpec = slideSpec
-                                ) +
-                                fadeOut(fadeSpec)
+                            fadeIn(fadeSpec) togetherWith
+                            slideOutHorizontally(
+                                targetOffsetX = { it },
+                                animationSpec = slideSpec,
+                            ) +
+                            fadeOut(fadeSpec)
                     }
 
                     else -> {
@@ -92,6 +92,6 @@ fun ComposeRendererScope<StackState>.AppScreenTransition(
                 }
             }
         },
-        content = { screen -> screen.SaveableContent(screenModifier) }
+        content = { screen -> screen.SaveableContent(screenModifier) },
     )
 }

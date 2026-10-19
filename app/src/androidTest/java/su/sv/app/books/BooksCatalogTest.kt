@@ -27,7 +27,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class BooksCatalogTest : BaseUiTest() {
-
     // ==================== Books Catalog Tests ====================
 
     /**
@@ -98,10 +97,11 @@ class BooksCatalogTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        val chipCount = composeRule
-            .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .size
+        val chipCount =
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.CATEGORY_CHIP, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .size
         assumeTrue("Нет чипов категорий", chipCount > 1)
 
         // Кликаем на второй чип (первый — «Все»)
@@ -231,13 +231,14 @@ class BooksCatalogTest : BaseUiTest() {
         navigateToBookmarks()
 
         // Переключатель отображается только при наличии заметок
-        val toggleExists = try {
-            composeRule
-                .onNodeWithTag(TestTags.Bookmarks.MODE_TOGGLE, useUnmergedTree = true)
-                .fetchSemanticsNode() != null
-        } catch (e: Throwable) {
-            false
-        }
+        val toggleExists =
+            try {
+                composeRule
+                    .onNodeWithTag(TestTags.Bookmarks.MODE_TOGGLE, useUnmergedTree = true)
+                    .fetchSemanticsNode() != null
+            } catch (e: Throwable) {
+                false
+            }
         assumeTrue("Нет заметок (переключатель не отображается)", toggleExists)
 
         composeRule
@@ -285,13 +286,14 @@ class BooksCatalogTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
-        val buttonExists = try {
-            composeRule
-                .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
-                .fetchSemanticsNode() != null
-        } catch (e: Throwable) {
-            false
-        }
+        val buttonExists =
+            try {
+                composeRule
+                    .onNodeWithTag(TestTags.BooksCatalog.DOWNLOADED_BUTTON, useUnmergedTree = true)
+                    .fetchSemanticsNode() != null
+            } catch (e: Throwable) {
+                false
+            }
 
         if (!buttonExists) return false
 

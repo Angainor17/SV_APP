@@ -25,7 +25,6 @@ import su.sv.app.testing.TestTags
  */
 @HiltAndroidTest
 class NavigationTest : BaseUiTest() {
-
     // ==================== Bottom Navigation Tests ====================
 
     /**
@@ -217,10 +216,11 @@ class NavigationTest : BaseUiTest() {
             .onNodeWithTag(TestTags.WikiArticle.ROOT, useUnmergedTree = true)
             .assertExists()
 
-        val hasBackButton = composeRule
-            .onAllNodesWithTag(TestTags.Common.BACK_BUTTON, useUnmergedTree = true)
-            .fetchSemanticsNodes()
-            .isNotEmpty()
+        val hasBackButton =
+            composeRule
+                .onAllNodesWithTag(TestTags.Common.BACK_BUTTON, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         assumeTrue("Статья открыта inline (кнопки «Назад» нет)", hasBackButton)
 
         // Нажимаем "Назад"

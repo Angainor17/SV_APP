@@ -29,7 +29,6 @@ import su.sv.app.testing.TestTags
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class NewsScreenTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -176,8 +175,8 @@ class NewsScreenTest {
      * Ожидает загрузки хотя бы одной новости. Возвращает false, если данные не
      * пришли (VK API может не отдавать данные в эмуляторе).
      */
-    private fun newsLoaded(): Boolean {
-        return try {
+    private fun newsLoaded(): Boolean =
+        try {
             composeRule.waitUntil(10000) {
                 composeRule
                     .onAllNodesWithTag(TestTags.News.ITEM, useUnmergedTree = true)
@@ -188,5 +187,4 @@ class NewsScreenTest {
         } catch (e: Throwable) {
             false
         }
-    }
 }
