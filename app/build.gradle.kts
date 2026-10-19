@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Base64
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,6 +13,20 @@ plugins {
     id("kotlin-parcelize")
     alias(libs.plugins.androidx.baselineprofile)
 }
+
+// Единый источник секретов (keystore, tracer-токены): gradle-свойство → env → local.properties.
+// Секреты НЕ хранятся в VCS: local.properties / .env — в .gitignore.
+// Объявлено до android {}, т.к. signingConfigs вызывает secret() при конфигурации.
+val localProps: Properties =
+    Properties().apply {
+        val f = rootProject.file("local.properties")
+        if (f.exists()) f.inputStream().use { load(it) }
+    }
+
+fun secret(name: String): String? =
+    (project.findProperty(name) as? String)
+        ?: System.getenv(name)
+        ?: localProps.getProperty(name)
 
 android {
     namespace = "su.sv.app"
@@ -38,8 +53,23 @@ android {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
     }
+    signingConfigs {
+        // Подпись release берётся из local.properties / env / gradle-свойств (см. secret()),
+        // чтобы keystore и пароли не попадали в VCS. Пока keystore не задан — release unsigned.
+        create("release") {
+            storeFile = secret("RELEASE_STORE_FILE")?.let { rootProject.file(it) }
+            storePassword = secret("RELEASE_STORE_PASSWORD")
+            keyAlias = secret("RELEASE_KEY_ALIAS")
+            keyPassword = secret("RELEASE_KEY_PASSWORD")
+        }
+    }
+    val releaseSigning = signingConfigs.getByName("release")
     buildTypes {
         release {
+            // Подписываем release только если keystore реально задан.
+            if (releaseSigning.storeFile != null) {
+                signingConfig = releaseSigning
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -60,6 +90,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // resValue("string", "app_name", …) в debug buildType
+        resValues = true
     }
 }
 
@@ -69,9 +101,11 @@ kotlin {
     }
 }
 
-// Обфускация токенов tracer (XOR + Base64), чтобы не хранить plaintext в VCS.
-// Полной защиты нет (ключ в том же файле), но сырые токены не лежат в репо.
-fun decodeTracerToken(encoded: String, xorKey: String): String {
+// Токены tracer приходят закодированными (XOR + Base64); здесь декодируются.
+fun decodeTracerToken(
+    encoded: String,
+    xorKey: String,
+): String {
     val data = Base64.getDecoder().decode(encoded)
     val key = xorKey.toByteArray(Charsets.UTF_8)
     val out = ByteArray(data.size)
@@ -83,24 +117,34 @@ fun decodeTracerToken(encoded: String, xorKey: String): String {
     return String(out, Charsets.UTF_8)
 }
 
+// Декодирует tracer-токен из секрета; при отсутствии — пустая строка (отчёты не шлются).
+fun tracerToken(
+    tokenKey: String,
+    xorKeyKey: String,
+): String {
+    val encoded = secret(tokenKey) ?: return ""
+    val xorKey = secret(xorKeyKey) ?: return ""
+    return decodeTracerToken(encoded, xorKey)
+}
+
 tracer {
     create("defaultConfig") {
-        pluginToken = decodeTracerToken("MTUHOAUMWhcEMzIhND0dNz0sLwUWLFEmNGo0JwMSEAI+NCcMJikFFhVoSFw=", "sv_tracer_plugin")
-        appToken = decodeTracerToken("EEUcHBgNLyEcOyUAPQdGaUwQMgksQhEjAzgVPhMtCjRULBk6MRw1GB42RQ==", "sv_tracer_app")
+        pluginToken = tracerToken("TRACER_PLUGIN_TOKEN", "TRACER_PLUGIN_TOKEN_XORKEY")
+        appToken = tracerToken("TRACER_APP_TOKEN", "TRACER_APP_TOKEN_XORKEY")
 
         uploadMapping = true
         uploadNativeSymbols = true
 //        additionalLibrariesPath = "$projectDir/aVeryNonstandardLibsDirectory"
     }
     create("debug") {
-        pluginToken = decodeTracerToken("MTUHOAUMWhcEMzIhND0dNz0sLwUWLFEmNGo0JwMSEAI+NCcMJikFFhVoSFw=", "sv_tracer_plugin")
-        appToken = decodeTracerToken("EEUcHBgNLyEcOyUAPQdGaUwQMgksQhEjAzgVPhMtCjRULBk6MRw1GB42RQ==", "sv_tracer_app")
+        pluginToken = tracerToken("TRACER_PLUGIN_TOKEN", "TRACER_PLUGIN_TOKEN_XORKEY")
+        appToken = tracerToken("TRACER_APP_TOKEN", "TRACER_APP_TOKEN_XORKEY")
 
         uploadMapping = true
     }
     create("release") {
-        pluginToken = decodeTracerToken("MTUHOAUMWhcEMzIhND0dNz0sLwUWLFEmNGo0JwMSEAI+NCcMJikFFhVoSFw=", "sv_tracer_plugin")
-        appToken = decodeTracerToken("EEUcHBgNLyEcOyUAPQdGaUwQMgksQhEjAzgVPhMtCjRULBk6MRw1GB42RQ==", "sv_tracer_app")
+        pluginToken = tracerToken("TRACER_PLUGIN_TOKEN", "TRACER_PLUGIN_TOKEN_XORKEY")
+        appToken = tracerToken("TRACER_APP_TOKEN", "TRACER_APP_TOKEN_XORKEY")
 
         uploadMapping = true
     }
@@ -199,7 +243,7 @@ tasks.register("runSmokeTests") {
     doFirst {
         project.extensions.extraProperties.set(
             "android.testInstrumentationRunnerArguments.annotation",
-            "su.sv.app.testing.SmokeTest"
+            "su.sv.app.testing.SmokeTest",
         )
     }
 }
@@ -217,7 +261,7 @@ tasks.register("runReleaseTests") {
     doFirst {
         project.extensions.extraProperties.set(
             "android.testInstrumentationRunnerArguments.annotation",
-            "su.sv.app.testing.ReleaseTest"
+            "su.sv.app.testing.ReleaseTest",
         )
     }
 }
@@ -235,7 +279,7 @@ tasks.register("runNavigationTests") {
     doFirst {
         project.extensions.extraProperties.set(
             "android.testInstrumentationRunnerArguments.annotation",
-            "su.sv.app.testing.NavigationTest"
+            "su.sv.app.testing.NavigationTest",
         )
     }
 }

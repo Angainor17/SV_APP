@@ -20,3 +20,13 @@ local.properties
 /superToasts/build/
 /ambilWarna/build/
 /rustore/
+
+# ===== Секреты и ключи подписи — НИКОГДА не коммитить =====
+*.jks
+*.keystore
+*.p12
+*.env
+.env
+rustore.env
+secrets.properties
+baselineprofile/build/

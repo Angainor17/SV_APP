@@ -1,0 +1,68 @@
+name: Publish to RuStore
+
+# =============================================================================
+# ⚠️  ВАЖНО ПРО СБОРКУ
+# `bundleRelease` резолвит `ru.ok.tracer` (SDK crash-отчётов VK) ТОЛЬКО из
+# внутреннего Nexus `nexus.vkteam.ru` — его нет ни на Maven Central, ни на Google.
+# На обычном GitHub-раннере шаг «Build signed AAB» упадёт. Рабочие варианты:
+#   1. self-hosted runner внутри сети VK (имеет доступ к nexus);
+#   2. собирать AAB локально / в VK GitVerse и публиковать через
+#      `./scripts/publish-rustore.sh` вручную;
+#   3. сделать tracer-плагин опциональным и собирать без него.
+# Шаг «Publish to RuStore» работает на GitHub — ему нужен только ключ RuStore,
+# nexus не требуется.
+#
+# Требуемые секреты (Settings → Secrets and variables → Actions):
+#   RUSTORE_KEY_ID, RUSTORE_PRIVATE_KEY           — ключ RuStore API
+#   SIGNING_KEYSTORE_B64                          — SV.jks в base64 (base64 SV.jks)
+#   RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS,
+#   RELEASE_KEY_PASSWORD                          — пароли/alias keystore
+#   TRACER_PLUGIN_TOKEN, TRACER_APP_TOKEN,
+#   TRACER_PLUGIN_TOKEN_XORKEY, TRACER_APP_TOKEN_XORKEY — tracer-токены (XOR+Base64)
+# =============================================================================
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build signed AAB
+        env:
+          # Подпись release (см. signingConfigs.release в app/build.gradle.kts)
+          RELEASE_STORE_FILE: /tmp/sv.jks
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          # Tracer-токены (закодированы XOR+Base64)
+          TRACER_PLUGIN_TOKEN: ${{ secrets.TRACER_PLUGIN_TOKEN }}
+          TRACER_APP_TOKEN: ${{ secrets.TRACER_APP_TOKEN }}
+          TRACER_PLUGIN_TOKEN_XORKEY: ${{ secrets.TRACER_PLUGIN_TOKEN_XORKEY }}
+          TRACER_APP_TOKEN_XORKEY: ${{ secrets.TRACER_APP_TOKEN_XORKEY }}
+        run: |
+          echo "${{ secrets.SIGNING_KEYSTORE_B64 }}" | base64 -d > /tmp/sv.jks
+          ./gradlew bundleRelease
+
+      - name: Publish to RuStore
+        env:
+          RUSTORE_KEY_ID: ${{ secrets.RUSTORE_KEY_ID }}
+          RUSTORE_PRIVATE_KEY: ${{ secrets.RUSTORE_PRIVATE_KEY }}
+          RUSTORE_PUBLISH_TYPE: MANUAL
+          RUSTORE_WHATS_NEW: ${{ github.ref_name }}
+          RUSTORE_ARTIFACT: app/build/outputs/bundle/release/app-release.aab
+        run: ./scripts/publish-rustore.sh
