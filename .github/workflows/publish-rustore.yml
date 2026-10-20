@@ -42,6 +42,21 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Decode signing keystore
+        run: echo "${{ secrets.SIGNING_KEYSTORE_B64 }}" | base64 -d > /tmp/sv.jks
+
+      - name: Generate Baseline Profile
+        # Перегенерирует baseline-prof.txt, чтобы в AAB попал свежий профиль (ускоряет
+        # холодный старт). Это инструментальный тест → нужен эмулятор/устройство, т.е.
+        # работает только на self-hosted раннере с эмулятором (или Gradle Managed Devices).
+        # На обычном GitHub-раннере упадёт и этот шаг, и сборка ниже (ru.ok.tracer → Nexus).
+        env:
+          RELEASE_STORE_FILE: /tmp/sv.jks
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: ./gradlew :app:generateReleaseBaselineProfile
+
       - name: Build signed AAB
         env:
           # Подпись release (см. signingConfigs.release в app/build.gradle.kts)
@@ -54,9 +69,7 @@ jobs:
           TRACER_APP_TOKEN: ${{ secrets.TRACER_APP_TOKEN }}
           TRACER_PLUGIN_TOKEN_XORKEY: ${{ secrets.TRACER_PLUGIN_TOKEN_XORKEY }}
           TRACER_APP_TOKEN_XORKEY: ${{ secrets.TRACER_APP_TOKEN_XORKEY }}
-        run: |
-          echo "${{ secrets.SIGNING_KEYSTORE_B64 }}" | base64 -d > /tmp/sv.jks
-          ./gradlew bundleRelease
+        run: ./gradlew bundleRelease
 
       - name: Publish to RuStore
         env:

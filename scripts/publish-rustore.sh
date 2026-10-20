@@ -39,9 +39,16 @@ RUSTORE_PUBLISH="${RUSTORE_PUBLISH:-0}"         # 1 = опубликовать (
 RUSTORE_ARTIFACT="${RUSTORE_ARTIFACT:-}"        # путь к AAB/APK (если не нужно пересобирать)
 BUILD_VARIANT="${BUILD_VARIANT:-bundleRelease}" # bundleRelease (AAB) | assembleRelease (APK)
 
-# Подпись (опционально). Внимание: в проекте пока НЕТ signingConfig для release (P1 в
-# docs/technical-debt.md). RuStore требует подписанный AAB upload-ключом — либо настрой
-# signingConfig в app/build.gradle.kts, либо передай SIGN_* для подписи здесь (jarsigner).
+# Baseline Profile: перегенерировать перед сборкой, чтобы в релиз попал свежий профиль
+# (ускоряет холодный старт). Требует подключённого эмулятора/устройства и подписи release
+# через signingConfigs.release (RELEASE_STORE_* в env/local.properties). 0 = пропустить.
+RUSTORE_BASELINE="${RUSTORE_BASELINE:-1}"
+BASELINE_TASK=":app:generateReleaseBaselineProfile"
+
+# Подпись (опционально). Release штатно подписывается через signingConfigs.release в
+# app/build.gradle.kts (ключи из env/local.properties: RELEASE_STORE_FILE и т.д.).
+# Если keystore передан ТОЛЬКО сюда (SIGN_*), артефакт подпишется здесь jarsigner'ом.
+# RuStore требует подписанный AAB upload-ключом.
 SIGN_STORE="${SIGN_STORE:-}"          # путь к .jks/.keystore
 SIGN_ALIAS="${SIGN_ALIAS:-}"
 SIGN_STORE_PASS="${SIGN_STORE_PASS:-}"
@@ -151,6 +158,24 @@ sign_artifact() {
 }
 
 # ---------------------------------------------------------------------------
+# Baseline Profile
+# ---------------------------------------------------------------------------
+# Перегенерирует baseline-prof.txt до сборки, чтобы в AAB/APK попал свежий профиль.
+# Пропускает себя (с предупреждением), если нет устройства/эмулятора или RUSTORE_BASELINE=0.
+regenerate_baseline_profile() {
+  if [ "$RUSTORE_BASELINE" != "1" ]; then
+    log "Baseline Profile: пропущено (RUSTORE_BASELINE=0)."
+    return 0
+  fi
+  if ! command -v adb >/dev/null 2>&1 || [ "$(adb get-state 2>/dev/null)" != "device" ]; then
+    warn "adb/эмулятор недоступен — Baseline Profile НЕ перегенерирован (в релиз попадёт закоммиченный профиль)."
+    return 0
+  fi
+  log "Генерация Baseline Profile: ./gradlew $BASELINE_TASK"
+  ./gradlew "$BASELINE_TASK"
+}
+
+# ---------------------------------------------------------------------------
 # Основной флоу
 # ---------------------------------------------------------------------------
 main() {
@@ -164,6 +189,7 @@ main() {
     artifact="$RUSTORE_ARTIFACT"
     [ -f "$artifact" ] || fail "файл не найден: $artifact"
   else
+    regenerate_baseline_profile
     log "Сборка: ./gradlew $BUILD_VARIANT"
     ./gradlew "$BUILD_VARIANT"
     artifact="$(find_artifact)"
