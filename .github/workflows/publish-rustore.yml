@@ -79,3 +79,12 @@ jobs:
           RUSTORE_WHATS_NEW: ${{ github.ref_name }}
           RUSTORE_ARTIFACT: app/build/outputs/bundle/release/app-release.aab
         run: ./scripts/publish-rustore.sh
+
+      - name: Publish to site (svremya.org)
+        # Обновляет вики-страницу «Приложение СВ»: ссылка на новый APK + версия
+        # (MediaWiki API: login → edit). Сам APK на /lib/ заливается отдельно по FTP —
+        # см. docs/RELEASE.md; в CI обычно делают локально, т.к. нужен FTP/SSH к серверу.
+        env:
+          WIKI_USER: ${{ secrets.WIKI_USER }}
+          WIKI_PASS: ${{ secrets.WIKI_PASS }}
+        run: ./scripts/publish-site.sh

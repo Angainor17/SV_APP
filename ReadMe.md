@@ -27,8 +27,10 @@ useNexus=false
 
 ## Релизный процесс
 
-Порядок выпуска версии в RuStore. Все секреты (keystore, ключ RuStore, tracer-токены)
+Порядок выпуска версии. Все секреты (keystore, ключ RuStore, tracer-токены)
 живут **вне git** — в `local.properties`, `scripts/rustore.env` или GitHub Secrets.
+
+> Полная пошаговая инструкция (включая публикацию на сайт) — в [`docs/RELEASE.md`](docs/RELEASE.md).
 
 ### 1. Поднять версию
 
@@ -80,10 +82,22 @@ source scripts/rustore.env && ./scripts/publish-rustore.sh
 которого нет на GitHub-раннерах, поэтому воркфлоу работает только на self-hosted раннере
 внутри сети VK (и для Baseline Profile ему нужен эмулятор).
 
+### 5. Опубликовать на сайт (svremya.org)
+
+Страница «Приложение СВ» на сайте. Скрипт обновляет ссылку на новый APK через MediaWiki API,
+а сам APK заливается на сервер по FTP (в вики `.apk` загрузить нельзя — только картинки).
+Подробности и порядок действий — в [`docs/RELEASE.md`](docs/RELEASE.md).
+
+```bash
+source scripts/rustore.env && ./scripts/publish-site.sh
+```
+
 ### Секреты: где что лежит
 
 | Секрет | Где хранится | Для чего |
 |---|---|---|
 | `SV.jks` + пароли | локально / GitHub Secrets | подпись release |
 | `RUSTORE_KEY_ID`, `RUSTORE_PRIVATE_KEY` | `scripts/rustore.env` / GitHub Secrets | API RuStore |
+| `WIKI_USER`, `WIKI_PASS` | `scripts/rustore.env` / GitHub Secrets | правка вики-страницы сайта |
+| `SITE_FTP_*` | `scripts/rustore.env` | (опц.) заливка APK на сервер сайта |
 | tracer-токены (XOR+Base64) | `local.properties` / GitHub Secrets | `ru.ok.tracer` |
