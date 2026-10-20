@@ -32,7 +32,7 @@ dependencies {
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
-    implementation(project(":shpargalki"))
+    debugImplementation(project(":shpargalki")) // шпаргалки — только в debug-сборке
 
     // Compose
     implementation(libs.bundles.compose)

@@ -32,7 +32,7 @@ dependencies {
 
     // Модули-фичи
     implementation(project(":api"))
-    implementation(project(":quiz"))
+    debugImplementation(project(":quiz")) // квизы — только в debug-сборке
 
     // Модули-utils
     implementation(project(":commonarchitecture"))
