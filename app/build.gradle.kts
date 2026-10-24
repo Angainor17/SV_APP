@@ -50,6 +50,14 @@ android {
             "\"${secret("RUSTORE_PUSH_PROJECT_ID") ?: ""}\"",
         )
 
+        // RuStore Remote Config: app_id инструмента (НЕ секрет — UUID из консоли RuStore).
+        // Пустое значение → инициализация Remote Config в SvApp пропускается.
+        buildConfigField(
+            "String",
+            "RUSTORE_REMOTE_CONFIG_APP_ID",
+            "\"${secret("RUSTORE_REMOTE_CONFIG_APP_ID") ?: ""}\"",
+        )
+
         // Локализация: только русский
         androidResources.localeFilters.add("ru")
 
@@ -222,6 +230,9 @@ dependencies {
 
     // RuStore push-уведомления
     implementation(libs.rustore.push.client)
+
+    // RuStore Remote Config (фичефлаги шпаргалок/квизов)
+    implementation(project(":featureflags"))
 
     // ============== Testing ==============
     // Unit tests

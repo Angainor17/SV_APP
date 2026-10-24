@@ -32,12 +32,13 @@ dependencies {
 
     // Модули-фичи
     implementation(project(":api"))
-    debugImplementation(project(":quiz")) // квизы — только в debug-сборке
+    implementation(project(":quiz")) // квизы (доступность — через Remote Config)
 
     // Модули-utils
     implementation(project(":commonarchitecture"))
     implementation(project(":commonui"))
     implementation(project(":managers"))
+    implementation(project(":featureflags"))
 
     // Compose
     implementation(libs.bundles.coil)

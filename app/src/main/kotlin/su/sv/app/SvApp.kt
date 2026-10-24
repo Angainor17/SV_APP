@@ -19,6 +19,7 @@ import ru.ok.tracer.heap.dumps.HeapDumpConfiguration
 import ru.rustore.sdk.pushclient.RuStorePushClient
 import su.sv.app.push.PushListenerService
 import su.sv.app.push.PushLogger
+import su.sv.featureflags.FeatureFlags
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -40,6 +41,17 @@ class SvApp :
 
         // Инициализация RuStore push-уведомлений
         initPush()
+
+        // Инициализация RuStore Remote Config (фичефлаги)
+        initFeatureFlags()
+    }
+
+    private fun initFeatureFlags() {
+        FeatureFlags.init(
+            context = this,
+            appId = BuildConfig.RUSTORE_REMOTE_CONFIG_APP_ID,
+            appVersion = BuildConfig.VERSION_NAME,
+        )
     }
 
     private fun initPush() {
