@@ -27,6 +27,7 @@ tracerVersion = "1.5.1"
 # с 16 KB page size); 0.1.41-android её убрала. Явный пин до обновления tracer-platform.
 tracerNativeBindings = "0.1.41-android"
 datastore = "1.3.0"
+rustorePush = "7.5.0"
 window = "1.5.1"
 baselineprofile = "1.5.0"
 uiautomator = "2.4.0"
@@ -94,6 +95,9 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 # DataStore
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# RuStore push-уведомления
+rustore-push-client = { module = "ru.rustore.sdk:pushclient", version.ref = "rustorePush" }
 
 # Window Manager (adaptive UI)
 androidx-window-core = { module = "androidx.window:window-core", version.ref = "window" }

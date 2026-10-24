@@ -42,6 +42,14 @@ android {
 
         testInstrumentationRunner = "su.sv.app.testing.HiltTestRunner"
 
+        // RuStore push: project_id для SDK (НЕ секрет — вшивается в APK, виден в манифесте).
+        // Пустое значение → инициализация push в SvApp пропускается.
+        buildConfigField(
+            "String",
+            "RUSTORE_PUSH_PROJECT_ID",
+            "\"${secret("RUSTORE_PUSH_PROJECT_ID") ?: ""}\"",
+        )
+
         // Локализация: только русский
         androidResources.localeFilters.add("ru")
 
@@ -90,6 +98,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
         // resValue("string", "app_name", …) в debug buildType
         resValues = true
     }
@@ -210,6 +219,9 @@ dependencies {
     ksp(libs.hilt.android.compiler)
 
     implementation(libs.threetenabp)
+
+    // RuStore push-уведомления
+    implementation(libs.rustore.push.client)
 
     // ============== Testing ==============
     // Unit tests

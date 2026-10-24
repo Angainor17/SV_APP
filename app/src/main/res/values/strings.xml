@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Свободное время</string>
+    <!-- Push-уведомления RuStore -->
+    <string name="notifications_notification_push_channel_id">sv_push</string>
+    <string name="notifications_notification_push_channel_name">Уведомления</string>
+    <string name="notifications_data_push_channel_id">sv_push_data</string>
+    <string name="notifications_data_push_channel_name">Обновления</string>
 </resources>

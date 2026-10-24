@@ -16,6 +16,9 @@ import ru.ok.tracer.crash.report.CrashFreeConfiguration
 import ru.ok.tracer.crash.report.CrashReportConfiguration
 import ru.ok.tracer.disk.usage.DiskUsageConfiguration
 import ru.ok.tracer.heap.dumps.HeapDumpConfiguration
+import ru.rustore.sdk.pushclient.RuStorePushClient
+import su.sv.app.push.PushListenerService
+import su.sv.app.push.PushLogger
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -34,6 +37,21 @@ class SvApp :
 
         // Инициализация логирования
         Timber.plant(Timber.DebugTree())
+
+        // Инициализация RuStore push-уведомлений
+        initPush()
+    }
+
+    private fun initPush() {
+        val projectId = BuildConfig.RUSTORE_PUSH_PROJECT_ID
+        if (projectId.isBlank()) return
+
+        PushListenerService.createNotificationChannels(this)
+        RuStorePushClient.init(
+            application = this,
+            projectId = projectId,
+            logger = PushLogger("RuStorePush"),
+        )
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader =

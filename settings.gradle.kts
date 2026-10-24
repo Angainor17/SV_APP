@@ -46,6 +46,9 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        // RuStore SDK (push-уведомления). Внешний публичный репозиторий — нужен
+        // в обеих ветках (Nexus и Google Maven), т.к. Nexus его не проксирует.
+        maven("https://nexus-external.rustore.ru/repository/maven-rustore-exposed/")
     }
 }
 

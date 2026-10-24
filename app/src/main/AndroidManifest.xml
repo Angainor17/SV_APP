@@ -30,6 +30,21 @@
             </intent-filter>
         </activity>
 
+        <!-- Приёмник push-уведомлений RuStore -->
+        <service
+            android:name=".push.PushListenerService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="ru.rustore.sdk.pushclient.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Канал по умолчанию для уведомлений, отображаемых средствами SDK -->
+        <meta-data
+            android:name="ru.rustore.sdk.pushclient.default_notification_channel_id"
+            android:value="@string/notifications_notification_push_channel_id" />
+
     </application>
 
 </manifest>
