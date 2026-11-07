@@ -33,19 +33,29 @@ sealed class UiRootBooksState {
                 searchQuery: String = "",
                 filterScrollResetKey: Int = 0,
             ): Content {
-                val categoryFilteredBooks = if (selectedFilters.isEmpty() || selectedFilters.contains(
-                        BookFilter.All
-                    )
-                ) {
-                    books
-                } else {
-                    books.filter { book ->
-                        selectedFilters.all { filter ->
-                            when (filter) {
-                                is BookFilter.All -> true
-                                is BookFilter.Category -> book.category == filter.name
-                                is BookFilter.Author -> book.author.contains(filter.name)
-                                is BookFilter.Series -> book.title.contains(filter.name)
+                val categoryFilteredBooks = when {
+                    // "Скачанное": все книги, но скачанные первыми (от новых к старым)
+                    selectedFilters.contains(BookFilter.Downloaded) -> {
+                        books.sortedWith(
+                            compareByDescending<UiBook> { it.fileUri != null }
+                                .thenByDescending { it.downloadedAt ?: Long.MIN_VALUE }
+                        )
+                    }
+
+                    selectedFilters.isEmpty() || selectedFilters.contains(BookFilter.All) -> {
+                        books
+                    }
+
+                    else -> {
+                        books.filter { book ->
+                            selectedFilters.all { filter ->
+                                when (filter) {
+                                    is BookFilter.All -> true
+                                    is BookFilter.Downloaded -> true
+                                    is BookFilter.Category -> book.category == filter.name
+                                    is BookFilter.Author -> book.author.contains(filter.name)
+                                    is BookFilter.Series -> book.title.contains(filter.name)
+                                }
                             }
                         }
                     }

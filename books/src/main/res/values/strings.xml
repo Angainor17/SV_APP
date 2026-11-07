@@ -66,6 +66,9 @@
 
     <!-- Filters -->
     <string name="books_filter_all">Все</string>
+    <string name="books_filter_downloaded">Скачанное</string>
     <string name="books_search_placeholder">Поиск по названию или автору</string>
+    <string name="books_search_content_description">Поиск</string>
+    <string name="books_search_clear_content_description">Очистить</string>
 
 </resources>

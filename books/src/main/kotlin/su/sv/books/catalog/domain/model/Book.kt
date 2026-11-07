@@ -18,4 +18,7 @@ data class Book(
     val category: String,
 
     val fileUri: Uri?,
+
+    /** Время скачивания файла (последнего изменения), null если не скачано */
+    val downloadedAt: Long? = null,
 )

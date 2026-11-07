@@ -8,6 +8,9 @@ sealed class BookFilter {
     /** Фильтр "Все книги" */
     object All : BookFilter()
 
+    /** Фильтр "Скачанное" — те же книги, но скачанные первыми (от новых к старым) */
+    object Downloaded : BookFilter()
+
     /** Фильтр по категории */
     data class Category(val name: String) : BookFilter()
 

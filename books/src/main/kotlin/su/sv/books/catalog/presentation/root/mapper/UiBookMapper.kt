@@ -27,6 +27,7 @@ class UiBookMapper @Inject constructor() {
                 else -> UIBookState.AVAILABLE_TO_DOWNLOAD
             },
             fileUri = domain.fileUri,
+            downloadedAt = domain.downloadedAt,
         )
     }
 }

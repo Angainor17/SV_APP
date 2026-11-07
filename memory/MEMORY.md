@@ -33,3 +33,4 @@
   в книге (2026-07-04, open)
 - [Timber Logging Rule](timber-logging-rule.md) — правило логирования: всегда Timber.tag("
   voronin") (2026-07-04)
+- [Books Catalog Filter & Search TZ](books-catalog-filter-search-tz.md) — ТЗ: фильтр «Скачанное» и поиск в тулбаре каталога книг (2026-11-07, ✅ implemented)

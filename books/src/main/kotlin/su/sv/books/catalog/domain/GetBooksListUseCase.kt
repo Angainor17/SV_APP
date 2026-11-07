@@ -20,6 +20,7 @@ class GetBooksListUseCase @Inject constructor(
                 list.map {
                     val id = it.id.orEmpty()
                     val fileNameWithExt = it.fileNameWithExt.orEmpty()
+                    val downloadInfo = downloadRepo.getDownloadInfo(fileNameWithExt)
 
                     Book(
                         id = id,
@@ -31,7 +32,8 @@ class GetBooksListUseCase @Inject constructor(
                         category = it.category.orEmpty(),
                         fileNameWithExt = fileNameWithExt,
 
-                        fileUri = downloadRepo.getDownloadsUri(fileNameWithExt),
+                        fileUri = downloadInfo.uri,
+                        downloadedAt = downloadInfo.lastModified,
                     )
                 }
             }

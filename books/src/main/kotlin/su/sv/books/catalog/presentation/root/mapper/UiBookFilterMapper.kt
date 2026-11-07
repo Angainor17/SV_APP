@@ -19,7 +19,8 @@ class UiBookFilterMapper @Inject constructor() {
             val isSelected = selectedFilters.contains(filterWithCount.filter)
             val isAvailable = availableFilterTypes.isEmpty() ||
                     availableFilterTypes.contains(filterWithCount.filter) ||
-                    filterWithCount.filter is BookFilter.All
+                    filterWithCount.filter is BookFilter.All ||
+                    filterWithCount.filter is BookFilter.Downloaded
 
             UiBookFilter(
                 filter = filterWithCount.filter,

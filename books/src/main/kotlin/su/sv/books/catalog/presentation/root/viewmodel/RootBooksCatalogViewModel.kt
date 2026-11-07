@@ -186,10 +186,13 @@ class RootBooksCatalogViewModel @Inject constructor(
         updateState { state ->
             val newSelectedFilters = when (filter) {
                 is BookFilter.All -> setOf(BookFilter.All)
+                is BookFilter.Downloaded -> setOf(BookFilter.Downloaded)
                 else -> {
-                    // При выборе другого фильтра убираем "Все" из выбранных
+                    // При выборе другого фильтра убираем "Все" и "Скачанное" из выбранных
                     val currentFilters =
-                        state.selectedFilters.filter { it !is BookFilter.All }.toSet()
+                        state.selectedFilters.filter {
+                            it !is BookFilter.All && it !is BookFilter.Downloaded
+                        }.toSet()
                     if (state.selectedFilters.contains(filter)) {
                         currentFilters - filter
                     } else {
@@ -256,8 +259,10 @@ class RootBooksCatalogViewModel @Inject constructor(
         selectedFilters: Set<BookFilter>,
         books: List<UiBook>
     ): List<UiBookFilter> {
-        // Если нет выбранных фильтров или выбрано "Все" - все фильтры доступны
-        if (selectedFilters.isEmpty() || selectedFilters.contains(BookFilter.All)) {
+        // Если нет выбранных фильтров, выбрано "Все" или "Скачанное" - все фильтры доступны
+        if (selectedFilters.isEmpty() || selectedFilters.contains(BookFilter.All) ||
+            selectedFilters.contains(BookFilter.Downloaded)
+        ) {
             return filters.map {
                 it.copy(
                     isAvailable = true,
@@ -271,6 +276,7 @@ class RootBooksCatalogViewModel @Inject constructor(
             selectedFilters.all { filter ->
                 when (filter) {
                     is BookFilter.All -> true
+                    is BookFilter.Downloaded -> true
                     is BookFilter.Category -> book.category == filter.name
                     is BookFilter.Author -> book.author.contains(filter.name)
                     is BookFilter.Series -> book.title.contains(filter.name)
@@ -283,6 +289,7 @@ class RootBooksCatalogViewModel @Inject constructor(
             val isSelected = selectedFilters.contains(uiFilter.filter)
             val isAvailable = when (uiFilter.filter) {
                 is BookFilter.All -> true
+                is BookFilter.Downloaded -> true
                 is BookFilter.Category -> filteredBooks.any { it.category == uiFilter.filter.name } || isSelected
                 is BookFilter.Author -> filteredBooks.any { it.author.contains(uiFilter.filter.name) } || isSelected
                 is BookFilter.Series -> filteredBooks.any { it.title.contains(uiFilter.filter.name) } || isSelected

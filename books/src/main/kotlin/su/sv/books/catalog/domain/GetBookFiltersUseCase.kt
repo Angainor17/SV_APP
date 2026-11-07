@@ -107,7 +107,14 @@ class GetBookFiltersUseCase @Inject constructor(
             count = books.size,
         )
 
-        return listOf(allFilter) + allFilters
+        // "Скачанное" — сразу после "Все"
+        val downloadedFilter = BookFilterWithCount(
+            filter = BookFilter.Downloaded,
+            displayName = resourcesRepository.getString(R.string.books_filter_downloaded),
+            count = books.count { it.fileUri != null },
+        )
+
+        return listOf(allFilter, downloadedFilter) + allFilters
     }
 
     /**

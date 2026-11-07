@@ -17,6 +17,21 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Информация о скачанном файле: URI и время скачивания (последнего изменения)
+ */
+data class DownloadInfo(
+    val uri: Uri?,
+    val lastModified: Long?,
+)
+
+private data class DownloadMatch(
+    val id: Long,
+    val localUri: String,
+    val score: Int,
+    val lastModified: Long?,
+)
+
 class BookDownloadRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val resourcesRepository: ResourcesRepository,
@@ -50,7 +65,13 @@ class BookDownloadRepository @Inject constructor(
      * Получаем адрес скачанного файла
      * Для Android 10+ используем DownloadManager.getUriForDownloadedFile()
      */
-    fun getDownloadsUri(fileNameWithExt: String): Uri? {
+    fun getDownloadsUri(fileNameWithExt: String): Uri? = getDownloadInfo(fileNameWithExt).uri
+
+    /**
+     * Получаем адрес скачанного файла и время скачивания
+     * Для Android 10+ используем DownloadManager.getUriForDownloadedFile()
+     */
+    fun getDownloadInfo(fileNameWithExt: String): DownloadInfo {
         Timber.d("Looking for file: $fileNameWithExt")
 
         // Извлекаем базовое имя для поиска
@@ -76,22 +97,31 @@ class BookDownloadRepository @Inject constructor(
         val query = DownloadManager.Query()
         query.setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL)
 
-        val cursor = downloadManager.query(query) ?: return null
+        val cursor = downloadManager.query(query) ?: return DownloadInfo(null, null)
 
         cursor.use {
             val idColumn = it.getColumnIndex(DownloadManager.COLUMN_ID)
             val titleColumn = it.getColumnIndex(DownloadManager.COLUMN_TITLE)
             val localUriColumn = it.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+            val lastModifiedColumn =
+                it.getColumnIndex(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP)
 
             Timber.d("Cursor count: ${it.count}")
 
             // Собираем все подходящие загрузки с оценкой совпадения
-            val matches = mutableListOf<Triple<Long, String, Int>>() // id, localUri, score
+            val matches = mutableListOf<DownloadMatch>()
 
             while (it.moveToNext()) {
                 val id = if (idColumn >= 0) it.getLong(idColumn) else -1
                 val title = if (titleColumn >= 0) it.getString(titleColumn) else null
                 val localUri = if (localUriColumn >= 0) it.getString(localUriColumn) else null
+                val lastModified = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+                    lastModifiedColumn >= 0
+                ) {
+                    it.getLong(lastModifiedColumn)
+                } else {
+                    null
+                }
 
                 Timber.d("Download: id=$id, title=$title, localUri=$localUri")
 
@@ -130,24 +160,26 @@ class BookDownloadRepository @Inject constructor(
                 }
 
                 if (score > 0) {
-                    matches.add(Triple(id, localUri ?: "", score))
+                    matches.add(DownloadMatch(id, localUri ?: "", score, lastModified))
                 }
             }
 
             // Сортируем по убыванию score
-            matches.sortByDescending { it.third }
+            matches.sortByDescending { it.score }
 
-            Timber.d("Matches: ${matches.map { Triple(it.first, it.second, it.third) }}")
+            Timber.d("Matches: ${matches.map { "id=${it.id}, localUri=${it.localUri}, score=${it.score}" }}")
 
             // Пробуем каждую подходящую загрузку
-            for ((id, localUri, score) in matches) {
+            for (match in matches) {
+                val id = match.id
+                val localUri = match.localUri
                 // 1. Пробуем getUriForDownloadedFile
                 val uri = downloadManager.getUriForDownloadedFile(id)
-                Timber.d("getUriForDownloadedFile($id) = $uri (score=$score)")
+                Timber.d("getUriForDownloadedFile($id) = $uri (score=${match.score})")
 
                 if (uri != null && checkUriAccessible(uri)) {
                     Timber.d("Found accessible URI: $uri")
-                    return uri
+                    return DownloadInfo(uri, match.lastModified)
                 }
 
                 // 2. Пробуем через MediaStore по localUri
@@ -155,7 +187,7 @@ class BookDownloadRepository @Inject constructor(
                     val mediaUri = findFileByLocalUri(localUri)
                     if (mediaUri != null && checkUriAccessible(mediaUri)) {
                         Timber.d("Found via MediaStore: $mediaUri")
-                        return mediaUri
+                        return DownloadInfo(mediaUri, match.lastModified)
                     }
                 }
             }
@@ -166,7 +198,7 @@ class BookDownloadRepository @Inject constructor(
             val mediaUri = findFileViaMediaStore(fileNameWithExt)
             if (mediaUri != null && checkUriAccessible(mediaUri)) {
                 Timber.d("Found via MediaStore fallback: $mediaUri")
-                return mediaUri
+                return DownloadInfo(mediaUri, null)
             }
         }
 
@@ -176,12 +208,12 @@ class BookDownloadRepository @Inject constructor(
             val file = File(folder, fileNameWithExt)
             if (file.exists()) {
                 Timber.d("Found via direct path: ${file.absolutePath}")
-                return Uri.fromFile(file)
+                return DownloadInfo(Uri.fromFile(file), file.lastModified().takeIf { it > 0 })
             }
         }
 
         Timber.w("File not found: $fileNameWithExt")
-        return null
+        return DownloadInfo(null, null)
     }
 
     /**

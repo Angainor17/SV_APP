@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -65,15 +66,18 @@ fun BookFiltersChips(
             horizontalArrangement = Arrangement.spacedBy(dimensions.itemSpacingMedium),
             contentPadding = PaddingValues(horizontal = dimensions.screenPaddingHorizontal / 2),
         ) {
-            // Сначала выбранные фильтры (кроме "Все")
+            // Сначала выбранные фильтры (кроме "Все" и "Скачанное")
             val selectedFilters = filters.filter {
-                it.isSelected && it.filter !is BookFilter.All
+                it.isSelected && it.filter !is BookFilter.All && it.filter !is BookFilter.Downloaded
             }
             // Потом "Все"
             val allFilter = filters.find { it.filter is BookFilter.All }
+            // "Скачанное" — сразу после "Все"
+            val downloadedFilter = filters.find { it.filter is BookFilter.Downloaded }
             // Потом остальные доступные
             val otherFilters = filters.filter {
-                !it.isSelected && it.filter !is BookFilter.All && it.isAvailable
+                !it.isSelected && it.filter !is BookFilter.All &&
+                        it.filter !is BookFilter.Downloaded && it.isAvailable
             }
 
             // "Все" всегда первый
@@ -82,6 +86,16 @@ fun BookFiltersChips(
                     BookFilterChip(
                         filter = allFilter,
                         onClick = { onFilterClick(allFilter.filter) },
+                    )
+                }
+            }
+
+            // "Скачанное" — второй
+            if (downloadedFilter != null) {
+                item(key = "downloaded") {
+                    BookFilterChip(
+                        filter = downloadedFilter,
+                        onClick = { onFilterClick(downloadedFilter.filter) },
                     )
                 }
             }
@@ -129,6 +143,17 @@ private fun BookFilterChip(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        },
+        leadingIcon = if (filter.filter is BookFilter.Downloaded) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Download,
+                    contentDescription = null,
+                    modifier = Modifier.size(dimensions.iconSizeSmall),
+                )
+            }
+        } else {
+            null
         },
         modifier = Modifier
             .padding(vertical = dimensions.itemSpacingSmall)

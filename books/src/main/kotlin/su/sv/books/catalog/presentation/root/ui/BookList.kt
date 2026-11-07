@@ -6,19 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -28,9 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import su.sv.books.R
 import su.sv.books.catalog.presentation.root.model.UiRootBooksState
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBookActions
 import su.sv.books.catalog.presentation.root.viewmodel.actions.RootBooksActions
@@ -43,6 +34,7 @@ fun BookList(
     state: UiRootBooksState.Content,
     actions: RootBooksActions,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    isSearchVisible: Boolean = false,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     val lazyGridState = rememberLazyGridState()
@@ -68,26 +60,8 @@ fun BookList(
             .fillMaxSize()
             .padding(contentPadding)
     ) {
-        // Поле поиска по названию или автору
-        OutlinedTextField(
-            value = state.searchQuery,
-            onValueChange = { query ->
-                actions.onAction(RootBookActions.OnSearchQueryChange(query))
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = adaptiveDims.screenPadding / 2,
-                    vertical = dimensions.itemSpacingMedium,
-                )
-                .testTag(BooksTestTags.BooksCatalog.SEARCH_FIELD),
-            placeholder = { Text(stringResource(R.string.books_search_placeholder)) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            singleLine = true,
-        )
-
-        // Фильтры chips
-        if (state.filters.isNotEmpty()) {
+        // Фильтры chips (скрываются в режиме поиска)
+        if (!isSearchVisible && state.filters.isNotEmpty()) {
             BookFiltersChips(
                 filters = state.filters,
                 onFilterClick = { filter ->

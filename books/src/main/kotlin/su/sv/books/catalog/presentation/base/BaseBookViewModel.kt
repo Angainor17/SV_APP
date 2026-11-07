@@ -33,7 +33,14 @@ abstract class BaseBookViewModel(
         var updatedBook: UiBook? = null
         updateBookState { book ->
             if (book.id == bookId) {
-                getBookWithActualDownloadState(book).also { updatedBook = it }
+                val actual = getBookWithActualDownloadState(book)
+                // Только что скачали — фиксируем время для сортировки «от новых к старым»
+                val withTimestamp = if (actual.fileUri != null && actual.downloadedAt == null) {
+                    actual.copy(downloadedAt = System.currentTimeMillis())
+                } else {
+                    actual
+                }
+                withTimestamp.also { updatedBook = it }
             } else {
                 book
             }

@@ -42,4 +42,7 @@ data class UiBook(
 
     /** Наличие скачанного файла */
     val downloadState: UIBookState,
+
+    /** Время скачивания файла (миллисекунды), null если не скачано */
+    val downloadedAt: Long? = null,
 ) : Parcelable
