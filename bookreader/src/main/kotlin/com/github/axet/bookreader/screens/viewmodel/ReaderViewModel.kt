@@ -417,6 +417,13 @@ class ReaderViewModel @Inject constructor(
 
     fun hideSelection() = selectionDelegate.hide()
 
+    /**
+     * Полностью снять выделение без debounce (панель + нативное выделение в FBReaderView).
+     * Используется при навигации (TOC, закладки и т.п.), чтобы выделение не «висело»
+     * на старом месте после перехода к новой позиции.
+     */
+    fun clearSelection() = selectionDelegate.hidePanel()
+
     // ==================== Закладки (прокси к делегату) ====================
 
     fun syncBookmarksFromFBook() = bookmarksDelegate.syncFromFBook()

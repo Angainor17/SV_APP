@@ -1968,6 +1968,11 @@ open class FBReaderView @JvmOverloads constructor(
                 app.runAction(ActionCode.SELECTION_BOOKMARK, highlighting.b)
                 return
             }
+            // Тап вне области выделения — сбрасываем выделение перед обработкой жеста.
+            // Учитываем оба случая: нативное выделение (FB2/EPUB, mySelection) и plugin (PDF/DJVU, SelectionView).
+            if (this@FBReaderView.selection != null || !mySelection.isEmpty()) {
+                app.runAction(ActionCode.SELECTION_CLEAR)
+            }
             super.onFingerSingleTap(x, y)
         }
 

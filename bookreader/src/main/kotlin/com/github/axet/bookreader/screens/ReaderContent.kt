@@ -135,6 +135,7 @@ fun ReaderContent(
                     fbReaderView = fbReaderView,
                     onDismiss = { viewModel.onAction(ReaderActions.HideDialogs) },
                     onNavigate = { position ->
+                        viewModel.clearSelection()
                         fbReaderView?.gotoPosition(position)
                         viewModel.onAction(ReaderActions.HideDialogs)
                     }
