@@ -81,7 +81,13 @@ write_key_pem() {
   if printf '%s' "$key" | grep -q -- '-----BEGIN'; then
     printf '%s\n' "$key" > "$WORKDIR/key.pem"
   else
-    printf '%s' "$key" | tr -d '[:space:]' | b64decode > "$WORKDIR/key.pem"
+    # RuStore выдаёт приватный ключ как «голый» Base64 (DER, обычно PKCS#8),
+    # а openssl подписывает только из PEM. Конвертируем DER→PEM (формат
+    # PKCS#8 / PKCS#1 openssl определит сам).
+    printf '%s' "$key" | tr -d '[:space:]' | b64decode > "$WORKDIR/key.der"
+    openssl pkey -inform DER -in "$WORKDIR/key.der" -out "$WORKDIR/key.pem" 2>/dev/null \
+      || openssl rsa -inform DER -in "$WORKDIR/key.der" -out "$WORKDIR/key.pem" 2>/dev/null \
+      || fail "не удалось конвертировать приватный ключ DER→PEM"
   fi
   [ -s "$WORKDIR/key.pem" ] || fail "не удалось распарсить приватный ключ"
 }
