@@ -9,7 +9,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.preference.PreferenceManager
 import com.github.axet.bookreader.app.ReaderPreferences
-import com.github.axet.bookreader.screens.viewmodel.ReaderViewModel
 import com.github.axet.bookreader.widgets.FBReaderView
 import org.geometerplus.fbreader.fbreader.ActionCode
 
@@ -25,8 +24,7 @@ import org.geometerplus.fbreader.fbreader.ActionCode
  */
 @Composable
 internal fun VolumeKeysHandler(
-    fbReaderView: FBReaderView?,
-    viewModel: ReaderViewModel
+    fbReaderView: FBReaderView?
 ) {
     val context = LocalContext.current
     val activity = remember(context) { context as? Activity } ?: return
@@ -44,17 +42,15 @@ internal fun VolumeKeysHandler(
         val originalCallback = activity.window.callback
         val wrapper = object : Window.Callback by originalCallback {
             override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-                if (viewModel.volumeKeysEnabled) {
-                    when (event.keyCode) {
-                        KeyEvent.KEYCODE_VOLUME_DOWN if event.action == KeyEvent.ACTION_DOWN -> {
-                            fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
-                            return true
-                        }
+                when (event.keyCode) {
+                    KeyEvent.KEYCODE_VOLUME_DOWN if event.action == KeyEvent.ACTION_DOWN -> {
+                        fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_FORWARD)
+                        return true
+                    }
 
-                        KeyEvent.KEYCODE_VOLUME_UP if event.action == KeyEvent.ACTION_DOWN -> {
-                            fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
-                            return true
-                        }
+                    KeyEvent.KEYCODE_VOLUME_UP if event.action == KeyEvent.ACTION_DOWN -> {
+                        fbReaderView.app?.runAction(ActionCode.VOLUME_KEY_SCROLL_BACK)
+                        return true
                     }
                 }
                 return originalCallback.dispatchKeyEvent(event)

@@ -96,7 +96,6 @@ fun ReaderSettingsContent(
 
             // Планируемые настройки (требуют дополнительные компоненты):
             // - Папка синхронизации — требует интеграции Storage Access Framework (SAF)
-            // - TTS язык — требует интеграции TTS движка (TextToSpeech)
             // - Блокировка экрана — требует реализации ScreenlockPreference
         }
     }

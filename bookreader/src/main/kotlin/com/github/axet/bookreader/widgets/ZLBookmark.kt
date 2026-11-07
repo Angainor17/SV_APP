@@ -20,8 +20,3 @@ open class ZLBookmark(
 
     override fun getOutlineColor(): ZLColor? = null
 }
-
-open class ZLTTSMark(
-    view: FBView,
-    m: Storage.Bookmark
-) : ZLBookmark(view, m)

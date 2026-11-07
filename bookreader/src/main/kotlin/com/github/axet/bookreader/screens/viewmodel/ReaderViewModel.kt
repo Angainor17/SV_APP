@@ -64,9 +64,6 @@ class ReaderViewModel @Inject constructor(
     /** Настройки */
     val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    /** Флаг для управления клавишами громкости */
-    var volumeKeysEnabled: Boolean = true
-
     // ==================== Делегаты ====================
 
     private val selectionDelegate = ReaderSelectionDelegate(

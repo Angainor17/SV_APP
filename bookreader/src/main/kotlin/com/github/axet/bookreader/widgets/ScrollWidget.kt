@@ -1,5 +1,6 @@
 package com.github.axet.bookreader.widgets
 
+import android.animation.TimeAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -28,6 +29,14 @@ import com.github.axet.bookreader.app.PluginPage
 import com.github.axet.bookreader.app.PluginView
 import com.github.axet.bookreader.app.Reflow
 import com.github.axet.bookreader.app.Storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.geometerplus.fbreader.fbreader.FBView
 import org.geometerplus.fbreader.fbreader.options.PageTurningOptions
 import org.geometerplus.zlibrary.core.view.ZLView
@@ -47,6 +56,8 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
 
     private val fb: FBReaderView = view
 
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
     lateinit var lm: LinearLayoutManager
 
     @JvmField
@@ -61,22 +72,22 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
 
         lm = object : LinearLayoutManager(fb.context) {
             var idley: Int = 0
-            val idle = object : Runnable {
-                override fun run() {
-                    if (idley >= 0) {
-                        val page = findLastPage()
-                        val next = page + 1
-                        if (next < adapter.pages.size) {
-                            val h = findViewHolderForAdapterPosition(next)
-                            h?.itemView?.draw(Canvas())
-                        }
-                    } else {
-                        val page = findFirstPage()
-                        val prev = page - 1
-                        if (prev >= 0) {
-                            val h = findViewHolderForAdapterPosition(prev)
-                            h?.itemView?.draw(Canvas())
-                        }
+            var idleJob: Job? = null
+
+            fun runIdle() {
+                if (idley >= 0) {
+                    val page = findLastPage()
+                    val next = page + 1
+                    if (next < adapter.pages.size) {
+                        val h = findViewHolderForAdapterPosition(next)
+                        h?.itemView?.draw(Canvas())
+                    }
+                } else {
+                    val page = findFirstPage()
+                    val prev = page - 1
+                    if (prev >= 0) {
+                        val h = findViewHolderForAdapterPosition(prev)
+                        h?.itemView?.draw(Canvas())
                     }
                 }
             }
@@ -86,8 +97,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                 if (fb.pluginview != null)
                     updateOverlays()
                 idley = dy
-                fb.removeCallbacks(idle)
-                fb.tts?.scrollVerticallyBy(dy)
+                idleJob?.cancel()
                 return off
             }
 
@@ -106,8 +116,11 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
 
             override fun onScrollStateChanged(state: Int) {
                 super.onScrollStateChanged(state)
-                fb.removeCallbacks(idle)
-                fb.postDelayed(idle, 1000)
+                idleJob?.cancel()
+                idleJob = scope.launch {
+                    delay(1000)
+                    runIdle()
+                }
             }
 
             override fun onLayoutCompleted(state: RecyclerView.State) {
@@ -122,7 +135,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
 
             override fun onDetachedFromWindow(view: RecyclerView, recycler: RecyclerView.Recycler) {
                 super.onDetachedFromWindow(view, recycler)
-                fb.removeCallbacks(idle)
+                idleJob?.cancel()
             }
         }
 
@@ -137,6 +150,11 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
         itemAnimator = null
 
         fb.config.setValue(fb.app.PageTurningOptions.fingerScrolling, PageTurningOptions.FingerScrollingType.byFlick)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        scope.cancel()
     }
 
     override fun onTouchEvent(e: MotionEvent): Boolean {
@@ -473,7 +491,6 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
         selectionRemove(view)
         linksRemove(view)
         searchRemove(view)
-        ttsRemove(view)
     }
 
     fun overlaysClose() {
@@ -493,8 +510,6 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
         bookmarksUpdate(view)
         if (fb.search != null)  // Call searchUpdate if search is active (not just if view.search exists)
             searchUpdate(view)
-        if (view.tts != null)
-            ttsUpdate(view)
     }
 
     fun linksClose() {
@@ -581,53 +596,6 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
         for (h in adapter.holders) {
             bookmarksRemove(h.page)
             bookmarksUpdate(h.page)
-        }
-    }
-
-    fun ttsClose() {
-        for (h in adapter.holders)
-            ttsRemove(h.page)
-    }
-
-    fun ttsRemove(view: ScrollAdapter.PageView) {
-        if (view.tts == null)
-            return
-        view.tts!!.close()
-        view.tts = null
-    }
-
-    fun ttsUpdate(view: ScrollAdapter.PageView) {
-        val pos = view.holder!!.adapterPosition
-        if (pos == -1) {
-            ttsRemove(view)
-        } else {
-            val c = adapter.pages[pos]
-
-            val page: PluginView.Selection.Page?
-
-            if (c.start == null || c.end == null)
-                page = null
-            else
-                page = fb.pluginview!!.selectPage(c.start!!, view.info, view.width, view.height)
-
-            if (page != null && (!fb.pluginview!!.reflow || view.info != null) && view.parent != null) { // cached views has no parrent
-                if (view.tts == null)
-                    view.tts = FBReaderView.TTSView(fb, page, view.info)
-                var x = view.left
-                val y = view.top
-                if (view.info != null)
-                    x += view.info!!.margin.left
-                view.tts!!.update(x, y)
-            } else {
-                ttsRemove(view)
-            }
-        }
-    }
-
-    fun ttsUpdate() {
-        for (h in adapter.holders) {
-            ttsRemove(h.page)
-            ttsUpdate(h.page)
         }
     }
 
@@ -918,10 +886,9 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
     }
 
     inner class ScrollAdapter : RecyclerView.Adapter<ScrollAdapter.PageHolder>() {
-        val lock = Any()
         @JvmField
         val pages = ArrayList<PageCursor>() // adapter items
-        var thread: Thread? = null
+        var reflowJob: Job? = null
         val size = Plugin.Box() // ScrollView size, after reset
         val invalidates = HashSet<PageHolder>() // pending invalidates
         @JvmField
@@ -1181,7 +1148,7 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
         inner class PageView(parent: ViewGroup) : View(parent.context) {
             @JvmField
             var holder: PageHolder? = null
-            var time: TimeAnimatorCompat? = null
+            var time: TimeAnimator? = null
             lateinit var progress: FrameLayout
             lateinit var progressBar: ProgressBar
             lateinit var progressText: TextView
@@ -1195,7 +1162,6 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
             var selection: SelectionView.PageView? = null
             var links: FBReaderView.LinksView? = null
             var bookmarks: FBReaderView.BookmarksView? = null
-            var tts: FBReaderView.TTSView? = null
             var search: FBReaderView.SearchView? = null
 
             init {
@@ -1279,83 +1245,83 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
                             page = c.start!!.paragraphIndex
                             index = c.start!!.elementIndex
                         }
-                        synchronized(lock) {
-                            val w = width
-                            val h = height
-                            if (thread == null) {
-                                if (fb.pluginview!!.reflower != null) {
-                                    if (fb.pluginview!!.reflower!!.page != page || fb.pluginview!!.reflower!!.count() == -1 || fb.pluginview!!.reflower!!.w != w || fb.pluginview!!.reflower!!.h != h) {
-                                        fb.pluginview!!.reflower!!.close()
-                                        fb.pluginview!!.reflower = null
-                                    }
+                        val w = width
+                        val h = height
+                        if (reflowJob == null) {
+                            if (fb.pluginview!!.reflower != null) {
+                                if (fb.pluginview!!.reflower!!.page != page || fb.pluginview!!.reflower!!.count() == -1 || fb.pluginview!!.reflower!!.w != w || fb.pluginview!!.reflower!!.h != h) {
+                                    fb.pluginview!!.reflower!!.close()
+                                    fb.pluginview!!.reflower = null
                                 }
                             }
-                            if (fb.pluginview!!.reflower == null) {
-                                if (thread == null) {
-                                    thread = object : Thread("reflow load thread") {
-                                        override fun run() {
-                                            var i = index
-                                            val pluginview = fb.pluginview // closeBook
-                                            val reflower = Reflow(context, w, h, page, fb.app.BookTextView as FBReaderView.CustomView, fb.book!!.info!!)
-                                            val bm = pluginview!!.render(reflower.w, reflower.h, page)
-                                            reflower.load(bm!!)
-                                            if (reflower.count() > 0)
-                                                bm.recycle()
-                                            if (i < 0) {
-                                                i = reflower.emptyCount() + i
-                                                c.start = ZLTextFixedPosition(page, i, 0)
-                                            }
-                                            reflower.index = i
-                                            synchronized(lock) {
-                                                pluginview.reflower = reflower
-                                                thread = null
-                                            }
-                                        }
-                                    }
-                                    thread!!.priority = Thread.MIN_PRIORITY
-                                    thread!!.start()
-                                }
-                            }
-                            if (thread != null) {
-                                if (time == null) {
-                                    val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-                                    if (pm.isPowerSaveMode) {
-                                        fb.postDelayed({ invalidate() }, 1000)
-                                    } else {
-                                        time = TimeAnimatorCompat()
-                                        time!!.start()
-                                        time!!.setTimeListener(object : TimeAnimatorCompat.TimeListener {
-                                            override fun onTimeUpdate(animation: TimeAnimatorCompat, totalTime: Long, deltaTime: Long) {
-                                                invalidate()
-                                            }
-                                        })
-                                    }
-                                }
-                                drawProgress(draw, page, index)
-                                return
-                            }
-                            if (time != null) {
-                                time!!.cancel()
-                                time = null
-                            }
-                            val canvas = getCanvas(c)
-                            fb.pluginview!!.current!!.pageNumber = page
-                            fb.pluginview!!.reflower!!.index = c.start!!.elementIndex
-                            if (fb.pluginview!!.reflower!!.count() > 0) {
-                                val bm = fb.pluginview!!.reflower!!.render(c.start!!.elementIndex)
-                                val src = Rect(0, 0, bm.width, bm.height)
-                                val dst = Rect(fb.app.BookTextView.getLeftMargin(), 0, fb.app.BookTextView.getLeftMargin() + fb.pluginview!!.reflower!!.rw, fb.pluginview!!.reflower!!.h)
-                                canvas.drawColor(Color.WHITE) // cache color always white
-                                canvas.drawBitmap(bm, src, dst, null) // cache paint always clean
-                                info = Reflow.Info(fb.pluginview!!.reflower!!, c.start!!.elementIndex)
-                            } else { // empty source page?
-                                fb.pluginview!!.drawWallpaper(canvas)
-                                fb.pluginview!!.drawPage(canvas, w, h, fb.pluginview!!.reflower!!.bm!!)
-                            }
-                            update()
-                            drawCache(draw)
-                            onReflowerDone()
                         }
+                        if (fb.pluginview!!.reflower == null) {
+                            if (reflowJob == null) {
+                                val pluginview = fb.pluginview
+                                val customView = fb.app.BookTextView as FBReaderView.CustomView
+                                val bookInfo = fb.book!!.info!!
+                                val needsStartFix = index < 0
+                                reflowJob = scope.launch(Dispatchers.Default) {
+                                    val reflower = Reflow(context, w, h, page, customView, bookInfo)
+                                    val bm = pluginview!!.render(reflower.w, reflower.h, page)
+                                    reflower.load(bm!!)
+                                    if (reflower.count() > 0)
+                                        bm.recycle()
+                                    var i = index
+                                    if (i < 0)
+                                        i = reflower.emptyCount() + i
+                                    reflower.index = i
+                                    withContext(Dispatchers.Main.immediate) {
+                                        if (needsStartFix)
+                                            c.start = ZLTextFixedPosition(page, i, 0)
+                                        pluginview.reflower = reflower
+                                        reflowJob = null
+                                    }
+                                }
+                            }
+                        }
+                        if (reflowJob != null) {
+                            if (time == null) {
+                                val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                                if (pm.isPowerSaveMode) {
+                                    scope.launch {
+                                        delay(1000)
+                                        invalidate()
+                                    }
+                                } else {
+                                    time = TimeAnimator()
+                                    time!!.start()
+                                    time!!.setTimeListener(object : TimeAnimator.TimeListener {
+                                        override fun onTimeUpdate(animation: TimeAnimator, totalTime: Long, deltaTime: Long) {
+                                            invalidate()
+                                        }
+                                    })
+                                }
+                            }
+                            drawProgress(draw, page, index)
+                            return
+                        }
+                        if (time != null) {
+                            time!!.cancel()
+                            time = null
+                        }
+                        val canvas = getCanvas(c)
+                        fb.pluginview!!.current!!.pageNumber = page
+                        fb.pluginview!!.reflower!!.index = c.start!!.elementIndex
+                        if (fb.pluginview!!.reflower!!.count() > 0) {
+                            val bm = fb.pluginview!!.reflower!!.render(c.start!!.elementIndex)
+                            val src = Rect(0, 0, bm.width, bm.height)
+                            val dst = Rect(fb.app.BookTextView.getLeftMargin(), 0, fb.app.BookTextView.getLeftMargin() + fb.pluginview!!.reflower!!.rw, fb.pluginview!!.reflower!!.h)
+                            canvas.drawColor(Color.WHITE) // cache color always white
+                            canvas.drawBitmap(bm, src, dst, null) // cache paint always clean
+                            info = Reflow.Info(fb.pluginview!!.reflower!!, c.start!!.elementIndex)
+                        } else { // empty source page?
+                            fb.pluginview!!.drawWallpaper(canvas)
+                            fb.pluginview!!.drawPage(canvas, w, h, fb.pluginview!!.reflower!!.bm!!)
+                        }
+                        update()
+                        drawCache(draw)
+                        onReflowerDone()
                         return
                     }
                     open(c)
@@ -1646,21 +1612,15 @@ class ScrollWidget(view: FBReaderView) : RecyclerView(view.context), ZLViewWidge
             if (fb.pluginview != null) {
                 val s = fb.pluginview!!.select(c!!.start!!, v!!.info, v!!.width, v!!.height, x, y)
                 if (s != null) {
-                    fb.tts?.selectionOpen(s)
-                        ?: fb.selectionOpen(s)
+                    fb.selectionOpen(s)
                     return
                 }
-                fb.tts?.selectionClose()
-                    ?: fb.selectionClose()
+                fb.selectionClose()
             }
             if (!openText(e))
                 return
-            if (fb.tts != null) {
-                fb.tts!!.selectionOpen(c!!, x, y)
-            } else {
-                // onFingerReleaseAfterLongPress будет вызван при ACTION_UP через onReleaseCheck
-                fb.app.BookTextView.onFingerLongPress(x, y)
-            }
+            // onFingerReleaseAfterLongPress будет вызван при ACTION_UP через onReleaseCheck
+            fb.app.BookTextView.onFingerLongPress(x, y)
             v!!.invalidate()
             adapter.invalidates.add(v!!.holder!!)
             closeText()

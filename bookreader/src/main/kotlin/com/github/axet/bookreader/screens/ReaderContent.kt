@@ -97,7 +97,7 @@ fun ReaderContent(
     BatteryReceiver(fbReaderView)
 
     // Обработка клавиш громкости
-    VolumeKeysHandler(fbReaderView, viewModel)
+    VolumeKeysHandler(fbReaderView)
 
     // Сохранение позиции при уходе с экрана
     DisposableEffect(Unit) {
@@ -105,7 +105,7 @@ fun ReaderContent(
             viewModel.savePosition()
             // Выходим из fullscreen режима при закрытии экрана
             fbReaderView?.exitFullscreen()
-            // Закрываем View — освобождаем pluginview/tts. Сама книга (currentFBook)
+            // Закрываем View — освобождаем pluginview. Сама книга (currentFBook)
             // остаётся в ViewModel и перезагрузится при возврате на экран.
             fbReaderView?.closeBook()
         }
@@ -261,10 +261,6 @@ fun ReaderContent(
                                     }
 
                                     override fun onDismissDialog() {}
-                                    override fun ttsStatus(speaking: Boolean) {
-                                        viewModel.volumeKeysEnabled = !speaking
-                                    }
-
                                     override fun onEditBookmark(bookmark: Storage.Bookmark) {
                                         viewModel.onAction(ReaderActions.EditBookmark(bookmark))
                                     }

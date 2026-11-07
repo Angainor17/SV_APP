@@ -13,7 +13,6 @@ object ReaderPreferences {
     const val PREFERENCE_ROTATE: String = "rotate"
     const val PREFERENCE_VIEW_MODE: String = "view_mode"
     const val PREFERENCE_STORAGE: String = "storage_path"
-    const val PREFERENCE_LANGUAGE: String = "tts_pref"
     const val PREFERENCE_IGNORE_EMBEDDED_FONTS: String = "ignore_embedded_fonts"
     const val PREFERENCE_FONTS_FOLDER: String = "fonts_folder"
 

@@ -45,6 +45,13 @@ import com.github.axet.bookreader.app.PluginView
 import com.github.axet.bookreader.app.ReaderPreferences
 import com.github.axet.bookreader.app.Reflow
 import com.github.axet.bookreader.app.Storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.github.axet.bookreader.services.ImagesProvider
 import com.google.android.material.snackbar.Snackbar
 import org.geometerplus.android.fbreader.dict.DictionaryUtil
@@ -119,7 +126,6 @@ open class FBReaderView @JvmOverloads constructor(
     var book: Storage.FBook? = null
     var pluginview: PluginView? = null
     var listener: Listener? = null
-    var tts: TTSPopup? = null
     var title: String? = null
     var w: Window? = null
     var footer: FBFooterView? = null
@@ -134,8 +140,15 @@ open class FBReaderView @JvmOverloads constructor(
     private var searchCurrentIndex = 0
     private var searchTotalCount = 0
 
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
     init {
         create()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        scope.cancel()
     }
 
     companion object {
@@ -144,30 +157,6 @@ open class FBReaderView @JvmOverloads constructor(
 
         const val PAGE_OVERLAP_PERCENTS = 5
         const val PAGE_PAPER_COLOR = 0x80ffffff
-
-        @JvmStatic
-        fun showControls(p: ViewGroup, areas: View) {
-            p.removeCallbacks(areas.tag as? Runnable)
-            p.addView(areas)
-            val hide = Runnable { hideControls(p, areas) }
-            areas.tag = hide
-            p.postDelayed(hide, 3000)
-        }
-
-        @JvmStatic
-        fun hideControls(p: ViewGroup, areas: View) {
-            p.removeCallbacks(areas.tag as? Runnable)
-            areas.tag = null
-            val v = ValueAnimator.ofFloat(1f, 0f)
-            v.addUpdateListener { animation -> ViewCompat.setAlpha(areas, animation.animatedValue as Float) }
-            v.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    p.removeView(areas)
-                }
-            })
-            v.duration = 500
-            v.start()
-        }
 
         @JvmStatic
         fun findUnion(areas: List<ZLTextElementArea>, bm: Storage.Bookmark): Rect? {
@@ -336,10 +325,6 @@ open class FBReaderView @JvmOverloads constructor(
         app.BookTextView.model = null
         app.Model = null
         book = null
-        if (tts != null) {
-            tts!!.close()
-            tts = null
-        }
     }
 
     val position: ZLTextPosition
@@ -1155,57 +1140,6 @@ open class FBReaderView @JvmOverloads constructor(
             (widget as PagerWidget).updateOverlaysReset()
     }
 
-    fun ttsClose() {
-        if (widget is ScrollWidget)
-            (widget as ScrollWidget).ttsClose()
-        if (widget is PagerWidget)
-            (widget as PagerWidget).ttsClose()
-        if (pluginview == null) {
-            app.BookTextView.removeHighlightings(ZLTTSMark::class.java)
-            if (widget is ScrollWidget) {
-                for (h in (widget as ScrollWidget).adapter.holders) {
-                    h.page.recycle()
-                    h.page.invalidate()
-                }
-            }
-        }
-    }
-
-    fun ttsUpdate() {
-        if (tts == null)
-            return // already closed, run from handler
-        if (pluginview == null) {
-            app.BookTextView.removeHighlightings(ZLTTSMark::class.java)
-            if (tts != null) {
-                val hi = ArrayList<ZLTextHighlighting>()
-                for (m in tts!!.marks) {
-                    val h = ZLTTSMark(app.BookTextView, m)
-                    hi.add(h)
-                }
-                app.BookTextView.addHighlightings(hi)
-            }
-        }
-        if (widget is ScrollWidget) {
-            if (pluginview == null) {
-                for (h in (widget as ScrollWidget).adapter.holders) {
-                    h.page.recycle()
-                    h.page.invalidate()
-                }
-            } else {
-                (widget as ScrollWidget).ttsUpdate()
-            }
-        }
-        if (widget is PagerWidget)
-            (widget as PagerWidget).updateOverlaysReset()
-        tts!!.view.bringToFront()
-    }
-
-    fun ttsOpen() {
-        tts = TTSPopup(this)
-        tts!!.show()
-        ttsUpdate()
-    }
-
     fun searchClose() {
         app.hideActivePopup()
         if (widget is ScrollWidget)
@@ -1351,7 +1285,30 @@ open class FBReaderView @JvmOverloads constructor(
         if (w == 0)
             return // activity closed
         areas.create(app, w)
-        showControls(this, areas)
+        showControls(areas)
+    }
+
+    fun showControls(areas: View) {
+        (areas.tag as? Job)?.cancel()
+        addView(areas)
+        areas.tag = scope.launch {
+            delay(3000)
+            hideControls(areas)
+        }
+    }
+
+    fun hideControls(areas: View) {
+        (areas.tag as? Job)?.cancel()
+        areas.tag = null
+        val v = ValueAnimator.ofFloat(1f, 0f)
+        v.addUpdateListener { animation -> ViewCompat.setAlpha(areas, animation.animatedValue as Float) }
+        v.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                removeView(areas)
+            }
+        })
+        v.duration = 500
+        v.start()
     }
 
     fun exitFullscreen() {
@@ -1439,7 +1396,6 @@ open class FBReaderView @JvmOverloads constructor(
 
     fun onScrollingFinished(pageIndex: ZLViewEnums.PageIndex) {
         listener?.onScrollingFinished(pageIndex)
-        tts?.onScrollingFinished(pageIndex)
     }
 
     fun extractSentenceContext(bookmark: Storage.Bookmark): Pair<String?, String?>? {
@@ -1642,8 +1598,6 @@ open class FBReaderView @JvmOverloads constructor(
 
         fun onDismissDialog()
 
-        fun ttsStatus(speaking: Boolean)
-
         fun onEditBookmark(bookmark: Storage.Bookmark)
 
         fun onFullscreenToggle(isFullscreen: Boolean)
@@ -1675,8 +1629,6 @@ open class FBReaderView @JvmOverloads constructor(
     }
 
     class ZLBookmark(view: FBView, b: Storage.Bookmark) : com.github.axet.bookreader.widgets.ZLBookmark(view, b)
-
-    class ZLTTSMark(view: FBView, m: Storage.Bookmark) : com.github.axet.bookreader.widgets.ZLTTSMark(view, m)
 
     class ConfigShadow : Config() {
         val map: MutableMap<String, String> = TreeMap()
@@ -1914,13 +1866,6 @@ open class FBReaderView @JvmOverloads constructor(
                 canvas.clipRect(c)
                 super.draw(canvas)
             }
-        }
-    }
-
-    class TTSView(view: FBReaderView, page: PluginView.Selection.Page, info: Reflow.Info?) : BookmarksView(view, page, view.tts!!.marks, info) {
-        override fun addView(v: View) {
-            super.addView(v)
-            v.setOnClickListener(null)
         }
     }
 

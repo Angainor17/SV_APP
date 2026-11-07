@@ -102,16 +102,6 @@ object ReaderTestTags {
         const val IGNORE_EMBEDDED = "font_ignore_embedded"
     }
 
-    // ==================== TTS ====================
-    object TTS {
-        const val PANEL = "tts_panel"
-        const val PLAY_BUTTON = "tts_play"
-        const val PAUSE_BUTTON = "tts_pause"
-        const val PREV_BUTTON = "tts_prev"
-        const val NEXT_BUTTON = "tts_next"
-        const val CLOSE_BUTTON = "tts_close"
-    }
-
     // ==================== Fullscreen ====================
     object Fullscreen {
         const val OVERLAY = "fullscreen_overlay"

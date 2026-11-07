@@ -193,8 +193,6 @@ bookreader/src/main/kotlin/com/github/axet/bookreader/
 │   ├── SelectionCoordinates.kt
 │   ├── SelectionState.kt
 │   ├── SelectionView.kt
-│   ├── TTSPopup.kt
-│   ├── TimeAnimatorCompat.kt
 │   ├── WallpaperLayout.kt
 │   ├── ZLBookmark.kt
 │   ├── ZLTextIndexPosition.kt
@@ -265,7 +263,7 @@ bookreader/src/main/kotlin/com/github/axet/bookreader/
 - Внутренние классы: `ScrollAdapter`, `PageView`, `PageHolder`, `PageCursor`, `Gestures`
 - Прямой перевод поля `public ZLTextPosition start` → `@JvmField var start: ZLTextPosition? = null`
   меняет тип для Kotlin-вызывающих с платформенного `ZLTextPosition!` на явный `ZLTextPosition?`,
-  поэтому в вызывающих файлах (`ComicsPlugin`, `DjvuPlugin`, `PDFPlugin`, `TTSPopup`) потребовались `!!`.
+  поэтому в вызывающих файлах (`ComicsPlugin`, `DjvuPlugin`, `PDFPlugin`) потребовались `!!`.
 - `RecyclerView.getChildAt(i)` в Kotlin возвращает `View?` (а не `View`).
 
 **Ключевые решения:**
@@ -295,9 +293,9 @@ bookreader/src/main/kotlin/com/github/axet/bookreader/
 - `ConfigShadow extends Config` — реализованы все абстрактные методы (`getValueInternal`, `listGroups`,
   `isInitialized` и др.).
 - Поля `pluginview`/`book`/`selection`/`footer` стали nullable → в вызывающих (`ScrollWidget`,
-  `PagerWidget`, `TTSPopup`) потребовались `!!`; `widget`/`drawer` — `@JvmField var ... = null`
+  `PagerWidget`) потребовались `!!`; `widget`/`drawer` — `@JvmField var ... = null`
   (конфликт с `setWidget`/`setDrawer`); `app`/`config` — `lateinit`.
-- Вложенные `LinksView`/`BookmarksView`/`TTSView`/`SearchView` принимают `info: Reflow.Info?` (nullable),
+- Вложенные `LinksView`/`BookmarksView`/`SearchView` принимают `info: Reflow.Info?` (nullable),
   чтобы соответствовать платформенному типу `Reflow.Info!` из Java.
 
 ### Общие правила миграции

@@ -47,6 +47,9 @@ dependencies {
         exclude("org.apache.httpcomponents", "httpmime")
     }
 
+    // Корутины
+    implementation(libs.kotlinx.coroutines.core)
+
     // DI
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

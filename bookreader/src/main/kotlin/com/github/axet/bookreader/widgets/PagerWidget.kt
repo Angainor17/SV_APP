@@ -35,7 +35,6 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
     private val infos = ReflowMap<Reflow.Info>()
     private val links = ReflowMap<FBReaderView.LinksView>()
     private val bookmarks = ReflowMap<FBReaderView.BookmarksView>()
-    private val tts = ReflowMap<FBReaderView.TTSView>()
     private val searchs = ReflowMap<FBReaderView.SearchView>()
 
     init {
@@ -166,11 +165,6 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             val b = FBReaderView.BookmarksView(fb, page, fb.book!!.info!!.bookmarks, info)
             val bold = bookmarks.put(position, b)
             bold?.close()
-            if (fb.tts != null) {
-                val t = FBReaderView.TTSView(fb, page, info)
-                val told = tts.put(position, t)
-                told?.close()
-            }
             if (fb.search != null) {
                 val s = FBReaderView.SearchView(fb, fb.search!!.getBounds(page), info)
                 val sold = searchs.put(position, s)
@@ -227,14 +221,6 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
                 it.update(x, y)
             }
 
-            for (t in tts.values) {
-                t.hide()
-            }
-            tts[position]?.let {
-                it.show()
-                it.update(x, y)
-            }
-
             for (s in searchs.values) {
                 s.hide()
             }
@@ -279,13 +265,6 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             l.close()
         }
         bookmarks.clear()
-    }
-
-    fun ttsClose() {
-        for (l in tts.values) {
-            l.close()
-        }
-        tts.clear()
     }
 
     fun searchClose() {
@@ -432,70 +411,59 @@ class PagerWidget(private val fb: FBReaderView) : ZLAndroidWidget(fb.context),
             if (s != null) {
                 Timber.tag("voronin")
                     .d("PagerWidget onLongClick: selection created successfully at %s", pos)
-                if (fb.tts != null) {
-                    fb.tts!!.selectionOpen(s)
-                } else {
-                    selectionPage = pos
-                    Timber.tag("voronin")
-                        .d("PagerWidget onLongClick: selectionPage set to %s", selectionPage!!)
-                    fb.selectionOpen(s)
-                    val page = fb.pluginview!!.selectPage(pos, getInfo(), dst.width(), dst.height())
-                    val run = {
-                        var x = dst.left
-                        val y = dst.top
-                        if (fb.pluginview!!.reflow)
-                            x += getInfo()!!.margin.left
-                        fb.selection!!.update(
-                            fb.selection!!.getChildAt(0) as SelectionView.PageView,
-                            x,
-                            y
-                        )
-                    }
-                    val setter = object : PluginView.Selection.Setter {
-                        override fun setStart(x: Int, y: Int) {
-                            val point =
-                                fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
-                            if (point != null)
-                                s.setStart(page, point)
-                            run()
-                        }
-
-                        override fun setEnd(x: Int, y: Int) {
-                            val point =
-                                fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
-                            if (point != null)
-                                s.setEnd(page, point)
-                            run()
-                        }
-
-                        override fun getBounds(): PluginView.Selection.Bounds {
-                            val bounds = s.getBounds(page)!!
-                            if (fb.pluginview!!.reflow) {
-                                bounds.rr = fb.pluginview!!.boundsUpdate(bounds.rr!!, getInfo()!!)
-                                bounds.start = true
-                                bounds.end = true
-                            }
-                            return bounds
-                        }
-                    }
-                    val view = SelectionView.PageView(
-                        context,
-                        fb.app.BookTextView as FBReaderView.CustomView,
-                        setter
+                selectionPage = pos
+                Timber.tag("voronin")
+                    .d("PagerWidget onLongClick: selectionPage set to %s", selectionPage!!)
+                fb.selectionOpen(s)
+                val page = fb.pluginview!!.selectPage(pos, getInfo(), dst.width(), dst.height())
+                val run = {
+                    var x = dst.left
+                    val y = dst.top
+                    if (fb.pluginview!!.reflow)
+                        x += getInfo()!!.margin.left
+                    fb.selection!!.update(
+                        fb.selection!!.getChildAt(0) as SelectionView.PageView,
+                        x,
+                        y
                     )
-                    fb.selection!!.add(view)
-                    run()
                 }
+                val setter = object : PluginView.Selection.Setter {
+                    override fun setStart(x: Int, y: Int) {
+                        val point =
+                            fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
+                        if (point != null)
+                            s.setStart(page, point)
+                        run()
+                    }
+
+                    override fun setEnd(x: Int, y: Int) {
+                        val point =
+                            fb.pluginview!!.selectPoint(getInfo(), x - dst.left, y - dst.top)
+                        if (point != null)
+                            s.setEnd(page, point)
+                        run()
+                    }
+
+                    override fun getBounds(): PluginView.Selection.Bounds {
+                        val bounds = s.getBounds(page)!!
+                        if (fb.pluginview!!.reflow) {
+                            bounds.rr = fb.pluginview!!.boundsUpdate(bounds.rr!!, getInfo()!!)
+                            bounds.start = true
+                            bounds.end = true
+                        }
+                        return bounds
+                    }
+                }
+                val view = SelectionView.PageView(
+                    context,
+                    fb.app.BookTextView as FBReaderView.CustomView,
+                    setter
+                )
+                fb.selection!!.add(view)
+                run()
                 return true
             }
-            if (fb.tts != null)
-                fb.tts!!.selectionClose()
-            else
-                fb.selectionClose()
-        }
-        if (fb.tts != null) {
-            fb.tts!!.selectionOpen(x, y)
-            return true
+            fb.selectionClose()
         }
         return super.onLongClick(v)
     }
