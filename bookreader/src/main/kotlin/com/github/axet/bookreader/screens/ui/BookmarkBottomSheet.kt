@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -74,6 +75,7 @@ fun BookmarkBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        scrimColor = Color.Transparent,
     ) {
         Column(
             modifier = Modifier
@@ -142,7 +144,8 @@ fun BookmarkBottomSheet(
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .background(color, CircleShape)
+                            .clip(CircleShape)
+                            .background(color)
                             .clickable { selectedColor = colorArgb },
                         contentAlignment = Alignment.Center
                     ) {
