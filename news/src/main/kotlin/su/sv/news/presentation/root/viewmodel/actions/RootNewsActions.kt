@@ -5,12 +5,6 @@ import su.sv.news.presentation.root.model.UiNewsMedia
 
 sealed class RootNewsActions {
 
-    /** Завершилось обновление при помощи SwipeRefresh */
-    object OnSwipeRefreshFinished : RootNewsActions()
-
-    /** Обновление списка книг при помощи SwipeRefresh */
-    object OnSwipeRefresh : RootNewsActions()
-
     /** Нажатие на сам элемент списка */
     data class OnNewsClick(val item: UiNewsItem) : RootNewsActions()
 

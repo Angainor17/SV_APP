@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.terrakok.modo.stack.LocalStackNavigation
@@ -134,13 +133,6 @@ fun RootNews(
             }
 
             hasItems -> {
-                val state = viewModel.state.collectAsStateWithLifecycle()
-                val stateValue = state.value
-
-                if (stateValue.isRefreshing) {
-                    viewModel.onAction(RootNewsActions.OnSwipeRefreshFinished)
-                }
-
                 // Ограничение ширины контента для планшетов
                 Box(
                     modifier = Modifier
@@ -151,7 +143,6 @@ fun RootNews(
                     NewsList(
                         lazyPagingItems = lazyPagingItems,
                         actions = viewModel,
-                        state = stateValue,
                         contentPadding = contentPadding,
                         onImageClick = { newsItem, imageIndex ->
                             // Открываем просмотрщик изображений

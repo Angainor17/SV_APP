@@ -8,16 +8,12 @@ import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import su.sv.commonarchitecture.presentation.base.BaseViewModel
 import su.sv.news.domain.GetNewsListUseCase
 import su.sv.news.presentation.root.mapper.UiNewsMapper
 import su.sv.news.presentation.root.model.UiNewsItem
 import su.sv.news.presentation.root.model.UiNewsMedia
-import su.sv.news.presentation.root.model.UiRootNewsState
 import su.sv.news.presentation.root.viewmodel.NewsPagingSource
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActions
 import su.sv.news.presentation.root.viewmodel.actions.RootNewsActionsHandler
@@ -29,10 +25,6 @@ class RootNewsViewModel @Inject constructor(
     private val getNewsListUseCase: GetNewsListUseCase,
     private val uiMapper: UiNewsMapper,
 ) : BaseViewModel(), RootNewsActionsHandler {
-
-    /** Контент экрана (вне списка) */
-    private val _state = MutableStateFlow(UiRootNewsState())
-    val state: StateFlow<UiRootNewsState> get() = _state
 
     /** Одноразовые события */
     private val _oneTimeEffect = Channel<NewsListOneTimeEffect>(capacity = Channel.BUFFERED)
@@ -53,18 +45,6 @@ class RootNewsViewModel @Inject constructor(
 
     override fun onAction(action: RootNewsActions) {
         when (action) {
-            RootNewsActions.OnSwipeRefreshFinished -> {
-                updateState { contentState ->
-                    contentState.copy(isRefreshing = false)
-                }
-            }
-
-            RootNewsActions.OnSwipeRefresh -> {
-                updateState { contentState ->
-                    contentState.copy(isRefreshing = true)
-                }
-            }
-
             is RootNewsActions.OnNewsClick -> {
                 _oneTimeEffect.trySend(
                     NewsListOneTimeEffect.OpenNewsItem(action.item)
@@ -81,12 +61,6 @@ class RootNewsViewModel @Inject constructor(
             is RootNewsActions.OnNewsImageClick -> {
                 // Обрабатывается в UI через onImageClick callback
             }
-        }
-    }
-
-    private fun updateState(action: (UiRootNewsState) -> UiRootNewsState) {
-        _state.update { state ->
-            action.invoke(state)
         }
     }
 }
