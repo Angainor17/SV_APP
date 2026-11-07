@@ -738,34 +738,28 @@ DataStore (асинхронные Flow-читалки) — двойная зап
 
 ## Handler/Runnable → Coroutines
 
-### 🟠 P1: TTSPopup — Handler + Runnable (1035 строк)
+### ✅ P1 (решено 2026-11-07): TTSPopup — удалён как мёртвый код
 
-**Проблема:** `Handler(Looper.getMainLooper())` + `Runnable` + `postDelayed`/`removeCallbacks`.
-Реальный removable-долг — два `postDelayed`: 200мс дебаунс `updateGravity(g)` и отложенный ретрай
-`speakRetry` в `ttsShowError`.
-
-**Файл:** `bookreader/widgets/TTSPopup.kt`
-
-**Решение (уточнено 2026-10-12):** класс НЕ Composable, поэтому прежняя рекомендация «LaunchedEffect +
-Flow» неверна; «бесконечный цикл» в `updateGravity` — на деле обычный дебаунс (remove + re-post).
-Нужен `CoroutineScope(SupervisorJob() + Dispatchers.Main)` + `Job` + `delay`. Часть `Runnable`-ов
-убрать нельзя: внешняя библиотека `com.github.axet.androidlibrary.sound.TTS` принимает колбэки
-`Runnable` (`playSpeech(..., done)`, `onError(done)`), а `onScrollFinished: ArrayList<Runnable>` —
-паттерн «выполнить после завершения скролла». Дополнительно `handler.removeCallbacks(delayed)` чистит
-поле `delayed` внешнего TTS — трогать вслепую рискованно. Требует ручной проверки TTS на устройстве
-(на эмуляторе TTS-движок ненадёжен).
-
-**Дополнительно:**
+TTS (`TTSPopup`, `TTSView`, `ZLTTSMark`, `tts_popup.xml`) вырезан целиком — единственная точка
+входа `ttsOpen()` имела 0 вызовов, UI-кнопки/жеста не было. Зависимость
+`com.github.axet:android-library` оставлена (нужна для `ThemeUtils`/`Storage`/`CacheImagesAdapter`),
+из неё ушёл только `sound.TTS`.
 
 ---
 
-### 🟡 P2: TimeAnimatorCompat — Handler.postDelayed для анимации
+### ✅ P2 (решено 2026-11-07): TimeAnimatorCompat — удалён как мёртвая обёртка
 
-**Файл:** `bookreader/widgets/TimeAnimatorCompat.kt` (строки 5, 15-18)
+Handler-based animation loop на 24 FPS заменён на `TimeAnimator` в `ScrollWidget.kt`; файл
+`TimeAnimatorCompat.kt` удалён.
 
-**Проблема:** Handler-based animation loop на 24 FPS.
+---
 
-**Решение:** `LaunchedEffect(remember { true })` + `delay(1000L / 24)`.
+### ✅ (решено 2026-11-07): UIUtil.wait + FIND_PREVIOUS/FIND_NEXT — удалены
+
+Обработчики `FIND_PREVIOUS`/`FIND_NEXT` в `FBReaderView.kt` (паттерн `UIUtil.wait` + Thread +
+ProgressDialog + Runnable + `View.post`) были мёртвыми: ни одного `runAction` и ни одной привязки
+в `keymap.xml`. Поиск идёт через `performSearchNext`/`performSearchPrevious`. После их удаления
+мёртвым стал и `org.geometerplus.android.util.UIUtil` (0 вызовов) — файл удалён.
 
 ---
 

@@ -57,7 +57,6 @@ import com.google.android.material.snackbar.Snackbar
 import org.geometerplus.android.fbreader.dict.DictionaryUtil
 import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow
 import org.geometerplus.android.util.UIMessageUtil
-import org.geometerplus.android.util.UIUtil
 import org.geometerplus.fbreader.bookmodel.BookModel
 import org.geometerplus.fbreader.bookmodel.FBHyperlinkType
 import org.geometerplus.fbreader.bookmodel.TOCTree
@@ -703,57 +702,6 @@ open class FBReaderView @JvmOverloads constructor(
                     (widget as ScrollWidget).adapter.processInvalidate()
                     (widget as ScrollWidget).adapter.processClear()
                 }
-            }
-        })
-
-        app.addAction(ActionCode.FIND_PREVIOUS, object : FBAction(app) {
-            override fun run(vararg params: Any?) {
-                if (search != null) {
-                    val run = Runnable {
-                        val page = search!!.prev()
-                        if (page == -1)
-                            return@Runnable
-                        this@FBReaderView.post {
-                            if (widget is ScrollWidget) {
-                                (widget as ScrollWidget).searchPage(page)
-                                return@post
-                            }
-                            if (widget is PagerWidget) {
-                                (widget as PagerWidget).searchPage(page)
-                            }
-                        }
-                    }
-                    UIUtil.wait("search", run, context)
-                    return
-                } else {
-                    app.BookTextView.findPrevious()
-                }
-                resetNewPosition()
-            }
-        })
-        app.addAction(ActionCode.FIND_NEXT, object : FBAction(app) {
-            override fun run(vararg params: Any?) {
-                if (search != null) {
-                    val run = Runnable {
-                        val page = search!!.next()
-                        if (page == -1)
-                            return@Runnable
-                        this@FBReaderView.post {
-                            if (widget is ScrollWidget) {
-                                (widget as ScrollWidget).searchPage(page)
-                                return@post
-                            }
-                            if (widget is PagerWidget) {
-                                (widget as PagerWidget).searchPage(page)
-                            }
-                        }
-                    }
-                    UIUtil.wait("search", run, context)
-                    return
-                } else {
-                    app.BookTextView.findNext()
-                }
-                resetNewPosition()
             }
         })
         app.addAction(ActionCode.CLEAR_FIND_RESULTS, object : FBAction(app) {
