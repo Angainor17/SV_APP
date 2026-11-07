@@ -34,7 +34,7 @@ abstract class ZLView protected constructor(@JvmField val Application: ZLApplica
 
     fun getContextHeight(): Int = myViewContext.getHeight()
 
-    abstract val footerArea: FooterArea
+    abstract val footerArea: FooterArea?
 
     abstract fun getAnimationType(): ZLViewEnums.Animation
 

@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Parcel
@@ -155,7 +156,7 @@ open class FBReaderView @JvmOverloads constructor(
         val ACTION_MENU: String = FBReaderView::class.java.canonicalName + ".ACTION_MENU"
 
         const val PAGE_OVERLAP_PERCENTS = 5
-        const val PAGE_PAPER_COLOR = 0x80ffffff
+        const val PAGE_PAPER_COLOR = Color.WHITE
 
         @JvmStatic
         fun findUnion(areas: List<ZLTextElementArea>, bm: Storage.Bookmark): Rect? {

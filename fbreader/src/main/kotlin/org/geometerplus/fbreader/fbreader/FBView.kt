@@ -443,7 +443,7 @@ open class FBView(private val myReader: FBReaderApp) : ZLTextView(
         return myViewOptions.colorProfile.HighlightingForegroundOption.getValue()
     }
 
-    override val footerArea: Footer
+    override val footerArea: Footer?
         get() {
             when (myViewOptions.ScrollbarType.getValue()) {
                 SCROLLBAR_SHOW_AS_FOOTER -> {
@@ -476,7 +476,7 @@ open class FBView(private val myReader: FBReaderApp) : ZLTextView(
                     }
                 }
             }
-            return myFooter!!
+            return myFooter
         }
 
     override fun releaseSelectionCursor() {
