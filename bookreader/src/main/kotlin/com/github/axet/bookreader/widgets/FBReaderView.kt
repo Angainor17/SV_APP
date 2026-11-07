@@ -185,8 +185,6 @@ open class FBReaderView @JvmOverloads constructor(
         app.BookTextView = CustomView(app)
         app.setView(app.BookTextView)
 
-        footer = FBFooterView(context, this)
-
         setWidget(Widgets.PAGING)
     }
 
@@ -271,16 +269,10 @@ open class FBReaderView @JvmOverloads constructor(
             removeView(widget as View)
         }
         widget = v
-        var lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        lp.addRule(RelativeLayout.ABOVE, footer!!.id)
+        val lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         addView(v as View, 0, lp)
         if (pos != null)
             gotoPosition(pos)
-        if (footer != null)
-            removeView(footer)
-        lp = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        addView(footer, lp)
     }
 
     fun loadBook(fbook: Storage.FBook) {
