@@ -22,6 +22,7 @@ object ReaderTestTags {
         const val BOOKMARKS_BUTTON = "reader_bookmarks_button"
         const val FONT_BUTTON = "reader_font_button"
         const val MENU_BUTTON = "reader_menu_button"
+        const val PAGE_INDICATOR = "reader_page_indicator"
 
         // Меню
         const val MENU_DROPDOWN = "reader_menu_dropdown"

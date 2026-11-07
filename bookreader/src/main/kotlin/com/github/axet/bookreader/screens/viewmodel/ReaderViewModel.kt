@@ -64,6 +64,21 @@ class ReaderViewModel @Inject constructor(
     /** Настройки */
     val shared: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
+    /** Видимость кнопок тулбара (реактивно подтягивается из SharedPreferences). */
+    private val _toolbarVisibility = MutableStateFlow(readToolbarVisibility())
+    val toolbarVisibility: StateFlow<ToolbarVisibility> = _toolbarVisibility.asStateFlow()
+
+    private val toolbarPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        when (key) {
+            ReaderPreferences.PREFERENCE_TOOLBAR_SEARCH,
+            ReaderPreferences.PREFERENCE_TOOLBAR_TOC,
+            ReaderPreferences.PREFERENCE_TOOLBAR_BOOKMARKS,
+            ReaderPreferences.PREFERENCE_TOOLBAR_FONT,
+            ReaderPreferences.PREFERENCE_TOOLBAR_PAGE_INDICATOR ->
+                _toolbarVisibility.value = readToolbarVisibility()
+        }
+    }
+
     // ==================== Делегаты ====================
 
     private val selectionDelegate = ReaderSelectionDelegate(
@@ -94,6 +109,10 @@ class ReaderViewModel @Inject constructor(
         sharedPreferences = shared,
         onHideSelectionPanel = { selectionDelegate.hidePanel() },
     )
+
+    init {
+        shared.registerOnSharedPreferenceChangeListener(toolbarPrefsListener)
+    }
 
     // ==================== Публичный API ====================
 
@@ -448,6 +467,14 @@ class ReaderViewModel @Inject constructor(
         _state.value = s.copy(zoomScale = 1.0f, zoomPivotX = 0f, zoomPivotY = 0f, isInZoom = false)
     }
 
+    private fun readToolbarVisibility(): ToolbarVisibility = ToolbarVisibility(
+        search = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_SEARCH, true),
+        toc = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_TOC, true),
+        bookmarks = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_BOOKMARKS, true),
+        font = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_FONT, true),
+        pageIndicator = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_PAGE_INDICATOR, true),
+    )
+
     // ==================== Жизненный цикл ====================
 
     fun closeBook() {
@@ -459,6 +486,7 @@ class ReaderViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        shared.unregisterOnSharedPreferenceChangeListener(toolbarPrefsListener)
         super.onCleared()
         closeBook()
     }

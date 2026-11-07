@@ -64,6 +64,7 @@ fun ReaderContent(
     viewModel: ReaderViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val toolbarVisibility by viewModel.toolbarVisibility.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     // Состояние для FBReaderView
@@ -122,6 +123,12 @@ fun ReaderContent(
         }
 
         is ReaderState.Content -> {
+            // Позиция страницы для индикатора в тулбаре.
+            // Доступ к app.textView безопасен только после завершения loadBook (isLoaded).
+            val pagePosition = if (isLoaded) fbReaderView?.app?.textView?.pagePosition() else null
+            val currentPage = pagePosition?.Current ?: 1
+            val totalPages = pagePosition?.Total ?: 1
+
             // Диалоги
             if (currentState.showToc) {
                 TocComposeDialog(
@@ -162,9 +169,6 @@ fun ReaderContent(
 
             // Навигация по страницам
             if (currentState.showNavigation && fbReaderView != null) {
-                val pagePosition = fbReaderView?.app?.textView?.pagePosition()
-                val currentPage = pagePosition?.Current ?: 1
-                val totalPages = pagePosition?.Total ?: 1
                 val chapterTitle = fbReaderView?.app?.currentTOCElement?.text
 
                 NavigationComposeDialog(
@@ -218,6 +222,9 @@ fun ReaderContent(
                     ) {
                         ReaderTopBar(
                             state = currentState,
+                            currentPage = currentPage,
+                            totalPages = totalPages,
+                            toolbarVisibility = toolbarVisibility,
                             onAction = { action ->
                                 when (action) {
                                     ReaderActions.NavigateBack -> {

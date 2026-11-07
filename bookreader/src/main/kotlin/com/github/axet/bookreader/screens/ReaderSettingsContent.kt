@@ -45,6 +45,7 @@ fun ReaderSettingsContent(
     val viewMode by viewModel.viewMode.collectAsStateWithLifecycle()
     val volumeKeys by viewModel.volumeKeys.collectAsStateWithLifecycle()
     val twoColumnView by viewModel.twoColumnView.collectAsStateWithLifecycle()
+    val toolbarVisibility by viewModel.toolbarVisibility.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -94,11 +95,63 @@ fun ReaderSettingsContent(
                 )
             }
 
+            // Кнопки в тулбаре читалки
+            SectionTitle(title = stringResource(R.string.sv_pref_toolbar_title))
+
+            SettingsSwitch(
+                title = stringResource(R.string.sv_pref_toolbar_search),
+                subtitle = stringResource(R.string.sv_pref_toolbar_summary),
+                checked = toolbarVisibility.search,
+                onCheckedChange = viewModel::setToolbarSearch,
+            )
+            SettingsSwitch(
+                title = stringResource(R.string.sv_pref_toolbar_toc),
+                subtitle = stringResource(R.string.sv_pref_toolbar_summary),
+                checked = toolbarVisibility.toc,
+                onCheckedChange = viewModel::setToolbarToc,
+            )
+            SettingsSwitch(
+                title = stringResource(R.string.sv_pref_toolbar_bookmarks),
+                subtitle = stringResource(R.string.sv_pref_toolbar_summary),
+                checked = toolbarVisibility.bookmarks,
+                onCheckedChange = viewModel::setToolbarBookmarks,
+            )
+            SettingsSwitch(
+                title = stringResource(R.string.sv_pref_toolbar_font),
+                subtitle = stringResource(R.string.sv_pref_toolbar_summary),
+                checked = toolbarVisibility.font,
+                onCheckedChange = viewModel::setToolbarFont,
+            )
+            SettingsSwitch(
+                title = stringResource(R.string.sv_pref_toolbar_page_indicator),
+                subtitle = stringResource(R.string.sv_pref_toolbar_summary),
+                checked = toolbarVisibility.pageIndicator,
+                onCheckedChange = viewModel::setToolbarPageIndicator,
+            )
+
             // Планируемые настройки (требуют дополнительные компоненты):
             // - Папка синхронизации — требует интеграции Storage Access Framework (SAF)
             // - Блокировка экрана — требует реализации ScreenlockPreference
         }
     }
+}
+
+/**
+ * Заголовок секции настроек
+ */
+@Composable
+private fun SectionTitle(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    )
 }
 
 /**

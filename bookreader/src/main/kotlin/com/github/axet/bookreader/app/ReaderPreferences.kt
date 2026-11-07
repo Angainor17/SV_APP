@@ -21,4 +21,12 @@ object ReaderPreferences {
      * null = авто (по размеру экрана), true = включить, false = выключить
      */
     const val PREFERENCE_TWO_COLUMN_VIEW: String = "two_column_view"
+
+    // === Видимость кнопок в тулбаре читалки ===
+
+    const val PREFERENCE_TOOLBAR_SEARCH: String = "toolbar_search"
+    const val PREFERENCE_TOOLBAR_TOC: String = "toolbar_toc"
+    const val PREFERENCE_TOOLBAR_BOOKMARKS: String = "toolbar_bookmarks"
+    const val PREFERENCE_TOOLBAR_FONT: String = "toolbar_font"
+    const val PREFERENCE_TOOLBAR_PAGE_INDICATOR: String = "toolbar_page_indicator"
 }

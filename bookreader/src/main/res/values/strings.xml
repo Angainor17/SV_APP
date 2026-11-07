@@ -38,6 +38,15 @@
     <string name="sv_bookmark_edit">Редактировать</string>
     <string name="sv_ignore_embedded_fonts">Игнорировать встроенные в книгу шрифты</string>
 
+    <!-- Toolbar visibility -->
+    <string name="sv_pref_toolbar_title">Кнопки в тулбаре</string>
+    <string name="sv_pref_toolbar_summary">Показывать кнопку в тулбаре читалки</string>
+    <string name="sv_pref_toolbar_search">Поиск</string>
+    <string name="sv_pref_toolbar_toc">Оглавление</string>
+    <string name="sv_pref_toolbar_bookmarks">Закладки</string>
+    <string name="sv_pref_toolbar_font">Шрифт</string>
+    <string name="sv_pref_toolbar_page_indicator">Индикатор страницы</string>
+
     <!-- Reflow (PDF) -->
     <string name="sv_reflow_text">Адаптировать текст</string>
     <string name="sv_original_layout">Оригинальный макет</string>

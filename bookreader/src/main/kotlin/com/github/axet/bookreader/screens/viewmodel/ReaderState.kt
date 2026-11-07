@@ -61,3 +61,18 @@ enum class ViewMode {
     /** Непрерывная прокрутка */
     CONTINUOUS
 }
+
+/**
+ * Видимость кнопок в тулбаре читалки.
+ *
+ * Управляется на экране настроек читалки и хранится в [android.content.SharedPreferences].
+ * Все флаги по умолчанию true (кнопки видны). Кнопка «Меню» (и вход в настройки)
+ * всегда видна и не скрывается — иначе пользователь не сможет вернуться на экран настроек.
+ */
+data class ToolbarVisibility(
+    val search: Boolean = true,
+    val toc: Boolean = true,
+    val bookmarks: Boolean = true,
+    val font: Boolean = true,
+    val pageIndicator: Boolean = true,
+)

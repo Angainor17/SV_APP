@@ -1,9 +1,11 @@
 package com.github.axet.bookreader.screens.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -31,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +45,7 @@ import com.github.axet.bookreader.R
 import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
 import com.github.axet.bookreader.screens.viewmodel.ReaderState
+import com.github.axet.bookreader.screens.viewmodel.ToolbarVisibility
 
 /**
  * Верхняя панель для экрана чтения книги
@@ -50,7 +54,9 @@ import com.github.axet.bookreader.screens.viewmodel.ReaderState
 @Composable
 fun ReaderTopBar(
     state: ReaderState.Content,
-
+    currentPage: Int,
+    totalPages: Int,
+    toolbarVisibility: ToolbarVisibility,
     onAction: (ReaderActions) -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -177,46 +183,66 @@ fun ReaderTopBar(
         actions = {
             // Only show other actions when not in search mode
             if (!searchState.isActive) {
-                // Search
-                IconButton(
-                    modifier = Modifier.testTag(ReaderTestTags.TopBar.SEARCH_BUTTON),
-                    onClick = {
-                        onAction(ReaderActions.Search(""))
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = MaterialTheme.colorScheme.onSurface
+                // Индикатор страницы — тап открывает шторку перемотки страниц
+                if (toolbarVisibility.pageIndicator) {
+                    Text(
+                        text = "$currentPage / $totalPages",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable { onAction(ReaderActions.ToggleNavigation) }
+                            .padding(horizontal = 8.dp, vertical = 6.dp)
+                            .testTag(ReaderTestTags.TopBar.PAGE_INDICATOR)
                     )
+                }
+
+                // Search
+                if (toolbarVisibility.search) {
+                    IconButton(
+                        modifier = Modifier.testTag(ReaderTestTags.TopBar.SEARCH_BUTTON),
+                        onClick = {
+                            onAction(ReaderActions.Search(""))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
 
                 // Table of Contents
-                IconButton(
-                    modifier = Modifier.testTag(ReaderTestTags.TopBar.TOC_BUTTON),
-                    onClick = { onAction(ReaderActions.ToggleToc) }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_toc_white_24dp),
-                        contentDescription = "Table of Contents",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+                if (toolbarVisibility.toc) {
+                    IconButton(
+                        modifier = Modifier.testTag(ReaderTestTags.TopBar.TOC_BUTTON),
+                        onClick = { onAction(ReaderActions.ToggleToc) }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_toc_white_24dp),
+                            contentDescription = "Table of Contents",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
 
                 // Bookmarks
-                IconButton(
-                    modifier = Modifier.testTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON),
-                    onClick = { onAction(ReaderActions.ToggleBookmarks) }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_bookmark_white_24dp),
-                        contentDescription = "Bookmarks",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+                if (toolbarVisibility.bookmarks) {
+                    IconButton(
+                        modifier = Modifier.testTag(ReaderTestTags.TopBar.BOOKMARKS_BUTTON),
+                        onClick = { onAction(ReaderActions.ToggleBookmarks) }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_bookmark_white_24dp),
+                            contentDescription = "Bookmarks",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
 
                 // Font size - показываем только если шрифт можно менять
-                if (state.canChangeFont) {
+                if (toolbarVisibility.font && state.canChangeFont) {
                     IconButton(
                         modifier = Modifier.testTag(ReaderTestTags.TopBar.FONT_BUTTON),
                         onClick = { onAction(ReaderActions.ToggleFontSettings) }
@@ -229,7 +255,7 @@ fun ReaderTopBar(
                     }
                 }
 
-                // More options menu
+                // More options menu — всегда виден: содержит вход в настройки читалки
                 IconButton(
                     modifier = Modifier.testTag(ReaderTestTags.TopBar.MENU_BUTTON),
                     onClick = { showMenu = true }

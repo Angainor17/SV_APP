@@ -41,6 +41,9 @@ class ReaderSettingsViewModel @Inject constructor(
     private val _twoColumnView = MutableStateFlow(readTwoColumnView())
     val twoColumnView: StateFlow<String> = _twoColumnView.asStateFlow()
 
+    private val _toolbarVisibility = MutableStateFlow(readToolbarVisibility())
+    val toolbarVisibility: StateFlow<ToolbarVisibility> = _toolbarVisibility.asStateFlow()
+
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
         when (key) {
             ReaderPreferences.PREFERENCE_VIEW_MODE ->
@@ -51,6 +54,13 @@ class ReaderSettingsViewModel @Inject constructor(
 
             ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW ->
                 _twoColumnView.value = normalizeTwoColumn(prefs.getString(key, "auto"))
+
+            ReaderPreferences.PREFERENCE_TOOLBAR_SEARCH,
+            ReaderPreferences.PREFERENCE_TOOLBAR_TOC,
+            ReaderPreferences.PREFERENCE_TOOLBAR_BOOKMARKS,
+            ReaderPreferences.PREFERENCE_TOOLBAR_FONT,
+            ReaderPreferences.PREFERENCE_TOOLBAR_PAGE_INDICATOR ->
+                _toolbarVisibility.value = readToolbarVisibility()
         }
     }
 
@@ -84,11 +94,44 @@ class ReaderSettingsViewModel @Inject constructor(
         shared.edit { putString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, newValue) }
     }
 
+    /** Включить/выключить видимость кнопки «Поиск» в тулбаре читалки. */
+    fun setToolbarSearch(enabled: Boolean) {
+        shared.edit { putBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_SEARCH, enabled) }
+    }
+
+    /** Включить/выключить видимость кнопки «Оглавление» в тулбаре читалки. */
+    fun setToolbarToc(enabled: Boolean) {
+        shared.edit { putBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_TOC, enabled) }
+    }
+
+    /** Включить/выключить видимость кнопки «Закладки» в тулбаре читалки. */
+    fun setToolbarBookmarks(enabled: Boolean) {
+        shared.edit { putBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_BOOKMARKS, enabled) }
+    }
+
+    /** Включить/выключить видимость кнопки «Шрифт» в тулбаре читалки. */
+    fun setToolbarFont(enabled: Boolean) {
+        shared.edit { putBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_FONT, enabled) }
+    }
+
+    /** Включить/выключить видимость индикатора страницы в тулбаре читалки. */
+    fun setToolbarPageIndicator(enabled: Boolean) {
+        shared.edit { putBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_PAGE_INDICATOR, enabled) }
+    }
+
     private fun readViewMode(): String =
         shared.getString(ReaderPreferences.PREFERENCE_VIEW_MODE, "PAGING") ?: "PAGING"
 
     private fun readTwoColumnView(): String =
         normalizeTwoColumn(shared.getString(ReaderPreferences.PREFERENCE_TWO_COLUMN_VIEW, "auto"))
+
+    private fun readToolbarVisibility(): ToolbarVisibility = ToolbarVisibility(
+        search = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_SEARCH, true),
+        toc = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_TOC, true),
+        bookmarks = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_BOOKMARKS, true),
+        font = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_FONT, true),
+        pageIndicator = shared.getBoolean(ReaderPreferences.PREFERENCE_TOOLBAR_PAGE_INDICATOR, true),
+    )
 
     private fun normalizeTwoColumn(raw: String?): String = when (raw) {
         "true" -> "true"
