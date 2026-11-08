@@ -31,6 +31,7 @@
             <option value="$PROJECT_DIR$/commonarchitecture" />
             <option value="$PROJECT_DIR$/commonui" />
             <option value="$PROJECT_DIR$/fbreader" />
+            <option value="$PROJECT_DIR$/featureflags" />
             <option value="$PROJECT_DIR$/info" />
             <option value="$PROJECT_DIR$/main" />
             <option value="$PROJECT_DIR$/managers" />
