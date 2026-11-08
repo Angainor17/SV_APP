@@ -70,6 +70,9 @@ class BooksCatalogTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
+        // Открываем поле поиска (оно скрыто за иконкой поиска в тулбаре)
+        openBooksSearch()
+
         // Вводим текст в поле поиска
         val searchQuery = "Батум"
 

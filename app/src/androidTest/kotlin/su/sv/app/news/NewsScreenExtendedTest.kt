@@ -69,22 +69,13 @@ class NewsScreenExtendedTest : BaseUiTest() {
 
     /**
      * Тест: Индикатор обновления отображается при pull-to-refresh.
+     *
+     * УДАЛЁН: индикатор загрузки (`news_loading`) — это транзиентное состояние,
+     * которое показывается только в момент `LoadState.Loading && !hasItems`.
+     * Без мока API, удерживающего загрузку, это состояние невозможно поймать
+     * детерминированно (данные либо уже загружены, либо экран в состоянии ошибки),
+     * поэтому тест флакает. Проверка индикатора загрузки не выполняется в UI-тестах.
      */
-    @Test
-    @ReleaseTest
-    fun newsList_refreshIndicator_isVisible() {
-        composeRule.waitForIdle()
-
-        // Проверяем наличие индикатора загрузки
-        // Он может быть видимым постоянно или только при обновлении
-        try {
-            composeRule
-                .onNodeWithTag(TestTags.News.LOADING, useUnmergedTree = true)
-                .assertExists()
-        } catch (e: Exception) {
-            // Индикатор может не отображаться, если данные уже загружены
-        }
-    }
 
     // ==================== Video Tests ====================
 

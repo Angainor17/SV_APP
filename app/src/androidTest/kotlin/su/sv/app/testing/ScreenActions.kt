@@ -182,66 +182,15 @@ class ScreenActions(
 
     /** Открытие настроек шрифта */
     fun openReaderFontSettings() {
-        rule.onNodeWithTag(TestTags.Reader.SETTINGS_BUTTON, useUnmergedTree = true).performClick()
-        rule.waitForIdle()
-    }
-
-    /** Увеличение размера шрифта */
-    fun increaseFontSize() {
-        rule.onNodeWithTag(TestTags.Reader.FONT_SIZE_UP, useUnmergedTree = true).performClick()
-        rule.waitForIdle()
-    }
-
-    /** Уменьшение размера шрифта */
-    fun decreaseFontSize() {
-        rule.onNodeWithTag(TestTags.Reader.FONT_SIZE_DOWN, useUnmergedTree = true).performClick()
-        rule.waitForIdle()
-    }
-
-    /** Переключение на тёмную тему читалки */
-    fun switchToDarkTheme() {
-        rule.onNodeWithTag(TestTags.Reader.THEME_DARK, useUnmergedTree = true).performClick()
-        rule.waitForIdle()
-    }
-
-    /** Переключение на светлую тему читалки */
-    fun switchToLightTheme() {
-        rule.onNodeWithTag(TestTags.Reader.THEME_LIGHT, useUnmergedTree = true).performClick()
+        rule.onNodeWithTag(TestTags.Reader.FONT_BUTTON, useUnmergedTree = true).performClick()
         rule.waitForIdle()
     }
 
     /** Открытие диалога закладок */
     fun openBookmarksDialog() {
         rule
-            .onNodeWithTag(TestTags.Reader.BOOKMARKS_LIST_BUTTON, useUnmergedTree = true)
+            .onNodeWithTag(TestTags.Reader.BOOKMARKS_BUTTON, useUnmergedTree = true)
             .performClick()
-        rule.waitForIdle()
-    }
-
-    /** Создание закладки */
-    fun createBookmark(title: String) {
-        rule.onNodeWithTag(TestTags.Reader.BOOKMARK_BUTTON, useUnmergedTree = true).performClick()
-        rule.waitForIdle()
-
-        rule
-            .onNodeWithTag(TestTags.Reader.BOOKMARK_TITLE_FIELD, useUnmergedTree = true)
-            .performTextInput(title)
-
-        rule
-            .onNodeWithTag(TestTags.Reader.BOOKMARK_SAVE_BUTTON, useUnmergedTree = true)
-            .performClick()
-        rule.waitForIdle()
-    }
-
-    /** Переход на следующую страницу */
-    fun nextPage() {
-        rule.onNodeWithTag(TestTags.Reader.PAGE_NEXT, useUnmergedTree = true).performClick()
-        rule.waitForIdle()
-    }
-
-    /** Переход на предыдущую страницу */
-    fun prevPage() {
-        rule.onNodeWithTag(TestTags.Reader.PAGE_PREV, useUnmergedTree = true).performClick()
         rule.waitForIdle()
     }
 

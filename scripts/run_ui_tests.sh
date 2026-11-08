@@ -71,7 +71,9 @@ echo -e "${GREEN}✅ Test APK built successfully${NC}"
 echo -e "\n${BLUE}🚀 Running tests...${NC}"
 
 if [ -n "$ANNOTATION" ]; then
-    ./gradlew connectedAndroidTest \n        -Pandroid.testInstrumentationRunnerArguments.annotation="$ANNOTATION" \n        --info
+    ./gradlew connectedAndroidTest \
+        -Pandroid.testInstrumentationRunnerArguments.annotation="$ANNOTATION" \
+        --info
 else
     ./gradlew connectedAndroidTest --info
 fi

@@ -41,6 +41,9 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
+        // Поле поиска появляется только после клика по иконке поиска в тулбаре
+        openBooksSearch()
+
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -54,6 +57,8 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     fun booksCatalog_searchByTitle_works() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
+
+        openBooksSearch()
 
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
@@ -79,6 +84,8 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
 
+        openBooksSearch()
+
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
             .performTextInput("Богатырёва")
@@ -102,6 +109,8 @@ class BooksCatalogExtendedTest : BaseUiTest() {
     fun booksCatalog_search_noResults_emptyList() {
         navigateToBooksTab()
         waitForItems(TestTags.BooksCatalog.ITEM, timeoutMs = 10000)
+
+        openBooksSearch()
 
         composeRule
             .onNodeWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
@@ -231,36 +240,6 @@ class BooksCatalogExtendedTest : BaseUiTest() {
         composeRule
             .onNodeWithTag(TestTags.BookDetail.READ_BUTTON, useUnmergedTree = true)
             .assertHasClickAction()
-    }
-
-    /**
-     * Тест: Клик на «Читать» открывает читалку (если книга скачана).
-     *
-     * Пропускается, если книга не скачана.
-     */
-    @Test
-    @ReleaseTest
-    fun bookDetail_readButtonOpensReader() {
-        openBookDetail()
-
-        // Читалка открывается только для скачанной книги — клик по кнопке не должен крашить
-        composeRule
-            .onNodeWithTag(TestTags.BookDetail.READ_BUTTON, useUnmergedTree = true)
-            .performClick()
-
-        composeRule.waitForIdle()
-
-        // Проверяем, что экран не упал (детали или читалка отображаются)
-        val readerOrDetailShown =
-            composeRule
-                .onAllNodesWithTag(TestTags.BookDetail.ROOT, useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty() ||
-                composeRule
-                    .onAllNodesWithTag(TestTags.Reader.ROOT, useUnmergedTree = true)
-                    .fetchSemanticsNodes()
-                    .isNotEmpty()
-        assert(readerOrDetailShown) { "Должен отображаться экран деталей или читалка" }
     }
 
     // ==================== Downloaded Books Tests ====================

@@ -36,6 +36,9 @@ object TestTags {
         const val ITEM_AUTHOR = "book_author"
         const val ITEM_COVER = "book_cover"
         const val SEARCH_FIELD = "books_search_field"
+        const val SEARCH_BUTTON = "books_search_button"
+        const val SEARCH_CLEAR_BUTTON = "books_search_clear_button"
+        const val SEARCH_CLOSE_BUTTON = "books_search_close_button"
         const val CATEGORY_FILTER = "category_filter"
         const val CATEGORY_CHIP = "category_chip"
         const val LOADING = "books_loading"
@@ -116,50 +119,45 @@ object TestTags {
     }
 
     // ==================== BookReader Module ====================
+    // Значения тегов должны совпадать с ReaderTestTags в модуле bookreader
+    // (com.github.axet.bookreader.screens.testing.ReaderTestTags).
     object Reader {
         const val ROOT = "reader_root"
         const val CONTENT = "reader_content"
         const val TOP_BAR = "reader_top_bar"
-        const val BOTTOM_BAR = "reader_bottom_bar"
-        const val TITLE = "reader_book_title"
-        const val CHAPTER_TITLE = "reader_chapter_title"
+        const val LOADING = "reader_loading"
+        const val ERROR = "reader_error"
 
-        // Settings
-        const val SETTINGS_BUTTON = "reader_settings_button"
-        const val FONT_SIZE_UP = "font_size_up"
-        const val FONT_SIZE_DOWN = "font_size_down"
-        const val THEME_LIGHT = "theme_light"
-        const val THEME_DARK = "theme_dark"
-        const val THEME_SEPIA = "theme_sepia"
-
-        // Navigation
-        const val TOC_BUTTON = "toc_button"
-        const val TOC_LIST = "toc_list"
-        const val TOC_ITEM = "toc_item"
-        const val PAGE_PREV = "page_prev"
-        const val PAGE_NEXT = "page_next"
+        // TopBar
+        const val BACK_BUTTON = "reader_back_button"
+        const val SEARCH_BUTTON = "reader_search_button"
+        const val TOC_BUTTON = "reader_toc_button"
+        const val BOOKMARKS_BUTTON = "reader_bookmarks_button"
+        const val FONT_BUTTON = "reader_font_button"
+        const val PAGE_INDICATOR = "reader_page_indicator"
+        const val MENU_BUTTON = "reader_menu_button"
+        const val MENU_DROPDOWN = "reader_menu_dropdown"
 
         // Search
-        const val SEARCH_BUTTON = "search_button"
         const val SEARCH_FIELD = "reader_search_field"
-        const val SEARCH_RESULT = "search_result"
-        const val SEARCH_CLOSE = "search_close"
+        const val SEARCH_CLOSE = "reader_search_close"
+
+        // TOC
+        const val TOC_DIALOG = "toc_dialog"
+        const val TOC_LIST = "toc_list"
+        const val TOC_ITEM = "toc_item"
 
         // Bookmarks
-        const val BOOKMARK_BUTTON = "bookmark_button"
-        const val BOOKMARK_DIALOG = "bookmark_dialog"
-        const val BOOKMARK_TITLE_FIELD = "bookmark_title_field"
-        const val BOOKMARK_SAVE_BUTTON = "bookmark_save_button"
-        const val BOOKMARKS_LIST_BUTTON = "bookmarks_list_button"
+        const val BOOKMARK_DIALOG = "bookmarks_dialog"
+        const val BOOKMARKS_LIST = "bookmarks_list"
+
+        // Font settings
+        const val FONT_SETTINGS_SHEET = "font_settings_sheet"
 
         // Selection
         const val SELECTION_PANEL = "selection_panel"
-        const val SELECTION_COPY = "selection_copy"
-        const val SELECTION_BOOKMARK = "selection_bookmark"
-
-        // Loading
-        const val LOADING = "reader_loading"
-        const val ERROR = "reader_error"
+        const val SELECTION_COPY = "selection_copy_button"
+        const val SELECTION_BOOKMARK = "selection_bookmark_button"
     }
 
     // ==================== Common ====================

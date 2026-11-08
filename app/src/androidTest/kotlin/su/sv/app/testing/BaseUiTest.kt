@@ -195,4 +195,23 @@ abstract class BaseUiTest {
     protected fun navigateToInfoTab() {
         screenActions.navigateToInfo()
     }
+
+    /**
+     * Открывает поле поиска в каталоге книг.
+     *
+     * Поле поиска скрыто за иконкой поиска в тулбаре. Иконка доступна всегда
+     * (после загрузки контента каталога), поэтому перед вводом текста нужно
+     * кликнуть по ней и дождаться появления самого поля.
+     */
+    protected fun openBooksSearch() {
+        composeRule
+            .onNodeWithTag(TestTags.BooksCatalog.SEARCH_BUTTON, useUnmergedTree = true)
+            .performClick()
+        composeRule.waitUntil(5000) {
+            composeRule
+                .onAllNodesWithTag(TestTags.BooksCatalog.SEARCH_FIELD, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+    }
 }

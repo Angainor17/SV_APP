@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -38,6 +39,7 @@ import com.github.axet.bookreader.screens.ui.FontsComposeBottomSheet
 import com.github.axet.bookreader.screens.ui.NavigationComposeDialog
 import com.github.axet.bookreader.screens.ui.ReaderTopBar
 import com.github.axet.bookreader.screens.ui.SelectionComposePanel
+import com.github.axet.bookreader.screens.testing.ReaderTestTags
 import com.github.axet.bookreader.screens.ui.TocComposeDialog
 import com.github.axet.bookreader.screens.ui.VolumeKeysHandler
 import com.github.axet.bookreader.screens.viewmodel.ReaderActions
@@ -115,7 +117,9 @@ fun ReaderContent(
     when (val currentState = state) {
         is ReaderState.Loading -> {
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .testTag(ReaderTestTags.LOADING),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -213,6 +217,7 @@ fun ReaderContent(
             }
 
             Scaffold(
+                modifier = Modifier.testTag(ReaderTestTags.ROOT),
                 containerColor = MaterialTheme.colorScheme.background,  // Мягкий светло-серый фон
                 topBar = {
                     // Animated visibility for smooth fullscreen transition
@@ -229,8 +234,13 @@ fun ReaderContent(
                             onAction = { action ->
                                 when (action) {
                                     ReaderActions.NavigateBack -> {
-                                        // Если fullscreen - сначала exit fullscreen
-                                        if (currentState.isFullscreen) {
+                                        // Если есть зум - сначала убираем его
+                                        if (currentState.isInZoom) {
+                                            Timber.tag("voronin")
+                                                .d("NavigateBack in zoom - resetting zoom first")
+                                            viewModel.onAction(ReaderActions.ZoomReset)
+                                        } else if (currentState.isFullscreen) {
+                                            // Если fullscreen - сначала exit fullscreen
                                             Timber.tag("voronin")
                                                 .d("NavigateBack in fullscreen - exiting fullscreen first")
                                             viewModel.onAction(ReaderActions.SetFullscreen(false))
@@ -252,6 +262,7 @@ fun ReaderContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
+                        .testTag(ReaderTestTags.CONTENT)
                 ) {
                     // FBReaderView через AndroidView
                     AndroidView(
@@ -306,14 +317,16 @@ fun ReaderContent(
                                         pivotX: Float,
                                         pivotY: Float
                                     ) {
-                                        // Zoom is applied directly to FBReaderView via scaleX/Y
-                                        // Optionally notify ViewModel for UI state (zoom indicator)
-                                        Timber.tag("voronin")
-                                            .d("ReaderContent: onZoomChange scale=$scale pivot=$pivotX,$pivotY")
+                                        // Синхронизируем состояние zoom с ViewModel, чтобы
+                                        // BackHandler (isInZoom) и кнопка «назад» могли его снять.
+                                        viewModel.onAction(
+                                            ReaderActions.ZoomUpdate(scale, pivotX, pivotY)
+                                        )
                                     }
 
                                     override fun onZoomEnd() {
-                                        Timber.tag("voronin").d("ReaderContent: onZoomEnd")
+                                        // Zoom сброшен (double-tap или pinch до 1.0) — обновляем состояние.
+                                        viewModel.onAction(ReaderActions.ZoomReset)
                                     }
                                 }
 
@@ -442,7 +455,9 @@ fun ReaderContent(
 
         is ReaderState.Error -> {
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .testTag(ReaderTestTags.ERROR),
                 contentAlignment = Alignment.Center
             ) {
                 Text(stringResource(R.string.sv_error_prefix, currentState.message))
