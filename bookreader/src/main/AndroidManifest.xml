@@ -29,19 +29,27 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <!--
+          Authority строится из applicationId приложения (${applicationId}.files и т.д.),
+          а не из жёсткой строки com.github.axet.bookreader.*. Иначе у su.sv.app, su.sv.app.dev,
+          com.github.axet.bookreader и их тестовых пакетов совпадает authority — и второй
+          установленный пакет падает с INSTALL_FAILED_CONFLICTING_PROVIDER (ломало и генерацию
+          Baseline Profile, и connectedAndroidTest). Код читает authority динамически
+          (StorageProvider.getAuthority() → ProviderInfo.authority), поэтому смена безопасна.
+        -->
         <provider
             android:name="com.github.axet.androidlibrary.services.FileProvider"
-            android:authorities="com.github.axet.bookreader.files"
+            android:authorities="${applicationId}.files"
             android:exported="false"
             android:grantUriPermissions="true" />
         <provider
             android:name="com.github.axet.androidlibrary.services.StorageProvider"
-            android:authorities="com.github.axet.bookreader.storage"
+            android:authorities="${applicationId}.storage"
             android:exported="false"
             android:grantUriPermissions="true" />
         <provider
             android:name="com.github.axet.bookreader.services.ImagesProvider"
-            android:authorities="com.github.axet.bookreader.images"
+            android:authorities="${applicationId}.images"
             android:exported="false"
             android:grantUriPermissions="true" />
     </application>

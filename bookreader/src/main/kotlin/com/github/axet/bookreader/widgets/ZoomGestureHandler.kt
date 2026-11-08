@@ -119,9 +119,12 @@ class ZoomGestureHandler(
                             .d("ZoomGestureHandler: onScale zoom=$currentZoom pivot=$pivotX,$pivotY")
                         listener.onZoomChange(currentZoom, pivotX, pivotY)
 
-                        // If zoom returns to 1.0, notify end
-                        if (currentZoom == minZoom && isInZoom) {
+                        // Если zoom вернулся к 1.0 — уведомляем о завершении и сбрасываем смещение
+                        if (currentZoom == minZoom) {
                             isInZoom = false
+                            translationX = 0f
+                            translationY = 0f
+                            listener.onPanChange(0f, 0f)
                             listener.onZoomEnd()
                         }
                     }
@@ -259,6 +262,8 @@ class ZoomGestureHandler(
             translationX = 0f
             translationY = 0f
             isInZoom = false
+            // Сбрасываем смещение панорамирования на view (иначе FBReaderView остаётся сдвинутым)
+            listener.onPanChange(0f, 0f)
             listener.onZoomEnd()
             Timber.tag("voronin").d("ZoomGestureHandler: resetZoom")
         }

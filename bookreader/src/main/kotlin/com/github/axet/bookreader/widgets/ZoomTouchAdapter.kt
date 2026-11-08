@@ -10,38 +10,40 @@ import android.view.View
  * screen coordinates to content coordinates.
  *
  * Formula:
- *   contentX = (screenX - pivotX) / scale + pivotX
- *   contentY = (screenY - pivotY) / scale + pivotY
+ *   contentX = (screenX - translationX - pivotX) / scale + pivotX
+ *   contentY = (screenY - translationY - pivotY) / scale + pivotY
  *
  * This ensures that touches at the same visual position map to the same
- * content position regardless of zoom level.
+ * content position regardless of zoom level and pan offset.
  */
 class ZoomTouchAdapter(private val fbReaderView: FBReaderView) {
 
     /**
      * Adapt X coordinate from screen to content space.
      * @param rawX Screen X coordinate
-     * @return Content X coordinate (adjusted for zoom)
+     * @return Content X coordinate (adjusted for zoom and pan)
      */
     fun adaptX(rawX: Float): Float {
         val scale = fbReaderView.scaleX
         if (scale == 1.0f) return rawX  // No adaptation needed at normal zoom
 
         val pivotX = fbReaderView.pivotX
-        return (rawX - pivotX) / scale + pivotX
+        val translationX = fbReaderView.translationX
+        return (rawX - translationX - pivotX) / scale + pivotX
     }
 
     /**
      * Adapt Y coordinate from screen to content space.
      * @param rawY Screen Y coordinate
-     * @return Content Y coordinate (adjusted for zoom)
+     * @return Content Y coordinate (adjusted for zoom and pan)
      */
     fun adaptY(rawY: Float): Float {
         val scale = fbReaderView.scaleY
         if (scale == 1.0f) return rawY  // No adaptation needed at normal zoom
 
         val pivotY = fbReaderView.pivotY
-        return (rawY - pivotY) / scale + pivotY
+        val translationY = fbReaderView.translationY
+        return (rawY - translationY - pivotY) / scale + pivotY
     }
 
     /**
@@ -97,7 +99,8 @@ class ZoomTouchAdapter(private val fbReaderView: FBReaderView) {
         if (scale == 1.0f) return contentX
 
         val pivotX = fbReaderView.pivotX
-        return (contentX - pivotX) * scale + pivotX
+        val translationX = fbReaderView.translationX
+        return (contentX - pivotX) * scale + pivotX + translationX
     }
 
     /**
@@ -110,6 +113,7 @@ class ZoomTouchAdapter(private val fbReaderView: FBReaderView) {
         if (scale == 1.0f) return contentY
 
         val pivotY = fbReaderView.pivotY
-        return (contentY - pivotY) * scale + pivotY
+        val translationY = fbReaderView.translationY
+        return (contentY - pivotY) * scale + pivotY + translationY
     }
 }

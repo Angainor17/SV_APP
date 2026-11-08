@@ -85,11 +85,15 @@ open class SelectionView(
             val dpi = ZLibrary.Instance().getDisplayDPI()
             val unit = dpi / 120
             val xCenter = if (which == SelectionCursor.Which.Left) x - unit - 1 else x + unit + 1
-            canvas.drawRect(
+            // Material Design: скруглённая «пилюля» + круг-грип вместо острого прямоугольника
+            val radius = unit.toFloat()
+            canvas.drawRoundRect(
                 (xCenter - unit).toFloat(),
                 (y - dpi / 8).toFloat(),
                 (xCenter + unit).toFloat(),
                 (y + dpi / 8).toFloat(),
+                radius,
+                radius,
                 handles
             )
             if (which == SelectionCursor.Which.Left)
