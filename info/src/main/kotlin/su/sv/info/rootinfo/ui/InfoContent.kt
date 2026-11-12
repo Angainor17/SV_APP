@@ -1,7 +1,6 @@
 package su.sv.info.rootinfo.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,27 +56,26 @@ fun InfoContent(
         },
         state = pullToRefreshState,
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .testTag(InfoTestTags.LINKS_LIST),
-                verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
-            ) {
-                items(
-                    items = state.items,
-                    key = { it.url }
-                ) { item ->
-                    InfoItem(item)
-                }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag(InfoTestTags.LINKS_LIST),
+            verticalArrangement = Arrangement.spacedBy(dimensions.listItemSpacing),
+        ) {
+            items(
+                items = state.items,
+                key = { it.url }
+            ) { item ->
+                InfoItem(item)
             }
 
-            // Версия приложения в фиксированном футере (не внутри списка)
-            AppVersionText(
-                version = appVersion,
-                dimensions = dimensions,
-            )
+            // Версия приложения — последний элемент списка (скроллится вместе с контактами)
+            item {
+                AppVersionText(
+                    version = appVersion,
+                    dimensions = dimensions,
+                )
+            }
         }
     }
 }

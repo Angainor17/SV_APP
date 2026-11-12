@@ -1,9 +1,11 @@
 package su.sv.app.info
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 import su.sv.app.testing.BaseUiTest
@@ -68,6 +70,8 @@ class InfoScreenTest : BaseUiTest() {
 
     /**
      * Тест: Версия приложения отображается.
+     *
+     * Версия — последний элемент списка, поэтому доскролливаем до неё.
      */
     @Test
     @ReleaseTest
@@ -76,8 +80,12 @@ class InfoScreenTest : BaseUiTest() {
         waitForInfoContent()
 
         composeRule
+            .onNodeWithTag(TestTags.Info.LINKS_LIST, useUnmergedTree = true)
+            .performScrollToNode(hasTestTag(TestTags.Info.VERSION))
+
+        composeRule
             .onNodeWithTag(TestTags.Info.VERSION, useUnmergedTree = true)
-            .assertExists()
+            .assertIsDisplayed()
     }
 
     /**
